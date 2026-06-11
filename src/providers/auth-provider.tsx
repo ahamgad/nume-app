@@ -26,7 +26,7 @@ interface AuthContextValue {
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
   resendVerification: () => Promise<{ error: string | null }>;
-  refreshSession: () => Promise<void>;
+  refreshSession: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -38,11 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => hasSupabaseEnv());
 
   useEffect(() => {
     if (!supabase) {
-      setIsLoading(false);
       return;
     }
 
@@ -82,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: `${getAppUrl()}/verify-email`,
+          emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email`,
         },
       });
       return { error: error?.message ?? null };
@@ -99,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (email: string) => {
       if (!supabase) return { error: missingConfigError };
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getAppUrl()}/reset-password`,
+        redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
       });
       return { error: error?.message ?? null };
     },
@@ -121,16 +120,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: user.email,
-      options: { emailRedirectTo: `${getAppUrl()}/verify-email` },
+      options: { emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email` },
     });
     return { error: error?.message ?? null };
   }, [supabase, user]);
 
-  const refreshSession = useCallback(async () => {
-    if (!supabase) return;
+  const refreshSession = useCallback(async (): Promise<User | null> => {
+    if (!supabase) return null;
     const { data } = await supabase.auth.refreshSession();
+    const nextUser = data.session?.user ?? null;
     setSession(data.session);
-    setUser(data.session?.user ?? null);
+    setUser(nextUser);
+    return nextUser;
   }, [supabase]);
 
   const value = useMemo(

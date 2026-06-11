@@ -152,7 +152,8 @@ export const en = {
     empty: {
       title: "Your accounts live here",
       description:
-        "Add a current account to start tracking where your money is held.",
+        "Add the account you use every day to start tracking where your money is held.",
+      action: "Start with your first account",
     },
     add: {
       title: "Add account",

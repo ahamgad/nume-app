@@ -16,7 +16,12 @@ cp .env.example .env.local
 4. In Supabase Auth settings:
    - Enable Email provider
    - Set **Site URL** to `http://localhost:3000` (or your production URL)
-   - Add redirect URLs: `http://localhost:3000/verify-email`, `http://localhost:3000/reset-password`
+   - Add redirect URLs:
+     - `http://localhost:3000/auth/callback`
+     - `http://localhost:3000/verify-email`
+     - `http://localhost:3000/reset-password`
+
+5. Apply migration `002_rls_records_account_ownership.sql` (QA security fix)
 
 ## 2. Run locally
 

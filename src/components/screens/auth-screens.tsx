@@ -189,9 +189,10 @@ export function VerifyEmailScreen() {
 
   async function handleContinue() {
     setSubmitting(true);
-    await refreshSession();
+    setError(null);
+    const nextUser = await refreshSession();
     setSubmitting(false);
-    if (user?.email_confirmed_at) {
+    if (nextUser?.email_confirmed_at) {
       router.replace("/");
       router.refresh();
     } else {

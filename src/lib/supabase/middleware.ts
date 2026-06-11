@@ -11,6 +11,8 @@ const AUTH_ROUTES = [
   "/verify-email",
 ];
 
+const AUTH_CALLBACK = "/auth/callback";
+
 function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
@@ -44,6 +46,12 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const onAuthRoute = isAuthRoute(pathname);
   const onVerifyRoute = pathname.startsWith("/verify-email");
+  const onResetPasswordRoute = pathname.startsWith("/reset-password");
+  const onAuthCallback = pathname.startsWith(AUTH_CALLBACK);
+
+  if (onAuthCallback) {
+    return supabaseResponse;
+  }
 
   if (!user && !onAuthRoute) {
     const url = request.nextUrl.clone();
@@ -57,7 +65,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && user.email_confirmed_at && onAuthRoute) {
+  if (user && user.email_confirmed_at && onAuthRoute && !onResetPasswordRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);

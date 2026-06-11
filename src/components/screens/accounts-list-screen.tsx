@@ -23,35 +23,40 @@ export function AccountsListScreen() {
       <>
         <ScreenHeader title={t("accounts.title")} />
         <ScreenBody>
-          <Skeleton className="mb-4 h-11 w-full rounded-md" />
-          <Skeleton className="h-20 w-full rounded-lg" />
+          <Skeleton className="mx-auto mt-10 h-8 w-48 rounded-md" />
+          <Skeleton className="mx-auto mt-4 h-16 w-full max-w-sm rounded-md" />
         </ScreenBody>
       </>
     );
   }
 
+  const hasAccounts = accounts.length > 0;
+
   return (
     <>
       <ScreenHeader title={t("accounts.title")} />
       <ScreenBody withTabBar>
-        <Button
-          className="mb-4 h-11 w-full"
-          onClick={() => router.push("/accounts/new")}
-        >
-          {t("accounts.addAccount")}
-        </Button>
+        {hasAccounts ? (
+          <Button
+            className="mb-4 h-11 w-full"
+            onClick={() => router.push("/accounts/new")}
+          >
+            {t("accounts.addAccount")}
+          </Button>
+        ) : null}
 
-        {accounts.length === 0 ? (
+        {!hasAccounts ? (
           <EmptyState
             icon={<Landmark />}
             title={t("accounts.empty.title")}
             description={t("accounts.empty.description")}
             action={
               <Button
+                variant="outline"
                 className="h-11 w-full"
                 onClick={() => router.push("/accounts/new")}
               >
-                {t("accounts.addAccount")}
+                {t("accounts.empty.action")}
               </Button>
             }
           />
