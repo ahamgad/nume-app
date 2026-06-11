@@ -1,0 +1,263 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+
+import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StickyFooter } from "@/components/patterns";
+import { Button } from "@/components/ui/button";
+import { DiscardDialog } from "@/components/ui/discard-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { formatCurrency, parseAmount } from "@/lib/format/currency";
+import { isFutureDate, todayIsoDate } from "@/lib/format/date";
+import { useFinance } from "@/lib/finance/store";
+import type { RecordType } from "@/lib/finance/types";
+import { useT } from "@/providers/i18n-provider";
+import { useToast } from "@/providers/toast-provider";
+
+interface AddRecordFormScreenProps {
+  accountId: string;
+  type: RecordType;
+}
+
+export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProps) {
+  const t = useT();
+  const router = useRouter();
+  const { getAccount, createRecord } = useFinance();
+  const { showToast } = useToast();
+
+  const account = getAccount(accountId);
+
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState(todayIsoDate());
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showDiscard, setShowDiscard] = useState(false);
+
+  const parsedAmount = parseAmount(amount);
+
+  const preview = useMemo(() => {
+    if (!account || parsedAmount === null) return null;
+    if (type === "adjustment") {
+      const delta = parsedAmount - account.currentBalance;
+      return {
+        current: account.currentBalance,
+        delta,
+        next: parsedAmount,
+      };
+    }
+    if (type === "income") {
+      return { next: account.currentBalance + parsedAmount };
+    }
+    return { next: account.currentBalance - parsedAmount };
+  }, [account, parsedAmount, type]);
+
+  const isDirty =
+    amount.trim().length > 0 ||
+    description.trim().length > 0 ||
+    date !== todayIsoDate();
+
+  function validate() {
+    const nextErrors: Record<string, string> = {};
+    const value = parseAmount(amount);
+
+    if (value === null) {
+      nextErrors.amount =
+        type === "adjustment"
+          ? t("records.validation.correctBalanceRequired")
+          : t("records.validation.amountRequired");
+    } else if (value <= 0 && type !== "adjustment") {
+      nextErrors.amount = t("records.validation.amountZero");
+    } else if (
+      type === "adjustment" &&
+      account &&
+      value === account.currentBalance
+    ) {
+      nextErrors.amount = t("records.adjustmentNoChange");
+    }
+
+    if (!date) {
+      nextErrors.date = t("records.validation.dateRequired");
+    } else if (isFutureDate(date)) {
+      nextErrors.date = t("records.validation.dateFuture");
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  }
+
+  function handleSubmit() {
+    if (!account || !validate()) return;
+    const value = parseAmount(amount);
+    if (value === null) return;
+
+    setSubmitting(true);
+    try {
+      createRecord({
+        accountId,
+        type,
+        amount: value,
+        description: description.trim() || null,
+        date,
+      });
+
+      if (type === "income") showToast(t("common.incomeRecorded"));
+      else if (type === "expense") showToast(t("common.expenseRecorded"));
+      else showToast(t("common.adjustmentRecorded"));
+
+      router.replace(`/accounts/${accountId}`);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleBack() {
+    if (isDirty) {
+      setShowDiscard(true);
+      return;
+    }
+    router.back();
+  }
+
+  const titleKey =
+    type === "adjustment"
+      ? "records.add.adjustment.title"
+      : (`records.add.${type}.title` as const);
+
+  const showInsufficientBalance =
+    type === "expense" &&
+    account &&
+    parsedAmount !== null &&
+    parsedAmount > account.currentBalance;
+
+  return (
+    <>
+      <ScreenHeader mode="stack" title={t(titleKey)} onBack={handleBack} />
+      <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
+        {account ? (
+          <p className="text-[0.8125rem] text-muted-foreground">
+            {account.name}
+          </p>
+        ) : null}
+
+        <div className="space-y-2">
+          <Label htmlFor="record-amount">
+            {type === "adjustment"
+              ? t("records.fields.correctBalance")
+              : t("records.fields.amount")}
+          </Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-sm text-muted-foreground">
+              EGP
+            </span>
+            <Input
+              id="record-amount"
+              inputMode="decimal"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="ps-14 tabular-nums"
+              aria-invalid={Boolean(errors.amount)}
+            />
+          </div>
+          {errors.amount ? (
+            <p className="text-sm text-destructive">{errors.amount}</p>
+          ) : null}
+          {showInsufficientBalance ? (
+            <p className="text-sm text-muted-foreground">
+              {t("records.insufficientBalance")}
+            </p>
+          ) : null}
+        </div>
+
+        {type !== "adjustment" ? (
+          <div className="space-y-2">
+            <Label htmlFor="description">
+              {t("records.fields.description.label")}{" "}
+              <span className="text-muted-foreground">({t("common.optional")})</span>
+            </Label>
+            <Input
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t(`records.fields.description.placeholder.${type}`)}
+            />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Label htmlFor="reason">
+              {t("records.fields.reason.label")}{" "}
+              <span className="text-muted-foreground">({t("common.optional")})</span>
+            </Label>
+            <Input
+              id="reason"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("records.fields.reason.placeholder")}
+            />
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="record-date">{t("records.fields.date")}</Label>
+          <Input
+            id="record-date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-invalid={Boolean(errors.date)}
+          />
+          {errors.date ? (
+            <p className="text-sm text-destructive">{errors.date}</p>
+          ) : null}
+        </div>
+
+        {preview && parsedAmount !== null ? (
+          <div className="space-y-1 text-[0.8125rem] text-muted-foreground">
+            {type === "adjustment" && preview.current !== undefined ? (
+              <>
+                <p>
+                  {t("records.preview.currentBalance", {
+                    amount: formatCurrency(preview.current),
+                  })}
+                </p>
+                <p>
+                  {t("records.preview.adjustment", {
+                    amount: formatCurrency(
+                      "delta" in preview ? preview.delta : 0,
+                    ),
+                  })}
+                </p>
+              </>
+            ) : null}
+            <p className="text-[0.9375rem] font-medium text-foreground">
+              {t("records.preview.newBalance", {
+                amount: formatCurrency(preview.next),
+              })}
+            </p>
+          </div>
+        ) : null}
+      </ScreenBody>
+
+      <StickyFooter>
+        <Button
+          className="h-12 w-full"
+          disabled={submitting || !account}
+          onClick={handleSubmit}
+        >
+          {submitting ? t("records.add.saving") : t("records.add.save")}
+        </Button>
+      </StickyFooter>
+
+      <DiscardDialog
+        open={showDiscard}
+        onConfirm={() => {
+          setShowDiscard(false);
+          router.back();
+        }}
+        onCancel={() => setShowDiscard(false)}
+      />
+    </>
+  );
+}

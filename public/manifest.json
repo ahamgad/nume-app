@@ -1,0 +1,18 @@
+{
+  "name": "NUME",
+  "short_name": "NUME",
+  "description": "Personal wealth operating system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#171717",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/brand-flatten-background.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
