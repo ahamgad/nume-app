@@ -43,7 +43,7 @@ export function ScreenHeader({
         ) : (
           <div className="size-11 shrink-0" />
         )}
-        <h1 className="min-w-0 flex-1 truncate px-1 text-center text-base font-semibold">
+        <h1 className="min-w-0 flex-1 truncate px-1 text-base font-semibold">
           {title}
         </h1>
         {rightAction ? (

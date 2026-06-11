@@ -1,6 +1,6 @@
 "use client";
 
-import { Landmark } from "lucide-react";
+import { Landmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
@@ -13,15 +13,41 @@ import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { useT } from "@/providers/i18n-provider";
 
+function AddAccountHeaderAction({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
+      aria-label={label}
+    >
+      <Plus className="size-5" />
+    </button>
+  );
+}
+
 export function AccountsListScreen() {
   const t = useT();
   const router = useRouter();
   const { accounts, isFinanceReady } = useFinance();
 
+  const addAccountAction = (
+    <AddAccountHeaderAction
+      label={t("accounts.addAccount")}
+      onClick={() => router.push("/accounts/new")}
+    />
+  );
+
   if (!isFinanceReady) {
     return (
       <>
-        <ScreenHeader title={t("accounts.title")} />
+        <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
         <ScreenBody withTabBar>
           <Skeleton className="mx-auto mt-10 h-8 w-48 rounded-md" />
           <Skeleton className="mx-auto mt-4 h-16 w-full max-w-sm rounded-md" />
@@ -34,17 +60,8 @@ export function AccountsListScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("accounts.title")} />
+      <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
       <ScreenBody withTabBar>
-        {hasAccounts ? (
-          <Button
-            className="mb-4 h-11 w-full"
-            onClick={() => router.push("/accounts/new")}
-          >
-            {t("accounts.addAccount")}
-          </Button>
-        ) : null}
-
         {!hasAccounts ? (
           <EmptyState
             icon={<Landmark />}
