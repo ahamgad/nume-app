@@ -44,7 +44,8 @@ function signedRecordAmount(record: FinanceRecord) {
 export function DashboardScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, isHydrated } = useFinance();
+  const { accounts, netWorth, recentRecords, isFinanceReady, isFinanceLoading } =
+    useFinance();
 
   const hasAccounts = accounts.length > 0;
   const activity = recentRecords(3);
@@ -53,24 +54,11 @@ export function DashboardScreen() {
     return latest;
   }, null);
 
-  if (!isHydrated) {
-    return (
-      <>
-        <ScreenHeader title={t("dashboard.title")} />
-        <ScreenBody className="space-y-3">
-          <Skeleton className="h-36 w-full rounded-lg" />
-          <Skeleton className="h-28 w-full rounded-lg" />
-          <Skeleton className="h-28 w-full rounded-lg" />
-        </ScreenBody>
-      </>
-    );
-  }
-
   return (
     <>
       <ScreenHeader title={t("dashboard.title")} />
       <ScreenBody className="space-y-3">
-        {!hasAccounts ? (
+        {isFinanceReady && !hasAccounts ? (
           <SetupBanner
             title={t("dashboard.setup.title")}
             description={t("dashboard.setup.description")}
@@ -80,26 +68,36 @@ export function DashboardScreen() {
         ) : null}
 
         <WidgetCard>
-          <MetricHero
-            label={t("dashboard.netWorth.title")}
-            value={formatCurrency(netWorth.netWorth)}
-            subline={`${t("dashboard.netWorth.assets")} ${formatCurrency(netWorth.assets)} · ${t("dashboard.netWorth.liabilities")} ${formatCurrency(netWorth.liabilities)}`}
-            meta={
-              hasAccounts && latestUpdate
-                ? t("dashboard.netWorth.updated", {
-                    time: formatRelativeTime(latestUpdate, t),
-                  })
-                : undefined
-            }
-          />
-          {!hasAccounts ? (
-            <Button
-              className="mt-5 h-11 w-full"
-              onClick={() => router.push("/accounts/new")}
-            >
-              {t("dashboard.netWorth.addFirstAccount")}
-            </Button>
-          ) : null}
+          {isFinanceLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-40" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+          ) : (
+            <>
+              <MetricHero
+                label={t("dashboard.netWorth.title")}
+                value={formatCurrency(netWorth.netWorth)}
+                subline={`${t("dashboard.netWorth.assets")} ${formatCurrency(netWorth.assets)} · ${t("dashboard.netWorth.liabilities")} ${formatCurrency(netWorth.liabilities)}`}
+                meta={
+                  hasAccounts && latestUpdate
+                    ? t("dashboard.netWorth.updated", {
+                        time: formatRelativeTime(latestUpdate, t),
+                      })
+                    : undefined
+                }
+              />
+              {isFinanceReady && !hasAccounts ? (
+                <Button
+                  className="mt-5 h-11 w-full"
+                  onClick={() => router.push("/accounts/new")}
+                >
+                  {t("dashboard.netWorth.addFirstAccount")}
+                </Button>
+              ) : null}
+            </>
+          )}
         </WidgetCard>
 
         <EducationalWidget
@@ -123,7 +121,7 @@ export function DashboardScreen() {
           hint={t("dashboard.widgets.goals.hint")}
         />
 
-        {activity.length > 0 ? (
+        {isFinanceReady && activity.length > 0 ? (
           <WidgetCard>
             <h2 className="text-lg font-semibold">
               {t("dashboard.activity.title")}

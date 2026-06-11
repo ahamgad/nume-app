@@ -67,6 +67,15 @@ create trigger accounts_updated_at
 alter table public.accounts enable row level security;
 alter table public.records enable row level security;
 
+-- Grants (authenticated role needs explicit table access when created via SQL)
+grant usage on schema public to postgres, anon, authenticated, service_role;
+
+grant all on table public.accounts to authenticated;
+grant all on table public.records to authenticated;
+
+grant all on table public.accounts to service_role;
+grant all on table public.records to service_role;
+
 -- Accounts policies
 create policy "accounts_select_own"
   on public.accounts for select

@@ -33,6 +33,8 @@ interface FinanceContextValue {
   records: FinanceRecord[];
   isLoading: boolean;
   isHydrated: boolean;
+  isFinanceReady: boolean;
+  isFinanceLoading: boolean;
   netWorth: ReturnType<typeof calculateNetWorth>;
   createAccount: (input: CreateAccountInput) => Promise<Account>;
   updateAccount: (
@@ -75,6 +77,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     queryKey: [FINANCE_QUERY_KEY, userId],
     queryFn: () => loadFinanceData(userId!),
     enabled: Boolean(userId),
+    placeholderData: (previous) => previous,
   });
 
   const accounts = useMemo(() => data?.accounts ?? [], [data?.accounts]);
@@ -90,10 +93,17 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       const account = await insertAccount(supabase, userId, input);
-      await invalidate();
+      queryClient.setQueryData(
+        [FINANCE_QUERY_KEY, userId],
+        (current: { accounts: Account[]; records: FinanceRecord[] } | undefined) => ({
+          accounts: [...(current?.accounts ?? []), account],
+          records: current?.records ?? [],
+        }),
+      );
+      void invalidate();
       return account;
     },
-    [userId, invalidate],
+    [userId, invalidate, queryClient],
   );
 
   const updateAccount = useCallback(
@@ -168,8 +178,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const netWorth = useMemo(() => calculateNetWorth(accounts), [accounts]);
 
-  const isLoading = authLoading || (Boolean(userId) && financeLoading);
-  const isHydrated = !authLoading && (!userId || isFetched);
+  const isFinanceLoading = Boolean(userId) && financeLoading && !isFetched;
+  const isFinanceReady = !userId || isFetched;
+  const isHydrated = !authLoading;
+  const isLoading = authLoading || isFinanceLoading;
 
   const value = useMemo(
     () => ({
@@ -177,6 +189,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       records,
       isLoading,
       isHydrated,
+      isFinanceReady,
+      isFinanceLoading,
       netWorth,
       createAccount,
       updateAccount,
@@ -191,6 +205,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       records,
       isLoading,
       isHydrated,
+      isFinanceReady,
+      isFinanceLoading,
       netWorth,
       createAccount,
       updateAccount,

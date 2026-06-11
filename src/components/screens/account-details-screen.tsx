@@ -42,13 +42,13 @@ interface AccountDetailsScreenProps {
 export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const t = useT();
   const router = useRouter();
-  const { getAccount, getAccountRecords, updateAccount, isHydrated } =
+  const { getAccount, getAccountRecords, updateAccount, isFinanceReady } =
     useFinance();
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
 
-  if (!isHydrated) {
+  if (!isFinanceReady) {
     return (
       <>
         <ScreenHeader mode="stack" title="…" />

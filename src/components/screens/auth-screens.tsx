@@ -31,7 +31,6 @@ export function LoginScreen() {
       return;
     }
     router.replace("/");
-    router.refresh();
   }
 
   return (

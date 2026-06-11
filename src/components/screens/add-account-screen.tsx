@@ -16,6 +16,7 @@ import {
 } from "@/lib/finance/types";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
+import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -72,8 +73,11 @@ export function AddAccountScreen() {
       });
       showToast(t("common.accountCreated"));
       router.replace(`/accounts/${account.id}`);
-    } catch {
-      setErrors({ form: t("common.retry") });
+    } catch (error) {
+      logSupabaseError("createAccount", error);
+      setErrors({
+        form: getSupabaseErrorMessage(error) || t("common.retry"),
+      });
     } finally {
       setSubmitting(false);
     }

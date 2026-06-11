@@ -16,13 +16,13 @@ import { useT } from "@/providers/i18n-provider";
 export function AccountsListScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, isHydrated } = useFinance();
+  const { accounts, isFinanceReady } = useFinance();
 
-  if (!isHydrated) {
+  if (!isFinanceReady) {
     return (
       <>
         <ScreenHeader title={t("accounts.title")} />
-        <ScreenBody>
+        <ScreenBody withTabBar>
           <Skeleton className="mx-auto mt-10 h-8 w-48 rounded-md" />
           <Skeleton className="mx-auto mt-4 h-16 w-full max-w-sm rounded-md" />
         </ScreenBody>

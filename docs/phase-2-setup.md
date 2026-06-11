@@ -22,6 +22,7 @@ cp .env.example .env.local
      - `http://localhost:3000/reset-password`
 
 5. Apply migration `002_rls_records_account_ownership.sql` (QA security fix)
+6. Apply migration `003_grants_authenticated.sql` if accounts were created before grants were added to 001
 
 ## 2. Run locally
 

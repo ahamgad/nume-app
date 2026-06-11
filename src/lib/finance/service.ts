@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { mapAccount, mapRecord, type DbAccount, type DbRecord } from "@/lib/finance/mappers";
+import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 import type {
   Account,
   CreateAccountInput,
@@ -42,10 +43,23 @@ export async function insertAccount(
   userId: string,
   input: CreateAccountInput,
 ): Promise<Account> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(getSupabaseErrorMessage(authError));
+  }
+
+  if (!user) {
+    throw new Error("Not authenticated — session unavailable for account insert");
+  }
+
   const { data, error } = await supabase
     .from("accounts")
     .insert({
-      user_id: userId,
+      user_id: user.id,
       account_type: input.type ?? "current_account",
       name: input.name.trim(),
       institution: input.institution?.trim() || null,
@@ -57,7 +71,14 @@ export async function insertAccount(
     .select("*")
     .single();
 
-  if (error) throw error;
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  if (user.id !== userId) {
+    throw new Error("Session user mismatch — please sign in again");
+  }
+
   return mapAccount(data as DbAccount);
 }
 
