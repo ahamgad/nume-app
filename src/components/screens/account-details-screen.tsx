@@ -17,6 +17,7 @@ import {
 } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -93,7 +94,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           ) : null}
           <div className="mt-1 flex flex-wrap gap-2">
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {t("accounts.types.currentAccount")}
+              {t(getAccountTypeLabelKey(account.type))}
             </span>
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
               {t("common.active")}
@@ -121,7 +122,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
               onCheckedChange={(checked) =>
-                updateAccount(account.id, { includeInNetWorth: checked })
+                void updateAccount(account.id, { includeInNetWorth: checked })
               }
             />
             <div className="border-t border-border">
@@ -132,7 +133,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 )}
                 checked={account.includeInEmergencyFund}
                 onCheckedChange={(checked) =>
-                  updateAccount(account.id, {
+                  void updateAccount(account.id, {
                     includeInEmergencyFund: checked,
                   })
                 }

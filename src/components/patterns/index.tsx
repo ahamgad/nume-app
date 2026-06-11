@@ -47,17 +47,21 @@ interface MetricHeroProps {
 export function MetricHero({ label, value, subline, meta }: MetricHeroProps) {
   return (
     <div>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-4xl font-semibold tabular-nums tracking-tight">
+      <p className="text-xs font-medium tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1.5 text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums">
         {value}
       </p>
       {subline ? (
-        <p className="mt-2 text-[0.9375rem] font-medium text-muted-foreground">
+        <p className="mt-2.5 text-[0.9375rem] font-medium leading-snug text-muted-foreground">
           {subline}
         </p>
       ) : null}
       {meta ? (
-        <p className="mt-1 text-[0.8125rem] text-muted-foreground">{meta}</p>
+        <p className="mt-1.5 text-[0.8125rem] leading-normal text-muted-foreground">
+          {meta}
+        </p>
       ) : null}
     </div>
   );

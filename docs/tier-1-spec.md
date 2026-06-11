@@ -45,3 +45,21 @@ Lightweight but complete destination:
 - Dashboard educational widgets: intentional, not disabled.
 - Black-and-white visual foundation; no decorative accent colors in Tier 1.
 - Localization-ready: i18n keys, logical CSS properties, no hardcoded strings.
+
+## Typography (Polish Pass)
+
+- **English:** Geist Sans (`geist` package) — default Latin font.
+- **Arabic:** IBM Plex Sans Arabic — active when locale is `ar`.
+- Locale switching via More → Language (typography/direction preview until translation pass).
+- Typography scales revalidated in `globals.css` and `MetricHero` component.
+
+## PWA Icons (Polish Pass)
+
+- Source of truth: `docs/brand-flatten-background.svg`
+- Master: `public/icons/icon-1024.png`
+- Regenerate: `npm run icons:generate`
+- Manifest references PNG assets at 192, 512, and 1024.
+
+## Add Account Flow (Polish Pass)
+
+First account: name + balance only. No sections, institution, or settings on create. Defaults applied silently. Contextual copy and "Continue" CTA for first account.

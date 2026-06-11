@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
-import { AppShell } from "@/components/layout/app-shell";
 import { AppProviders } from "@/providers/app-providers";
+import { fontVariables, geistSans } from "@/lib/fonts";
 
 import "./globals.css";
 
@@ -15,8 +15,15 @@ export const metadata: Metadata = {
     title: "NUME",
   },
   icons: {
-    icon: "/brand-flatten-background.svg",
-    apple: "/brand-flatten-background.svg",
+    icon: [
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   manifest: "/manifest.json",
 };
@@ -39,11 +46,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-dvh bg-background text-foreground">
-        <AppProviders>
-          <AppShell>{children}</AppShell>
-        </AppProviders>
+    <html lang="en" className={`${fontVariables} ${geistSans.className} h-full antialiased`}>
+      <body className="min-h-dvh bg-background font-latin text-foreground">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

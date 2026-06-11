@@ -7,11 +7,20 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useTranslations } from "@/providers/i18n-provider";
+import { useAuth } from "@/providers/auth-provider";
+import { cn } from "@/lib/utils";
 
 export function MoreScreen() {
   const t = useT();
   const router = useRouter();
+  const { signOut } = useAuth();
+
+  async function handleLogout() {
+    await signOut();
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <>
@@ -45,10 +54,7 @@ export function MoreScreen() {
         <Button
           variant="outline"
           className="mt-6 h-11 w-full"
-          onClick={() => {
-            // Auth not in Tier 1 slice; placeholder action
-            router.push("/");
-          }}
+          onClick={handleLogout}
         >
           {t("more.logout")}
         </Button>
@@ -59,10 +65,17 @@ export function MoreScreen() {
 
 export function MoreProfileScreen() {
   const t = useT();
+  const { user } = useAuth();
   return (
     <>
       <ScreenHeader mode="stack" title={t("more.profile.title")} />
-      <ScreenBody withTabBar={false}>
+      <ScreenBody withTabBar={false} className="space-y-4">
+        <div className="rounded-lg border border-border px-4 py-3">
+          <p className="text-sm font-medium">{t("more.profile.email")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {user?.email ?? "—"}
+          </p>
+        </div>
         <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("more.profile.stub")}
         </p>
@@ -91,8 +104,35 @@ export function MoreAppearanceScreen() {
   );
 }
 
+function LocaleOption({
+  label,
+  active,
+  onSelect,
+}: {
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "flex min-h-11 flex-1 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors",
+        active
+          ? "border-foreground bg-foreground text-background"
+          : "border-border bg-background text-foreground",
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
 export function MoreLanguageScreen() {
   const t = useT();
+  const { locale, setLocale } = useTranslations();
+
   return (
     <>
       <ScreenHeader mode="stack" title={t("more.language.title")} />
@@ -100,10 +140,22 @@ export function MoreLanguageScreen() {
         <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("more.language.stub")}
         </p>
-        <div className="rounded-lg border border-border px-4 py-3">
+        <div className="space-y-3 rounded-lg border border-border p-4">
           <p className="text-sm font-medium">{t("more.language.description")}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("more.language.current")}
+          <div className="flex gap-2">
+            <LocaleOption
+              label={t("more.language.english")}
+              active={locale === "en"}
+              onSelect={() => setLocale("en")}
+            />
+            <LocaleOption
+              label={t("more.language.arabic")}
+              active={locale === "ar"}
+              onSelect={() => setLocale("ar")}
+            />
+          </div>
+          <p className="text-[0.8125rem] text-muted-foreground">
+            {t("more.language.previewNote")}
           </p>
         </div>
       </ScreenBody>

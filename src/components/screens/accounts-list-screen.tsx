@@ -8,6 +8,7 @@ import { EmptyState, ListRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { useT } from "@/providers/i18n-provider";
@@ -66,7 +67,7 @@ export function AccountsListScreen() {
                     primary={account.name}
                     secondary={[
                       account.institution,
-                      t("accounts.types.currentAccount"),
+                      t(getAccountTypeLabelKey(account.type)),
                     ]
                       .filter(Boolean)
                       .join(" · ")}

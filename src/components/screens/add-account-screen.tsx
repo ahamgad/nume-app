@@ -1,42 +1,47 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { StickyFooter, ToggleSettingRow } from "@/components/patterns";
+import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
+import {
+  ENABLED_ADD_ACCOUNT_TYPES,
+  type MoneyAccountType,
+} from "@/lib/finance/types";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { useT } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
+import { cn } from "@/lib/utils";
 
 export function AddAccountScreen() {
   const t = useT();
   const router = useRouter();
-  const { createAccount } = useFinance();
+  const { accounts, createAccount } = useFinance();
   const { showToast } = useToast();
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
+  const isFirstAccount = accounts.length === 0;
+
+  const [accountType, setAccountType] =
+    useState<MoneyAccountType>("current_account");
   const [name, setName] = useState("");
-  const [institution, setInstitution] = useState("");
   const [balance, setBalance] = useState("");
-  const [includeInNetWorth, setIncludeInNetWorth] = useState(true);
-  const [includeInEmergencyFund, setIncludeInEmergencyFund] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDiscard, setShowDiscard] = useState(false);
 
-  const isDirty =
-    name.trim().length > 0 ||
-    institution.trim().length > 0 ||
-    balance.trim().length > 0 ||
-    !includeInNetWorth ||
-    includeInEmergencyFund;
+  const isDirty = name.trim().length > 0 || balance.trim().length > 0;
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   function validate() {
     const nextErrors: Record<string, string> = {};
@@ -60,15 +65,15 @@ export function AddAccountScreen() {
 
     setSubmitting(true);
     try {
-      const account = createAccount({
+      const account = await createAccount({
+        type: isFirstAccount ? "current_account" : accountType,
         name,
-        institution: institution.trim() || null,
         currentBalance: parsedBalance,
-        includeInNetWorth,
-        includeInEmergencyFund,
       });
       showToast(t("common.accountCreated"));
       router.replace(`/accounts/${account.id}`);
+    } catch {
+      setErrors({ form: t("common.retry") });
     } finally {
       setSubmitting(false);
     }
@@ -86,105 +91,107 @@ export function AddAccountScreen() {
     <>
       <ScreenHeader
         mode="stack"
-        title={t("accounts.add.title")}
+        title={
+          isFirstAccount
+            ? t("accounts.add.firstAccount.title")
+            : t("accounts.add.title")
+        }
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} withStickyFooter className="space-y-6">
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold">
-            {t("accounts.sections.basic")}
-          </h2>
-          <div className="space-y-2">
-            <Label htmlFor="account-name">{t("accounts.fields.name.label")}</Label>
-            <Input
-              id="account-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("accounts.fields.name.placeholder")}
-              aria-invalid={Boolean(errors.name)}
-            />
-            {errors.name ? (
-              <p className="text-sm text-destructive">{errors.name}</p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="institution">
-              {t("accounts.fields.institution.label")}{" "}
-              <span className="text-muted-foreground">({t("common.optional")})</span>
-            </Label>
-            <Input
-              id="institution"
-              value={institution}
-              onChange={(e) => setInstitution(e.target.value)}
-              placeholder={t("accounts.fields.institution.placeholder")}
-            />
-          </div>
-        </section>
+      <ScreenBody withTabBar={false} withStickyFooter>
+        <div className="space-y-6 pt-2">
+          <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
+            {isFirstAccount
+              ? t("accounts.add.firstAccount.lead")
+              : t("accounts.add.lead")}
+          </p>
 
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold">
-            {t("accounts.sections.balance")}
-          </h2>
-          <div className="space-y-2">
-            <Label htmlFor="balance">{t("accounts.fields.balance.label")}</Label>
-            <div className="relative">
-              <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-sm text-muted-foreground">
-                EGP
-              </span>
-              <Input
-                id="balance"
-                inputMode="decimal"
-                value={balance}
-                onChange={(e) => setBalance(e.target.value)}
-                className="ps-14 tabular-nums"
-                aria-invalid={Boolean(errors.balance)}
-              />
-            </div>
-            {errors.balance ? (
-              <p className="text-sm text-destructive">{errors.balance}</p>
-            ) : null}
-          </div>
-        </section>
-
-        <section>
-          <button
-            type="button"
-            onClick={() => setSettingsOpen((open) => !open)}
-            className="flex min-h-11 w-full items-center justify-between py-2 text-[0.9375rem] font-medium"
-          >
-            {t("accounts.fields.settings.title")}
-            <ChevronDown
-              className={`size-4 transition-transform ${settingsOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-          {settingsOpen ? (
-            <div className="space-y-1 border-t border-border pt-2">
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInNetWorth.label")}
-                description={t("accounts.settings.includeInNetWorth.description")}
-                checked={includeInNetWorth}
-                onCheckedChange={setIncludeInNetWorth}
-              />
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInEmergencyFund.label")}
-                description={t(
-                  "accounts.settings.includeInEmergencyFund.description",
-                )}
-                checked={includeInEmergencyFund}
-                onCheckedChange={setIncludeInEmergencyFund}
-              />
+          {!isFirstAccount ? (
+            <div className="space-y-2">
+              <Label>{t("accounts.add.chooseType")}</Label>
+              <div className="flex gap-2">
+                {ENABLED_ADD_ACCOUNT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAccountType(type)}
+                    className={cn(
+                      "inline-flex min-h-11 flex-1 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
+                      accountType === type
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-background text-foreground",
+                    )}
+                  >
+                    {t(getAccountTypeLabelKey(type))}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : null}
-        </section>
+
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="account-name">
+                {t("accounts.fields.name.label")}
+              </Label>
+              <Input
+                ref={nameInputRef}
+                id="account-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("accounts.fields.name.placeholder")}
+                aria-invalid={Boolean(errors.name)}
+                autoComplete="off"
+              />
+              {errors.name ? (
+                <p className="text-sm text-destructive">{errors.name}</p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="balance">
+                {t("accounts.fields.balance.label")}
+              </Label>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-base font-medium text-muted-foreground">
+                  EGP
+                </span>
+                <Input
+                  id="balance"
+                  inputMode="decimal"
+                  value={balance}
+                  onChange={(e) => setBalance(e.target.value)}
+                  placeholder="0"
+                  className="h-14 ps-16 text-2xl font-semibold tabular-nums tracking-tight"
+                  aria-invalid={Boolean(errors.balance)}
+                />
+              </div>
+              {errors.balance ? (
+                <p className="text-sm text-destructive">{errors.balance}</p>
+              ) : (
+                <p className="text-[0.8125rem] text-muted-foreground">
+                  {t("accounts.add.balanceHint")}
+                </p>
+              )}
+            </div>
+          </div>
+          {errors.form ? (
+            <p className="text-sm text-destructive">{errors.form}</p>
+          ) : null}
+        </div>
       </ScreenBody>
 
       <StickyFooter>
         <Button
-          className="h-12 w-full"
+          className="h-12 w-full text-base"
           disabled={submitting}
           onClick={handleSubmit}
         >
-          {submitting ? t("accounts.creating") : t("accounts.createAccount")}
+          {submitting
+            ? t("accounts.creating")
+            : isFirstAccount
+              ? t("accounts.add.firstAccount.cta")
+              : t("accounts.createAccount")}
         </Button>
       </StickyFooter>
 

@@ -88,14 +88,14 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!account || !validate()) return;
     const value = parseAmount(amount);
     if (value === null) return;
 
     setSubmitting(true);
     try {
-      createRecord({
+      await createRecord({
         accountId,
         type,
         amount: value,
@@ -108,6 +108,8 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
       else showToast(t("common.adjustmentRecorded"));
 
       router.replace(`/accounts/${accountId}`);
+    } catch {
+      setErrors({ form: t("common.retry") });
     } finally {
       setSubmitting(false);
     }

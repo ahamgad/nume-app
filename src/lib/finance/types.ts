@@ -1,4 +1,27 @@
-export type AccountType = "current_account";
+/** Money account types enabled in Phase 2 (progressive rollout). */
+export type MoneyAccountType = "current_account" | "cash" | "wallet";
+
+export type AccountType =
+  | MoneyAccountType
+  | "savings_account"
+  | "certificate"
+  | "gold"
+  | "stocks"
+  | "loan"
+  | "credit_card";
+
+/** Types exposed in the Add Account flow for the current release. */
+export const ENABLED_ADD_ACCOUNT_TYPES: MoneyAccountType[] = [
+  "current_account",
+  "cash",
+  "wallet",
+];
+
+export function isEnabledAddAccountType(
+  type: string,
+): type is MoneyAccountType {
+  return ENABLED_ADD_ACCOUNT_TYPES.includes(type as MoneyAccountType);
+}
 
 export type RecordType = "income" | "expense" | "adjustment";
 
@@ -26,6 +49,7 @@ export interface FinanceRecord {
 }
 
 export interface CreateAccountInput {
+  type?: MoneyAccountType;
   name: string;
   institution?: string | null;
   currentBalance: number;

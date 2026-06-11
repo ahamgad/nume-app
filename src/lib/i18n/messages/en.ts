@@ -6,6 +6,56 @@ export const en = {
     goals: "Goals",
     more: "More",
   },
+  auth: {
+    fields: {
+      email: "Email",
+      password: "Password",
+      newPassword: "New password",
+    },
+    login: {
+      title: "Welcome back",
+      lead: "Sign in to continue managing your wealth.",
+      submit: "Sign in",
+      submitting: "Signing in…",
+      forgotPassword: "Forgot password?",
+      noAccount: "Don't have an account?",
+      createAccount: "Create account",
+    },
+    register: {
+      title: "Create your account",
+      lead: "Start building a clear picture of your financial life.",
+      submit: "Create account",
+      submitting: "Creating account…",
+      passwordHint: "At least 8 characters.",
+      hasAccount: "Already have an account?",
+      signIn: "Sign in",
+    },
+    verify: {
+      title: "Verify your email",
+      lead: "We sent a confirmation link to your inbox. Verify your email to continue.",
+      continue: "I've verified my email",
+      resend: "Resend confirmation email",
+      resendSuccess: "Confirmation email sent.",
+      notVerifiedYet: "Email not verified yet. Check your inbox and try again.",
+      signOut: "Sign out",
+    },
+    forgot: {
+      title: "Reset your password",
+      lead: "Enter your email and we'll send you a reset link.",
+      sent: "If an account exists for that email, a reset link is on its way.",
+      submit: "Send reset link",
+      submitting: "Sending…",
+      remembered: "Remember your password?",
+      backToLogin: "Back to sign in",
+    },
+    reset: {
+      title: "Set a new password",
+      lead: "Choose a new password for your account.",
+      submit: "Update password",
+      submitting: "Updating…",
+    },
+    sessionExpired: "Your session has expired. Please sign in again.",
+  },
   common: {
     back: "Back",
     save: "Save",
@@ -96,6 +146,8 @@ export const en = {
     },
     types: {
       currentAccount: "Current account",
+      cash: "Cash",
+      wallet: "Wallet",
     },
     empty: {
       title: "Your accounts live here",
@@ -104,6 +156,14 @@ export const en = {
     },
     add: {
       title: "Add account",
+      chooseType: "Account type",
+      lead: "Enter the account name and today's balance.",
+      balanceHint: "Use the balance you see in your bank app today.",
+      firstAccount: {
+        title: "Add your first account",
+        lead: "Start with one account you use every day. You can add more later.",
+        cta: "Continue",
+      },
       currentAccount: {
         title: "Add account",
       },
@@ -232,7 +292,11 @@ export const en = {
       title: "Language",
       description: "App language",
       current: "English",
-      stub: "Arabic and additional languages will be available in a future update.",
+      english: "English",
+      arabic: "Arabic",
+      stub: "Arabic translations will be fully available in a future update. You can preview the Arabic typeface below.",
+      previewNote:
+        "Switching language updates typography and layout direction. Copy remains in English until localization is complete.",
     },
     about: {
       title: "About NUME",

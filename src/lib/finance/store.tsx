@@ -1,36 +1,40 @@
 "use client";
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 
 import { calculateNetWorth } from "@/lib/finance/net-worth";
+import {
+  fetchAccounts,
+  fetchRecords,
+  insertAccount,
+  insertRecordWithBalanceUpdate,
+  patchAccount,
+} from "@/lib/finance/service";
 import type {
   Account,
   CreateAccountInput,
   CreateRecordInput,
   FinanceRecord,
 } from "@/lib/finance/types";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/providers/auth-provider";
 
-const STORAGE_KEY = "nume-finance-v1";
-
-interface FinanceState {
-  accounts: Account[];
-  records: FinanceRecord[];
-}
+const FINANCE_QUERY_KEY = "finance";
 
 interface FinanceContextValue {
   accounts: Account[];
   records: FinanceRecord[];
+  isLoading: boolean;
   isHydrated: boolean;
   netWorth: ReturnType<typeof calculateNetWorth>;
-  createAccount: (input: CreateAccountInput) => Account;
+  createAccount: (input: CreateAccountInput) => Promise<Account>;
   updateAccount: (
     id: string,
     patch: Partial<
@@ -43,73 +47,57 @@ interface FinanceContextValue {
         | "currentBalance"
       >
     >,
-  ) => void;
+  ) => Promise<void>;
   getAccount: (id: string) => Account | undefined;
   getAccountRecords: (accountId: string) => FinanceRecord[];
-  createRecord: (input: CreateRecordInput) => FinanceRecord;
+  createRecord: (input: CreateRecordInput) => Promise<FinanceRecord>;
   recentRecords: (limit?: number) => FinanceRecord[];
+  refresh: () => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
 
-function loadState(): FinanceState {
-  if (typeof window === "undefined") {
-    return { accounts: [], records: [] };
-  }
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { accounts: [], records: [] };
-    return JSON.parse(raw) as FinanceState;
-  } catch {
-    return { accounts: [], records: [] };
-  }
-}
-
-function persistState(state: FinanceState) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+async function loadFinanceData(userId: string) {
+  const supabase = createClient();
+  const [accounts, records] = await Promise.all([
+    fetchAccounts(supabase, userId),
+    fetchRecords(supabase, userId),
+  ]);
+  return { accounts, records };
 }
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<FinanceState>({
-    accounts: [],
-    records: [],
+  const { user, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
+  const userId = user?.id;
+
+  const { data, isLoading: financeLoading, isFetched } = useQuery({
+    queryKey: [FINANCE_QUERY_KEY, userId],
+    queryFn: () => loadFinanceData(userId!),
+    enabled: Boolean(userId),
   });
-  const [isHydrated, setIsHydrated] = useState(false);
 
-  useEffect(() => {
-    const loaded = loadState();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client hydration from localStorage
-    setState(loaded);
-    setIsHydrated(true);
-  }, []);
+  const accounts = useMemo(() => data?.accounts ?? [], [data?.accounts]);
+  const records = useMemo(() => data?.records ?? [], [data?.records]);
 
-  useEffect(() => {
-    if (isHydrated) persistState(state);
-  }, [state, isHydrated]);
+  const invalidate = useCallback(async () => {
+    if (!userId) return;
+    await queryClient.invalidateQueries({ queryKey: [FINANCE_QUERY_KEY, userId] });
+  }, [queryClient, userId]);
 
-  const createAccount = useCallback((input: CreateAccountInput): Account => {
-    const now = new Date().toISOString();
-    const account: Account = {
-      id: crypto.randomUUID(),
-      type: "current_account",
-      name: input.name.trim(),
-      institution: input.institution?.trim() || null,
-      currentBalance: input.currentBalance,
-      includeInNetWorth: input.includeInNetWorth ?? true,
-      includeInEmergencyFund: input.includeInEmergencyFund ?? false,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    };
-    setState((prev) => ({
-      ...prev,
-      accounts: [...prev.accounts, account],
-    }));
-    return account;
-  }, []);
+  const createAccount = useCallback(
+    async (input: CreateAccountInput): Promise<Account> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const account = await insertAccount(supabase, userId, input);
+      await invalidate();
+      return account;
+    },
+    [userId, invalidate],
+  );
 
   const updateAccount = useCallback(
-    (
+    async (
       id: string,
       patch: Partial<
         Pick<
@@ -122,102 +110,72 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         >
       >,
     ) => {
-      setState((prev) => ({
-        ...prev,
-        accounts: prev.accounts.map((account) =>
-          account.id === id
-            ? { ...account, ...patch, updatedAt: new Date().toISOString() }
-            : account,
-        ),
-      }));
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      await patchAccount(supabase, userId, id, patch);
+      await invalidate();
     },
-    [],
+    [userId, invalidate],
   );
 
   const getAccount = useCallback(
-    (id: string) => state.accounts.find((a) => a.id === id),
-    [state.accounts],
+    (id: string) => accounts.find((a) => a.id === id),
+    [accounts],
   );
 
   const getAccountRecords = useCallback(
     (accountId: string) =>
-      state.records
+      records
         .filter((r) => r.accountId === accountId)
         .sort(
           (a, b) =>
             new Date(b.date).getTime() - new Date(a.date).getTime() ||
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         ),
-    [state.records],
+    [records],
   );
 
   const createRecord = useCallback(
-    (input: CreateRecordInput): FinanceRecord => {
-      const account = state.accounts.find((a) => a.id === input.accountId);
+    async (input: CreateRecordInput): Promise<FinanceRecord> => {
+      if (!userId) throw new Error("Not authenticated");
+      const account = accounts.find((a) => a.id === input.accountId);
       if (!account) throw new Error("Account not found");
 
-      let nextBalance = account.currentBalance;
-      let recordAmount = input.amount;
-
-      if (input.type === "income") {
-        nextBalance += input.amount;
-      } else if (input.type === "expense") {
-        nextBalance -= input.amount;
-      } else {
-        const delta = input.amount - account.currentBalance;
-        nextBalance = input.amount;
-        recordAmount = delta;
-      }
-
-      const record: FinanceRecord = {
-        id: crypto.randomUUID(),
-        accountId: input.accountId,
-        type: input.type,
-        amount: recordAmount,
-        description: input.description?.trim() || null,
-        date: input.date,
-        createdAt: new Date().toISOString(),
-      };
-
-      setState((prev) => ({
-        accounts: prev.accounts.map((a) =>
-          a.id === input.accountId
-            ? {
-                ...a,
-                currentBalance: nextBalance,
-                updatedAt: new Date().toISOString(),
-              }
-            : a,
-        ),
-        records: [record, ...prev.records],
-      }));
-
+      const supabase = createClient();
+      const { record } = await insertRecordWithBalanceUpdate(
+        supabase,
+        userId,
+        input,
+        account.currentBalance,
+      );
+      await invalidate();
       return record;
     },
-    [state.accounts],
+    [userId, accounts, invalidate],
   );
 
   const recentRecords = useCallback(
     (limit = 3) =>
-      [...state.records]
+      [...records]
         .sort(
           (a, b) =>
             new Date(b.date).getTime() - new Date(a.date).getTime() ||
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         )
         .slice(0, limit),
-    [state.records],
+    [records],
   );
 
-  const netWorth = useMemo(
-    () => calculateNetWorth(state.accounts),
-    [state.accounts],
-  );
+  const netWorth = useMemo(() => calculateNetWorth(accounts), [accounts]);
+
+  const isLoading = authLoading || (Boolean(userId) && financeLoading);
+  const isHydrated = !authLoading && (!userId || isFetched);
 
   const value = useMemo(
     () => ({
-      accounts: state.accounts.filter((a) => a.status === "active"),
-      records: state.records,
+      accounts,
+      records,
+      isLoading,
       isHydrated,
       netWorth,
       createAccount,
@@ -226,10 +184,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccountRecords,
       createRecord,
       recentRecords,
+      refresh: invalidate,
     }),
     [
-      state.accounts,
-      state.records,
+      accounts,
+      records,
+      isLoading,
       isHydrated,
       netWorth,
       createAccount,
@@ -238,6 +198,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccountRecords,
       createRecord,
       recentRecords,
+      invalidate,
     ],
   );
 
