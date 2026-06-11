@@ -14,7 +14,11 @@ import {
   ENABLED_ADD_ACCOUNT_TYPES,
   type MoneyAccountType,
 } from "@/lib/finance/types";
-import { parseAmount } from "@/lib/format/currency";
+import {
+  formatAmountInput,
+  parseAmount,
+  sanitizeAmountInput,
+} from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT } from "@/providers/i18n-provider";
@@ -27,6 +31,7 @@ export function AddAccountScreen() {
   const { accounts, createAccount } = useFinance();
   const { showToast } = useToast();
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const balanceInputRef = useRef<HTMLInputElement>(null);
 
   const isFirstAccount = accounts.length === 0;
 
@@ -43,6 +48,17 @@ export function AddAccountScreen() {
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
+
+  function handleBalanceChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const sanitized = sanitizeAmountInput(e.target.value);
+    setBalance(sanitized);
+    requestAnimationFrame(() => {
+      const input = balanceInputRef.current;
+      if (!input) return;
+      const displayLength = formatAmountInput(sanitized).length;
+      input.setSelectionRange(displayLength, displayLength);
+    });
+  }
 
   function validate() {
     const nextErrors: Record<string, string> = {};
@@ -67,7 +83,7 @@ export function AddAccountScreen() {
     setSubmitting(true);
     try {
       const account = await createAccount({
-        type: isFirstAccount ? "current_account" : accountType,
+        type: accountType,
         name,
         currentBalance: parsedBalance,
       });
@@ -110,28 +126,26 @@ export function AddAccountScreen() {
               : t("accounts.add.lead")}
           </p>
 
-          {!isFirstAccount ? (
-            <div className="space-y-2">
-              <Label>{t("accounts.add.chooseType")}</Label>
-              <div className="flex gap-2">
-                {ENABLED_ADD_ACCOUNT_TYPES.map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setAccountType(type)}
-                    className={cn(
-                      "inline-flex min-h-11 flex-1 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
-                      accountType === type
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border bg-background text-foreground",
-                    )}
-                  >
-                    {t(getAccountTypeLabelKey(type))}
-                  </button>
-                ))}
-              </div>
+          <div className="space-y-2">
+            <Label>{t("accounts.add.chooseType")}</Label>
+            <div className="flex gap-2">
+              {ENABLED_ADD_ACCOUNT_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setAccountType(type)}
+                  className={cn(
+                    "inline-flex min-h-11 flex-1 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
+                    accountType === type
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-background text-foreground",
+                  )}
+                >
+                  {t(getAccountTypeLabelKey(type))}
+                </button>
+              ))}
             </div>
-          ) : null}
+          </div>
 
           <div className="space-y-5">
             <div className="space-y-2">
@@ -161,10 +175,11 @@ export function AddAccountScreen() {
                   EGP
                 </span>
                 <Input
+                  ref={balanceInputRef}
                   id="balance"
                   inputMode="decimal"
-                  value={balance}
-                  onChange={(e) => setBalance(e.target.value)}
+                  value={formatAmountInput(balance)}
+                  onChange={handleBalanceChange}
                   placeholder="0"
                   className="h-14 ps-16 text-2xl font-semibold tabular-nums tracking-tight"
                   aria-invalid={Boolean(errors.balance)}

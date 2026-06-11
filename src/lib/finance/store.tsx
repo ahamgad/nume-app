@@ -11,6 +11,7 @@ import {
 
 import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
+  deleteAccount as deleteAccountService,
   fetchAccounts,
   fetchRecords,
   insertAccount,
@@ -37,6 +38,7 @@ interface FinanceContextValue {
   isFinanceLoading: boolean;
   netWorth: ReturnType<typeof calculateNetWorth>;
   createAccount: (input: CreateAccountInput) => Promise<Account>;
+  deleteAccount: (id: string) => Promise<void>;
   updateAccount: (
     id: string,
     patch: Partial<
@@ -102,6 +104,25 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       );
       void invalidate();
       return account;
+    },
+    [userId, invalidate, queryClient],
+  );
+
+  const deleteAccount = useCallback(
+    async (id: string): Promise<void> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      await deleteAccountService(supabase, userId, id);
+      queryClient.setQueryData(
+        [FINANCE_QUERY_KEY, userId],
+        (current: { accounts: Account[]; records: FinanceRecord[] } | undefined) => ({
+          accounts: (current?.accounts ?? []).filter((account) => account.id !== id),
+          records: (current?.records ?? []).filter(
+            (record) => record.accountId !== id,
+          ),
+        }),
+      );
+      void invalidate();
     },
     [userId, invalidate, queryClient],
   );
@@ -193,6 +214,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       isFinanceLoading,
       netWorth,
       createAccount,
+      deleteAccount,
       updateAccount,
       getAccount,
       getAccountRecords,
@@ -209,6 +231,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       isFinanceLoading,
       netWorth,
       createAccount,
+      deleteAccount,
       updateAccount,
       getAccount,
       getAccountRecords,

@@ -119,6 +119,22 @@ export async function patchAccount(
   if (error) throw error;
 }
 
+export async function deleteAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  id: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("accounts")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+}
+
 export async function insertRecordWithBalanceUpdate(
   supabase: SupabaseClient,
   userId: string,

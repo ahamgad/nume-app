@@ -10,6 +10,7 @@ interface ScreenHeaderProps {
   title: string;
   mode?: "tab" | "stack";
   onBack?: () => void;
+  rightAction?: ReactNode;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export function ScreenHeader({
   title,
   mode = "tab",
   onBack,
+  rightAction,
   className,
 }: ScreenHeaderProps) {
   const router = useRouter();
@@ -41,10 +43,16 @@ export function ScreenHeader({
         ) : (
           <div className="size-11 shrink-0" />
         )}
-        <h1 className="min-w-0 flex-1 truncate px-1 text-base font-semibold">
+        <h1 className="min-w-0 flex-1 truncate px-1 text-center text-base font-semibold">
           {title}
         </h1>
-        <div className="size-11 shrink-0" />
+        {rightAction ? (
+          <div className="flex size-11 shrink-0 items-center justify-center">
+            {rightAction}
+          </div>
+        ) : (
+          <div className="size-11 shrink-0" />
+        )}
       </div>
     </header>
   );

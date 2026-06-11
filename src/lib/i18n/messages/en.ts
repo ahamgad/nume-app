@@ -205,6 +205,16 @@ export const en = {
         empty: "No records yet. Add a record to track balance changes.",
       },
       addRecord: "Add record",
+      deleteAccount: "Delete account",
+      deleteSuccess: "Account deleted",
+      deleteConfirm: {
+        title: "Delete this account?",
+        description:
+          "This removes the account and its records. This action cannot be undone.",
+        confirm: "Delete account",
+        deleting: "Deleting…",
+        cancel: "Cancel",
+      },
       notFound: "Account not found",
       notFoundDescription: "This account may have been removed.",
     },

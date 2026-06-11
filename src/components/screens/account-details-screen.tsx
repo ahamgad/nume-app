@@ -4,14 +4,15 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import {
   MetricHero,
   RecordRow,
-  StickyFooter,
   ToggleSettingRow,
   WidgetCard,
 } from "@/components/patterns";
@@ -22,7 +23,9 @@ import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord, RecordType } from "@/lib/finance/types";
+import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT } from "@/providers/i18n-provider";
+import { useToast } from "@/providers/toast-provider";
 
 function recordIcon(type: RecordType) {
   if (type === "income") return <ArrowDownLeft className="size-4" />;
@@ -42,17 +45,37 @@ interface AccountDetailsScreenProps {
 export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const t = useT();
   const router = useRouter();
-  const { getAccount, getAccountRecords, updateAccount, isFinanceReady } =
+  const { showToast } = useToast();
+  const { getAccount, getAccountRecords, updateAccount, deleteAccount, isFinanceReady } =
     useFinance();
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
+
+  async function handleDeleteConfirm() {
+    if (!account) return;
+    setDeleting(true);
+    try {
+      await deleteAccount(account.id);
+      showToast(t("accounts.details.deleteSuccess"));
+      router.replace("/accounts");
+    } catch (error) {
+      logSupabaseError("deleteAccount", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  }
 
   if (!isFinanceReady) {
     return (
       <>
         <ScreenHeader mode="stack" title="…" />
-        <ScreenBody withTabBar={false} withStickyFooter>
+        <ScreenBody withTabBar={false}>
           <Skeleton className="h-40 w-full rounded-lg" />
         </ScreenBody>
       </>
@@ -84,8 +107,21 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   return (
     <>
-      <ScreenHeader mode="stack" title={account.name} />
-      <ScreenBody withTabBar={false} withStickyFooter className="space-y-6">
+      <ScreenHeader
+        mode="stack"
+        title={account.name}
+        rightAction={
+          <button
+            type="button"
+            onClick={() => router.push(`/accounts/${account.id}/records/new`)}
+            className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
+            aria-label={t("accounts.details.addRecord")}
+          >
+            <Plus className="size-5" />
+          </button>
+        }
+      />
+      <ScreenBody withTabBar={false} className="space-y-6">
         <div>
           {account.institution ? (
             <p className="text-[0.8125rem] text-muted-foreground">
@@ -140,6 +176,13 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               />
             </div>
           </div>
+          <Button
+            variant="outline"
+            className="mt-4 h-11 w-full text-destructive hover:text-destructive"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            {t("accounts.details.deleteAccount")}
+          </Button>
         </section>
 
         <section>
@@ -166,14 +209,43 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         </section>
       </ScreenBody>
 
-      <StickyFooter>
-        <Button
-          className="h-12 w-full"
-          onClick={() => router.push(`/accounts/${account.id}/records/new`)}
-        >
-          {t("accounts.details.addRecord")}
-        </Button>
-      </StickyFooter>
+      {showDeleteConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-account-title"
+            className="w-full max-w-sm rounded-xl border border-border bg-background p-5 shadow-sm"
+          >
+            <h2 id="delete-account-title" className="text-base font-semibold">
+              {t("accounts.details.deleteConfirm.title")}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("accounts.details.deleteConfirm.description")}
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <Button
+                variant="destructive"
+                className="h-11 w-full"
+                disabled={deleting}
+                onClick={handleDeleteConfirm}
+              >
+                {deleting
+                  ? t("accounts.details.deleteConfirm.deleting")
+                  : t("accounts.details.deleteConfirm.confirm")}
+              </Button>
+              <Button
+                variant="ghost"
+                className="h-11 w-full"
+                disabled={deleting}
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                {t("accounts.details.deleteConfirm.cancel")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
