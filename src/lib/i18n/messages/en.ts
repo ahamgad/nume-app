@@ -160,6 +160,7 @@ export const en = {
     creating: "Creating…",
     sections: {
       money: "Money accounts",
+      certificates: "Certificates",
       basic: "Basic information",
       balance: "Balance",
     },
@@ -167,6 +168,7 @@ export const en = {
       currentAccount: "Current account",
       cash: "Cash",
       wallet: "Wallet",
+      certificate: "Certificate 🏦",
     },
     empty: {
       title: "Your accounts live here",
@@ -181,6 +183,7 @@ export const en = {
       title: "Add account",
       chooseType: "Account type",
       lead: "Enter the account name and today's balance.",
+      certificateLead: "Track a fixed-term deposit with expected returns.",
       balanceHint: "Use the balance you see in your bank app today.",
       firstAccount: {
         title: "Add your first account",
@@ -245,6 +248,103 @@ export const en = {
       balanceRequired: "Current balance is required",
       balanceInvalid: "Enter a valid amount",
       balanceNegative: "Balance cannot be negative",
+    },
+  },
+  certificates: {
+    create: {
+      title: "Add certificate",
+      submit: "Create certificate",
+      creating: "Creating…",
+      success: "Certificate created",
+    },
+    edit: {
+      title: "Edit certificate",
+      submit: "Save changes",
+      saving: "Saving…",
+      success: "Certificate updated",
+    },
+    fields: {
+      name: {
+        label: "Certificate name",
+        placeholder: "e.g. 12-month CD",
+      },
+      institution: {
+        label: "Institution name",
+        placeholder: "e.g. National Bank",
+      },
+      principal: {
+        label: "Principal amount",
+        hint: "The amount locked in this certificate.",
+      },
+      rate: {
+        label: "Annual interest rate (%)",
+        hint: "Fixed annual rate before tax.",
+      },
+      purchaseDate: {
+        label: "Purchase date",
+      },
+      term: {
+        label: "Term",
+        custom: "Custom months",
+        months: "{count} months",
+      },
+      payoutFrequency: {
+        label: "Payout frequency",
+      },
+    },
+    payoutFrequency: {
+      monthly: "Monthly",
+      quarterly: "Quarterly",
+      semi_annual: "Semi-annual",
+      annual: "Annual",
+      at_maturity: "At maturity",
+    },
+    status: {
+      active: "Active",
+      matured: "Matured",
+      archived: "Archived",
+    },
+    details: {
+      summary: "Summary",
+      outcomes: "Expected outcomes",
+      principal: "Principal",
+      rate: "Annual interest rate",
+      purchaseDate: "Purchase date",
+      maturityDate: "Maturity date",
+      remainingDays: "Remaining days",
+      remainingDaysCount: "{count} days",
+      remainingDayCount: "1 day",
+      status: "Status",
+      expectedProfit: "Expected profit",
+      expectedTotalReturn: "Expected total return",
+      nextPayoutDate: "Next payout date",
+      noNextPayout: "No upcoming payout",
+      edit: "Edit certificate",
+      archive: "Archive certificate",
+      archiveSuccess: "Certificate archived",
+      archiveConfirm: {
+        title: "Archive this certificate?",
+        description:
+          "This removes the certificate from your active accounts. You can review archived items later.",
+        confirm: "Archive certificate",
+        archiving: "Archiving…",
+        cancel: "Cancel",
+      },
+      notFound: "Certificate not found",
+      notFoundDescription: "This certificate may have been archived or removed.",
+    },
+    validation: {
+      nameRequired: "Certificate name is required",
+      principalRequired: "Principal amount is required",
+      principalPositive: "Principal must be greater than zero",
+      rateRequired: "Annual interest rate is required",
+      rateNegative: "Rate cannot be negative",
+      rateMax: "Rate cannot exceed 100%",
+      purchaseDateRequired: "Purchase date is required",
+      purchaseDateFuture: "Purchase date cannot be in the future",
+      termRequired: "Enter a valid term in months",
+      termMin: "Term must be at least 1 month",
+      termMax: "Term cannot exceed 600 months",
     },
   },
   records: {

@@ -2,6 +2,7 @@
 
 import { Landmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
+import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 function AddAccountHeaderAction({
@@ -32,11 +34,70 @@ function AddAccountHeaderAction({
   );
 }
 
+function AccountSection({
+  title,
+  accounts,
+  formatLocale,
+  onSelect,
+  t,
+}: {
+  title: string;
+  accounts: Account[];
+  formatLocale: string;
+  onSelect: (accountId: string) => void;
+  t: ReturnType<typeof useT>;
+}) {
+  if (accounts.length === 0) return null;
+
+  return (
+    <section>
+      <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
+        {title}
+      </p>
+      <Card className="overflow-hidden shadow-none">
+        {accounts.map((account, index) => (
+          <div key={account.id}>
+            <ListRow
+              primary={account.name}
+              secondary={
+                account.institution
+                  ? t("accounts.list.meta", {
+                      institution: account.institution,
+                      type: t(getAccountTypeLabelKey(account.type)),
+                    })
+                  : t(getAccountTypeLabelKey(account.type))
+              }
+              trailing={formatCurrency(account.currentBalance, formatLocale)}
+              onClick={() => onSelect(account.id)}
+            />
+            {index < accounts.length - 1 ? (
+              <div className="mx-4 border-b border-border" />
+            ) : null}
+          </div>
+        ))}
+      </Card>
+    </section>
+  );
+}
+
 export function AccountsListScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
   const { accounts, isFinanceReady, refresh } = useFinance();
+
+  const { moneyAccounts, certificateAccounts } = useMemo(() => {
+    const money: Account[] = [];
+    const certificates: Account[] = [];
+    for (const account of accounts) {
+      if (account.type === "certificate") {
+        certificates.push(account);
+      } else {
+        money.push(account);
+      }
+    }
+    return { moneyAccounts: money, certificateAccounts: certificates };
+  }, [accounts]);
 
   const addAccountAction = (
     <AddAccountHeaderAction
@@ -79,33 +140,22 @@ export function AccountsListScreen() {
             }
           />
         ) : (
-          <section>
-            <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-              {t("accounts.sections.money")}
-            </p>
-            <Card className="overflow-hidden shadow-none">
-              {accounts.map((account, index) => (
-                <div key={account.id}>
-                  <ListRow
-                    primary={account.name}
-                    secondary={
-                      account.institution
-                        ? t("accounts.list.meta", {
-                            institution: account.institution,
-                            type: t(getAccountTypeLabelKey(account.type)),
-                          })
-                        : t(getAccountTypeLabelKey(account.type))
-                    }
-                    trailing={formatCurrency(account.currentBalance, formatLocale)}
-                    onClick={() => router.push(`/accounts/${account.id}`)}
-                  />
-                  {index < accounts.length - 1 ? (
-                    <div className="mx-4 border-b border-border" />
-                  ) : null}
-                </div>
-              ))}
-            </Card>
-          </section>
+          <div className="space-y-6">
+            <AccountSection
+              title={t("accounts.sections.money")}
+              accounts={moneyAccounts}
+              formatLocale={formatLocale}
+              onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
+              t={t}
+            />
+            <AccountSection
+              title={t("accounts.sections.certificates")}
+              accounts={certificateAccounts}
+              formatLocale={formatLocale}
+              onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
+              t={t}
+            />
+          </div>
         )}
       </ScreenBody>
     </>

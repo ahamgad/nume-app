@@ -9,6 +9,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import {
   MetricHero,
@@ -104,6 +105,10 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         </ScreenBody>
       </>
     );
+  }
+
+  if (account.type === "certificate") {
+    return <CertificateDetailsScreen accountId={accountId} />;
   }
 
   return (

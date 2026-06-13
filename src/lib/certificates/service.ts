@@ -1,0 +1,255 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { calculateMaturityDate } from "@/lib/certificates/certificate-engine";
+import { mapCertificate, type DbCertificate } from "@/lib/certificates/mappers";
+import type {
+  Certificate,
+  CreateCertificateInput,
+  UpdateCertificateInput,
+} from "@/lib/certificates/types";
+import { patchAccount } from "@/lib/finance/service";
+import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
+
+async function assertDestinationAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  destinationAccountId: string | null | undefined,
+): Promise<void> {
+  if (!destinationAccountId) return;
+
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("id")
+    .eq("id", destinationAccountId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    throw new Error("Destination account not found");
+  }
+}
+
+export async function getCertificates(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<Certificate[]> {
+  const { data, error } = await supabase
+    .from("certificates")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return (data as DbCertificate[]).map(mapCertificate);
+}
+
+export async function getCertificateByAccountId(
+  supabase: SupabaseClient,
+  userId: string,
+  accountId: string,
+): Promise<Certificate | null> {
+  const { data, error } = await supabase
+    .from("certificates")
+    .select("*")
+    .eq("account_id", accountId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+  return mapCertificate(data as DbCertificate);
+}
+
+export async function getCertificate(
+  supabase: SupabaseClient,
+  userId: string,
+  certificateId: string,
+): Promise<Certificate | null> {
+  const { data, error } = await supabase
+    .from("certificates")
+    .select("*")
+    .eq("id", certificateId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+  return mapCertificate(data as DbCertificate);
+}
+
+export async function createCertificate(
+  supabase: SupabaseClient,
+  userId: string,
+  input: CreateCertificateInput,
+): Promise<Certificate> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(getSupabaseErrorMessage(authError));
+  }
+
+  if (!user || user.id !== userId) {
+    throw new Error("Not authenticated — session unavailable for certificate insert");
+  }
+
+  await assertDestinationAccount(supabase, userId, input.destinationAccountId);
+
+  const maturityDate = calculateMaturityDate(
+    input.purchaseDate,
+    input.termMonths,
+  );
+
+  const { data: accountRow, error: accountError } = await supabase
+    .from("accounts")
+    .insert({
+      user_id: user.id,
+      account_type: "certificate",
+      name: input.name.trim(),
+      institution: input.institution?.trim() || null,
+      current_balance: input.principalAmount,
+      include_in_net_worth: input.includeInNetWorth ?? true,
+      include_in_emergency_fund: input.includeInEmergencyFund ?? false,
+      status: "active",
+    })
+    .select("id")
+    .single();
+
+  if (accountError) {
+    throw new Error(getSupabaseErrorMessage(accountError));
+  }
+
+  const { data: certificateRow, error: certificateError } = await supabase
+    .from("certificates")
+    .insert({
+      user_id: user.id,
+      account_id: accountRow.id,
+      principal_amount: input.principalAmount,
+      annual_interest_rate: input.annualInterestRate,
+      purchase_date: input.purchaseDate,
+      term_months: input.termMonths,
+      maturity_date: maturityDate,
+      payout_frequency: input.payoutFrequency,
+      destination_account_id: input.destinationAccountId ?? null,
+      auto_apply: false,
+      status: "active",
+    })
+    .select("*")
+    .single();
+
+  if (certificateError) {
+    await supabase.from("accounts").delete().eq("id", accountRow.id).eq("user_id", userId);
+    throw new Error(getSupabaseErrorMessage(certificateError));
+  }
+
+  return mapCertificate(certificateRow as DbCertificate);
+}
+
+export async function updateCertificate(
+  supabase: SupabaseClient,
+  userId: string,
+  certificateId: string,
+  input: UpdateCertificateInput,
+): Promise<Certificate> {
+  const existing = await getCertificate(supabase, userId, certificateId);
+  if (!existing) {
+    throw new Error("Certificate not found");
+  }
+
+  if (input.destinationAccountId !== undefined) {
+    await assertDestinationAccount(supabase, userId, input.destinationAccountId);
+  }
+
+  const purchaseDate = input.purchaseDate ?? existing.purchaseDate;
+  const termMonths = input.termMonths ?? existing.termMonths;
+  const principalAmount = input.principalAmount ?? existing.principalAmount;
+
+  const maturityDate =
+    input.purchaseDate !== undefined || input.termMonths !== undefined
+      ? calculateMaturityDate(purchaseDate, termMonths)
+      : existing.maturityDate;
+
+  const certificatePayload: Record<string, unknown> = {
+    auto_apply: false,
+  };
+
+  if (input.principalAmount !== undefined) {
+    certificatePayload.principal_amount = input.principalAmount;
+  }
+  if (input.annualInterestRate !== undefined) {
+    certificatePayload.annual_interest_rate = input.annualInterestRate;
+  }
+  if (input.purchaseDate !== undefined) {
+    certificatePayload.purchase_date = input.purchaseDate;
+  }
+  if (input.termMonths !== undefined) {
+    certificatePayload.term_months = input.termMonths;
+  }
+  if (
+    input.purchaseDate !== undefined ||
+    input.termMonths !== undefined
+  ) {
+    certificatePayload.maturity_date = maturityDate;
+  }
+  if (input.payoutFrequency !== undefined) {
+    certificatePayload.payout_frequency = input.payoutFrequency;
+  }
+  if (input.destinationAccountId !== undefined) {
+    certificatePayload.destination_account_id = input.destinationAccountId;
+  }
+  if (input.status !== undefined) {
+    certificatePayload.status = input.status;
+  }
+
+  const { data, error } = await supabase
+    .from("certificates")
+    .update(certificatePayload)
+    .eq("id", certificateId)
+    .eq("user_id", userId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+
+  const accountPatch: Parameters<typeof patchAccount>[3] = {};
+  if (input.name !== undefined) accountPatch.name = input.name;
+  if (input.institution !== undefined) accountPatch.institution = input.institution;
+  if (input.includeInNetWorth !== undefined) {
+    accountPatch.includeInNetWorth = input.includeInNetWorth;
+  }
+  if (input.includeInEmergencyFund !== undefined) {
+    accountPatch.includeInEmergencyFund = input.includeInEmergencyFund;
+  }
+  if (input.principalAmount !== undefined) {
+    accountPatch.currentBalance = principalAmount;
+  }
+
+  if (Object.keys(accountPatch).length > 0) {
+    await patchAccount(supabase, userId, existing.accountId, accountPatch);
+  }
+
+  if (input.status === "archived") {
+    await supabase
+      .from("accounts")
+      .update({ status: "archived" })
+      .eq("id", existing.accountId)
+      .eq("user_id", userId);
+  }
+
+  return mapCertificate(data as DbCertificate);
+}
+
+export async function archiveCertificate(
+  supabase: SupabaseClient,
+  userId: string,
+  certificateId: string,
+): Promise<Certificate> {
+  return updateCertificate(supabase, userId, certificateId, {
+    status: "archived",
+  });
+}

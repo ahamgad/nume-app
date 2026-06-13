@@ -161,6 +161,7 @@ export const ar = {
     creating: "جارٍ الإنشاء…",
     sections: {
       money: "حسابات النقد",
+      certificates: "الشهادات",
       basic: "المعلومات الأساسية",
       balance: "الرصيد",
     },
@@ -168,6 +169,7 @@ export const ar = {
       currentAccount: "حساب جاري",
       cash: "نقد",
       wallet: "محفظة",
+      certificate: "شهادة 🏦",
     },
     empty: {
       title: "حساباتك هنا",
@@ -181,6 +183,7 @@ export const ar = {
       title: "إضافة حساب",
       chooseType: "نوع الحساب",
       lead: "أدخل اسم الحساب ورصيده اليوم.",
+      certificateLead: "تتبّع وديعة لأجل بعائد متوقّع.",
       balanceHint: "استخدم الرصيد الظاهر في تطبيق البنك اليوم.",
       firstAccount: {
         title: "أضف حسابك الأول",
@@ -244,6 +247,103 @@ export const ar = {
       balanceRequired: "الرصيد الحالي مطلوب",
       balanceInvalid: "أدخل مبلغًا صالحًا",
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
+    },
+  },
+  certificates: {
+    create: {
+      title: "إضافة شهادة",
+      submit: "إنشاء الشهادة",
+      creating: "جارٍ الإنشاء…",
+      success: "تم إنشاء الشهادة",
+    },
+    edit: {
+      title: "تعديل الشهادة",
+      submit: "حفظ التغييرات",
+      saving: "جارٍ الحفظ…",
+      success: "تم تحديث الشهادة",
+    },
+    fields: {
+      name: {
+        label: "اسم الشهادة",
+        placeholder: "مثال: وديعة 12 شهرًا",
+      },
+      institution: {
+        label: "اسم المؤسسة",
+        placeholder: "مثال: البنك الأهلي",
+      },
+      principal: {
+        label: "المبلغ الأساسي",
+        hint: "المبلغ المقفول في هذه الشهادة.",
+      },
+      rate: {
+        label: "معدل الفائدة السنوي (%)",
+        hint: "معدل سنوي ثابت قبل الضريبة.",
+      },
+      purchaseDate: {
+        label: "تاريخ الشراء",
+      },
+      term: {
+        label: "المدة",
+        custom: "أشهر مخصصة",
+        months: "{count} شهرًا",
+      },
+      payoutFrequency: {
+        label: "وتيرة الدفع",
+      },
+    },
+    payoutFrequency: {
+      monthly: "شهري",
+      quarterly: "ربع سنوي",
+      semi_annual: "نصف سنوي",
+      annual: "سنوي",
+      at_maturity: "عند الاستحقاق",
+    },
+    status: {
+      active: "نشطة",
+      matured: "مستحقة",
+      archived: "مؤرشفة",
+    },
+    details: {
+      summary: "الملخص",
+      outcomes: "النتائج المتوقعة",
+      principal: "المبلغ الأساسي",
+      rate: "معدل الفائدة السنوي",
+      purchaseDate: "تاريخ الشراء",
+      maturityDate: "تاريخ الاستحقاق",
+      remainingDays: "الأيام المتبقية",
+      remainingDaysCount: "{count} يومًا",
+      remainingDayCount: "يوم واحد",
+      status: "الحالة",
+      expectedProfit: "الربح المتوقع",
+      expectedTotalReturn: "إجمالي العائد المتوقع",
+      nextPayoutDate: "تاريخ الدفع التالي",
+      noNextPayout: "لا توجد دفعة قادمة",
+      edit: "تعديل الشهادة",
+      archive: "أرشفة الشهادة",
+      archiveSuccess: "تمت أرشفة الشهادة",
+      archiveConfirm: {
+        title: "أرشفة هذه الشهادة؟",
+        description:
+          "سيُزال هذا من حساباتك النشطة. يمكنك مراجعة المؤرشف لاحقًا.",
+        confirm: "أرشفة الشهادة",
+        archiving: "جارٍ الأرشفة…",
+        cancel: "إلغاء",
+      },
+      notFound: "الشهادة غير موجودة",
+      notFoundDescription: "ربما أُرشفت هذه الشهادة أو أُزيلت.",
+    },
+    validation: {
+      nameRequired: "اسم الشهادة مطلوب",
+      principalRequired: "المبلغ الأساسي مطلوب",
+      principalPositive: "يجب أن يكون المبلغ الأساسي أكبر من صفر",
+      rateRequired: "معدل الفائدة السنوي مطلوب",
+      rateNegative: "لا يمكن أن يكون المعدل سالبًا",
+      rateMax: "لا يمكن أن يتجاوز المعدل 100%",
+      purchaseDateRequired: "تاريخ الشراء مطلوب",
+      purchaseDateFuture: "لا يمكن أن يكون تاريخ الشراء في المستقبل",
+      termRequired: "أدخل مدة صالحة بالأشهر",
+      termMin: "يجب أن تكون المدة شهرًا واحدًا على الأقل",
+      termMax: "لا يمكن أن تتجاوز المدة 600 شهرًا",
     },
   },
   records: {
