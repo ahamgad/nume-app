@@ -38,7 +38,7 @@ export function ScreenHeader({
             className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
             aria-label="Back"
           >
-            <ChevronLeft className="size-5 rtl:rotate-180" />
+            <ChevronLeft className="size-6 rtl:rotate-180" />
           </button>
         ) : (
           <div className="size-11 shrink-0" />

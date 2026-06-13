@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  CalendarRange,
   Landmark,
   LayoutDashboard,
   Menu,
   Target,
-  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const tabs = [
   { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
-  { href: "/planning", labelKey: "nav.planning" as const, icon: TrendingUp },
+  { href: "/planning", labelKey: "nav.planning" as const, icon: CalendarRange },
   { href: "/accounts", labelKey: "nav.accounts" as const, icon: Landmark },
   { href: "/goals", labelKey: "nav.goals" as const, icon: Target },
   { href: "/more", labelKey: "nav.more" as const, icon: Menu },

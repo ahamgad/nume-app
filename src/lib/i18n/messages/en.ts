@@ -260,9 +260,9 @@ export const en = {
       correctBalance: "Correct balance",
     },
     preview: {
-      newBalance: "New balance: {amount}",
-      currentBalance: "Current balance: {amount}",
-      adjustment: "Adjustment: {amount}",
+      newBalance: "New balance",
+      currentBalance: "Current balance",
+      adjustment: "Adjustment",
     },
     insufficientBalance:
       "This expense exceeds your current balance. You can still save this record.",

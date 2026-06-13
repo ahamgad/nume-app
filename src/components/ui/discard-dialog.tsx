@@ -15,7 +15,7 @@ export function DiscardDialog({ open, onConfirm, onCancel }: DiscardDialogProps)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:items-center sm:pb-4">
       <div
         role="dialog"
         aria-modal="true"

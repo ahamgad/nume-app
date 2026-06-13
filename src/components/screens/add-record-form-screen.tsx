@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatCurrency, parseAmount } from "@/lib/format/currency";
+import {
+  formatAmountInput,
+  formatCurrency,
+  parseAmount,
+  sanitizeAmountInput,
+} from "@/lib/format/currency";
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { RecordType } from "@/lib/finance/types";
@@ -26,6 +31,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
   const router = useRouter();
   const { getAccount, createRecord } = useFinance();
   const { showToast } = useToast();
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
   const account = getAccount(accountId);
 
@@ -58,6 +64,27 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     amount.trim().length > 0 ||
     description.trim().length > 0 ||
     date !== todayIsoDate();
+
+  function clearFieldError(field: string) {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function handleAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const sanitized = sanitizeAmountInput(e.target.value);
+    setAmount(sanitized);
+    clearFieldError("amount");
+    requestAnimationFrame(() => {
+      const input = amountInputRef.current;
+      if (!input) return;
+      const displayLength = formatAmountInput(sanitized).length;
+      input.setSelectionRange(displayLength, displayLength);
+    });
+  }
 
   function validate() {
     const nextErrors: Record<string, string> = {};
@@ -150,16 +177,17 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
               ? t("records.fields.correctBalance")
               : t("records.fields.amount")}
           </Label>
-          <div className="relative">
+          <div className="relative min-w-0">
             <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-sm text-muted-foreground">
               EGP
             </span>
             <Input
+              ref={amountInputRef}
               id="record-amount"
               inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="ps-14 tabular-nums"
+              value={formatAmountInput(amount)}
+              onChange={handleAmountChange}
+              className="w-full min-w-0 ps-14 tabular-nums"
               aria-invalid={Boolean(errors.amount)}
             />
           </div>
@@ -201,13 +229,17 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <Label htmlFor="record-date">{t("records.fields.date")}</Label>
           <Input
             id="record-date"
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => {
+              setDate(e.target.value);
+              clearFieldError("date");
+            }}
+            className="w-full min-w-0"
             aria-invalid={Boolean(errors.date)}
           />
           {errors.date ? (
@@ -216,28 +248,29 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
         </div>
 
         {preview && parsedAmount !== null ? (
-          <div className="space-y-1 text-[0.8125rem] text-muted-foreground">
+          <div className="space-y-1">
             {type === "adjustment" && preview.current !== undefined ? (
               <>
-                <p>
-                  {t("records.preview.currentBalance", {
-                    amount: formatCurrency(preview.current),
-                  })}
-                </p>
-                <p>
-                  {t("records.preview.adjustment", {
-                    amount: formatCurrency(
-                      "delta" in preview ? preview.delta : 0,
-                    ),
-                  })}
-                </p>
+                <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
+                  <span>{t("records.preview.currentBalance")}</span>
+                  <span className="shrink-0 tabular-nums">
+                    {formatCurrency(preview.current)}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
+                  <span>{t("records.preview.adjustment")}</span>
+                  <span className="shrink-0 tabular-nums">
+                    {formatCurrency("delta" in preview ? preview.delta : 0)}
+                  </span>
+                </div>
               </>
             ) : null}
-            <p className="text-[0.9375rem] font-medium text-foreground">
-              {t("records.preview.newBalance", {
-                amount: formatCurrency(preview.next),
-              })}
-            </p>
+            <div className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium text-foreground">
+              <span>{t("records.preview.newBalance")}</span>
+              <span className="shrink-0 tabular-nums">
+                {formatCurrency(preview.next)}
+              </span>
+            </div>
           </div>
         ) : null}
       </ScreenBody>

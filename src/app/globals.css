@@ -121,7 +121,19 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   body {
     @apply bg-background text-[0.9375rem] leading-normal text-foreground;
   }

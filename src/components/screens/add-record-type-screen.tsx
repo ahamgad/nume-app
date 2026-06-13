@@ -4,6 +4,7 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -62,9 +63,7 @@ export function AddRecordTypeScreen({ accountId }: AddRecordTypeScreenProps) {
                     {t(`records.add.${type}.description`)}
                   </p>
                 </div>
-                <span className="shrink-0 text-muted-foreground rtl:rotate-180">
-                  ›
-                </span>
+                <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
               </button>
               {index < recordTypes.length - 1 ? (
                 <div className="mx-4 border-b border-border" />

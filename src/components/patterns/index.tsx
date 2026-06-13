@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { ChevronRight } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -228,7 +230,7 @@ export function ListRow({
         </span>
       ) : null}
       {showChevron && onClick ? (
-        <span className="shrink-0 text-muted-foreground rtl:rotate-180">›</span>
+        <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
       ) : null}
     </Comp>
   );
@@ -295,7 +297,7 @@ export function MoreMenuRow({ title, description, onClick }: MoreMenuRowProps) {
           </p>
         ) : null}
       </div>
-      <span className="shrink-0 text-muted-foreground rtl:rotate-180">›</span>
+      <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
     </button>
   );
 }

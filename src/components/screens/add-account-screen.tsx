@@ -49,9 +49,19 @@ export function AddAccountScreen() {
     nameInputRef.current?.focus();
   }, []);
 
+  function clearFieldError(field: string) {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
   function handleBalanceChange(e: React.ChangeEvent<HTMLInputElement>) {
     const sanitized = sanitizeAmountInput(e.target.value);
     setBalance(sanitized);
+    clearFieldError("balance");
     requestAnimationFrame(() => {
       const input = balanceInputRef.current;
       if (!input) return;
@@ -156,7 +166,10 @@ export function AddAccountScreen() {
                 ref={nameInputRef}
                 id="account-name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  clearFieldError("name");
+                }}
                 placeholder={t("accounts.fields.name.placeholder")}
                 aria-invalid={Boolean(errors.name)}
                 autoComplete="off"
