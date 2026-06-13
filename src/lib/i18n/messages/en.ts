@@ -6,6 +6,10 @@ export const en = {
     goals: "Goals",
     more: "More",
   },
+  a11y: {
+    mainNavigation: "Main navigation",
+    dismiss: "Dismiss",
+  },
   auth: {
     fields: {
       email: "Email",
@@ -37,6 +41,7 @@ export const en = {
       resend: "Resend confirmation email",
       resendSuccess: "Confirmation email sent.",
       notVerifiedYet: "Email not verified yet. Check your inbox and try again.",
+      noEmail: "No email on file",
       signOut: "Sign out",
     },
     forgot: {
@@ -58,12 +63,23 @@ export const en = {
   },
   common: {
     back: "Back",
+    brandName: "NUME",
+    loading: "…",
+    emptyValue: "—",
     save: "Save",
     cancel: "Cancel",
     retry: "Try again",
     required: "Required",
     optional: "Optional",
     active: "Active",
+    currency: {
+      code: "EGP",
+      zeroPlaceholder: "0",
+    },
+    time: {
+      minutesAgo: "{count}m ago",
+      hoursAgo: "{count}h ago",
+    },
     discardChanges: {
       title: "Discard changes?",
       description: "Any unsaved changes will be lost.",
@@ -86,6 +102,8 @@ export const en = {
       justNow: "just now",
       addFirstAccount: "Add your first account",
       error: "Unable to load net worth",
+      subline:
+        "{assetsLabel} {assets} · {liabilitiesLabel} {liabilities}",
     },
     setup: {
       title: "Add your first account",
@@ -116,6 +134,7 @@ export const en = {
     },
     activity: {
       title: "Recent activity",
+      recordMeta: "{account} · {date}",
     },
   },
   planning: {
@@ -154,6 +173,9 @@ export const en = {
       description:
         "Add the account you use every day to start tracking where your money is held.",
       action: "Start with your first account",
+    },
+    list: {
+      meta: "{institution} · {type}",
     },
     add: {
       title: "Add account",
@@ -305,9 +327,9 @@ export const en = {
       current: "English",
       english: "English",
       arabic: "Arabic",
-      stub: "Arabic translations will be fully available in a future update. You can preview the Arabic typeface below.",
+      stub: "Choose the language you prefer for NUME.",
       previewNote:
-        "Switching language updates typography and layout direction. Copy remains in English until localization is complete.",
+        "Switching language updates typography, layout direction, and translated copy.",
     },
     about: {
       title: "About NUME",
@@ -319,5 +341,9 @@ export const en = {
   },
 } as const;
 
-export type Messages = typeof en;
+type DeepStringRecord<T> = T extends object
+  ? { [K in keyof T]: DeepStringRecord<T[K]> }
+  : string;
+
+export type Messages = DeepStringRecord<typeof en>;
 export type MessageKey = string;

@@ -3,10 +3,12 @@
 import { X } from "lucide-react";
 
 import { useToast } from "@/providers/toast-provider";
+import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
 export function ToastViewport() {
   const { toasts, dismissToast } = useToast();
+  const t = useT();
 
   if (toasts.length === 0) return null;
 
@@ -30,7 +32,7 @@ export function ToastViewport() {
             type="button"
             onClick={() => dismissToast(toast.id)}
             className="inline-flex size-11 shrink-0 items-center justify-center rounded-md opacity-80 transition-opacity hover:opacity-100"
-            aria-label="Dismiss"
+            aria-label={t("a11y.dismiss")}
           >
             <X className="size-4" />
           </button>

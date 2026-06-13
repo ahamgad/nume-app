@@ -1,10 +1,11 @@
 import { en, type Messages } from "./messages/en";
+import { ar } from "./messages/ar";
 
 export type Locale = "en" | "ar";
 
 const messages: Record<Locale, Messages> = {
   en,
-  ar: en, // Arabic copy added in localization pass; structure ready
+  ar,
 };
 
 type NestedKeyOf<T, Prefix extends string = ""> = T extends object

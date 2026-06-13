@@ -24,7 +24,7 @@ import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord, RecordType } from "@/lib/finance/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
 function recordIcon(type: RecordType) {
@@ -44,6 +44,7 @@ interface AccountDetailsScreenProps {
 
 export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const t = useT();
+  const formatLocale = useFormatLocale();
   const router = useRouter();
   const { showToast } = useToast();
   const { getAccount, getAccountRecords, updateAccount, deleteAccount, isFinanceReady } =
@@ -74,7 +75,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   if (!isFinanceReady) {
     return (
       <>
-        <ScreenHeader mode="stack" title="…" />
+        <ScreenHeader mode="stack" title={t("common.loading")} />
         <ScreenBody withTabBar={false}>
           <Skeleton className="h-40 w-full rounded-lg" />
         </ScreenBody>
@@ -141,15 +142,15 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         <WidgetCard>
           <MetricHero
             label={t("accounts.details.currentBalance")}
-            value={formatCurrency(account.currentBalance)}
+            value={formatCurrency(account.currentBalance, formatLocale)}
             meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t),
+              time: formatRelativeTime(account.updatedAt, t, formatLocale),
             })}
           />
         </WidgetCard>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-start text-lg font-semibold">
             {t("accounts.details.settingsTitle")}
           </h2>
           <div className="rounded-lg border border-border px-4">
@@ -186,7 +187,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-start text-lg font-semibold">
             {t("accounts.details.records.title")}
           </h2>
           {records.length === 0 ? (
@@ -199,8 +200,8 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 <RecordRow
                   key={record.id}
                   label={recordLabel(record, t)}
-                  amount={formatSignedCurrency(record.amount, record.type)}
-                  meta={formatDisplayDate(record.date)}
+                  amount={formatSignedCurrency(record.amount, record.type, formatLocale)}
+                  meta={formatDisplayDate(record.date, formatLocale)}
                   icon={recordIcon(record.type)}
                 />
               ))}

@@ -21,7 +21,7 @@ import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord, RecordType } from "@/lib/finance/types";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 function recordIcon(type: RecordType) {
   if (type === "income") return <ArrowDownLeft className="size-4" />;
@@ -34,15 +34,16 @@ function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
   return t(`records.types.${record.type}`);
 }
 
-function signedRecordAmount(record: FinanceRecord) {
+function signedRecordAmount(record: FinanceRecord, locale: string) {
   if (record.type === "adjustment") {
-    return formatSignedCurrency(record.amount, "adjustment");
+    return formatSignedCurrency(record.amount, "adjustment", locale);
   }
-  return formatSignedCurrency(record.amount, record.type);
+  return formatSignedCurrency(record.amount, record.type, locale);
 }
 
 export function DashboardScreen() {
   const t = useT();
+  const formatLocale = useFormatLocale();
   const router = useRouter();
   const { accounts, netWorth, recentRecords, isFinanceReady, isFinanceLoading, refresh } =
     useFinance();
@@ -78,12 +79,17 @@ export function DashboardScreen() {
             <>
               <MetricHero
                 label={t("dashboard.netWorth.title")}
-                value={formatCurrency(netWorth.netWorth)}
-                subline={`${t("dashboard.netWorth.assets")} ${formatCurrency(netWorth.assets)} · ${t("dashboard.netWorth.liabilities")} ${formatCurrency(netWorth.liabilities)}`}
+                value={formatCurrency(netWorth.netWorth, formatLocale)}
+                subline={t("dashboard.netWorth.subline", {
+                  assetsLabel: t("dashboard.netWorth.assets"),
+                  assets: formatCurrency(netWorth.assets, formatLocale),
+                  liabilitiesLabel: t("dashboard.netWorth.liabilities"),
+                  liabilities: formatCurrency(netWorth.liabilities, formatLocale),
+                })}
                 meta={
                   hasAccounts && latestUpdate
                     ? t("dashboard.netWorth.updated", {
-                        time: formatRelativeTime(latestUpdate, t),
+                        time: formatRelativeTime(latestUpdate, t, formatLocale),
                       })
                     : undefined
                 }
@@ -123,7 +129,7 @@ export function DashboardScreen() {
 
         {isFinanceReady && activity.length > 0 ? (
           <WidgetCard>
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-start text-lg font-semibold">
               {t("dashboard.activity.title")}
             </h2>
             <div className="mt-2 divide-y divide-border">
@@ -133,8 +139,11 @@ export function DashboardScreen() {
                   <RecordRow
                     key={record.id}
                     label={recordLabel(record, t)}
-                    amount={signedRecordAmount(record)}
-                    meta={`${account?.name ?? ""} · ${formatDisplayDate(record.date)}`}
+                    amount={signedRecordAmount(record, formatLocale)}
+                    meta={t("dashboard.activity.recordMeta", {
+                      account: account?.name ?? "",
+                      date: formatDisplayDate(record.date, formatLocale),
+                    })}
                     icon={recordIcon(record.type)}
                     onClick={() =>
                       router.push(`/accounts/${record.accountId}`)

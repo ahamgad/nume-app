@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 function AddAccountHeaderAction({
   label,
@@ -34,6 +34,7 @@ function AddAccountHeaderAction({
 
 export function AccountsListScreen() {
   const t = useT();
+  const formatLocale = useFormatLocale();
   const router = useRouter();
   const { accounts, isFinanceReady, refresh } = useFinance();
 
@@ -87,13 +88,15 @@ export function AccountsListScreen() {
                 <div key={account.id}>
                   <ListRow
                     primary={account.name}
-                    secondary={[
-                      account.institution,
-                      t(getAccountTypeLabelKey(account.type)),
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                    trailing={formatCurrency(account.currentBalance)}
+                    secondary={
+                      account.institution
+                        ? t("accounts.list.meta", {
+                            institution: account.institution,
+                            type: t(getAccountTypeLabelKey(account.type)),
+                          })
+                        : t(getAccountTypeLabelKey(account.type))
+                    }
+                    trailing={formatCurrency(account.currentBalance, formatLocale)}
                     onClick={() => router.push(`/accounts/${account.id}`)}
                   />
                   {index < accounts.length - 1 ? (

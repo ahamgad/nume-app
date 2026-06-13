@@ -73,7 +73,7 @@ export function MoreProfileScreen() {
         <div className="rounded-lg border border-border px-4 py-3">
           <p className="text-sm font-medium">{t("more.profile.email")}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {user?.email ?? "—"}
+            {user?.email ?? t("common.emptyValue")}
           </p>
         </div>
         <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
@@ -172,14 +172,14 @@ export function MoreAboutScreen() {
         <div className="flex flex-col items-center py-8 text-center">
           <Image
             src="/brand-flatten-black.svg"
-            alt="NUME"
+            alt={t("common.brandName")}
             width={48}
             height={48}
             className="dark:hidden"
           />
           <Image
             src="/brand-flatten-white.svg"
-            alt="NUME"
+            alt={t("common.brandName")}
             width={48}
             height={48}
             className="hidden dark:block"

@@ -19,7 +19,8 @@ import {
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { RecordType } from "@/lib/finance/types";
-import { useT, useLocale } from "@/providers/i18n-provider";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { useT, useLocale, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
 interface AddRecordFormScreenProps {
@@ -30,6 +31,8 @@ interface AddRecordFormScreenProps {
 export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProps) {
   const t = useT();
   const locale = useLocale();
+  const formatLocale = useFormatLocale();
+  const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { getAccount, createRecord } = useFinance();
   const { showToast } = useToast();
@@ -83,7 +86,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     requestAnimationFrame(() => {
       const input = amountInputRef.current;
       if (!input) return;
-      const displayLength = formatAmountInput(sanitized).length;
+      const displayLength = formatAmountInput(sanitized, amountInputLocale).length;
       input.setSelectionRange(displayLength, displayLength);
     });
   }
@@ -181,13 +184,13 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </Label>
           <div className="relative min-w-0">
             <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-sm text-muted-foreground">
-              EGP
+              {t("common.currency.code")}
             </span>
             <Input
               ref={amountInputRef}
               id="record-amount"
               inputMode="decimal"
-              value={formatAmountInput(amount)}
+              value={formatAmountInput(amount, amountInputLocale)}
               onChange={handleAmountChange}
               className="w-full min-w-0 ps-14 tabular-nums"
               aria-invalid={Boolean(errors.amount)}
@@ -236,7 +239,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           <DateField
             id="record-date"
             value={date}
-            locale={locale === "ar" ? "ar" : "en-GB"}
+            locale={formatLocale}
             onChange={(nextDate) => {
               setDate(nextDate);
               clearFieldError("date");
@@ -255,13 +258,13 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
                 <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
                   <span>{t("records.preview.currentBalance")}</span>
                   <span className="shrink-0 tabular-nums">
-                    {formatCurrency(preview.current)}
+                    {formatCurrency(preview.current, formatLocale)}
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
                   <span>{t("records.preview.adjustment")}</span>
                   <span className="shrink-0 tabular-nums">
-                    {formatCurrency("delta" in preview ? preview.delta : 0)}
+                    {formatCurrency("delta" in preview ? preview.delta : 0, formatLocale)}
                   </span>
                 </div>
               </>
@@ -269,7 +272,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
             <div className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium text-foreground">
               <span>{t("records.preview.newBalance")}</span>
               <span className="shrink-0 tabular-nums">
-                {formatCurrency(preview.next)}
+                {formatCurrency(preview.next, formatLocale)}
               </span>
             </div>
           </div>

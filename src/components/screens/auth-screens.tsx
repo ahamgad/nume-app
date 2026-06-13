@@ -180,7 +180,11 @@ export function VerifyEmailScreen() {
     const { error: resendError } = await resendVerification();
     setSubmitting(false);
     if (resendError) {
-      setError(resendError);
+      setError(
+        resendError === "No email on file"
+          ? t("auth.verify.noEmail")
+          : resendError,
+      );
       return;
     }
     setMessage(t("auth.verify.resendSuccess"));

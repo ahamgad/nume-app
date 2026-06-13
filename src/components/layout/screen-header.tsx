@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { cn } from "@/lib/utils";
+import { useT } from "@/providers/i18n-provider";
 
 interface ScreenHeaderProps {
   title: string;
@@ -23,6 +24,7 @@ export function ScreenHeader({
   className,
 }: ScreenHeaderProps) {
   const router = useRouter();
+  const t = useT();
 
   return (
     <header
@@ -37,7 +39,7 @@ export function ScreenHeader({
             type="button"
             onClick={onBack ?? (() => router.back())}
             className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
-            aria-label="Back"
+            aria-label={t("common.back")}
           >
             <ChevronLeft className="size-6 rtl:rotate-180" />
           </button>

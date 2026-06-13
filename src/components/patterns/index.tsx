@@ -28,7 +28,7 @@ interface EducationalWidgetProps {
 export function EducationalWidget({ title, body, hint }: EducationalWidgetProps) {
   return (
     <WidgetCard>
-      <h2 className="text-lg font-semibold leading-snug">{title}</h2>
+      <h2 className="text-start text-lg font-semibold leading-snug">{title}</h2>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
         {body}
       </p>

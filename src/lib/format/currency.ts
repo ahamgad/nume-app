@@ -32,10 +32,6 @@ export function parseAmount(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-const AMOUNT_INPUT_FORMAT = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 2,
-});
-
 /** Normalize typed input to an unformatted numeric string (no commas). */
 export function sanitizeAmountInput(value: string): string {
   const stripped = value.replace(/,/g, "");
@@ -50,7 +46,14 @@ export function sanitizeAmountInput(value: string): string {
 }
 
 /** Format an unformatted amount string for display in inputs. */
-export function formatAmountInput(value: string): string {
+export function formatAmountInput(
+  value: string,
+  locale: string = "en-US",
+): string {
+  const amountInputFormat = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 2,
+  });
+
   const sanitized = sanitizeAmountInput(value);
   if (!sanitized) return "";
   if (sanitized === ".") return ".";
@@ -58,11 +61,11 @@ export function formatAmountInput(value: string): string {
   if (sanitized.endsWith(".")) {
     const intPart = sanitized.slice(0, -1);
     if (!intPart) return ".";
-    return `${AMOUNT_INPUT_FORMAT.format(Number(intPart))}.`;
+    return `${amountInputFormat.format(Number(intPart))}.`;
   }
 
   const [intPart, decPart] = sanitized.split(".");
-  const formattedInt = AMOUNT_INPUT_FORMAT.format(Number(intPart || "0"));
+  const formattedInt = amountInputFormat.format(Number(intPart || "0"));
   if (decPart !== undefined) {
     return `${formattedInt}.${decPart}`;
   }

@@ -21,12 +21,15 @@ import {
 } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
-import { useT } from "@/providers/i18n-provider";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
 
 export function AddAccountScreen() {
   const t = useT();
+  const locale = useLocale();
+  const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { accounts, createAccount } = useFinance();
   const { showToast } = useToast();
@@ -65,7 +68,7 @@ export function AddAccountScreen() {
     requestAnimationFrame(() => {
       const input = balanceInputRef.current;
       if (!input) return;
-      const displayLength = formatAmountInput(sanitized).length;
+      const displayLength = formatAmountInput(sanitized, amountInputLocale).length;
       input.setSelectionRange(displayLength, displayLength);
     });
   }
@@ -185,15 +188,15 @@ export function AddAccountScreen() {
               </Label>
               <div className="relative">
                 <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-base font-medium text-muted-foreground">
-                  EGP
+                  {t("common.currency.code")}
                 </span>
                 <Input
                   ref={balanceInputRef}
                   id="balance"
                   inputMode="decimal"
-                  value={formatAmountInput(balance)}
+                  value={formatAmountInput(balance, amountInputLocale)}
                   onChange={handleBalanceChange}
-                  placeholder="0"
+                  placeholder={t("common.currency.zeroPlaceholder")}
                   className="h-14 ps-16 text-2xl font-semibold tabular-nums tracking-tight"
                   aria-invalid={Boolean(errors.balance)}
                 />

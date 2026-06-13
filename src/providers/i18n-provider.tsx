@@ -75,3 +75,8 @@ export function useT() {
 export function useLocale() {
   return useTranslations().locale;
 }
+
+export function useFormatLocale() {
+  const locale = useLocale();
+  return locale === "ar" ? "ar-EG" : "en-GB";
+}
