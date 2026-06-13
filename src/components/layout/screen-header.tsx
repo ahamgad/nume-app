@@ -94,7 +94,7 @@ export function ScreenBody({
     return (
       <main
         className={cn(
-          "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
+          "flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 pt-4",
           "min-w-0 w-full max-w-full",
           scrollPadding,
           className,
@@ -109,7 +109,7 @@ export function ScreenBody({
     <main
       ref={elementRef}
       className={cn(
-        "relative flex-1 overflow-y-auto overflow-x-hidden",
+        "relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden",
         "min-w-0 w-full max-w-full",
         scrollPadding,
       )}

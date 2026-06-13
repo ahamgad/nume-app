@@ -47,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${fontVariables} ${geistSans.className} h-full antialiased`}>
-      <body className="min-h-dvh bg-background font-latin text-foreground">
+      <body className="h-dvh overflow-hidden bg-background font-latin text-foreground">
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

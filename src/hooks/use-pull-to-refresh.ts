@@ -19,8 +19,16 @@ function applyResistance(rawDelta: number): number {
   return Math.min(resisted, MAX_OFFSET);
 }
 
-function isAtScrollTop(element: HTMLElement): boolean {
-  return element.scrollTop <= 0;
+function isAtScrollTop(scrollContainer: HTMLElement): boolean {
+  if (scrollContainer.scrollTop > 0) return false;
+
+  if (typeof window !== "undefined") {
+    if (window.scrollY > 0) return false;
+    if (document.documentElement.scrollTop > 0) return false;
+    if (document.body.scrollTop > 0) return false;
+  }
+
+  return true;
 }
 
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
