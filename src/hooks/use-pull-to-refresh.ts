@@ -1,97 +1,129 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const PULL_THRESHOLD = 64;
-const MAX_PULL = 112;
-const REFRESH_INDICATOR_HEIGHT = 44;
+/** Finger travel required to trigger refresh (1:1 with pull distance). */
+const PULL_THRESHOLD = 52;
+const MAX_PULL = 88;
+/** Show spinner feedback once the user has pulled this far. */
+const PULL_HINT = 12;
 
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const elementRef = useRef<HTMLElement | null>(null);
   const startYRef = useRef(0);
-  const pullingRef = useRef(false);
-  const pullDistanceRef = useRef(0);
+  const isPullingRef = useRef(false);
   const isRefreshingRef = useRef(false);
+  const pullDistanceRef = useRef(0);
+  const onRefreshRef = useRef(onRefresh);
 
-  const setPull = useCallback((value: number) => {
-    pullDistanceRef.current = value;
-    setPullDistance(value);
-  }, []);
+  useEffect(() => {
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
 
   const runRefresh = useCallback(async () => {
-    if (!onRefresh || isRefreshingRef.current) return;
+    if (!onRefreshRef.current || isRefreshingRef.current) return;
+
     isRefreshingRef.current = true;
+    isPullingRef.current = false;
+    pullDistanceRef.current = 0;
+    setPullDistance(0);
     setIsRefreshing(true);
-    setPull(0);
+
     try {
-      await onRefresh();
+      await onRefreshRef.current();
     } finally {
       isRefreshingRef.current = false;
       setIsRefreshing(false);
+      isPullingRef.current = false;
+      pullDistanceRef.current = 0;
+      setPullDistance(0);
     }
-  }, [onRefresh, setPull]);
+  }, []);
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element || !onRefresh) return;
 
     function handleTouchStart(event: TouchEvent) {
-      if (element!.scrollTop > 0 || isRefreshingRef.current) return;
+      if (isRefreshingRef.current || element!.scrollTop > 0) return;
       startYRef.current = event.touches[0]?.clientY ?? 0;
-      pullingRef.current = true;
+      isPullingRef.current = true;
     }
 
     function handleTouchMove(event: TouchEvent) {
-      if (!pullingRef.current || element!.scrollTop > 0 || isRefreshingRef.current) {
+      if (isRefreshingRef.current) return;
+
+      if (!isPullingRef.current) return;
+
+      if (element!.scrollTop > 0) {
+        isPullingRef.current = false;
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
         return;
       }
 
-      const currentY = event.touches[0]?.clientY ?? 0;
-      const delta = currentY - startYRef.current;
+      const delta = (event.touches[0]?.clientY ?? 0) - startYRef.current;
 
-      if (delta > 0) {
-        event.preventDefault();
-        setPull(Math.min(delta * 0.45, MAX_PULL));
-      } else {
-        setPull(0);
+      if (delta <= 0) {
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        return;
       }
+
+      if (delta > PULL_HINT) {
+        event.preventDefault();
+      }
+
+      const distance = Math.min(delta, MAX_PULL);
+      pullDistanceRef.current = distance;
+      setPullDistance(distance);
     }
 
     function handleTouchEnd() {
-      if (!pullingRef.current) return;
-      pullingRef.current = false;
+      if (!isPullingRef.current) return;
 
-      if (pullDistanceRef.current >= PULL_THRESHOLD && !isRefreshingRef.current) {
+      const shouldRefresh =
+        pullDistanceRef.current >= PULL_THRESHOLD && !isRefreshingRef.current;
+
+      isPullingRef.current = false;
+      pullDistanceRef.current = 0;
+      setPullDistance(0);
+
+      if (shouldRefresh) {
         void runRefresh();
-        return;
       }
+    }
 
-      setPull(0);
+    function handleTouchCancel() {
+      isPullingRef.current = false;
+      pullDistanceRef.current = 0;
+      setPullDistance(0);
     }
 
     element.addEventListener("touchstart", handleTouchStart, { passive: true });
     element.addEventListener("touchmove", handleTouchMove, { passive: false });
-    element.addEventListener("touchend", handleTouchEnd);
-    element.addEventListener("touchcancel", handleTouchEnd);
+    element.addEventListener("touchend", handleTouchEnd, { passive: true });
+    element.addEventListener("touchcancel", handleTouchCancel, { passive: true });
 
     return () => {
       element.removeEventListener("touchstart", handleTouchStart);
       element.removeEventListener("touchmove", handleTouchMove);
       element.removeEventListener("touchend", handleTouchEnd);
-      element.removeEventListener("touchcancel", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [onRefresh, runRefresh, setPull]);
+  }, [onRefresh, runRefresh]);
 
-  const indicatorHeight = isRefreshing
-    ? REFRESH_INDICATOR_HEIGHT
-    : pullDistance > 0
-      ? Math.max(pullDistance, 0)
-      : 0;
+  const showIndicator =
+    isRefreshing || pullDistance >= PULL_HINT;
+
+  const indicatorOpacity = isRefreshing
+    ? 1
+    : Math.min(pullDistance / PULL_THRESHOLD, 1);
 
   return {
     elementRef,
-    indicatorHeight,
     isRefreshing,
-    isPulling: pullDistance > 0 || isRefreshing,
+    showIndicator,
+    indicatorOpacity,
   };
 }

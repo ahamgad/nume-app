@@ -74,14 +74,14 @@ export function ScreenBody({
   withStickyFooter = false,
   onRefresh,
 }: ScreenBodyProps) {
-  const { elementRef, indicatorHeight, isRefreshing, isPulling } =
+  const { elementRef, isRefreshing, showIndicator, indicatorOpacity } =
     usePullToRefresh(onRefresh);
 
   return (
     <main
       ref={elementRef}
       className={cn(
-        "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
+        "relative flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
         "min-w-0 w-full max-w-full",
         withTabBar &&
           "pb-[calc(4.5rem+env(safe-area-inset-bottom))]",
@@ -90,18 +90,16 @@ export function ScreenBody({
         className,
       )}
     >
-      {onRefresh ? (
+      {onRefresh && showIndicator ? (
         <div
-          aria-hidden={!isPulling}
-          className={cn(
-            "flex items-center justify-center overflow-hidden transition-[height] duration-200 ease-out",
-            isPulling ? "opacity-100" : "opacity-0",
-          )}
-          style={{ height: indicatorHeight }}
+          aria-live="polite"
+          aria-busy={isRefreshing}
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-center py-4"
+          style={{ opacity: indicatorOpacity }}
         >
           <Loader2
             className={cn(
-              "size-5 text-muted-foreground",
+              "size-8 text-muted-foreground",
               isRefreshing && "animate-spin",
             )}
           />
