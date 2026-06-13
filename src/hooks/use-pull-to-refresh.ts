@@ -6,7 +6,7 @@ const PULL_THRESHOLD = 56;
 const HOLD_OFFSET = 52;
 /** Maximum visual pull distance. */
 const MAX_OFFSET = 88;
-/** Finger travel before we take over the gesture (avoids blocking scroll). */
+/** Downward finger travel before committing to a pull gesture. */
 const PULL_ACTIVATION = 10;
 const RESISTANCE_SCALE = 80;
 const RESISTANCE_DIM = 0.5;
@@ -19,6 +19,10 @@ function applyResistance(rawDelta: number): number {
   return Math.min(resisted, MAX_OFFSET);
 }
 
+function isAtScrollTop(element: HTMLElement): boolean {
+  return element.scrollTop <= 0;
+}
+
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   const [offset, setOffset] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -26,7 +30,10 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
 
   const elementRef = useRef<HTMLElement | null>(null);
   const startYRef = useRef(0);
-  const isActiveRef = useRef(false);
+  /** Touch began while the scroll container was at the top. */
+  const startedAtTopRef = useRef(false);
+  /** Pull gesture is actively driving translateY / preventDefault. */
+  const isPullingRef = useRef(false);
   const isRefreshingRef = useRef(false);
   const offsetRef = useRef(0);
   const onRefreshRef = useRef(onRefresh);
@@ -39,19 +46,35 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     offsetRef.current = offset;
   }, [offset]);
 
+  const resetPull = useCallback(() => {
+    isPullingRef.current = false;
+    startedAtTopRef.current = false;
+    offsetRef.current = 0;
+    setOffset(0);
+    setIsAnimating(false);
+  }, []);
+
   const snapBack = useCallback(() => {
+    if (offsetRef.current <= 0) {
+      resetPull();
+      return;
+    }
+
+    isPullingRef.current = false;
+    startedAtTopRef.current = false;
     setIsAnimating(true);
     requestAnimationFrame(() => {
       offsetRef.current = 0;
       setOffset(0);
     });
-  }, []);
+  }, [resetPull]);
 
   const runRefresh = useCallback(async () => {
     if (!onRefreshRef.current || isRefreshingRef.current) return;
 
     isRefreshingRef.current = true;
-    isActiveRef.current = false;
+    isPullingRef.current = false;
+    startedAtTopRef.current = false;
     setIsRefreshing(true);
     setIsAnimating(true);
     setOffset(HOLD_OFFSET);
@@ -81,37 +104,48 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     if (!element || !onRefresh) return;
 
     function handleTouchStart(event: TouchEvent) {
-      if (isRefreshingRef.current || element!.scrollTop > 0) return;
+      if (isRefreshingRef.current) return;
+
+      if (!isAtScrollTop(element!)) {
+        startedAtTopRef.current = false;
+        isPullingRef.current = false;
+        return;
+      }
 
       startYRef.current = event.touches[0]?.clientY ?? 0;
-      isActiveRef.current = true;
+      startedAtTopRef.current = true;
+      isPullingRef.current = false;
       setIsAnimating(false);
     }
 
     function handleTouchMove(event: TouchEvent) {
       if (isRefreshingRef.current) return;
-      if (!isActiveRef.current) return;
 
-      if (element!.scrollTop > 0) {
-        isActiveRef.current = false;
-        offsetRef.current = 0;
-        setOffset(0);
-        setIsAnimating(false);
+      if (!isAtScrollTop(element!)) {
+        if (isPullingRef.current || offsetRef.current > 0) {
+          resetPull();
+        } else {
+          startedAtTopRef.current = false;
+          isPullingRef.current = false;
+        }
         return;
       }
+
+      if (!startedAtTopRef.current) return;
 
       const rawDelta = (event.touches[0]?.clientY ?? 0) - startYRef.current;
 
       if (rawDelta <= 0) {
-        offsetRef.current = 0;
-        setOffset(0);
-        setIsAnimating(false);
+        if (isPullingRef.current || offsetRef.current > 0) {
+          resetPull();
+        }
         return;
       }
 
-      if (rawDelta > PULL_ACTIVATION) {
-        event.preventDefault();
-      }
+      if (rawDelta <= PULL_ACTIVATION) return;
+
+      isPullingRef.current = true;
+      event.preventDefault();
 
       const distance = applyResistance(rawDelta);
       offsetRef.current = distance;
@@ -120,12 +154,18 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     }
 
     function handleTouchEnd() {
-      if (!isActiveRef.current) return;
+      if (isRefreshingRef.current) return;
 
-      isActiveRef.current = false;
+      if (!isPullingRef.current && offsetRef.current <= 0) {
+        startedAtTopRef.current = false;
+        return;
+      }
 
       const shouldRefresh =
         offsetRef.current >= PULL_THRESHOLD && !isRefreshingRef.current;
+
+      isPullingRef.current = false;
+      startedAtTopRef.current = false;
 
       if (shouldRefresh) {
         void runRefresh();
@@ -136,11 +176,12 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     }
 
     function handleTouchCancel() {
-      if (!isActiveRef.current) return;
-
-      isActiveRef.current = false;
-
       if (isRefreshingRef.current) return;
+
+      if (!isPullingRef.current && offsetRef.current <= 0) {
+        startedAtTopRef.current = false;
+        return;
+      }
 
       snapBack();
     }
@@ -156,7 +197,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       element.removeEventListener("touchend", handleTouchEnd);
       element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [onRefresh, runRefresh, snapBack]);
+  }, [onRefresh, runRefresh, resetPull, snapBack]);
 
   const showIndicator = isRefreshing || offset > 0;
 
