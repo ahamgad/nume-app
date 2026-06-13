@@ -169,6 +169,8 @@ export const en = {
       cash: "Cash",
       wallet: "Wallet",
       certificate: "Certificate 🏦",
+      gold: "Gold",
+      loan: "Loans",
     },
     empty: {
       title: "Your accounts live here",
@@ -185,6 +187,7 @@ export const en = {
       lead: "Enter the account name and today's balance.",
       certificateLead: "Track a fixed-term deposit with expected returns.",
       balanceHint: "Use the balance you see in your bank app today.",
+      comingSoon: "Coming soon",
       firstAccount: {
         title: "Add your first account",
         lead: "Start with one account you use every day. You can add more later.",
@@ -285,8 +288,9 @@ export const en = {
       },
       term: {
         label: "Term",
-        custom: "Custom months",
-        months: "{count} months",
+        custom: "Custom years",
+        yearOne: "1 year",
+        yearsCount: "{count} years",
       },
       payoutFrequency: {
         label: "Payout frequency",
@@ -325,7 +329,7 @@ export const en = {
       archiveConfirm: {
         title: "Archive this certificate?",
         description:
-          "This removes the certificate from your active accounts. You can review archived items later.",
+          "This removes the certificate from your active accounts and net worth.",
         confirm: "Archive certificate",
         archiving: "Archiving…",
         cancel: "Cancel",
@@ -342,9 +346,11 @@ export const en = {
       rateMax: "Rate cannot exceed 100%",
       purchaseDateRequired: "Purchase date is required",
       purchaseDateFuture: "Purchase date cannot be in the future",
-      termRequired: "Enter a valid term in months",
+      termRequired: "Enter a valid term in years",
       termMin: "Term must be at least 1 month",
-      termMax: "Term cannot exceed 600 months",
+      termMax: "Term cannot exceed 50 years",
+      termYearsMin: "Enter at least 1 year",
+      termYearsMax: "Term cannot exceed 50 years",
     },
   },
   records: {

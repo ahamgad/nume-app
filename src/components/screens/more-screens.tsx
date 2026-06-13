@@ -1,15 +1,27 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { isDevEnvironment } from "@/dev/is-dev-environment";
 import { useT, useTranslations } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
+
+const CertificatesQaDevPanel = isDevEnvironment
+  ? dynamic(
+      () =>
+        import("@/dev/certificates-qa-dev-panel").then(
+          (module) => module.CertificatesQaDevPanel,
+        ),
+      { ssr: false },
+    )
+  : () => null;
 
 export function MoreScreen() {
   const t = useT();
@@ -58,6 +70,8 @@ export function MoreScreen() {
         >
           {t("more.logout")}
         </Button>
+
+        {isDevEnvironment ? <CertificatesQaDevPanel /> : null}
       </ScreenBody>
     </>
   );

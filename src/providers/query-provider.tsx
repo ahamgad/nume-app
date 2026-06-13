@@ -21,12 +21,12 @@ export function QueryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     function handleVisibilityChange() {
       if (document.visibilityState === "visible") {
-        void client.invalidateQueries();
+        void client.invalidateQueries({ queryKey: ["finance"] });
       }
     }
 
     function handlePageShow() {
-      void client.invalidateQueries();
+      void client.invalidateQueries({ queryKey: ["finance"] });
     }
 
     document.addEventListener("visibilitychange", handleVisibilityChange);

@@ -12,9 +12,9 @@ import {
 import {
   archiveCertificate as archiveCertificateService,
   createCertificate as createCertificateService,
-  getCertificates,
   updateCertificate as updateCertificateService,
 } from "@/lib/certificates/service";
+import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import type {
   Certificate,
   CreateCertificateInput,
@@ -36,6 +36,7 @@ import type {
   FinanceRecord,
 } from "@/lib/finance/types";
 import { createClient } from "@/lib/supabase/client";
+import { logSupabaseError } from "@/lib/supabase/errors";
 import { useAuth } from "@/providers/auth-provider";
 
 const FINANCE_QUERY_KEY = "finance";
@@ -88,15 +89,24 @@ const FinanceContext = createContext<FinanceContextValue | null>(null);
 
 async function loadFinanceData(userId: string): Promise<FinanceData> {
   const supabase = createClient();
-  const [accounts, records, certificatesRaw] = await Promise.all([
+  // Core money data must never depend on optional Certificates migration.
+  const [accounts, records] = await Promise.all([
     fetchAccounts(supabase, userId),
     fetchRecords(supabase, userId),
-    getCertificates(supabase, userId),
   ]);
+
+  let certificates: Certificate[] = [];
+  try {
+    certificates = await getCertificatesSafe(supabase, userId);
+  } catch (error) {
+    logSupabaseError("loadFinanceData:certificates", error);
+  }
+
   const activeAccountIds = new Set(accounts.map((account) => account.id));
-  const certificates = certificatesRaw.filter((certificate) =>
+  certificates = certificates.filter((certificate) =>
     activeAccountIds.has(certificate.accountId),
   );
+
   return { accounts, records, certificates };
 }
 
@@ -143,6 +153,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     await queryClient.invalidateQueries({ queryKey: [FINANCE_QUERY_KEY, userId] });
   }, [queryClient, userId]);
 
+  const refresh = useCallback(async () => {
+    if (!userId) return;
+    await queryClient.refetchQueries({ queryKey: [FINANCE_QUERY_KEY, userId] });
+  }, [queryClient, userId]);
+
   const createAccount = useCallback(
     async (input: CreateAccountInput): Promise<Account> => {
       if (!userId) throw new Error("Not authenticated");
@@ -156,10 +171,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           certificates: current?.certificates ?? [],
         }),
       );
-      void invalidate();
       return account;
     },
-    [userId, invalidate, queryClient],
+    [userId, queryClient],
   );
 
   const createCertificate = useCallback(
@@ -176,10 +190,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           certificates: [...(current?.certificates ?? []), certificate],
         }),
       );
-      void invalidate();
       return certificate;
     },
-    [userId, invalidate, queryClient],
+    [userId, queryClient],
   );
 
   const updateCertificate = useCallback(
@@ -228,10 +241,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           };
         },
       );
-      void invalidate();
       return updated;
     },
-    [userId, invalidate, queryClient],
+    [userId, queryClient],
   );
 
   const archiveCertificate = useCallback(
@@ -259,9 +271,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           };
         },
       );
-      void invalidate();
     },
-    [userId, certificates, invalidate, queryClient],
+    [userId, certificates, queryClient],
   );
 
   const deleteAccount = useCallback(
@@ -281,9 +292,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           ),
         }),
       );
-      void invalidate();
     },
-    [userId, invalidate, queryClient],
+    [userId, queryClient],
   );
 
   const updateAccount = useCallback(
@@ -393,7 +403,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccountRecords,
       createRecord,
       recentRecords,
-      refresh: invalidate,
+      refresh,
     }),
     [
       accounts,
@@ -415,7 +425,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccountRecords,
       createRecord,
       recentRecords,
-      invalidate,
+      refresh,
     ],
   );
 

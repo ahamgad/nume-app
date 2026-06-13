@@ -41,6 +41,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     getCertificateByAccountId,
     archiveCertificate,
     isFinanceReady,
+    refresh,
   } = useFinance();
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
@@ -119,7 +120,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         title={account.name}
         onBack={() => router.push("/accounts")}
       />
-      <ScreenBody withTabBar={false} className="space-y-6">
+      <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
         <div>
           {account.institution ? (
             <p className="text-[0.8125rem] text-muted-foreground">

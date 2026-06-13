@@ -43,7 +43,7 @@ function EditCertificateForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateCertificate } = useFinance();
+  const { updateCertificate, refresh } = useFinance();
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -91,12 +91,12 @@ function EditCertificateForm({
       });
       showToast(t("certificates.edit.success"));
       router.replace(`/accounts/${accountId}`);
+      return;
     } catch (error) {
       logSupabaseError("updateCertificate", error);
       setErrors({
         form: getSupabaseErrorMessage(error) || t("common.retry"),
       });
-    } finally {
       setSubmitting(false);
     }
   }
@@ -116,12 +116,13 @@ function EditCertificateForm({
         title={t("certificates.edit.title")}
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} withStickyFooter>
+      <ScreenBody withTabBar={false} withStickyFooter onRefresh={refresh}>
         <div className="space-y-6 pt-2">
           <CertificateFormFields
             values={values}
             errors={errors}
             amountInputLocale={amountInputLocale}
+            disabled={submitting}
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />

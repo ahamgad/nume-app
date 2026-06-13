@@ -6,8 +6,13 @@ import { DateField } from "@/components/ui/date-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  CERTIFICATE_TERM_PRESETS,
+  ScrollChipSelect,
+  type ScrollChipOption,
+} from "@/components/ui/scroll-chip-select";
+import {
+  CERTIFICATE_TERM_YEAR_PRESETS,
   type CertificateFormValues,
+  type CertificateTermPreset,
 } from "@/lib/certificates/form";
 import type { PayoutFrequency } from "@/lib/certificates/types";
 import {
@@ -16,7 +21,6 @@ import {
 } from "@/lib/format/currency";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
-import { cn } from "@/lib/utils";
 
 const PAYOUT_FREQUENCIES: PayoutFrequency[] = [
   "monthly",
@@ -30,14 +34,24 @@ interface CertificateFormFieldsProps {
   values: CertificateFormValues;
   errors: Record<string, string>;
   amountInputLocale: string;
+  disabled?: boolean;
   onChange: (patch: Partial<CertificateFormValues>) => void;
   onClearError: (field: string) => void;
+}
+
+function termYearLabel(
+  years: number,
+  t: ReturnType<typeof useT>,
+): string {
+  if (years === 1) return t("certificates.fields.term.yearOne");
+  return t("certificates.fields.term.yearsCount", { count: years });
 }
 
 export function CertificateFormFields({
   values,
   errors,
   amountInputLocale,
+  disabled = false,
   onChange,
   onClearError,
 }: CertificateFormFieldsProps) {
@@ -45,6 +59,24 @@ export function CertificateFormFields({
   const formatLocale = useFormatLocale();
   const principalInputRef = useRef<HTMLInputElement>(null);
   const rateInputRef = useRef<HTMLInputElement>(null);
+
+  const termOptions: ScrollChipOption<CertificateTermPreset>[] = [
+    ...CERTIFICATE_TERM_YEAR_PRESETS.map((years) => ({
+      value: years,
+      label: termYearLabel(years, t),
+    })),
+    {
+      value: "custom",
+      label: t("certificates.fields.term.custom"),
+    },
+  ];
+
+  const payoutOptions: ScrollChipOption<PayoutFrequency>[] = PAYOUT_FREQUENCIES.map(
+    (frequency) => ({
+      value: frequency,
+      label: t(`certificates.payoutFrequency.${frequency}` as TranslationKey),
+    }),
+  );
 
   function handleAmountChange(
     field: "principalAmount" | "annualInterestRate",
@@ -69,6 +101,7 @@ export function CertificateFormFields({
         <Input
           id="certificate-name"
           value={values.name}
+          disabled={disabled}
           onChange={(event) => {
             onChange({ name: event.target.value });
             onClearError("name");
@@ -89,6 +122,7 @@ export function CertificateFormFields({
         <Input
           id="certificate-institution"
           value={values.institution}
+          disabled={disabled}
           onChange={(event) => onChange({ institution: event.target.value })}
           placeholder={t("certificates.fields.institution.placeholder")}
           autoComplete="organization"
@@ -107,6 +141,7 @@ export function CertificateFormFields({
             ref={principalInputRef}
             id="certificate-principal"
             inputMode="decimal"
+            disabled={disabled}
             value={formatAmountInput(values.principalAmount, amountInputLocale)}
             onChange={(event) =>
               handleAmountChange(
@@ -136,6 +171,7 @@ export function CertificateFormFields({
             ref={rateInputRef}
             id="certificate-rate"
             inputMode="decimal"
+            disabled={disabled}
             value={formatAmountInput(values.annualInterestRate, amountInputLocale)}
             onChange={(event) =>
               handleAmountChange(
@@ -168,6 +204,7 @@ export function CertificateFormFields({
         <DateField
           id="certificate-purchase-date"
           value={values.purchaseDate}
+          disabled={disabled}
           onChange={(value) => {
             onChange({ purchaseDate: value });
             onClearError("purchaseDate");
@@ -182,47 +219,29 @@ export function CertificateFormFields({
 
       <div className="space-y-2">
         <Label>{t("certificates.fields.term.label")}</Label>
-        <div className="grid grid-cols-3 gap-2">
-          {CERTIFICATE_TERM_PRESETS.map((months) => (
-            <button
-              key={months}
-              type="button"
-              onClick={() => {
-                onChange({ termPreset: months, customTermMonths: "" });
-                onClearError("term");
-              }}
-              className={cn(
-                "inline-flex min-h-11 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
-                values.termPreset === months
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-background text-foreground",
-              )}
-            >
-              {t("certificates.fields.term.months", { count: months })}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              onChange({ termPreset: "custom" });
-              onClearError("term");
-            }}
-            className={cn(
-              "col-span-3 inline-flex min-h-11 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
-              values.termPreset === "custom"
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-background text-foreground",
-            )}
-          >
-            {t("certificates.fields.term.custom")}
-          </button>
-        </div>
+        <ScrollChipSelect<CertificateTermPreset>
+          value={values.termPreset}
+          options={termOptions}
+          ariaLabel={t("certificates.fields.term.label")}
+          onChange={(termPreset) => {
+            onChange({
+              termPreset,
+              customTermYears: termPreset === "custom" ? values.customTermYears : "",
+            });
+            onClearError("term");
+          }}
+        />
         {values.termPreset === "custom" ? (
           <Input
-            inputMode="numeric"
-            value={values.customTermMonths}
+            inputMode="decimal"
+            disabled={disabled}
+            value={values.customTermYears}
             onChange={(event) => {
-              onChange({ customTermMonths: event.target.value.replace(/\D/g, "") });
+              const raw = event.target.value.replace(/[^\d.]/g, "");
+              const [whole, fraction = ""] = raw.split(".");
+              const sanitized =
+                raw.includes(".") ? `${whole}.${fraction.slice(0, 1)}` : whole;
+              onChange({ customTermYears: sanitized });
               onClearError("term");
             }}
             placeholder={t("certificates.fields.term.custom")}
@@ -236,23 +255,12 @@ export function CertificateFormFields({
 
       <div className="space-y-2">
         <Label>{t("certificates.fields.payoutFrequency.label")}</Label>
-        <div className="flex flex-wrap gap-2">
-          {PAYOUT_FREQUENCIES.map((frequency) => (
-            <button
-              key={frequency}
-              type="button"
-              onClick={() => onChange({ payoutFrequency: frequency })}
-              className={cn(
-                "inline-flex min-h-11 flex-1 basis-[calc(50%-0.25rem)] items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
-                values.payoutFrequency === frequency
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-background text-foreground",
-              )}
-            >
-              {t(`certificates.payoutFrequency.${frequency}` as TranslationKey)}
-            </button>
-          ))}
-        </div>
+        <ScrollChipSelect
+          value={values.payoutFrequency}
+          options={payoutOptions}
+          ariaLabel={t("certificates.fields.payoutFrequency.label")}
+          onChange={(payoutFrequency) => onChange({ payoutFrequency })}
+        />
       </div>
     </div>
   );

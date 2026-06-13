@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
@@ -10,19 +10,24 @@ import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ScrollChipSelect,
+  type ScrollChipOption,
+} from "@/components/ui/scroll-chip-select";
 import {
   DEFAULT_CERTIFICATE_FORM_VALUES,
   resolveTermMonths,
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
-import { ADD_ACCOUNT_TYPES, isCertificateAccountType } from "@/lib/finance/add-account-types";
-import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import {
-  ENABLED_ADD_ACCOUNT_TYPES,
-  type AccountType,
-  type MoneyAccountType,
-} from "@/lib/finance/types";
+  ADD_ACCOUNT_TYPES,
+  isCertificateAccountType,
+  ONBOARDING_ACCOUNT_TYPES,
+} from "@/lib/finance/add-account-types";
+import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
+import type { AccountType, MoneyAccountType } from "@/lib/finance/types";
 import {
   formatAmountInput,
   parseAmount,
@@ -37,15 +42,39 @@ import { cn } from "@/lib/utils";
 
 export function AddAccountScreen() {
   const t = useT();
+  const { accounts, isFinanceReady } = useFinance();
+
+  if (!isFinanceReady) {
+    return (
+      <>
+        <ScreenHeader mode="stack" title={t("common.loading")} />
+        <ScreenBody withTabBar={false}>
+          <Skeleton className="mt-4 h-10 w-full rounded-md" />
+          <Skeleton className="mt-4 h-14 w-full rounded-md" />
+          <Skeleton className="mt-4 h-14 w-full rounded-md" />
+        </ScreenBody>
+      </>
+    );
+  }
+
+  return (
+    <AddAccountForm isFirstAccountFlow={accounts.length === 0} />
+  );
+}
+
+interface AddAccountFormProps {
+  isFirstAccountFlow: boolean;
+}
+
+function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
+  const t = useT();
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { accounts, createAccount, createCertificate } = useFinance();
+  const { createAccount, createCertificate } = useFinance();
   const { showToast } = useToast();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const balanceInputRef = useRef<HTMLInputElement>(null);
-
-  const isFirstAccount = accounts.length === 0;
 
   const [accountType, setAccountType] = useState<AccountType>("current_account");
   const [name, setName] = useState("");
@@ -64,12 +93,28 @@ export function AddAccountScreen() {
       certificateValues.institution.trim().length > 0 ||
       certificateValues.principalAmount.trim().length > 0 ||
       certificateValues.annualInterestRate.trim().length > 0 ||
-      certificateValues.customTermMonths.trim().length > 0
+      certificateValues.customTermYears.trim().length > 0
     : name.trim().length > 0 || balance.trim().length > 0;
 
   useEffect(() => {
     nameInputRef.current?.focus();
   }, []);
+
+  const accountTypeOptions = useMemo((): ScrollChipOption<AccountType>[] => {
+    if (isFirstAccountFlow) {
+      return ONBOARDING_ACCOUNT_TYPES.map((option) => ({
+        value: option.type,
+        label: t(getAccountTypeLabelKey(option.type)),
+        disabled: !option.enabled,
+        hint: option.enabled ? undefined : t("accounts.add.comingSoon"),
+      }));
+    }
+
+    return ADD_ACCOUNT_TYPES.map((type) => ({
+      value: type,
+      label: t(getAccountTypeLabelKey(type)),
+    }));
+  }, [isFirstAccountFlow, t]);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -137,12 +182,12 @@ export function AddAccountScreen() {
         });
         showToast(t("certificates.create.success"));
         router.replace(`/accounts/${certificate.accountId}`);
+        return;
       } catch (error) {
         logSupabaseError("createCertificate", error);
         setErrors({
           form: getSupabaseErrorMessage(error) || t("common.retry"),
         });
-      } finally {
         setSubmitting(false);
       }
       return;
@@ -161,25 +206,32 @@ export function AddAccountScreen() {
       });
       showToast(t("common.accountCreated"));
       router.replace(`/accounts/${account.id}`);
+      return;
     } catch (error) {
       logSupabaseError("createAccount", error);
       setErrors({
         form: getSupabaseErrorMessage(error) || t("common.retry"),
       });
-    } finally {
       setSubmitting(false);
     }
   }
 
+  function handleAccountTypeChange(type: AccountType) {
+    setAccountType(type);
+    setErrors({});
+    if (isCertificateAccountType(type)) {
+      setCertificateValues(DEFAULT_CERTIFICATE_FORM_VALUES);
+    }
+  }
+
   function handleBack() {
+    if (submitting) return;
     if (isDirty) {
       setShowDiscard(true);
       return;
     }
     router.back();
   }
-
-  const selectableTypes = isFirstAccount ? ENABLED_ADD_ACCOUNT_TYPES : ADD_ACCOUNT_TYPES;
 
   return (
     <>
@@ -188,53 +240,43 @@ export function AddAccountScreen() {
         title={
           isCertificate
             ? t("certificates.create.title")
-            : isFirstAccount
+            : isFirstAccountFlow
               ? t("accounts.add.firstAccount.title")
               : t("accounts.add.title")
         }
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <div className="space-y-6 pt-2">
+        <div
+          className={cn(
+            "space-y-6 pt-2",
+            submitting && "pointer-events-none opacity-60",
+          )}
+        >
           <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
             {isCertificate
               ? t("accounts.add.certificateLead")
-              : isFirstAccount
+              : isFirstAccountFlow
                 ? t("accounts.add.firstAccount.lead")
                 : t("accounts.add.lead")}
           </p>
 
-          {!isFirstAccount || !isCertificate ? (
-            <div className="space-y-2">
-              <Label>{t("accounts.add.chooseType")}</Label>
-              <div className={cn("grid gap-2", isFirstAccount ? "grid-cols-3" : "grid-cols-2")}>
-                {selectableTypes.map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => {
-                      setAccountType(type);
-                      setErrors({});
-                    }}
-                    className={cn(
-                      "inline-flex min-h-11 items-center justify-center rounded-md border px-2 py-2 text-xs font-medium transition-colors",
-                      accountType === type
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border bg-background text-foreground",
-                    )}
-                  >
-                    {t(getAccountTypeLabelKey(type))}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
+          <div className="space-y-2">
+            <Label>{t("accounts.add.chooseType")}</Label>
+            <ScrollChipSelect
+              value={accountType}
+              options={accountTypeOptions}
+              ariaLabel={t("accounts.add.chooseType")}
+              onChange={handleAccountTypeChange}
+            />
+          </div>
 
           {isCertificate ? (
             <CertificateFormFields
               values={certificateValues}
               errors={errors}
               amountInputLocale={amountInputLocale}
+              disabled={submitting}
               onChange={(patch) =>
                 setCertificateValues((current) => ({ ...current, ...patch }))
               }
@@ -250,6 +292,7 @@ export function AddAccountScreen() {
                   ref={nameInputRef}
                   id="account-name"
                   value={name}
+                  disabled={submitting}
                   onChange={(e) => {
                     setName(e.target.value);
                     clearFieldError("name");
@@ -275,6 +318,7 @@ export function AddAccountScreen() {
                     ref={balanceInputRef}
                     id="balance"
                     inputMode="decimal"
+                    disabled={submitting}
                     value={formatAmountInput(balance, amountInputLocale)}
                     onChange={handleBalanceChange}
                     placeholder={t("common.currency.zeroPlaceholder")}
@@ -311,7 +355,7 @@ export function AddAccountScreen() {
               : t("accounts.creating")
             : isCertificate
               ? t("certificates.create.submit")
-              : isFirstAccount
+              : isFirstAccountFlow
                 ? t("accounts.add.firstAccount.cta")
                 : t("accounts.createAccount")}
         </Button>

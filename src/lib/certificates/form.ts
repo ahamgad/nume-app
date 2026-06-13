@@ -1,11 +1,14 @@
 import type { PayoutFrequency } from "@/lib/certificates/types";
-import { todayIsoDate } from "@/lib/format/date";
+import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import type { TranslationKey } from "@/lib/i18n";
 import { parseAmount } from "@/lib/format/currency";
 
-export const CERTIFICATE_TERM_PRESETS = [3, 6, 12, 24, 36] as const;
+/** Preset certificate terms in whole years (stored as months in DB). */
+export const CERTIFICATE_TERM_YEAR_PRESETS = [1, 2, 3, 4, 5] as const;
 
-export type CertificateTermPreset = (typeof CERTIFICATE_TERM_PRESETS)[number] | "custom";
+export type CertificateTermPreset =
+  | (typeof CERTIFICATE_TERM_YEAR_PRESETS)[number]
+  | "custom";
 
 export interface CertificateFormValues {
   name: string;
@@ -14,7 +17,7 @@ export interface CertificateFormValues {
   annualInterestRate: string;
   purchaseDate: string;
   termPreset: CertificateTermPreset;
-  customTermMonths: string;
+  customTermYears: string;
   payoutFrequency: PayoutFrequency;
 }
 
@@ -24,18 +27,26 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   principalAmount: "",
   annualInterestRate: "",
   purchaseDate: todayIsoDate(),
-  termPreset: 12,
-  customTermMonths: "",
+  termPreset: 1,
+  customTermYears: "",
   payoutFrequency: "at_maturity",
 };
 
+export function yearsToTermMonths(years: number): number {
+  return Math.round(years * 12);
+}
+
+export function termMonthsToYears(termMonths: number): number {
+  return termMonths / 12;
+}
+
 export function resolveTermMonths(values: CertificateFormValues): number | null {
   if (values.termPreset === "custom") {
-    const months = Number.parseInt(values.customTermMonths, 10);
-    if (!Number.isFinite(months)) return null;
-    return months;
+    const years = Number.parseFloat(values.customTermYears);
+    if (!Number.isFinite(years)) return null;
+    return yearsToTermMonths(years);
   }
-  return values.termPreset;
+  return yearsToTermMonths(values.termPreset);
 }
 
 export function validateCertificateForm(
@@ -66,7 +77,7 @@ export function validateCertificateForm(
 
   if (!values.purchaseDate) {
     errors.purchaseDate = t("certificates.validation.purchaseDateRequired");
-  } else if (values.purchaseDate > todayIsoDate()) {
+  } else if (isFutureDate(values.purchaseDate)) {
     errors.purchaseDate = t("certificates.validation.purchaseDateFuture");
   }
 
@@ -77,6 +88,15 @@ export function validateCertificateForm(
     errors.term = t("certificates.validation.termMin");
   } else if (termMonths > 600) {
     errors.term = t("certificates.validation.termMax");
+  }
+
+  if (values.termPreset === "custom") {
+    const years = Number.parseFloat(values.customTermYears);
+    if (!Number.isFinite(years) || years <= 0) {
+      errors.term = t("certificates.validation.termYearsMin");
+    } else if (years > 50) {
+      errors.term = t("certificates.validation.termYearsMax");
+    }
   }
 
   return errors;
@@ -92,11 +112,11 @@ export function certificateFormValuesFromCertificate(
   },
   account: { name: string; institution: string | null },
 ): CertificateFormValues {
-  const preset = CERTIFICATE_TERM_PRESETS.includes(
-    certificate.termMonths as (typeof CERTIFICATE_TERM_PRESETS)[number],
-  )
-    ? (certificate.termMonths as CertificateTermPreset)
-    : "custom";
+  const years = termMonthsToYears(certificate.termMonths);
+  const presetYear = CERTIFICATE_TERM_YEAR_PRESETS.find(
+    (value) => yearsToTermMonths(value) === certificate.termMonths,
+  );
+  const termPreset: CertificateTermPreset = presetYear ?? "custom";
 
   return {
     name: account.name,
@@ -104,8 +124,11 @@ export function certificateFormValuesFromCertificate(
     principalAmount: String(certificate.principalAmount),
     annualInterestRate: String(certificate.annualInterestRate),
     purchaseDate: certificate.purchaseDate,
-    termPreset: preset,
-    customTermMonths: preset === "custom" ? String(certificate.termMonths) : "",
+    termPreset,
+    customTermYears:
+      termPreset === "custom"
+        ? String(Number.isInteger(years) ? years : Number(years.toFixed(2)))
+        : "",
     payoutFrequency: certificate.payoutFrequency,
   };
 }
@@ -121,7 +144,7 @@ export function isCertificateFormDirty(
     values.annualInterestRate !== initial.annualInterestRate ||
     values.purchaseDate !== initial.purchaseDate ||
     values.termPreset !== initial.termPreset ||
-    values.customTermMonths !== initial.customTermMonths ||
+    values.customTermYears !== initial.customTermYears ||
     values.payoutFrequency !== initial.payoutFrequency
   );
 }

@@ -1,5 +1,8 @@
 -- NUME Phase 3.1b.1: certificates configuration (1:1 with accounts)
 -- Run after 003_grants_authenticated.sql
+--
+-- SAFETY: This migration is additive only. It must NOT alter, delete, or hide
+-- existing rows in public.accounts or public.records.
 
 create type public.certificate_payout_frequency as enum (
   'monthly',

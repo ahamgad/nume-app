@@ -7,6 +7,7 @@ import type {
   CreateCertificateInput,
   UpdateCertificateInput,
 } from "@/lib/certificates/types";
+import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import { patchAccount } from "@/lib/finance/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 
@@ -34,14 +35,7 @@ export async function getCertificates(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<Certificate[]> {
-  const { data, error } = await supabase
-    .from("certificates")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: true });
-
-  if (error) throw error;
-  return (data as DbCertificate[]).map(mapCertificate);
+  return getCertificatesSafe(supabase, userId);
 }
 
 export async function getCertificateByAccountId(

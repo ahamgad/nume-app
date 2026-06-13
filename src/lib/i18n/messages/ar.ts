@@ -170,6 +170,8 @@ export const ar = {
       cash: "نقد",
       wallet: "محفظة",
       certificate: "شهادة 🏦",
+      gold: "ذهب",
+      loan: "قروض",
     },
     empty: {
       title: "حساباتك هنا",
@@ -185,6 +187,7 @@ export const ar = {
       lead: "أدخل اسم الحساب ورصيده اليوم.",
       certificateLead: "تتبّع وديعة لأجل بعائد متوقّع.",
       balanceHint: "استخدم الرصيد الظاهر في تطبيق البنك اليوم.",
+      comingSoon: "قريبًا",
       firstAccount: {
         title: "أضف حسابك الأول",
         lead: "ابدأ بحساب واحد تستخدمه يوميًا. يمكنك إضافة المزيد لاحقًا.",
@@ -284,8 +287,9 @@ export const ar = {
       },
       term: {
         label: "المدة",
-        custom: "أشهر مخصصة",
-        months: "{count} شهرًا",
+        custom: "سنوات مخصصة",
+        yearOne: "سنة واحدة",
+        yearsCount: "{count} سنوات",
       },
       payoutFrequency: {
         label: "وتيرة الدفع",
@@ -324,7 +328,7 @@ export const ar = {
       archiveConfirm: {
         title: "أرشفة هذه الشهادة؟",
         description:
-          "سيُزال هذا من حساباتك النشطة. يمكنك مراجعة المؤرشف لاحقًا.",
+          "سيُزال هذا من حساباتك النشطة وصافي ثروتك.",
         confirm: "أرشفة الشهادة",
         archiving: "جارٍ الأرشفة…",
         cancel: "إلغاء",
@@ -341,9 +345,11 @@ export const ar = {
       rateMax: "لا يمكن أن يتجاوز المعدل 100%",
       purchaseDateRequired: "تاريخ الشراء مطلوب",
       purchaseDateFuture: "لا يمكن أن يكون تاريخ الشراء في المستقبل",
-      termRequired: "أدخل مدة صالحة بالأشهر",
+      termRequired: "أدخل مدة صالحة بالسنوات",
       termMin: "يجب أن تكون المدة شهرًا واحدًا على الأقل",
-      termMax: "لا يمكن أن تتجاوز المدة 600 شهرًا",
+      termMax: "لا يمكن أن تتجاوز المدة 50 سنة",
+      termYearsMin: "أدخل سنة واحدة على الأقل",
+      termYearsMax: "لا يمكن أن تتجاوز المدة 50 سنة",
     },
   },
   records: {
