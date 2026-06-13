@@ -7,6 +7,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
+import { DateField } from "@/components/ui/date-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,7 +19,7 @@ import {
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { RecordType } from "@/lib/finance/types";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
 interface AddRecordFormScreenProps {
@@ -28,6 +29,7 @@ interface AddRecordFormScreenProps {
 
 export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProps) {
   const t = useT();
+  const locale = useLocale();
   const router = useRouter();
   const { getAccount, createRecord } = useFinance();
   const { showToast } = useToast();
@@ -231,12 +233,12 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
 
         <div className="min-w-0 w-full max-w-full space-y-2">
           <Label htmlFor="record-date">{t("records.fields.date")}</Label>
-          <Input
+          <DateField
             id="record-date"
-            type="date"
             value={date}
-            onChange={(e) => {
-              setDate(e.target.value);
+            locale={locale === "ar" ? "ar" : "en-GB"}
+            onChange={(nextDate) => {
+              setDate(nextDate);
               clearFieldError("date");
             }}
             aria-invalid={Boolean(errors.date)}

@@ -74,28 +74,52 @@ export function ScreenBody({
   withStickyFooter = false,
   onRefresh,
 }: ScreenBodyProps) {
-  const { elementRef, isRefreshing, showIndicator, indicatorOpacity } =
-    usePullToRefresh(onRefresh);
+  const {
+    elementRef,
+    isRefreshing,
+    isAnimating,
+    showIndicator,
+    indicatorOpacity,
+    offset,
+    contentStyle,
+    handleTransitionEnd,
+  } = usePullToRefresh(onRefresh);
+
+  const scrollPadding = cn(
+    withTabBar && "pb-[calc(4.5rem+env(safe-area-inset-bottom))]",
+    withStickyFooter && "pb-[calc(5.5rem+env(safe-area-inset-bottom))]",
+  );
+
+  if (!onRefresh) {
+    return (
+      <main
+        className={cn(
+          "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
+          "min-w-0 w-full max-w-full",
+          scrollPadding,
+          className,
+        )}
+      >
+        {children}
+      </main>
+    );
+  }
 
   return (
     <main
       ref={elementRef}
       className={cn(
-        "relative flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
+        "relative flex-1 overflow-y-auto overflow-x-hidden",
         "min-w-0 w-full max-w-full",
-        withTabBar &&
-          "pb-[calc(4.5rem+env(safe-area-inset-bottom))]",
-        withStickyFooter &&
-          "pb-[calc(5.5rem+env(safe-area-inset-bottom))]",
-        className,
+        scrollPadding,
       )}
     >
-      {onRefresh && showIndicator ? (
+      {showIndicator ? (
         <div
           aria-live="polite"
           aria-busy={isRefreshing}
-          className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-center py-4"
-          style={{ opacity: indicatorOpacity }}
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-center"
+          style={{ height: offset, opacity: indicatorOpacity }}
         >
           <Loader2
             className={cn(
@@ -105,7 +129,16 @@ export function ScreenBody({
           />
         </div>
       ) : null}
-      {children}
+      <div
+        style={contentStyle}
+        onTransitionEnd={handleTransitionEnd}
+        className={cn(
+          "min-w-0 w-full max-w-full",
+          offset > 0 || isAnimating ? "will-change-transform" : undefined,
+        )}
+      >
+        <div className={cn("px-4 pt-4", className)}>{children}</div>
+      </div>
     </main>
   );
 }

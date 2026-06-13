@@ -1,44 +1,80 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type TransitionEvent } from "react";
 
-/** Finger travel required to trigger refresh (1:1 with pull distance). */
-const PULL_THRESHOLD = 52;
-const MAX_PULL = 88;
-/** Show spinner feedback once the user has pulled this far. */
-const PULL_HINT = 12;
+/** Visual offset required to trigger refresh after release. */
+const PULL_THRESHOLD = 56;
+/** Offset held while refresh runs and during snap-back start. */
+const HOLD_OFFSET = 52;
+/** Maximum visual pull distance. */
+const MAX_OFFSET = 88;
+/** Finger travel before we take over the gesture (avoids blocking scroll). */
+const PULL_ACTIVATION = 10;
+const RESISTANCE_SCALE = 80;
+const RESISTANCE_DIM = 0.5;
+const SNAP_BACK_MS = 280;
+
+function applyResistance(rawDelta: number): number {
+  if (rawDelta <= 0) return 0;
+  const resisted =
+    (rawDelta * RESISTANCE_SCALE) / (rawDelta + RESISTANCE_SCALE * RESISTANCE_DIM);
+  return Math.min(resisted, MAX_OFFSET);
+}
 
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
-  const [pullDistance, setPullDistance] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const elementRef = useRef<HTMLElement | null>(null);
   const startYRef = useRef(0);
-  const isPullingRef = useRef(false);
+  const isActiveRef = useRef(false);
   const isRefreshingRef = useRef(false);
-  const pullDistanceRef = useRef(0);
+  const offsetRef = useRef(0);
   const onRefreshRef = useRef(onRefresh);
 
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
+  useEffect(() => {
+    offsetRef.current = offset;
+  }, [offset]);
+
+  const snapBack = useCallback(() => {
+    setIsAnimating(true);
+    requestAnimationFrame(() => {
+      offsetRef.current = 0;
+      setOffset(0);
+    });
+  }, []);
+
   const runRefresh = useCallback(async () => {
     if (!onRefreshRef.current || isRefreshingRef.current) return;
 
     isRefreshingRef.current = true;
-    isPullingRef.current = false;
-    pullDistanceRef.current = 0;
-    setPullDistance(0);
+    isActiveRef.current = false;
     setIsRefreshing(true);
+    setIsAnimating(true);
+    setOffset(HOLD_OFFSET);
+    offsetRef.current = HOLD_OFFSET;
 
     try {
       await onRefreshRef.current();
     } finally {
       isRefreshingRef.current = false;
       setIsRefreshing(false);
-      isPullingRef.current = false;
-      pullDistanceRef.current = 0;
-      setPullDistance(0);
+      snapBack();
     }
-  }, []);
+  }, [snapBack]);
+
+  const handleTransitionEnd = useCallback(
+    (event: TransitionEvent<HTMLDivElement>) => {
+      if (event.propertyName !== "transform") return;
+      if (offsetRef.current === 0) {
+        setIsAnimating(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const element = elementRef.current;
@@ -46,58 +82,67 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
 
     function handleTouchStart(event: TouchEvent) {
       if (isRefreshingRef.current || element!.scrollTop > 0) return;
+
       startYRef.current = event.touches[0]?.clientY ?? 0;
-      isPullingRef.current = true;
+      isActiveRef.current = true;
+      setIsAnimating(false);
     }
 
     function handleTouchMove(event: TouchEvent) {
       if (isRefreshingRef.current) return;
-
-      if (!isPullingRef.current) return;
+      if (!isActiveRef.current) return;
 
       if (element!.scrollTop > 0) {
-        isPullingRef.current = false;
-        pullDistanceRef.current = 0;
-        setPullDistance(0);
+        isActiveRef.current = false;
+        offsetRef.current = 0;
+        setOffset(0);
+        setIsAnimating(false);
         return;
       }
 
-      const delta = (event.touches[0]?.clientY ?? 0) - startYRef.current;
+      const rawDelta = (event.touches[0]?.clientY ?? 0) - startYRef.current;
 
-      if (delta <= 0) {
-        pullDistanceRef.current = 0;
-        setPullDistance(0);
+      if (rawDelta <= 0) {
+        offsetRef.current = 0;
+        setOffset(0);
+        setIsAnimating(false);
         return;
       }
 
-      if (delta > PULL_HINT) {
+      if (rawDelta > PULL_ACTIVATION) {
         event.preventDefault();
       }
 
-      const distance = Math.min(delta, MAX_PULL);
-      pullDistanceRef.current = distance;
-      setPullDistance(distance);
+      const distance = applyResistance(rawDelta);
+      offsetRef.current = distance;
+      setOffset(distance);
+      setIsAnimating(false);
     }
 
     function handleTouchEnd() {
-      if (!isPullingRef.current) return;
+      if (!isActiveRef.current) return;
+
+      isActiveRef.current = false;
 
       const shouldRefresh =
-        pullDistanceRef.current >= PULL_THRESHOLD && !isRefreshingRef.current;
-
-      isPullingRef.current = false;
-      pullDistanceRef.current = 0;
-      setPullDistance(0);
+        offsetRef.current >= PULL_THRESHOLD && !isRefreshingRef.current;
 
       if (shouldRefresh) {
         void runRefresh();
+        return;
       }
+
+      snapBack();
     }
 
     function handleTouchCancel() {
-      isPullingRef.current = false;
-      pullDistanceRef.current = 0;
-      setPullDistance(0);
+      if (!isActiveRef.current) return;
+
+      isActiveRef.current = false;
+
+      if (isRefreshingRef.current) return;
+
+      snapBack();
     }
 
     element.addEventListener("touchstart", handleTouchStart, { passive: true });
@@ -111,19 +156,32 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       element.removeEventListener("touchend", handleTouchEnd);
       element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [onRefresh, runRefresh]);
+  }, [onRefresh, runRefresh, snapBack]);
 
-  const showIndicator =
-    isRefreshing || pullDistance >= PULL_HINT;
+  const showIndicator = isRefreshing || offset > 0;
 
   const indicatorOpacity = isRefreshing
     ? 1
-    : Math.min(pullDistance / PULL_THRESHOLD, 1);
+    : Math.min(offset / PULL_THRESHOLD, 1);
+
+  const contentStyle: CSSProperties =
+    offset > 0 || isAnimating
+      ? {
+          transform: `translate3d(0, ${offset}px, 0)`,
+          transition: isAnimating
+            ? `transform ${SNAP_BACK_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+            : undefined,
+        }
+      : {};
 
   return {
     elementRef,
     isRefreshing,
+    isAnimating,
     showIndicator,
     indicatorOpacity,
+    offset,
+    contentStyle,
+    handleTransitionEnd,
   };
 }
