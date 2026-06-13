@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { cn } from "@/lib/utils";
 
 interface ScreenHeaderProps {
@@ -63,6 +64,7 @@ interface ScreenBodyProps {
   className?: string;
   withTabBar?: boolean;
   withStickyFooter?: boolean;
+  onRefresh?: () => Promise<void>;
 }
 
 export function ScreenBody({
@@ -70,11 +72,17 @@ export function ScreenBody({
   className,
   withTabBar = true,
   withStickyFooter = false,
+  onRefresh,
 }: ScreenBodyProps) {
+  const { elementRef, indicatorHeight, isRefreshing, isPulling } =
+    usePullToRefresh(onRefresh);
+
   return (
     <main
+      ref={elementRef}
       className={cn(
-        "flex-1 overflow-y-auto px-4 pt-4",
+        "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4",
+        "min-w-0 w-full max-w-full",
         withTabBar &&
           "pb-[calc(4.5rem+env(safe-area-inset-bottom))]",
         withStickyFooter &&
@@ -82,6 +90,23 @@ export function ScreenBody({
         className,
       )}
     >
+      {onRefresh ? (
+        <div
+          aria-hidden={!isPulling}
+          className={cn(
+            "flex items-center justify-center overflow-hidden transition-[height] duration-200 ease-out",
+            isPulling ? "opacity-100" : "opacity-0",
+          )}
+          style={{ height: indicatorHeight }}
+        >
+          <Loader2
+            className={cn(
+              "size-5 text-muted-foreground",
+              isRefreshing && "animate-spin",
+            )}
+          />
+        </div>
+      ) : null}
       {children}
     </main>
   );

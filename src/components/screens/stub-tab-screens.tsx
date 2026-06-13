@@ -12,13 +12,13 @@ import { useT } from "@/providers/i18n-provider";
 export function PlanningScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts } = useFinance();
+  const { accounts, refresh } = useFinance();
   const hasAccounts = accounts.length > 0;
 
   return (
     <>
       <ScreenHeader title={t("planning.title")} />
-      <ScreenBody>
+      <ScreenBody onRefresh={refresh}>
         <EmptyState
           icon={<CalendarRange />}
           title={t("planning.empty.title")}
@@ -43,13 +43,13 @@ export function PlanningScreen() {
 export function GoalsScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts } = useFinance();
+  const { accounts, refresh } = useFinance();
   const hasAccounts = accounts.length > 0;
 
   return (
     <>
       <ScreenHeader title={t("goals.title")} />
-      <ScreenBody>
+      <ScreenBody onRefresh={refresh}>
         <EmptyState
           icon={<Target />}
           title={t("goals.empty.title")}

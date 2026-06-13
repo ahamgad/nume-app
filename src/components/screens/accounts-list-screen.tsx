@@ -35,7 +35,7 @@ function AddAccountHeaderAction({
 export function AccountsListScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, isFinanceReady } = useFinance();
+  const { accounts, isFinanceReady, refresh } = useFinance();
 
   const addAccountAction = (
     <AddAccountHeaderAction
@@ -48,7 +48,7 @@ export function AccountsListScreen() {
     return (
       <>
         <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
-        <ScreenBody withTabBar>
+        <ScreenBody withTabBar onRefresh={refresh}>
           <Skeleton className="mx-auto mt-10 h-8 w-48 rounded-md" />
           <Skeleton className="mx-auto mt-4 h-16 w-full max-w-sm rounded-md" />
         </ScreenBody>
@@ -61,7 +61,7 @@ export function AccountsListScreen() {
   return (
     <>
       <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
-      <ScreenBody withTabBar>
+      <ScreenBody withTabBar onRefresh={refresh}>
         {!hasAccounts ? (
           <EmptyState
             icon={<Landmark />}

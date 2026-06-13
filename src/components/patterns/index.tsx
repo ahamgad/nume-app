@@ -13,8 +13,8 @@ interface WidgetCardProps {
 
 export function WidgetCard({ children, className }: WidgetCardProps) {
   return (
-    <Card className={cn("shadow-none", className)}>
-      <CardContent className="p-5">{children}</CardContent>
+    <Card className={cn("min-w-0 w-full shadow-none", className)}>
+      <CardContent className="w-full min-w-0 p-5 text-start">{children}</CardContent>
     </Card>
   );
 }
@@ -48,7 +48,7 @@ interface MetricHeroProps {
 
 export function MetricHero({ label, value, subline, meta }: MetricHeroProps) {
   return (
-    <div>
+    <div className="w-full min-w-0 text-start">
       <p className="text-xs font-medium tracking-wide text-muted-foreground">
         {label}
       </p>
@@ -181,9 +181,10 @@ export function SetupBanner({
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex min-h-11 shrink-0 items-center px-2 text-sm font-medium"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1 px-2 text-sm font-medium"
         >
-          {actionLabel} →
+          {actionLabel}
+          <ChevronRight className="size-4 rtl:rotate-180" />
         </button>
       </div>
     </div>

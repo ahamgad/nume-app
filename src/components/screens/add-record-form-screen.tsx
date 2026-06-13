@@ -171,7 +171,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </p>
         ) : null}
 
-        <div className="space-y-2">
+        <div className="min-w-0 w-full max-w-full space-y-2">
           <Label htmlFor="record-amount">
             {type === "adjustment"
               ? t("records.fields.correctBalance")
@@ -202,7 +202,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
         </div>
 
         {type !== "adjustment" ? (
-          <div className="space-y-2">
+          <div className="min-w-0 w-full max-w-full space-y-2">
             <Label htmlFor="description">
               {t("records.fields.description.label")}{" "}
               <span className="text-muted-foreground">({t("common.optional")})</span>
@@ -215,7 +215,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
             />
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="min-w-0 w-full max-w-full space-y-2">
             <Label htmlFor="reason">
               {t("records.fields.reason.label")}{" "}
               <span className="text-muted-foreground">({t("common.optional")})</span>
@@ -229,7 +229,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </div>
         )}
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 w-full max-w-full space-y-2">
           <Label htmlFor="record-date">{t("records.fields.date")}</Label>
           <Input
             id="record-date"
@@ -239,7 +239,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
               setDate(e.target.value);
               clearFieldError("date");
             }}
-            className="w-full min-w-0"
             aria-invalid={Boolean(errors.date)}
           />
           {errors.date ? (

@@ -44,7 +44,7 @@ function signedRecordAmount(record: FinanceRecord) {
 export function DashboardScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, isFinanceReady, isFinanceLoading } =
+  const { accounts, netWorth, recentRecords, isFinanceReady, isFinanceLoading, refresh } =
     useFinance();
 
   const hasAccounts = accounts.length > 0;
@@ -57,7 +57,7 @@ export function DashboardScreen() {
   return (
     <>
       <ScreenHeader title={t("dashboard.title")} />
-      <ScreenBody className="space-y-3">
+      <ScreenBody className="space-y-3" onRefresh={refresh}>
         {isFinanceReady && !hasAccounts ? (
           <SetupBanner
             title={t("dashboard.setup.title")}
