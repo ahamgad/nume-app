@@ -2,13 +2,19 @@
 
 import { type ReactNode } from "react";
 
+import {
+  BOTTOM_SHEET_BACKDROP_CLASS,
+  BOTTOM_SHEET_ENTER_CLASS,
+  BOTTOM_SHEET_PANEL_CLASS,
+  BottomSheetDragHandle,
+} from "@/components/ui/bottom-sheet-chrome";
 import { useT } from "@/providers/i18n-provider";
 import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
 
 /**
- * Confirmation bottom sheet — compact, bottom-anchored, fixed height.
- * No expansion, internal scroll, search, or drag logic.
+ * Confirmation bottom sheet — compact, bottom-anchored, content-driven.
+ * Visually aligned with SelectionBottomSheet; no expansion or drag logic.
  */
 interface ConfirmationBottomSheetProps {
   open: boolean;
@@ -38,7 +44,8 @@ export function ConfirmationBottomSheet({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4",
+        "fixed inset-0 z-50 animate-in fade-in-0 duration-200",
+        BOTTOM_SHEET_BACKDROP_CLASS,
         className,
       )}
     >
@@ -54,11 +61,15 @@ export function ConfirmationBottomSheet({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "relative z-10 mb-[calc(1rem+env(safe-area-inset-bottom))] w-full max-w-sm rounded-xl border border-border bg-background p-5 shadow-sm",
+          BOTTOM_SHEET_PANEL_CLASS,
+          BOTTOM_SHEET_ENTER_CLASS,
           panelClassName,
         )}
       >
-        {children}
+        <BottomSheetDragHandle />
+        <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2">
+          {children}
+        </div>
       </div>
     </div>
   );

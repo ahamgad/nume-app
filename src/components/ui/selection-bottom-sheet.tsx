@@ -10,6 +10,12 @@ import {
 
 import { useT } from "@/providers/i18n-provider";
 import { useModalLayerLock } from "@/providers/modal-layer-provider";
+import {
+  BOTTOM_SHEET_BACKDROP_CLASS,
+  BOTTOM_SHEET_ENTER_CLASS,
+  BOTTOM_SHEET_PANEL_CLASS,
+  BottomSheetDragHandle,
+} from "@/components/ui/bottom-sheet-chrome";
 import { cn } from "@/lib/utils";
 
 /** Matches in-flow `ScreenHeader` bar height (`h-14`). */
@@ -141,7 +147,13 @@ function SelectionBottomSheetContent({
   const isDragging = dragOffset > 0;
 
   return (
-    <div className={cn("fixed inset-0 z-50 bg-black/40", className)}>
+    <div
+      className={cn(
+        "fixed inset-0 z-50 animate-in fade-in-0 duration-200",
+        BOTTOM_SHEET_BACKDROP_CLASS,
+        className,
+      )}
+    >
       <button
         type="button"
         aria-label={t("common.cancel")}
@@ -154,7 +166,8 @@ function SelectionBottomSheetContent({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl border border-border bg-background shadow-sm",
+          BOTTOM_SHEET_PANEL_CLASS,
+          BOTTOM_SHEET_ENTER_CLASS,
           !isDragging &&
             "transition-[min-height,max-height,height,transform] duration-200 ease-out",
           panelClassName,
@@ -166,15 +179,13 @@ function SelectionBottomSheetContent({
           transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
         }}
       >
-        <div
-          className="flex shrink-0 cursor-grab flex-col items-center pt-2 active:cursor-grabbing"
+        <BottomSheetDragHandle
+          className="cursor-grab active:cursor-grabbing"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-        >
-          <div className="h-1 w-10 rounded-full bg-muted-foreground/35" />
-        </div>
+        />
         {header ? (
           <div className="shrink-0 border-b border-border bg-background px-4 py-4">
             {header}
