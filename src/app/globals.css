@@ -178,4 +178,20 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+
+  .animate-nume-splash-pulse {
+    animation: nume-splash-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes nume-splash-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scale(1.06);
+  }
 }

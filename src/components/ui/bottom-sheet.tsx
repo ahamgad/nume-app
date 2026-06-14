@@ -6,6 +6,10 @@ import { useVisualViewportInset } from "@/hooks/use-visual-viewport-inset";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
+/**
+ * Keyboard-aware bottom sheet primitive.
+ * Search fields inside sheets must NOT use autoFocus — keyboard opens on user tap only.
+ */
 interface BottomSheetProps {
   open: boolean;
   onClose: () => void;

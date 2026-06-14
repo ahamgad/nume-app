@@ -1,7 +1,6 @@
 import type { AppLocale } from "@/lib/fonts";
 
 export const LOCALE_STORAGE_KEY = "nume-locale";
-export const LOCALE_RETURN_PATH_KEY = "nume-locale-return";
 
 export function readStoredLocale(): AppLocale {
   if (typeof window === "undefined") return "en";
@@ -9,12 +8,9 @@ export function readStoredLocale(): AppLocale {
   return stored === "ar" ? "ar" : "en";
 }
 
-/** Persist locale and reload through splash so providers rehydrate like an app restart. */
+/** Persist locale and cold-restart through splash → dashboard (not previous route). */
 export function requestLocaleRestart(next: AppLocale) {
   window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
-  window.sessionStorage.setItem(
-    LOCALE_RETURN_PATH_KEY,
-    window.location.pathname + window.location.search,
-  );
+  window.sessionStorage.removeItem("nume-locale-return");
   window.location.assign("/splash");
 }

@@ -29,7 +29,7 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   purchaseDate: todayIsoDate(),
   termPreset: 1,
   customTermYears: "",
-  payoutFrequency: "instantly",
+  payoutFrequency: "monthly",
 };
 
 export function yearsToTermMonths(years: number): number {

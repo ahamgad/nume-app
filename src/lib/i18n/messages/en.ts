@@ -473,7 +473,7 @@ export const en = {
       arabic: "Arabic",
       stub: "Choose the language you prefer for NUME.",
       previewNote:
-        "Switching language restarts the app briefly and returns you to this screen.",
+        "Switching language restarts the app and opens the dashboard in your chosen language.",
     },
     about: {
       title: "About NUME",

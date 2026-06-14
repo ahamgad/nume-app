@@ -110,15 +110,14 @@ function EditCertificateForm({
     router.back();
   }
 
-  const { allowNavigation } = useSwipeBackDiscard({
+  const { confirmDiscardNavigation } = useSwipeBackDiscard({
     isDirty: isDirty && !submitting,
     onRequestDiscard: () => setShowDiscard(true),
   });
 
   function handleDiscardConfirm() {
     setShowDiscard(false);
-    allowNavigation();
-    router.back();
+    confirmDiscardNavigation(() => router.back());
   }
 
   return (

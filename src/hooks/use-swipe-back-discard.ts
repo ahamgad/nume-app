@@ -9,8 +9,11 @@ interface UseSwipeBackDiscardOptions {
 }
 
 /**
- * Intercepts iOS swipe-back (popstate) so unsaved forms show the same discard
- * dialog as the header back button.
+ * Intercepts iOS swipe-back before Next.js navigates away.
+ *
+ * Root cause of transition flash: popstate fires after the browser starts
+ * history traversal. We push a guard entry while dirty and re-push on
+ * popstate (capture phase) before paint so the URL never leaves the form.
  */
 export function useSwipeBackDiscard({
   isDirty,
@@ -27,17 +30,19 @@ export function useSwipeBackDiscard({
   useEffect(() => {
     if (!enabled || !isDirty) return;
 
-    window.history.pushState({ numeDiscardGuard: true }, "");
+    bypassRef.current = false;
+    const url = window.location.pathname + window.location.search;
+    window.history.pushState({ numeDiscardGuard: true }, "", url);
 
     function handlePopState() {
       if (bypassRef.current) return;
-      window.history.pushState({ numeDiscardGuard: true }, "");
+      window.history.pushState({ numeDiscardGuard: true }, "", url);
       onRequestDiscardRef.current();
     }
 
-    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("popstate", handlePopState, { capture: true });
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("popstate", handlePopState, { capture: true });
       if (!bypassRef.current && window.history.state?.numeDiscardGuard) {
         bypassRef.current = true;
         window.history.back();
@@ -45,12 +50,14 @@ export function useSwipeBackDiscard({
     };
   }, [enabled, isDirty]);
 
-  const allowNavigation = useCallback(() => {
+  /** Call before router.back() when the user confirms discarding changes. */
+  const confirmDiscardNavigation = useCallback((navigateBack: () => void) => {
     bypassRef.current = true;
     if (window.history.state?.numeDiscardGuard) {
       window.history.back();
     }
+    navigateBack();
   }, []);
 
-  return { allowNavigation };
-}
+  return { confirmDiscardNavigation };
+};

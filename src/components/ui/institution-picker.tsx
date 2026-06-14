@@ -172,7 +172,6 @@ export function InstitutionPicker({
             {resolvedLabel}
           </h2>
           <Input
-            autoFocus
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder={t("institutions.searchPlaceholder")}

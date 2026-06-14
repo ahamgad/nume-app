@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -29,7 +30,7 @@ export function ScreenHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-sm pt-[env(safe-area-inset-top)]",
+        "z-30 shrink-0 border-b border-border bg-background/95 backdrop-blur-sm pt-[env(safe-area-inset-top)]",
         className,
       )}
     >
@@ -87,17 +88,17 @@ export function ScreenBody({
     handleTransitionEnd,
   } = usePullToRefresh(onRefresh);
 
-  const scrollPadding = cn(
-    withTabBar && "pb-[calc(4.5rem+env(safe-area-inset-bottom))]",
-    withStickyFooter && "pb-[calc(5.5rem+env(safe-area-inset-bottom))]",
-  );
+  const scrollPadding = getScreenBodyScrollPadding({
+    withTabBar,
+    withStickyFooter,
+  });
 
   if (!onRefresh) {
     return (
       <main
         className={cn(
           "flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 pt-4",
-          "min-w-0 w-full max-w-full",
+          "min-w-0 w-full max-w-full overscroll-y-contain",
           scrollPadding,
           className,
         )}
@@ -112,7 +113,7 @@ export function ScreenBody({
       ref={elementRef}
       className={cn(
         "relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden",
-        "min-w-0 w-full max-w-full",
+        "min-w-0 w-full max-w-full overscroll-y-contain",
         scrollPadding,
       )}
     >

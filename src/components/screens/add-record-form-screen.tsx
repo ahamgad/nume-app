@@ -156,15 +156,14 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     router.back();
   }
 
-  const { allowNavigation } = useSwipeBackDiscard({
+  const { confirmDiscardNavigation } = useSwipeBackDiscard({
     isDirty,
     onRequestDiscard: () => setShowDiscard(true),
   });
 
   function handleDiscardConfirm() {
     setShowDiscard(false);
-    allowNavigation();
-    router.back();
+    confirmDiscardNavigation(() => router.back());
   }
 
   const titleKey =
