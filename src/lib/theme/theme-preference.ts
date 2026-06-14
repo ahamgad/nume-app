@@ -1,6 +1,7 @@
 export type ThemePreference = "system" | "light" | "dark";
 
 export const THEME_STORAGE_KEY = "nume-theme";
+export const THEME_VERSION_KEY = "nume-theme-version";
 
 const THEME_COLOR_LIGHT = "#ffffff";
 const THEME_COLOR_DARK = "#171717";
@@ -31,6 +32,20 @@ function updateThemeColorMeta(isDark: boolean) {
   meta.setAttribute("content", color);
 }
 
+function bumpThemeVersion(root: HTMLElement) {
+  const version = String(Date.now());
+  root.dataset.themeVersion = version;
+  try {
+    window.sessionStorage.setItem(THEME_VERSION_KEY, version);
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function invalidateThemeCompositorLayers(root: HTMLElement) {
+  void root.offsetHeight;
+}
+
 /** Apply theme globally on `document.documentElement` — instant, no React re-render required. */
 export function applyThemePreference(preference: ThemePreference) {
   const root = document.documentElement;
@@ -41,12 +56,16 @@ export function applyThemePreference(preference: ThemePreference) {
   root.dataset.theme = preference;
   root.style.colorScheme = isDark ? "dark" : "light";
 
+  bumpThemeVersion(root);
   updateThemeColorMeta(isDark);
-
-  // iOS/Safari: nudge compositor so cached layers repaint with new tokens.
-  void root.offsetHeight;
+  invalidateThemeCompositorLayers(root);
 
   requestAnimationFrame(() => {
     root.classList.remove("theme-switching");
   });
+}
+
+/** Re-apply stored theme — for navigation / visibility / Safari snapshot invalidation. */
+export function reapplyStoredThemePreference() {
+  applyThemePreference(readStoredTheme());
 }

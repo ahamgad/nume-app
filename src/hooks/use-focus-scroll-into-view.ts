@@ -2,11 +2,14 @@
 
 import { type RefObject, useEffect } from "react";
 
+import { isPwaStandalone } from "@/lib/device/pwa-standalone";
 import {
   applyKeyboardScrollInset,
   clearKeyboardScrollInset,
   scrollInputIntoContainer,
 } from "@/lib/scroll/scroll-input-into-view";
+
+const PWA_FIRST_FOCUS_DELAY_MS = 70;
 
 function isFocusableInput(element: HTMLElement): boolean {
   if (element.isContentEditable) return true;
@@ -52,9 +55,10 @@ export function useFocusScrollIntoView(
     let focusOutRaf = 0;
     let viewportCoalesceRaf = 0;
     let viewportListenerAttached = false;
+    let keyboardWarmedUp = !keyboardInset || !isPwaStandalone();
 
     function onViewportResize() {
-      if (!focusedTarget) return;
+      if (!focusedTarget || !keyboardWarmedUp) return;
       if (viewportCoalesceRaf) return;
       viewportCoalesceRaf = requestAnimationFrame(() => {
         viewportCoalesceRaf = 0;
@@ -64,7 +68,14 @@ export function useFocusScrollIntoView(
     }
 
     function attachViewportListener() {
-      if (!keyboardInset || viewportListenerAttached || !window.visualViewport) return;
+      if (
+        !keyboardInset ||
+        !keyboardWarmedUp ||
+        viewportListenerAttached ||
+        !window.visualViewport
+      ) {
+        return;
+      }
       window.visualViewport.addEventListener("resize", onViewportResize);
       viewportListenerAttached = true;
     }
@@ -103,21 +114,41 @@ export function useFocusScrollIntoView(
       scrollInputIntoContainer(scrollContainer, target);
     }
 
+    function runFollowUpAdjust(target: HTMLElement) {
+      followUpTimer = window.setTimeout(() => {
+        followUpTimer = null;
+        if (focusedTarget === target) {
+          adjustForTarget(target);
+        }
+      }, 120);
+    }
+
     function scheduleAdjust(target: HTMLElement) {
       cancelAdjustPending();
       cancelFocusOutCheck();
       focusedTarget = target;
+
+      const needsPwaWarmUp =
+        keyboardInset && isPwaStandalone() && !keyboardWarmedUp;
+
+      if (needsPwaWarmUp) {
+        followUpTimer = window.setTimeout(() => {
+          followUpTimer = null;
+          if (focusedTarget !== target) return;
+          adjustForTarget(target);
+          keyboardWarmedUp = true;
+          attachViewportListener();
+          runFollowUpAdjust(target);
+        }, PWA_FIRST_FOCUS_DELAY_MS);
+        return;
+      }
+
       attachViewportListener();
 
       adjustRaf = requestAnimationFrame(() => {
         adjustRaf = 0;
         adjustForTarget(target);
-        followUpTimer = window.setTimeout(() => {
-          followUpTimer = null;
-          if (focusedTarget === target) {
-            adjustForTarget(target);
-          }
-        }, 120);
+        runFollowUpAdjust(target);
       });
     }
 

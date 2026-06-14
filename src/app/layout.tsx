@@ -59,7 +59,7 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("nume-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);if(t==="light"||t==="dark"||t==="system"){document.documentElement.dataset.theme=t;}else{document.documentElement.dataset.theme="system";}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("nume-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;r.classList.toggle("dark",d);r.dataset.theme=t==="light"||t==="dark"||t==="system"?t:"system";r.style.colorScheme=d?"dark":"light";r.dataset.themeVersion=String(Date.now());var c=d?"#171717":"#ffffff";var m=document.querySelector('meta[name="theme-color"]:not([media])');if(!m){m=document.createElement("meta");m.setAttribute("name","theme-color");document.head.appendChild(m);}m.setAttribute("content",c);}catch(e){}})();`,
           }}
         />
         <script

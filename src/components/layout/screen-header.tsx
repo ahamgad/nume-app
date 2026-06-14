@@ -143,7 +143,7 @@ export function ScreenBody({
     <main
       ref={setScrollContainerRef}
       data-app-scroll
-      className={cn("relative", scrollContainerClassName, className)}
+      className={cn("relative", scrollContainerClassName)}
     >
       {showIndicator ? (
         <div
@@ -166,6 +166,7 @@ export function ScreenBody({
         className={cn(
           "min-w-0 w-full max-w-full",
           offset > 0 || isAnimating ? "will-change-transform" : undefined,
+          className,
         )}
       >
         {children}

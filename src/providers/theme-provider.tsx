@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -13,6 +14,7 @@ import {
 import {
   applyThemePreference,
   readStoredTheme,
+  reapplyStoredThemePreference,
   THEME_STORAGE_KEY,
   type ThemePreference,
 } from "@/lib/theme/theme-preference";
@@ -24,6 +26,8 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+const EDGE_SWIPE_REAPPLY_PX = 24;
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemePreference>(() => readStoredTheme());
 
@@ -32,17 +36,52 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
-  useEffect(() => {
-    function reapplyStoredTheme() {
-      applyThemePreference(readStoredTheme());
+  useLayoutEffect(() => {
+    function handleNavigationThemeSync() {
+      reapplyStoredThemePreference();
     }
 
-    window.addEventListener("pageshow", reapplyStoredTheme);
-    window.addEventListener("popstate", reapplyStoredTheme);
+    function handlePageShow(event: PageTransitionEvent) {
+      reapplyStoredThemePreference();
+      if (event.persisted) {
+        requestAnimationFrame(reapplyStoredThemePreference);
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        reapplyStoredThemePreference();
+      }
+    }
+
+    function handleEdgeSwipeThemePriming(event: TouchEvent) {
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      const fromLeftEdge = touch.clientX <= EDGE_SWIPE_REAPPLY_PX;
+      const fromRightEdge =
+        touch.clientX >= window.innerWidth - EDGE_SWIPE_REAPPLY_PX;
+
+      if (fromLeftEdge || fromRightEdge) {
+        reapplyStoredThemePreference();
+      }
+    }
+
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("pagehide", handleNavigationThemeSync);
+    window.addEventListener("popstate", handleNavigationThemeSync);
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("touchstart", handleEdgeSwipeThemePriming, {
+      capture: true,
+      passive: true,
+    });
 
     return () => {
-      window.removeEventListener("pageshow", reapplyStoredTheme);
-      window.removeEventListener("popstate", reapplyStoredTheme);
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("pagehide", handleNavigationThemeSync);
+      window.removeEventListener("popstate", handleNavigationThemeSync);
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("touchstart", handleEdgeSwipeThemePriming, true);
     };
   }, []);
 
