@@ -1,3 +1,5 @@
+import { normalizeNumericInput } from "@/lib/format/numerals";
+
 const DEFAULT_LOCALE = "en-EG";
 
 export function formatCurrency(
@@ -26,7 +28,7 @@ export function formatSignedCurrency(
 }
 
 export function parseAmount(value: string): number | null {
-  const normalized = value.replace(/,/g, "").trim();
+  const normalized = normalizeNumericInput(value).trim();
   if (!normalized || normalized === ".") return null;
   const parsed = Number.parseFloat(normalized);
   return Number.isFinite(parsed) ? parsed : null;
@@ -34,7 +36,7 @@ export function parseAmount(value: string): number | null {
 
 /** Normalize typed input to an unformatted numeric string (no commas). */
 export function sanitizeAmountInput(value: string): string {
-  const stripped = value.replace(/,/g, "");
+  const stripped = normalizeNumericInput(value);
   if (!stripped) return "";
 
   const match = stripped.match(/^(\d*)(\.?\d{0,2})?/);
@@ -42,6 +44,25 @@ export function sanitizeAmountInput(value: string): string {
 
   const intPart = match[1] ?? "";
   const decPart = match[2] ?? "";
+  return intPart + decPart;
+}
+
+/** Decimal input with configurable fractional digits (e.g. custom term years). */
+export function sanitizeDecimalInput(
+  value: string,
+  maxFractionDigits = 1,
+): string {
+  const stripped = normalizeNumericInput(value);
+  if (!stripped) return "";
+
+  const match = stripped.match(/^(\d*)(\.?\d*)?/);
+  if (!match) return "";
+
+  const intPart = match[1] ?? "";
+  let decPart = match[2] ?? "";
+  if (decPart.startsWith(".")) {
+    decPart = `.${decPart.slice(1, 1 + maxFractionDigits)}`;
+  }
   return intPart + decPart;
 }
 

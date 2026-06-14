@@ -10,6 +10,7 @@ import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { DateField } from "@/components/ui/date-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useSwipeBackDiscard } from "@/hooks/use-swipe-back-discard";
 import {
   formatAmountInput,
   formatCurrency,
@@ -155,6 +156,17 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     router.back();
   }
 
+  const { allowNavigation } = useSwipeBackDiscard({
+    isDirty,
+    onRequestDiscard: () => setShowDiscard(true),
+  });
+
+  function handleDiscardConfirm() {
+    setShowDiscard(false);
+    allowNavigation();
+    router.back();
+  }
+
   const titleKey =
     type === "adjustment"
       ? "records.add.adjustment.title"
@@ -291,10 +303,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
 
       <DiscardDialog
         open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          router.back();
-        }}
+        onConfirm={handleDiscardConfirm}
         onCancel={() => setShowDiscard(false)}
       />
     </>

@@ -1,4 +1,4 @@
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Cairo } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
@@ -6,14 +6,14 @@ export const geistSans = GeistSans;
 
 export const geistMono = GeistMono;
 
-export const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
-  subsets: ["arabic"],
+export const cairo = Cairo({
+  subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-ibm-plex-arabic",
+  variable: "--font-cairo",
   display: "swap",
 });
 
-export const fontVariables = `${geistSans.variable} ${geistMono.variable} ${ibmPlexSansArabic.variable}`;
+export const fontVariables = `${geistSans.variable} ${geistMono.variable} ${cairo.variable}`;
 
 export type AppLocale = "en" | "ar";
 

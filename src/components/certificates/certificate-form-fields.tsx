@@ -19,11 +19,13 @@ import type { PayoutFrequency } from "@/lib/certificates/types";
 import {
   formatAmountInput,
   sanitizeAmountInput,
+  sanitizeDecimalInput,
 } from "@/lib/format/currency";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 const PAYOUT_FREQUENCIES: PayoutFrequency[] = [
+  "instantly",
   "monthly",
   "quarterly",
   "semi_annual",
@@ -236,10 +238,7 @@ export function CertificateFormFields({
             disabled={disabled}
             value={values.customTermYears}
             onChange={(event) => {
-              const raw = event.target.value.replace(/[^\d.]/g, "");
-              const [whole, fraction = ""] = raw.split(".");
-              const sanitized =
-                raw.includes(".") ? `${whole}.${fraction.slice(0, 1)}` : whole;
+              const sanitized = sanitizeDecimalInput(event.target.value, 1);
               onChange({ customTermYears: sanitized });
               onClearError("term");
             }}

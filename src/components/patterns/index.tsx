@@ -195,6 +195,7 @@ interface ListRowProps {
   primary: string;
   secondary?: string;
   trailing?: string;
+  leading?: ReactNode;
   onClick?: () => void;
   showChevron?: boolean;
 }
@@ -203,6 +204,7 @@ export function ListRow({
   primary,
   secondary,
   trailing,
+  leading,
   onClick,
   showChevron = true,
 }: ListRowProps) {
@@ -217,6 +219,9 @@ export function ListRow({
         onClick && "transition-colors active:bg-muted",
       )}
     >
+      {leading ? (
+        <div className="shrink-0 text-muted-foreground">{leading}</div>
+      ) : null}
       <div className="min-w-0 flex-1">
         <p className="truncate text-[0.9375rem] font-medium">{primary}</p>
         {secondary ? (

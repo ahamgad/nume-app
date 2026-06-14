@@ -64,6 +64,8 @@ export function calculateCurrentValue(
 
 function frequencyStepMonths(frequency: PayoutFrequency): number | null {
   switch (frequency) {
+    case "instantly":
+      return null;
     case "monthly":
       return 1;
     case "quarterly":
@@ -83,6 +85,10 @@ export function calculateNextPayoutDate(
   payoutFrequency: PayoutFrequency,
   asOfDate: string = todayIsoDate(),
 ): string | null {
+  if (payoutFrequency === "instantly") {
+    return purchaseDate;
+  }
+
   if (payoutFrequency === "at_maturity") {
     return maturityDate >= asOfDate ? maturityDate : null;
   }

@@ -9,6 +9,8 @@ import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { isDevEnvironment } from "@/dev/is-dev-environment";
+import { requestLocaleRestart } from "@/lib/i18n/locale-restart";
+import type { AppLocale } from "@/lib/fonts";
 import { useT, useTranslations } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
@@ -145,7 +147,12 @@ function LocaleOption({
 
 export function MoreLanguageScreen() {
   const t = useT();
-  const { locale, setLocale } = useTranslations();
+  const { locale } = useTranslations();
+
+  function handleLocaleChange(next: AppLocale) {
+    if (next === locale) return;
+    requestLocaleRestart(next);
+  }
 
   return (
     <>
@@ -160,15 +167,15 @@ export function MoreLanguageScreen() {
             <LocaleOption
               label={t("more.language.english")}
               active={locale === "en"}
-              onSelect={() => setLocale("en")}
+              onSelect={() => handleLocaleChange("en")}
             />
             <LocaleOption
               label={t("more.language.arabic")}
               active={locale === "ar"}
-              onSelect={() => setLocale("ar")}
+              onSelect={() => handleLocaleChange("ar")}
             />
           </div>
-          <p className="text-[0.8125rem] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {t("more.language.previewNote")}
           </p>
         </div>

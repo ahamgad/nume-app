@@ -12,12 +12,14 @@ import {
 
 import { createTranslator, type TranslationKey, type Locale } from "@/lib/i18n";
 import {
+  LOCALE_STORAGE_KEY,
+  readStoredLocale,
+} from "@/lib/i18n/locale-restart";
+import {
   getLocaleAttributes,
   getLocaleFontClass,
   type AppLocale,
 } from "@/lib/fonts";
-
-const LOCALE_STORAGE_KEY = "nume-locale";
 
 interface I18nContextValue {
   locale: AppLocale;
@@ -27,12 +29,6 @@ interface I18nContextValue {
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
-
-function readStoredLocale(): AppLocale {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  return stored === "ar" ? "ar" : "en";
-}
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>(() => readStoredLocale());

@@ -8,6 +8,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
+import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +42,7 @@ import {
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { useSwipeBackDiscard } from "@/hooks/use-swipe-back-discard";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -113,6 +115,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       return ONBOARDING_ACCOUNT_TYPES.map((option) => ({
         value: option.type,
         label: t(getAccountTypeLabelKey(option.type)),
+        icon: <AccountTypeIcon type={option.type} className="size-3.5" />,
         disabled: !option.enabled,
         hint: option.enabled ? undefined : t("accounts.add.comingSoon"),
       }));
@@ -121,6 +124,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
     return ADD_ACCOUNT_TYPES.map((type) => ({
       value: type,
       label: t(getAccountTypeLabelKey(type)),
+      icon: <AccountTypeIcon type={type} className="size-3.5" />,
     }));
   }, [isFirstAccountFlow, t]);
 
@@ -245,6 +249,17 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       setShowDiscard(true);
       return;
     }
+    router.back();
+  }
+
+  const { allowNavigation } = useSwipeBackDiscard({
+    isDirty: isDirty && !submitting,
+    onRequestDiscard: () => setShowDiscard(true),
+  });
+
+  function handleDiscardConfirm() {
+    setShowDiscard(false);
+    allowNavigation();
     router.back();
   }
 
@@ -389,10 +404,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
 
       <DiscardDialog
         open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          router.back();
-        }}
+        onConfirm={handleDiscardConfirm}
         onCancel={() => setShowDiscard(false)}
       />
     </>

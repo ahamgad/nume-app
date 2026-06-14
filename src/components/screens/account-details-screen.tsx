@@ -17,9 +17,11 @@ import {
   ToggleSettingRow,
   WidgetCard,
 } from "@/components/patterns";
+import { AccountTypeBadge } from "@/components/ui/account-type-icon";
+import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
+import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -131,13 +133,11 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         <div>
           {account.institution ? (
             <p className="text-[0.8125rem] text-muted-foreground">
-              {account.institution}
+              {formatInstitutionDisplay(account.institution, t)}
             </p>
           ) : null}
           <div className="mt-1 flex flex-wrap gap-2">
-            <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {t(getAccountTypeLabelKey(account.type))}
-            </span>
+            <AccountTypeBadge type={account.type} />
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
               {t("common.active")}
             </span>
@@ -215,43 +215,18 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         </section>
       </ScreenBody>
 
-      {showDeleteConfirm ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:items-center sm:pb-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-account-title"
-            className="w-full max-w-sm rounded-xl border border-border bg-background p-5 shadow-sm"
-          >
-            <h2 id="delete-account-title" className="text-base font-semibold">
-              {t("accounts.details.deleteConfirm.title")}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("accounts.details.deleteConfirm.description")}
-            </p>
-            <div className="mt-5 flex flex-col gap-2">
-              <Button
-                variant="destructive"
-                className="h-11 w-full"
-                disabled={deleting}
-                onClick={handleDeleteConfirm}
-              >
-                {deleting
-                  ? t("accounts.details.deleteConfirm.deleting")
-                  : t("accounts.details.deleteConfirm.confirm")}
-              </Button>
-              <Button
-                variant="ghost"
-                className="h-11 w-full"
-                disabled={deleting}
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                {t("accounts.details.deleteConfirm.cancel")}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <ConfirmBottomSheet
+        open={showDeleteConfirm}
+        titleId="delete-account-title"
+        title={t("accounts.details.deleteConfirm.title")}
+        description={t("accounts.details.deleteConfirm.description")}
+        confirmLabel={t("accounts.details.deleteConfirm.confirm")}
+        confirmLoadingLabel={t("accounts.details.deleteConfirm.deleting")}
+        cancelLabel={t("accounts.details.deleteConfirm.cancel")}
+        confirmDisabled={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect, useRef, type ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
 export interface ScrollChipOption<T extends string | number> {
   value: T;
   label: string;
+  icon?: ReactNode;
   disabled?: boolean;
   hint?: string;
 }
@@ -15,6 +18,29 @@ interface ScrollChipSelectProps<T extends string | number> {
   onChange: (value: T) => void;
   ariaLabel: string;
   className?: string;
+  /**
+   * Global chip default rule (NUME v1): when enabled, selects the first
+   * non-disabled option if the current value is missing or disabled.
+   * See `resolveDefaultChipValue` in this module.
+   */
+  defaultToFirstOption?: boolean;
+}
+
+/** Shared rule for horizontal chip selectors — first enabled chip wins when unset. */
+export function resolveDefaultChipValue<T extends string | number>(
+  value: T | null | undefined,
+  options: ScrollChipOption<T>[],
+): T | null {
+  const firstEnabled = options.find((option) => !option.disabled);
+  if (!firstEnabled) return null;
+
+  const hasValidSelection = options.some(
+    (option) => option.value === value && !option.disabled,
+  );
+  if (value === null || value === undefined || !hasValidSelection) {
+    return firstEnabled.value;
+  }
+  return value;
 }
 
 export function ScrollChipSelect<T extends string | number>({
@@ -23,7 +49,22 @@ export function ScrollChipSelect<T extends string | number>({
   onChange,
   ariaLabel,
   className,
+  defaultToFirstOption = true,
 }: ScrollChipSelectProps<T>) {
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    if (!defaultToFirstOption) return;
+    const resolved = resolveDefaultChipValue(value, options);
+    if (resolved !== null && resolved !== value) {
+      onChangeRef.current(resolved);
+    }
+  }, [defaultToFirstOption, value, options]);
+
   return (
     <div
       role="listbox"
@@ -50,13 +91,14 @@ export function ScrollChipSelect<T extends string | number>({
               if (!disabled) onChange(option.value);
             }}
             className={cn(
-              "inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               selected
                 ? "border-foreground/25 bg-muted text-foreground"
                 : "border-border bg-background text-foreground",
               disabled && "cursor-not-allowed opacity-45",
             )}
           >
+            {option.icon}
             {option.label}
           </button>
         );

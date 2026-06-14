@@ -46,7 +46,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fontVariables} ${geistSans.className} h-full antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fontVariables} ${geistSans.className} h-full antialiased`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var l=localStorage.getItem("nume-locale");if(l==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl";document.documentElement.dataset.locale="ar";}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="h-dvh overflow-hidden bg-background font-latin text-foreground">
         <AppProviders>{children}</AppProviders>
       </body>

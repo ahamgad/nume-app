@@ -3,12 +3,14 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   filterInstitutions,
-  getInstitutionDisplayLabel,
-  getInstitutionLabel,
+  getInstitutionFullName,
+  getInstitutionShortcut,
+  getInstitutionTriggerLabel,
   getInstitutionsForContext,
   isOtherInstitutionValue,
   matchInstitutionEntry,
@@ -88,7 +90,7 @@ export function InstitutionPicker({
 
   const displayLabel = useMemo(() => {
     if (pendingOther && !value.trim()) return t("institutions.other");
-    return getInstitutionDisplayLabel(value, accountType, t);
+    return getInstitutionTriggerLabel(value, accountType, t);
   }, [pendingOther, value, accountType, t]);
 
   const showCustomField = isOtherSelected;
@@ -157,88 +159,77 @@ export function InstitutionPicker({
         />
       ) : null}
 
-      {open ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-          <button
-            type="button"
-            aria-label={t("common.cancel")}
-            className="absolute inset-0"
-            onClick={closeSheet}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="institution-picker-title"
-            className="relative z-10 flex max-h-[min(80dvh,640px)] w-full max-w-lg flex-col rounded-t-xl border border-border bg-background shadow-sm pb-[env(safe-area-inset-bottom)]"
+      <BottomSheet
+        open={open}
+        onClose={closeSheet}
+        ariaLabelledBy="institution-picker-title"
+      >
+        <div className="border-b border-border px-4 py-4">
+          <h2
+            id="institution-picker-title"
+            className="text-base font-semibold"
           >
-            <div className="border-b border-border px-4 py-4">
-              <h2
-                id="institution-picker-title"
-                className="text-base font-semibold"
-              >
-                {resolvedLabel}
-              </h2>
-              <Input
-                autoFocus
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t("institutions.searchPlaceholder")}
-                className="mt-3"
-                autoComplete="off"
-              />
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
-              {!hasResults ? (
-                <p className="px-2 py-6 text-center text-sm text-muted-foreground">
-                  {t("institutions.noResults")}
-                </p>
-              ) : (
-                <>
-                  {filteredBanks.length > 0 ? (
-                    <InstitutionSection
-                      title={t("institutions.categories.banks")}
-                      entries={filteredBanks}
-                      selectedId={matchedEntry?.id ?? null}
-                      onSelect={handleSelect}
-                      t={t}
-                    />
-                  ) : null}
-
-                  {filteredFinancial.length > 0 ? (
-                    <InstitutionSection
-                      title={t("institutions.categories.financialServices")}
-                      entries={filteredFinancial}
-                      selectedId={matchedEntry?.id ?? null}
-                      onSelect={handleSelect}
-                      t={t}
-                    />
-                  ) : null}
-
-                  {showOtherOption ? (
-                    <div className="mt-2 border-t border-border pt-2">
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isOtherSelected && !matchedEntry}
-                        onClick={handleSelectOther}
-                        className={cn(
-                          "flex min-h-11 w-full items-center rounded-md px-3 text-start text-[0.9375rem] transition-colors",
-                          isOtherSelected && !matchedEntry
-                            ? "bg-muted font-medium"
-                            : "hover:bg-muted/60",
-                        )}
-                      >
-                        {t("institutions.other")}
-                      </button>
-                    </div>
-                  ) : null}
-                </>
-              )}
-            </div>
-          </div>
+            {resolvedLabel}
+          </h2>
+          <Input
+            autoFocus
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={t("institutions.searchPlaceholder")}
+            className="mt-3"
+            autoComplete="off"
+          />
         </div>
-      ) : null}
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+          {!hasResults ? (
+            <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+              {t("institutions.noResults")}
+            </p>
+          ) : (
+            <>
+              {filteredBanks.length > 0 ? (
+                <InstitutionSection
+                  title={t("institutions.categories.banks")}
+                  entries={filteredBanks}
+                  selectedId={matchedEntry?.id ?? null}
+                  onSelect={handleSelect}
+                  t={t}
+                />
+              ) : null}
+
+              {filteredFinancial.length > 0 ? (
+                <InstitutionSection
+                  title={t("institutions.categories.financialServices")}
+                  entries={filteredFinancial}
+                  selectedId={matchedEntry?.id ?? null}
+                  onSelect={handleSelect}
+                  t={t}
+                />
+              ) : null}
+
+              {showOtherOption ? (
+                <div className="mt-2 border-t border-border pt-2">
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={isOtherSelected && !matchedEntry}
+                    onClick={handleSelectOther}
+                    className={cn(
+                      "flex min-h-11 w-full items-center rounded-md px-3 text-start text-[0.9375rem] transition-colors",
+                      isOtherSelected && !matchedEntry
+                        ? "bg-muted font-medium"
+                        : "hover:bg-muted/60",
+                    )}
+                  >
+                    {t("institutions.other")}
+                  </button>
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </BottomSheet>
     </div>
   );
 }
@@ -262,7 +253,10 @@ function InstitutionSection({
         {title}
       </p>
       <div role="listbox" aria-label={title}>
-        {entries.map((entry) => (
+        {entries.map((entry) => {
+          const shortcut = getInstitutionShortcut(entry);
+          const fullName = getInstitutionFullName(entry, t);
+          return (
           <button
             key={entry.id}
             type="button"
@@ -270,15 +264,19 @@ function InstitutionSection({
             aria-selected={selectedId === entry.id}
             onClick={() => onSelect(entry)}
             className={cn(
-              "flex min-h-11 w-full items-center rounded-md px-3 text-start text-[0.9375rem] transition-colors",
+              "flex min-h-11 w-full flex-col justify-center rounded-md px-3 py-2 text-start transition-colors",
               selectedId === entry.id
-                ? "bg-muted font-medium"
+                ? "bg-muted"
                 : "hover:bg-muted/60",
             )}
           >
-            {getInstitutionLabel(entry, t)}
+            <span className="text-[0.9375rem] font-medium">{shortcut}</span>
+            {fullName !== shortcut ? (
+              <span className="text-sm text-muted-foreground">{fullName}</span>
+            ) : null}
           </button>
-        ))}
+        );
+        })}
       </div>
     </section>
   );

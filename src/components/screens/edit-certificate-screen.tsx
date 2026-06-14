@@ -9,6 +9,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSwipeBackDiscard } from "@/hooks/use-swipe-back-discard";
 import {
   certificateFormValuesFromCertificate,
   isCertificateFormDirty,
@@ -109,6 +110,17 @@ function EditCertificateForm({
     router.back();
   }
 
+  const { allowNavigation } = useSwipeBackDiscard({
+    isDirty: isDirty && !submitting,
+    onRequestDiscard: () => setShowDiscard(true),
+  });
+
+  function handleDiscardConfirm() {
+    setShowDiscard(false);
+    allowNavigation();
+    router.back();
+  }
+
   return (
     <>
       <ScreenHeader
@@ -144,10 +156,7 @@ function EditCertificateForm({
 
       <DiscardDialog
         open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          router.back();
-        }}
+        onConfirm={handleDiscardConfirm}
         onCancel={() => setShowDiscard(false)}
       />
     </>

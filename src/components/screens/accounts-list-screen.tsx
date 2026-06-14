@@ -6,9 +6,11 @@ import { useMemo } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
+import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
@@ -59,10 +61,14 @@ function AccountSection({
           <div key={account.id}>
             <ListRow
               primary={account.name}
+              leading={<AccountTypeIcon type={account.type} />}
               secondary={
                 account.institution
                   ? t("accounts.list.meta", {
-                      institution: account.institution,
+                      institution: formatInstitutionDisplay(
+                        account.institution,
+                        t,
+                      ),
                       type: t(getAccountTypeLabelKey(account.type)),
                     })
                   : t(getAccountTypeLabelKey(account.type))

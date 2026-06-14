@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { MetricHero, WidgetCard } from "@/components/patterns";
+import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
+import { AccountTypeBadge } from "@/components/ui/account-type-icon";
+import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
+import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { computeCertificateMetrics } from "@/lib/certificates/certificate-engine";
-import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -39,6 +41,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const {
     getAccount,
     getCertificateByAccountId,
+    updateCertificate,
     archiveCertificate,
     isFinanceReady,
     refresh,
@@ -54,6 +57,9 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     if (!certificate) return null;
     return computeCertificateMetrics(certificate);
   }, [certificate]);
+
+  const payoutFrequencyKey =
+    `certificates.payoutFrequency.${certificate?.payoutFrequency}` as TranslationKey;
 
   async function handleArchiveConfirm() {
     if (!certificate) return;
@@ -113,6 +119,18 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           count: metrics.remainingDays,
         });
 
+  const nextPayoutLabel =
+    certificate.payoutFrequency === "instantly"
+      ? t("certificates.details.upfrontPayout")
+      : t("certificates.details.nextPayoutDate");
+
+  const nextPayoutValue =
+    certificate.payoutFrequency === "instantly"
+      ? formatDisplayDate(certificate.purchaseDate, formatLocale)
+      : metrics.nextPayoutDate
+        ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
+        : t("certificates.details.noNextPayout");
+
   return (
     <>
       <ScreenHeader
@@ -124,13 +142,11 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         <div>
           {account.institution ? (
             <p className="text-[0.8125rem] text-muted-foreground">
-              {account.institution}
+              {formatInstitutionDisplay(account.institution, t)}
             </p>
           ) : null}
           <div className="mt-1 flex flex-wrap gap-2">
-            <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {t(getAccountTypeLabelKey(account.type))}
-            </span>
+            <AccountTypeBadge type={account.type} />
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
               {t(statusKey)}
             </span>
@@ -152,6 +168,10 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             <DetailRow
               label={t("certificates.details.rate")}
               value={`${certificate.annualInterestRate}%`}
+            />
+            <DetailRow
+              label={t("certificates.details.payoutFrequency")}
+              value={t(payoutFrequencyKey)}
             />
             <DetailRow
               label={t("certificates.details.purchaseDate")}
@@ -182,29 +202,52 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               label={t("certificates.details.expectedTotalReturn")}
               value={formatCurrency(metrics.expectedTotalReturn, formatLocale)}
             />
-            <DetailRow
-              label={t("certificates.details.nextPayoutDate")}
-              value={
-                metrics.nextPayoutDate
-                  ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
-                  : t("certificates.details.noNextPayout")
-              }
-            />
+            <DetailRow label={nextPayoutLabel} value={nextPayoutValue} />
           </div>
         </section>
 
-        <section className="space-y-3">
+        <Button
+          variant="outline"
+          className="h-11 w-full"
+          onClick={() => router.push(`/accounts/${account.id}/edit`)}
+        >
+          <Pencil className="me-2 size-4" />
+          {t("certificates.details.edit")}
+        </Button>
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("accounts.details.settingsTitle")}
+          </h2>
+          <div className="rounded-lg border border-border px-4">
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInNetWorth.label")}
+              description={t("accounts.settings.includeInNetWorth.description")}
+              checked={account.includeInNetWorth}
+              onCheckedChange={(checked) =>
+                void updateCertificate(certificate.id, {
+                  includeInNetWorth: checked,
+                })
+              }
+            />
+            <div className="border-t border-border">
+              <ToggleSettingRow
+                label={t("accounts.settings.includeInEmergencyFund.label")}
+                description={t(
+                  "accounts.settings.includeInEmergencyFund.description",
+                )}
+                checked={account.includeInEmergencyFund}
+                onCheckedChange={(checked) =>
+                  void updateCertificate(certificate.id, {
+                    includeInEmergencyFund: checked,
+                  })
+                }
+              />
+            </div>
+          </div>
           <Button
             variant="outline"
-            className="h-11 w-full"
-            onClick={() => router.push(`/accounts/${account.id}/edit`)}
-          >
-            <Pencil className="me-2 size-4" />
-            {t("certificates.details.edit")}
-          </Button>
-          <Button
-            variant="outline"
-            className="h-11 w-full text-destructive hover:text-destructive"
+            className="mt-4 h-11 w-full text-destructive hover:text-destructive"
             onClick={() => setShowArchiveConfirm(true)}
           >
             {t("certificates.details.archive")}
@@ -212,43 +255,18 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         </section>
       </ScreenBody>
 
-      {showArchiveConfirm ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:items-center sm:pb-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="archive-certificate-title"
-            className="w-full max-w-sm rounded-xl border border-border bg-background p-5 shadow-sm"
-          >
-            <h2 id="archive-certificate-title" className="text-base font-semibold">
-              {t("certificates.details.archiveConfirm.title")}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("certificates.details.archiveConfirm.description")}
-            </p>
-            <div className="mt-5 flex flex-col gap-2">
-              <Button
-                variant="destructive"
-                className="h-11 w-full"
-                disabled={archiving}
-                onClick={handleArchiveConfirm}
-              >
-                {archiving
-                  ? t("certificates.details.archiveConfirm.archiving")
-                  : t("certificates.details.archiveConfirm.confirm")}
-              </Button>
-              <Button
-                variant="ghost"
-                className="h-11 w-full"
-                disabled={archiving}
-                onClick={() => setShowArchiveConfirm(false)}
-              >
-                {t("certificates.details.archiveConfirm.cancel")}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <ConfirmBottomSheet
+        open={showArchiveConfirm}
+        titleId="archive-certificate-title"
+        title={t("certificates.details.archiveConfirm.title")}
+        description={t("certificates.details.archiveConfirm.description")}
+        confirmLabel={t("certificates.details.archiveConfirm.confirm")}
+        confirmLoadingLabel={t("certificates.details.archiveConfirm.archiving")}
+        cancelLabel={t("certificates.details.archiveConfirm.cancel")}
+        confirmDisabled={archiving}
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setShowArchiveConfirm(false)}
+      />
     </>
   );
 }

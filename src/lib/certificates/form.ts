@@ -29,7 +29,7 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   purchaseDate: todayIsoDate(),
   termPreset: 1,
   customTermYears: "",
-  payoutFrequency: "at_maturity",
+  payoutFrequency: "instantly",
 };
 
 export function yearsToTermMonths(years: number): number {
@@ -42,8 +42,8 @@ export function termMonthsToYears(termMonths: number): number {
 
 export function resolveTermMonths(values: CertificateFormValues): number | null {
   if (values.termPreset === "custom") {
-    const years = Number.parseFloat(values.customTermYears);
-    if (!Number.isFinite(years)) return null;
+    const years = parseAmount(values.customTermYears);
+    if (years === null || !Number.isFinite(years)) return null;
     return yearsToTermMonths(years);
   }
   return yearsToTermMonths(values.termPreset);
@@ -71,7 +71,7 @@ export function validateCertificateForm(
     errors.annualInterestRate = t("certificates.validation.rateRequired");
   } else if (rate < 0) {
     errors.annualInterestRate = t("certificates.validation.rateNegative");
-  } else if (rate > 100) {
+  } else if (rate > 9999) {
     errors.annualInterestRate = t("certificates.validation.rateMax");
   }
 
@@ -91,8 +91,8 @@ export function validateCertificateForm(
   }
 
   if (values.termPreset === "custom") {
-    const years = Number.parseFloat(values.customTermYears);
-    if (!Number.isFinite(years) || years <= 0) {
+    const years = parseAmount(values.customTermYears);
+    if (years === null || !Number.isFinite(years) || years <= 0) {
       errors.term = t("certificates.validation.termYearsMin");
     } else if (years > 50) {
       errors.term = t("certificates.validation.termYearsMax");
