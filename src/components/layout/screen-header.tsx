@@ -6,10 +6,7 @@ import { type ReactNode, useCallback, useRef } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
-import {
-  getScreenBodyScrollPadding,
-  SCREEN_BODY_TOP_PADDING,
-} from "@/lib/layout/screen-spacing";
+import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
@@ -35,7 +32,7 @@ export function ScreenHeader({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg shrink-0 border-b border-border bg-background/95 backdrop-blur-sm pt-[env(safe-area-inset-top)]",
+        "z-30 shrink-0 border-b border-border bg-background pt-[env(safe-area-inset-top)]",
         className,
       )}
     >
@@ -94,7 +91,7 @@ export function ScreenBody({
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
 
-  useFocusScrollIntoView(scrollRef, !isModalOpen);
+  useFocusScrollIntoView(scrollRef, !isModalOpen, withStickyFooter);
 
   const {
     elementRef,
@@ -113,9 +110,9 @@ export function ScreenBody({
   });
 
   const scrollContainerClassName = cn(
-    "flex-1 min-h-0 overflow-x-hidden",
+    "flex-1 min-h-0 overflow-x-hidden px-4 pt-4",
     "min-w-0 w-full max-w-full overscroll-y-contain",
-    SCREEN_BODY_TOP_PADDING,
+    "transition-[padding-bottom] duration-200 ease-out",
     isModalOpen
       ? "overflow-hidden touch-none"
       : "overflow-y-auto",
@@ -135,7 +132,7 @@ export function ScreenBody({
       <main
         ref={scrollRef}
         data-app-scroll
-        className={cn(scrollContainerClassName, "px-4", className)}
+        className={cn(scrollContainerClassName, className)}
       >
         {children}
       </main>
@@ -146,7 +143,7 @@ export function ScreenBody({
     <main
       ref={setScrollContainerRef}
       data-app-scroll
-      className={cn("relative", scrollContainerClassName)}
+      className={cn("relative", scrollContainerClassName, className)}
     >
       {showIndicator ? (
         <div
@@ -171,7 +168,7 @@ export function ScreenBody({
           offset > 0 || isAnimating ? "will-change-transform" : undefined,
         )}
       >
-        <div className={cn("px-4", className)}>{children}</div>
+        {children}
       </div>
     </main>
   );

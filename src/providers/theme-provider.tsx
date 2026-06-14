@@ -33,6 +33,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
+    function reapplyStoredTheme() {
+      applyThemePreference(readStoredTheme());
+    }
+
+    window.addEventListener("pageshow", reapplyStoredTheme);
+    window.addEventListener("popstate", reapplyStoredTheme);
+
+    return () => {
+      window.removeEventListener("pageshow", reapplyStoredTheme);
+      window.removeEventListener("popstate", reapplyStoredTheme);
+    };
+  }, []);
+
+  useEffect(() => {
     if (theme !== "system") return;
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");

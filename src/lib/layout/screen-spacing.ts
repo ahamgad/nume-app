@@ -9,10 +9,6 @@
 /** Matches TabBar `h-14` (3.5rem). */
 export const TAB_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Offset for fixed ScreenHeader (safe area + h-14) plus ScreenBody content inset. */
-export const SCREEN_BODY_TOP_PADDING =
-  "pt-[calc(3.5rem+env(safe-area-inset-top)+1rem)]";
-
 /** Bottom inset for stack/detail screens without the tab bar visible. */
 export const STACK_SCREEN_BOTTOM_PADDING =
   "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";

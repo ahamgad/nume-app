@@ -114,7 +114,7 @@ export function StickyFooter({ children, className }: StickyFooterProps) {
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm",
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background",
         className,
       )}
     >

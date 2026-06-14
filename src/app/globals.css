@@ -144,8 +144,22 @@
     @apply font-sans antialiased;
     overflow: hidden;
     overscroll-behavior: none;
+    color-scheme: light dark;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  html.theme-switching,
+  html.theme-switching * {
+    transition: none !important;
   }
   h1,
   h2,
