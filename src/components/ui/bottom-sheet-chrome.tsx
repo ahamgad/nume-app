@@ -5,9 +5,15 @@ import { cn } from "@/lib/utils";
 /** Shared backdrop for all bottom sheets — stronger modal separation. */
 export const BOTTOM_SHEET_BACKDROP_CLASS = "bg-black/55";
 
-/** Bottom-anchored panel chrome shared by selection and confirmation sheets. */
-export const BOTTOM_SHEET_PANEL_CLASS =
-  "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl border border-border bg-background shadow-sm";
+/** Bottom-anchored panel base shared by selection and confirmation sheets. */
+const BOTTOM_SHEET_PANEL_BASE =
+  "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm";
+
+/** Selection sheets — bordered panel chrome. */
+export const BOTTOM_SHEET_PANEL_CLASS = `${BOTTOM_SHEET_PANEL_BASE} border border-border`;
+
+/** Confirmation sheets — borderless, cleaner surface. */
+export const CONFIRMATION_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
 
 /** Opening animation aligned across sheet types. */
 export const BOTTOM_SHEET_ENTER_CLASS =

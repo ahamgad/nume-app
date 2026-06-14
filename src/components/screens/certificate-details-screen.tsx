@@ -297,6 +297,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
       <ConfirmBottomSheet
         open={showArchiveConfirm}
         titleId="archive-certificate-title"
+        icon="archive"
         title={t("certificates.details.archiveConfirm.title")}
         description={t("certificates.details.archiveConfirm.description")}
         confirmLabel={t("certificates.details.archiveConfirm.confirm")}

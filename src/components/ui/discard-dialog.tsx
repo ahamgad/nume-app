@@ -2,6 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { ConfirmationBottomSheet } from "@/components/ui/confirmation-bottom-sheet";
+import {
+  CONFIRMATION_SHEET_DESCRIPTION_CLASS,
+  CONFIRMATION_SHEET_TITLE_CLASS,
+  ConfirmationSheetIconBadge,
+} from "@/components/ui/confirmation-sheet-presentation";
 import { useT } from "@/providers/i18n-provider";
 
 interface DiscardDialogProps {
@@ -19,10 +24,11 @@ export function DiscardDialog({ open, onConfirm, onCancel }: DiscardDialogProps)
       onClose={onCancel}
       ariaLabelledBy="discard-title"
     >
-      <h2 id="discard-title" className="text-base font-semibold">
+      <ConfirmationSheetIconBadge icon="discard" />
+      <h2 id="discard-title" className={CONFIRMATION_SHEET_TITLE_CLASS}>
         {t("common.discardChanges.title")}
       </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className={CONFIRMATION_SHEET_DESCRIPTION_CLASS}>
         {t("common.discardChanges.description")}
       </p>
       <div className="mt-5 flex flex-col gap-2">

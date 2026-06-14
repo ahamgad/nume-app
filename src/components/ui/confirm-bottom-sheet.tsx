@@ -2,6 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { ConfirmationBottomSheet } from "@/components/ui/confirmation-bottom-sheet";
+import {
+  CONFIRMATION_SHEET_DESCRIPTION_CLASS,
+  CONFIRMATION_SHEET_TITLE_CLASS,
+  ConfirmationSheetIconBadge,
+  type ConfirmationSheetIcon,
+} from "@/components/ui/confirmation-sheet-presentation";
 
 interface ConfirmBottomSheetProps {
   open: boolean;
@@ -10,6 +16,7 @@ interface ConfirmBottomSheetProps {
   description: string;
   confirmLabel: string;
   cancelLabel: string;
+  icon: ConfirmationSheetIcon;
   onConfirm: () => void;
   onCancel: () => void;
   confirmDisabled?: boolean;
@@ -24,6 +31,7 @@ export function ConfirmBottomSheet({
   description,
   confirmLabel,
   cancelLabel,
+  icon,
   onConfirm,
   onCancel,
   confirmDisabled = false,
@@ -36,10 +44,11 @@ export function ConfirmBottomSheet({
       onClose={onCancel}
       ariaLabelledBy={titleId}
     >
-      <h2 id={titleId} className="text-base font-semibold">
+      <ConfirmationSheetIconBadge icon={icon} />
+      <h2 id={titleId} className={CONFIRMATION_SHEET_TITLE_CLASS}>
         {title}
       </h2>
-      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      <p className={CONFIRMATION_SHEET_DESCRIPTION_CLASS}>{description}</p>
       <div className="mt-5 flex flex-col gap-2">
         <Button
           variant={confirmVariant}

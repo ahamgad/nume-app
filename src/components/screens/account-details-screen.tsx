@@ -267,6 +267,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       <ConfirmBottomSheet
         open={showArchiveConfirm}
         titleId="archive-account-title"
+        icon="archive"
         title={t("accounts.details.archiveConfirm.title")}
         description={t("accounts.details.archiveConfirm.description")}
         confirmLabel={t("accounts.details.archiveConfirm.confirm")}

@@ -5,7 +5,7 @@ import { type ReactNode } from "react";
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  BOTTOM_SHEET_PANEL_CLASS,
+  CONFIRMATION_SHEET_PANEL_CLASS,
   BottomSheetDragHandle,
 } from "@/components/ui/bottom-sheet-chrome";
 import { useT } from "@/providers/i18n-provider";
@@ -61,7 +61,7 @@ export function ConfirmationBottomSheet({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          BOTTOM_SHEET_PANEL_CLASS,
+          CONFIRMATION_SHEET_PANEL_CLASS,
           BOTTOM_SHEET_ENTER_CLASS,
           panelClassName,
         )}
