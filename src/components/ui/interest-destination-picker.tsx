@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
-import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { SelectionBottomSheet } from "@/components/ui/selection-bottom-sheet";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -102,7 +102,7 @@ export function InterestDestinationPicker({
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
       </button>
 
-      <BottomSheet
+      <SelectionBottomSheet
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="interest-destination-picker-title"
@@ -177,7 +177,7 @@ export function InterestDestinationPicker({
             </div>
           )}
         </div>
-      </BottomSheet>
+      </SelectionBottomSheet>
     </div>
   );
 }

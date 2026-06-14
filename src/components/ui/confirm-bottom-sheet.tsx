@@ -1,9 +1,7 @@
 "use client";
 
-import { type ReactNode } from "react";
-
 import { Button } from "@/components/ui/button";
-import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { ConfirmationBottomSheet } from "@/components/ui/confirmation-bottom-sheet";
 
 interface ConfirmBottomSheetProps {
   open: boolean;
@@ -17,7 +15,6 @@ interface ConfirmBottomSheetProps {
   confirmDisabled?: boolean;
   confirmLoadingLabel?: string;
   confirmVariant?: "destructive" | "default";
-  children?: ReactNode;
 }
 
 export function ConfirmBottomSheet({
@@ -34,10 +31,9 @@ export function ConfirmBottomSheet({
   confirmVariant = "destructive",
 }: ConfirmBottomSheetProps) {
   return (
-    <BottomSheet
+    <ConfirmationBottomSheet
       open={open}
       onClose={onCancel}
-      variant="compact"
       ariaLabelledBy={titleId}
     >
       <h2 id={titleId} className="text-base font-semibold">
@@ -64,6 +60,6 @@ export function ConfirmBottomSheet({
           {cancelLabel}
         </Button>
       </div>
-    </BottomSheet>
+    </ConfirmationBottomSheet>
   );
 }

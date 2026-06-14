@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 
-import { useKeyboardScroll } from "@/hooks/use-keyboard-scroll";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
@@ -20,12 +19,11 @@ const DISMISS_DRAG_THRESHOLD_PX = 72;
 type SheetSnap = "half" | "full";
 
 /**
- * Native-style bottom sheet (Phase 3.5):
- * - Default half sheet; drag up / scroll expand → full; drag down → dismiss.
- * - Selection sheets: ≤10 options → no search (parent omits search); >10 → search visible.
- * - Keyboard uses the shared `useKeyboardScroll` strategy (no viewport resize).
+ * Selection bottom sheet — pickers and searchable lists.
+ * Half sheet by default; drag handle up → full; drag down → dismiss.
+ * Internal scroll only. No keyboard/viewport adjustments.
  */
-interface BottomSheetProps {
+interface SelectionBottomSheetProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
@@ -33,10 +31,9 @@ interface BottomSheetProps {
   ariaLabel?: string;
   className?: string;
   panelClassName?: string;
-  variant?: "sheet" | "compact";
 }
 
-export function BottomSheet({
+export function SelectionBottomSheet({
   open,
   onClose,
   children,
@@ -44,17 +41,13 @@ export function BottomSheet({
   ariaLabel,
   className,
   panelClassName,
-  variant = "sheet",
-}: BottomSheetProps) {
+}: SelectionBottomSheetProps) {
   const t = useT();
   const [snap, setSnap] = useState<SheetSnap>("half");
   const [dragOffset, setDragOffset] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef(0);
   const dragging = useRef(false);
-  const sheetKey = open ? "open" : "closed";
-
-  useKeyboardScroll(scrollRef, { bottomReservePx: 16 });
 
   const handleDismiss = useCallback(() => {
     setDragOffset(0);
@@ -67,19 +60,22 @@ export function BottomSheet({
     event.currentTarget.setPointerCapture(event.pointerId);
   }, []);
 
-  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragging.current) return;
-    const delta = event.clientY - dragStartY.current;
-    if (delta > 0) {
-      setDragOffset(delta);
-      return;
-    }
-    if (delta < -40 && snap === "half") {
-      setSnap("full");
-      setDragOffset(0);
-      dragging.current = false;
-    }
-  }, [snap]);
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!dragging.current) return;
+      const delta = event.clientY - dragStartY.current;
+      if (delta > 0) {
+        setDragOffset(delta);
+        return;
+      }
+      if (delta < -40 && snap === "half") {
+        setSnap("full");
+        setDragOffset(0);
+        dragging.current = false;
+      }
+    },
+    [snap],
+  );
 
   const handlePointerUp = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -95,47 +91,7 @@ export function BottomSheet({
     [dragOffset, handleDismiss],
   );
 
-  const handleScroll = useCallback(() => {
-    const node = scrollRef.current;
-    if (!node || snap === "full") return;
-    if (node.scrollTop <= 0 && node.scrollHeight > node.clientHeight) {
-      setSnap("full");
-    }
-  }, [snap]);
-
   if (!open) return null;
-
-  const isCompact = variant === "compact";
-
-  if (isCompact) {
-    return (
-      <div
-        className={cn(
-          "fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 pt-4 sm:items-center sm:pb-4",
-          className,
-        )}
-      >
-        <button
-          type="button"
-          aria-label={t("common.cancel")}
-          className="absolute inset-0"
-          onClick={handleDismiss}
-        />
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          className={cn(
-            "relative z-10 w-full max-w-sm rounded-xl border border-border bg-background p-5 shadow-sm",
-            panelClassName,
-          )}
-        >
-          {children}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={cn("fixed inset-0 z-50 bg-black/40", className)}>
@@ -146,7 +102,7 @@ export function BottomSheet({
         onClick={handleDismiss}
       />
       <div
-        key={sheetKey}
+        key={open ? "open" : "closed"}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
@@ -171,7 +127,6 @@ export function BottomSheet({
         </div>
         <div
           ref={scrollRef}
-          onScroll={handleScroll}
           className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain pb-[env(safe-area-inset-bottom)]"
         >
           {children}

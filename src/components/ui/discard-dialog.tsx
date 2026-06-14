@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { ConfirmationBottomSheet } from "@/components/ui/confirmation-bottom-sheet";
 import { useT } from "@/providers/i18n-provider";
 
 interface DiscardDialogProps {
@@ -14,10 +14,9 @@ export function DiscardDialog({ open, onConfirm, onCancel }: DiscardDialogProps)
   const t = useT();
 
   return (
-    <BottomSheet
+    <ConfirmationBottomSheet
       open={open}
       onClose={onCancel}
-      variant="compact"
       ariaLabelledBy="discard-title"
     >
       <h2 id="discard-title" className="text-base font-semibold">
@@ -38,6 +37,6 @@ export function DiscardDialog({ open, onConfirm, onCancel }: DiscardDialogProps)
           {t("common.discardChanges.cancel")}
         </Button>
       </div>
-    </BottomSheet>
+    </ConfirmationBottomSheet>
   );
 }

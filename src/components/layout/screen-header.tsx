@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { useKeyboardScroll } from "@/hooks/use-keyboard-scroll";
+import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
 import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
@@ -80,9 +80,7 @@ export function ScreenBody({
 }: ScreenBodyProps) {
   const scrollRef = useRef<HTMLElement>(null);
 
-  const bottomReservePx = withStickyFooter ? 88 : withTabBar ? 72 : 16;
-
-  useKeyboardScroll(scrollRef, { bottomReservePx });
+  useFocusScrollIntoView(scrollRef);
 
   const {
     elementRef,

@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { SelectionBottomSheet } from "@/components/ui/selection-bottom-sheet";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -161,7 +161,7 @@ export function InstitutionPicker({
         />
       ) : null}
 
-      <BottomSheet
+      <SelectionBottomSheet
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="institution-picker-title"
@@ -232,7 +232,7 @@ export function InstitutionPicker({
             </>
           )}
         </div>
-      </BottomSheet>
+      </SelectionBottomSheet>
     </div>
   );
 }
