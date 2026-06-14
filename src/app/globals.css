@@ -199,25 +199,64 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .animate-nume-logo-reveal {
-    animation: nume-logo-reveal 500ms ease-out forwards;
+  .animate-nume-logo-arrival {
+    animation: nume-logo-arrival 400ms ease-out forwards;
     opacity: 0;
   }
 
+  .nume-logo-shimmer-bar {
+    position: absolute;
+    top: -30%;
+    bottom: -30%;
+    width: 42%;
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.42) 50%,
+      transparent 62%,
+      transparent 100%
+    );
+    mix-blend-mode: soft-light;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  html.dark .nume-logo-shimmer-bar {
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.22) 50%,
+      transparent 62%,
+      transparent 100%
+    );
+    mix-blend-mode: overlay;
+  }
+
+  .animate-nume-logo-shimmer {
+    animation: nume-logo-shimmer 400ms ease-out 400ms forwards;
+  }
+
   .animate-nume-wordmark-reveal {
-    animation: nume-wordmark-reveal 500ms ease-out 300ms forwards;
+    animation: nume-wordmark-reveal 400ms ease-out 700ms forwards;
     opacity: 0;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-nume-logo-reveal,
+    .animate-nume-logo-arrival,
     .animate-nume-wordmark-reveal {
-      animation: nume-splash-fade-in 400ms ease-out forwards;
+      animation: nume-splash-fade-in 350ms ease-out forwards;
       transform: none;
     }
 
     .animate-nume-wordmark-reveal {
       animation-delay: 150ms;
+    }
+
+    .animate-nume-logo-shimmer,
+    .nume-logo-shimmer-bar {
+      display: none;
     }
   }
 
@@ -228,14 +267,34 @@
   }
 }
 
-@keyframes nume-logo-reveal {
+@keyframes nume-logo-arrival {
   from {
     opacity: 0;
-    transform: scale(0.96) rotate(-2deg);
+    transform: scale(0.96) translateY(2px);
   }
   to {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes nume-logo-shimmer {
+  0% {
+    transform: translateX(-170%) skewX(-14deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.16;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  82% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(270%) skewX(-14deg);
+    opacity: 0;
   }
 }
 

@@ -48,23 +48,30 @@ export function SplashScreen() {
   return (
     <div className="flex h-dvh flex-col items-center justify-center bg-background px-6">
       <div className="flex flex-col items-center">
-        <div className="animate-nume-logo-reveal">
+        <div className="relative size-[5.5rem] animate-nume-logo-arrival">
           <Image
             src="/brand-flatten-black.svg"
             alt="NUME"
             width={88}
             height={88}
             priority
-            className="dark:hidden"
+            className="relative z-0 dark:hidden"
           />
           <Image
             src="/brand-flatten-white.svg"
-            alt="NUME"
+            alt=""
             width={88}
             height={88}
             priority
-            className="hidden dark:block"
+            aria-hidden
+            className="relative z-0 hidden dark:block"
           />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
+          >
+            <div className="nume-logo-shimmer-bar animate-nume-logo-shimmer" />
+          </div>
         </div>
         <p
           aria-hidden
