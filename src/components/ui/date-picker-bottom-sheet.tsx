@@ -4,7 +4,10 @@ import { arEG, enGB } from "date-fns/locale";
 import { useMemo } from "react";
 
 import { Calendar } from "@/components/ui/calendar";
-import { SelectionBottomSheet } from "@/components/ui/selection-bottom-sheet";
+import {
+  SELECTION_SHEET_HEADER_HEIGHT_PX,
+  SelectionBottomSheet,
+} from "@/components/ui/selection-bottom-sheet";
 import {
   parseIsoDate,
   todayIsoDate,
@@ -38,6 +41,10 @@ export function DatePickerBottomSheet({
     () => (value ? parseIsoDate(value) : undefined),
     [value],
   );
+  const startMonth = useMemo(
+    () => new Date(maxDateValue.getFullYear() - 100, 0),
+    [maxDateValue],
+  );
 
   function handleSelect(date: Date | undefined) {
     if (!date) return;
@@ -49,7 +56,6 @@ export function DatePickerBottomSheet({
     <SelectionBottomSheet
       open={open}
       onClose={onClose}
-      defaultHalfSize="large"
       ariaLabelledBy="date-picker-title"
       header={
         <h2 id="date-picker-title" className="text-base font-semibold">
@@ -57,12 +63,19 @@ export function DatePickerBottomSheet({
         </h2>
       }
     >
-      <div className="flex justify-center px-2 pb-4">
+      <div
+        className="flex justify-center px-2"
+        style={{ paddingBottom: SELECTION_SHEET_HEADER_HEIGHT_PX }}
+      >
         <Calendar
           mode="single"
+          captionLayout="dropdown"
+          navLayout="after"
           locale={dayPickerLocale}
           selected={selectedDate}
           defaultMonth={selectedDate ?? maxDateValue}
+          startMonth={startMonth}
+          endMonth={maxDateValue}
           onSelect={handleSelect}
           disabled={{ after: maxDateValue }}
           className="w-full [--cell-size:2.5rem]"

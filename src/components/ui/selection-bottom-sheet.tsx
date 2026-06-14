@@ -4,7 +4,6 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -13,39 +12,28 @@ import { useT } from "@/providers/i18n-provider";
 import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
 
-const HALF_SHEET_HEIGHT = "50dvh";
-const LARGE_HALF_SHEET_HEIGHT = "66dvh";
-const FULL_SHEET_HEIGHT = "min(92dvh, 640px)";
-const LARGE_DATASET_THRESHOLD = 10;
+/** Matches in-flow `ScreenHeader` bar height (`h-14`). */
+export const SELECTION_SHEET_HEADER_HEIGHT_PX = 56;
+
+const SHEET_MIN_HEIGHT = "50dvh";
+const SHEET_MAX_HEIGHT = `calc(100dvh - ${SELECTION_SHEET_HEADER_HEIGHT_PX * 2}px)`;
 const DISMISS_DRAG_THRESHOLD_PX = 72;
 const EXPAND_DRAG_THRESHOLD_PX = 40;
 
 type SheetSnap = "half" | "full";
 
-function resolveHalfSheetHeight(
-  optionCount?: number,
-  defaultHalfSize?: "default" | "large",
-) {
-  if (defaultHalfSize === "large") {
-    return LARGE_HALF_SHEET_HEIGHT;
-  }
-  if (optionCount !== undefined && optionCount > LARGE_DATASET_THRESHOLD) {
-    return LARGE_HALF_SHEET_HEIGHT;
-  }
-  return HALF_SHEET_HEIGHT;
-}
-
 /**
  * Selection bottom sheet — pickers and searchable lists.
  * States: closed → half → full. Drag down from full → half; from half → dismiss.
+ *
+ * Half snap: content-driven height clamped between 50dvh and
+ * `100dvh − (headerHeight × 2)`. Full snap: expands to max height.
  */
 interface SelectionBottomSheetProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   header?: ReactNode;
-  optionCount?: number;
-  defaultHalfSize?: "default" | "large";
   ariaLabelledBy?: string;
   ariaLabel?: string;
   className?: string;
@@ -57,8 +45,6 @@ export function SelectionBottomSheet({
   onClose,
   children,
   header,
-  optionCount,
-  defaultHalfSize,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -72,8 +58,6 @@ export function SelectionBottomSheet({
     <SelectionBottomSheetContent
       onClose={onClose}
       header={header}
-      optionCount={optionCount}
-      defaultHalfSize={defaultHalfSize}
       ariaLabelledBy={ariaLabelledBy}
       ariaLabel={ariaLabel}
       className={className}
@@ -88,8 +72,6 @@ function SelectionBottomSheetContent({
   onClose,
   children,
   header,
-  optionCount,
-  defaultHalfSize,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -101,10 +83,7 @@ function SelectionBottomSheetContent({
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef(0);
   const dragging = useRef(false);
-  const halfSheetHeight = useMemo(
-    () => resolveHalfSheetHeight(optionCount, defaultHalfSize),
-    [defaultHalfSize, optionCount],
-  );
+  const isFull = snap === "full";
 
   const handleDismiss = useCallback(() => {
     setDragOffset(0);
@@ -175,12 +154,15 @@ function SelectionBottomSheetContent({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col rounded-t-xl border border-border bg-background shadow-sm",
-          !isDragging && "transition-[height,transform] duration-200 ease-out",
+          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl border border-border bg-background shadow-sm",
+          !isDragging &&
+            "transition-[min-height,max-height,height,transform] duration-200 ease-out",
           panelClassName,
         )}
         style={{
-          height: snap === "half" ? halfSheetHeight : FULL_SHEET_HEIGHT,
+          minHeight: isFull ? SHEET_MAX_HEIGHT : SHEET_MIN_HEIGHT,
+          maxHeight: SHEET_MAX_HEIGHT,
+          height: isFull ? SHEET_MAX_HEIGHT : "auto",
           transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
         }}
       >

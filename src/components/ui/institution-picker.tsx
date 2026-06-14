@@ -165,7 +165,6 @@ export function InstitutionPicker({
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="institution-picker-title"
-        optionCount={entries.length + 1}
         header={
           <>
             <h2

@@ -106,7 +106,6 @@ export function InterestDestinationPicker({
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="interest-destination-picker-title"
-        optionCount={accounts.length + 1}
         header={
           <>
             <h2
