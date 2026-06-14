@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import { DateField } from "@/components/ui/date-field";
+import { InterestDestinationPicker } from "@/components/ui/interest-destination-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import {
   type CertificateTermPreset,
 } from "@/lib/certificates/form";
 import type { PayoutFrequency } from "@/lib/certificates/types";
+import type { Account } from "@/lib/finance/types";
 import {
   formatAmountInput,
   sanitizeAmountInput,
@@ -37,6 +39,7 @@ interface CertificateFormFieldsProps {
   values: CertificateFormValues;
   errors: Record<string, string>;
   amountInputLocale: string;
+  settlementAccounts: Account[];
   disabled?: boolean;
   onChange: (patch: Partial<CertificateFormValues>) => void;
   onClearError: (field: string) => void;
@@ -54,6 +57,7 @@ export function CertificateFormFields({
   values,
   errors,
   amountInputLocale,
+  settlementAccounts,
   disabled = false,
   onChange,
   onClearError,
@@ -260,6 +264,14 @@ export function CertificateFormFields({
           onChange={(payoutFrequency) => onChange({ payoutFrequency })}
         />
       </div>
+
+      <InterestDestinationPicker
+        id="certificate-interest-destination"
+        value={values.destinationAccountId}
+        accounts={settlementAccounts}
+        disabled={disabled}
+        onChange={(destinationAccountId) => onChange({ destinationAccountId })}
+      />
     </div>
   );
 }

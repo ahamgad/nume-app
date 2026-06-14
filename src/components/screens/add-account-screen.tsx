@@ -33,6 +33,7 @@ import {
   type InstitutionPickerContext,
 } from "@/lib/institutions/catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
+import { filterSettlementAccounts } from "@/lib/finance/account-capabilities";
 import type { AccountType, MoneyAccountType } from "@/lib/finance/types";
 import {
   formatAmountInput,
@@ -42,7 +43,8 @@ import {
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import { useSwipeBackDiscard } from "@/hooks/use-swipe-back-discard";
+import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
+import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -78,7 +80,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { createAccount, createCertificate } = useFinance();
+  const { accounts, createAccount, createCertificate } = useFinance();
   const { showToast } = useToast();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const balanceInputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +97,11 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   const [showDiscard, setShowDiscard] = useState(false);
 
   const isCertificate = isCertificateAccountType(accountType);
+
+  const settlementAccounts = useMemo(
+    () => filterSettlementAccounts(accounts),
+    [accounts],
+  );
 
   const isDirty = isCertificate
     ? certificateValues.name.trim().length > 0 ||
@@ -191,6 +198,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
           purchaseDate: certificateValues.purchaseDate,
           termMonths,
           payoutFrequency: certificateValues.payoutFrequency,
+          destinationAccountId: certificateValues.destinationAccountId,
         });
         showToast(t("certificates.create.success"));
         router.replace(`/accounts/${certificate.accountId}`);
@@ -252,9 +260,8 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
     router.back();
   }
 
-  const { confirmDiscardNavigation } = useSwipeBackDiscard({
+  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
     isDirty: isDirty && !submitting,
-    onRequestDiscard: () => setShowDiscard(true),
   });
 
   function handleDiscardConfirm() {
@@ -264,6 +271,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
 
   return (
     <>
+      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader
         mode="stack"
         title={
@@ -305,6 +313,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
               values={certificateValues}
               errors={errors}
               amountInputLocale={amountInputLocale}
+              settlementAccounts={settlementAccounts}
               disabled={submitting}
               onChange={(patch) =>
                 setCertificateValues((current) => ({ ...current, ...patch }))

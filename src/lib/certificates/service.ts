@@ -8,6 +8,7 @@ import type {
   UpdateCertificateInput,
 } from "@/lib/certificates/types";
 import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
+import { canReceiveTransfers } from "@/lib/finance/account-capabilities";
 import { patchAccount } from "@/lib/finance/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 
@@ -20,7 +21,7 @@ async function assertDestinationAccount(
 
   const { data, error } = await supabase
     .from("accounts")
-    .select("id")
+    .select("id, account_type, status")
     .eq("id", destinationAccountId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -28,6 +29,15 @@ async function assertDestinationAccount(
   if (error) throw error;
   if (!data) {
     throw new Error("Destination account not found");
+  }
+
+  if (
+    !canReceiveTransfers({
+      type: data.account_type,
+      status: data.status,
+    })
+  ) {
+    throw new Error("Destination account cannot receive transfers");
   }
 }
 

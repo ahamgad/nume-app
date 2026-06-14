@@ -5,6 +5,7 @@ const TYPE_LABEL_KEYS: Partial<Record<AccountType, TranslationKey>> = {
   current_account: "accounts.types.currentAccount",
   cash: "accounts.types.cash",
   wallet: "accounts.types.wallet",
+  savings_account: "accounts.types.savingsAccount",
   certificate: "accounts.types.certificate",
   gold: "accounts.types.gold",
   loan: "accounts.types.loan",

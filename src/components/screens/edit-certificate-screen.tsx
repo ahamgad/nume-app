@@ -9,7 +9,8 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSwipeBackDiscard } from "@/hooks/use-swipe-back-discard";
+import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
+import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
   certificateFormValuesFromCertificate,
   isCertificateFormDirty,
@@ -17,6 +18,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
+import { filterSettlementAccounts } from "@/lib/finance/account-capabilities";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
@@ -44,7 +46,7 @@ function EditCertificateForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateCertificate, refresh } = useFinance();
+  const { updateCertificate, refresh, accounts } = useFinance();
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -52,6 +54,20 @@ function EditCertificateForm({
   const [showDiscard, setShowDiscard] = useState(false);
 
   const isDirty = isCertificateFormDirty(values, initialValues);
+
+  const settlementAccounts = useMemo(() => {
+    const eligible = filterSettlementAccounts(accounts, {
+      excludeAccountIds: [accountId],
+    });
+    if (!values.destinationAccountId) return eligible;
+    const selected = accounts.find(
+      (account) => account.id === values.destinationAccountId,
+    );
+    if (!selected || eligible.some((account) => account.id === selected.id)) {
+      return eligible;
+    }
+    return [...eligible, selected];
+  }, [accounts, accountId, values.destinationAccountId]);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -89,6 +105,7 @@ function EditCertificateForm({
         purchaseDate: values.purchaseDate,
         termMonths,
         payoutFrequency: values.payoutFrequency,
+        destinationAccountId: values.destinationAccountId,
       });
       showToast(t("certificates.edit.success"));
       router.replace(`/accounts/${accountId}`);
@@ -110,9 +127,8 @@ function EditCertificateForm({
     router.back();
   }
 
-  const { confirmDiscardNavigation } = useSwipeBackDiscard({
+  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
     isDirty: isDirty && !submitting,
-    onRequestDiscard: () => setShowDiscard(true),
   });
 
   function handleDiscardConfirm() {
@@ -122,6 +138,7 @@ function EditCertificateForm({
 
   return (
     <>
+      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader
         mode="stack"
         title={t("certificates.edit.title")}
@@ -133,6 +150,7 @@ function EditCertificateForm({
             values={values}
             errors={errors}
             amountInputLocale={amountInputLocale}
+            settlementAccounts={settlementAccounts}
             disabled={submitting}
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}

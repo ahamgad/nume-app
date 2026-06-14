@@ -9,6 +9,7 @@ import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns"
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
+import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { computeCertificateMetrics } from "@/lib/certificates/certificate-engine";
@@ -43,6 +44,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     getCertificateByAccountId,
     updateCertificate,
     archiveCertificate,
+    accounts,
     isFinanceReady,
     refresh,
   } = useFinance();
@@ -131,6 +133,14 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
         : t("certificates.details.noNextPayout");
 
+  const destinationAccount = certificate.destinationAccountId
+    ? accounts.find((item) => item.id === certificate.destinationAccountId) ?? null
+    : null;
+
+  const destinationDisplay = destinationAccount
+    ? formatAccountDestinationDisplay(destinationAccount, t)
+    : t("certificates.details.interestPayout.notSelected");
+
   return (
     <>
       <ScreenHeader
@@ -170,10 +180,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={`${certificate.annualInterestRate}%`}
             />
             <DetailRow
-              label={t("certificates.details.payoutFrequency")}
-              value={t(payoutFrequencyKey)}
-            />
-            <DetailRow
               label={t("certificates.details.purchaseDate")}
               value={formatDisplayDate(certificate.purchaseDate, formatLocale)}
             />
@@ -186,6 +192,22 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={remainingDaysValue}
             />
             <DetailRow label={t("certificates.details.status")} value={t(statusKey)} />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("certificates.details.interestPayout.title")}
+          </h2>
+          <div className="divide-y divide-border rounded-lg border border-border px-4">
+            <DetailRow
+              label={t("certificates.details.interestPayout.frequency")}
+              value={t(payoutFrequencyKey)}
+            />
+            <DetailRow
+              label={t("certificates.details.interestPayout.destination")}
+              value={destinationDisplay}
+            />
           </div>
         </section>
 

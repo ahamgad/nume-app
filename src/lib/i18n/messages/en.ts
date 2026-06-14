@@ -168,6 +168,7 @@ export const en = {
       currentAccount: "Current account",
       cash: "Cash",
       wallet: "Wallet",
+      savingsAccount: "Savings account",
       certificate: "Certificate",
       gold: "Gold",
       loan: "Loans",
@@ -330,6 +331,14 @@ export const en = {
       payoutFrequency: {
         label: "Payout frequency",
       },
+      interestDestination: {
+        label: "Interest destination",
+        description: "Where should certificate interest be paid?",
+        placeholder: "Select account",
+        searchPlaceholder: "Search accounts",
+        noResults: "No matching accounts",
+        notSelected: "Not selected",
+      },
     },
     payoutFrequency: {
       instantly: "Instantly",
@@ -360,6 +369,12 @@ export const en = {
       nextPayoutDate: "Next payout date",
       upfrontPayout: "Upfront payout",
       payoutFrequency: "Payout frequency",
+      interestPayout: {
+        title: "Interest payout",
+        frequency: "Frequency",
+        destination: "Destination",
+        notSelected: "Not selected",
+      },
       noNextPayout: "No upcoming payout",
       edit: "Edit certificate",
       archive: "Archive certificate",

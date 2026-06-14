@@ -19,6 +19,7 @@ export interface CertificateFormValues {
   termPreset: CertificateTermPreset;
   customTermYears: string;
   payoutFrequency: PayoutFrequency;
+  destinationAccountId: string | null;
 }
 
 export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
@@ -30,6 +31,7 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   termPreset: 1,
   customTermYears: "",
   payoutFrequency: "monthly",
+  destinationAccountId: null,
 };
 
 export function yearsToTermMonths(years: number): number {
@@ -109,6 +111,7 @@ export function certificateFormValuesFromCertificate(
     purchaseDate: string;
     termMonths: number;
     payoutFrequency: PayoutFrequency;
+    destinationAccountId: string | null;
   },
   account: { name: string; institution: string | null },
 ): CertificateFormValues {
@@ -130,6 +133,7 @@ export function certificateFormValuesFromCertificate(
         ? String(Number.isInteger(years) ? years : Number(years.toFixed(2)))
         : "",
     payoutFrequency: certificate.payoutFrequency,
+    destinationAccountId: certificate.destinationAccountId,
   };
 }
 
@@ -145,6 +149,7 @@ export function isCertificateFormDirty(
     values.purchaseDate !== initial.purchaseDate ||
     values.termPreset !== initial.termPreset ||
     values.customTermYears !== initial.customTermYears ||
-    values.payoutFrequency !== initial.payoutFrequency
+    values.payoutFrequency !== initial.payoutFrequency ||
+    values.destinationAccountId !== initial.destinationAccountId
   );
 }

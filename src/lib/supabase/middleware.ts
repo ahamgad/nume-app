@@ -11,10 +11,18 @@ const AUTH_ROUTES = [
   "/verify-email",
 ];
 
+const PUBLIC_ROUTES = ["/splash"];
+
 const AUTH_CALLBACK = "/auth/callback";
 
 function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
+function isPublicRoute(pathname: string) {
+  return PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 }
@@ -53,7 +61,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if (!user && !onAuthRoute) {
+  if (!user && !onAuthRoute && !isPublicRoute(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

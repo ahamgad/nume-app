@@ -112,7 +112,7 @@ Only accounts marked **Transaction Capable = Yes** in the matrix are eligible fo
 
 | Surface | v1 / future |
 |---------|-------------|
-| Interest destination pickers | Future (Certificates `destination_account_id`) |
+| Interest destination pickers | **Shipped** (Certificates `destination_account_id`, informational v1) |
 | Loan repayment account pickers | Future (Loans) |
 | Internal transfers | Future |
 | Automation / system payout targets | Future (`auto_apply`, scheduled jobs) |
@@ -123,6 +123,16 @@ Only accounts marked **Transaction Capable = Yes** in the matrix are eligible fo
 * **Gold must never appear** in destination pickers. Gold is a held asset, not a cash endpoint.
 * **Loans must never appear** as destinations. Repayments flow *from* liquid accounts *toward* loan balance reconciliation (future design).
 * The registry is a **product rule**, not a UI filter hack. Service layer and picker data sources must enforce capability flags — not hardcoded type lists scattered in components.
+
+### Implementation (Certificates v1 lifecycle pass)
+
+* **Source of truth:** `src/lib/finance/account-capabilities.ts`
+* **`canReceiveTransfers(account)`** — active settlement accounts eligible for destination pickers
+* **`SETTLEMENT_ACCOUNT_TYPES`** — current account, wallet, savings (future)
+* **`WEALTH_ONLY_ACCOUNT_TYPES`** — cash, certificate, gold, loan, and other non-settlement types
+* **`getSettlementAccounts` / `filterSettlementAccounts`** — shared picker data sources; UI must not hardcode type filters
+
+Gold and future automation surfaces must import these helpers — not duplicate allowlists in components.
 
 ### Implementation direction (future — not in this phase)
 

@@ -169,6 +169,7 @@ export const ar = {
       currentAccount: "حساب جاري",
       cash: "نقد",
       wallet: "محفظة",
+      savingsAccount: "حساب توفير",
       certificate: "شهادة",
       gold: "ذهب",
       loan: "قروض",
@@ -329,6 +330,14 @@ export const ar = {
       payoutFrequency: {
         label: "وتيرة الدفع",
       },
+      interestDestination: {
+        label: "وجهة العائد",
+        description: "إلى أي حساب تريد استلام عائد الشهادة؟",
+        placeholder: "اختر حسابًا",
+        searchPlaceholder: "ابحث في الحسابات",
+        noResults: "لا توجد حسابات مطابقة",
+        notSelected: "غير محدد",
+      },
     },
     payoutFrequency: {
       instantly: "فورًا",
@@ -359,6 +368,12 @@ export const ar = {
       nextPayoutDate: "تاريخ الدفع التالي",
       upfrontPayout: "دفعة مقدمة",
       payoutFrequency: "وتيرة الدفع",
+      interestPayout: {
+        title: "العائد",
+        frequency: "وتيرة الدفع",
+        destination: "وجهة العائد",
+        notSelected: "غير محدد",
+      },
       noNextPayout: "لا توجد دفعة قادمة",
       edit: "تعديل الشهادة",
       archive: "أرشفة الشهادة",
