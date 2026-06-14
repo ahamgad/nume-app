@@ -31,10 +31,10 @@ const DESTRUCTIVE_CONFIRMATION_ICONS = new Set<ConfirmationSheetIcon>([
 ]);
 
 export const CONFIRMATION_SHEET_TITLE_CLASS =
-  "text-center text-2xl font-bold";
+  "text-center text-xl font-bold";
 
 export const CONFIRMATION_SHEET_DESCRIPTION_CLASS =
-  "mt-2 text-center text-base leading-relaxed text-muted-foreground";
+  "mt-2 text-center text-sm leading-relaxed text-muted-foreground";
 
 export function ConfirmationSheetIconBadge({
   icon,

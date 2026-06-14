@@ -83,6 +83,14 @@ export const INSTITUTION_BANKS: InstitutionCatalogEntry[] = [
     storageValue: "ADIB",
     labelKey: "institutions.banks.adib",
   },
+  {
+    id: "aaib",
+    category: "bank",
+    shortcut: "AAIB",
+    storageValue: "Arab African International Bank",
+    labelKey: "institutions.banks.aaib",
+    matchValues: ["AAIB", "البنك العربي الأفريقي الدولي"],
+  },
 ];
 
 export const INSTITUTION_FINANCIAL_SERVICES: InstitutionCatalogEntry[] = [

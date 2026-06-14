@@ -303,6 +303,7 @@ export const en = {
       alexBank: "Bank of Alexandria",
       fab: "First Abu Dhabi Bank",
       adib: "Abu Dhabi Islamic Bank",
+      aaib: "Arab African International Bank",
     },
     financialServices: {
       thndr: "Thndr",
