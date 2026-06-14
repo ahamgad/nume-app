@@ -4,6 +4,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -13,11 +14,20 @@ import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
 
 const HALF_SHEET_HEIGHT = "50dvh";
+const LARGE_HALF_SHEET_HEIGHT = "66dvh";
 const FULL_SHEET_HEIGHT = "min(92dvh, 640px)";
+const LARGE_DATASET_THRESHOLD = 10;
 const DISMISS_DRAG_THRESHOLD_PX = 72;
 const EXPAND_DRAG_THRESHOLD_PX = 40;
 
 type SheetSnap = "half" | "full";
+
+function resolveHalfSheetHeight(optionCount?: number) {
+  if (optionCount !== undefined && optionCount > LARGE_DATASET_THRESHOLD) {
+    return LARGE_HALF_SHEET_HEIGHT;
+  }
+  return HALF_SHEET_HEIGHT;
+}
 
 /**
  * Selection bottom sheet — pickers and searchable lists.
@@ -27,6 +37,8 @@ interface SelectionBottomSheetProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  header?: ReactNode;
+  optionCount?: number;
   ariaLabelledBy?: string;
   ariaLabel?: string;
   className?: string;
@@ -37,6 +49,8 @@ export function SelectionBottomSheet({
   open,
   onClose,
   children,
+  header,
+  optionCount,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -49,6 +63,8 @@ export function SelectionBottomSheet({
   return (
     <SelectionBottomSheetContent
       onClose={onClose}
+      header={header}
+      optionCount={optionCount}
       ariaLabelledBy={ariaLabelledBy}
       ariaLabel={ariaLabel}
       className={className}
@@ -62,6 +78,8 @@ export function SelectionBottomSheet({
 function SelectionBottomSheetContent({
   onClose,
   children,
+  header,
+  optionCount,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -73,6 +91,10 @@ function SelectionBottomSheetContent({
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef(0);
   const dragging = useRef(false);
+  const halfSheetHeight = useMemo(
+    () => resolveHalfSheetHeight(optionCount),
+    [optionCount],
+  );
 
   const handleDismiss = useCallback(() => {
     setDragOffset(0);
@@ -148,7 +170,7 @@ function SelectionBottomSheetContent({
           panelClassName,
         )}
         style={{
-          height: snap === "half" ? HALF_SHEET_HEIGHT : FULL_SHEET_HEIGHT,
+          height: snap === "half" ? halfSheetHeight : FULL_SHEET_HEIGHT,
           transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
         }}
       >
@@ -161,10 +183,15 @@ function SelectionBottomSheetContent({
         >
           <div className="h-1 w-10 rounded-full bg-muted-foreground/35" />
         </div>
+        {header ? (
+          <div className="shrink-0 border-b border-border bg-background px-4 py-4">
+            {header}
+          </div>
+        ) : null}
         <div
           ref={scrollRef}
           data-sheet-scroll
-          className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain pb-[env(safe-area-inset-bottom)]"
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-2 py-2 pb-[env(safe-area-inset-bottom)]"
         >
           {children}
         </div>

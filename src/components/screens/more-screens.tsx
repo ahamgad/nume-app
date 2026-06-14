@@ -8,12 +8,14 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SettingsRadioList } from "@/components/ui/settings-radio-list";
 import { isDevEnvironment } from "@/dev/is-dev-environment";
 import { requestLocaleRestart } from "@/lib/i18n/locale-restart";
 import type { AppLocale } from "@/lib/fonts";
+import type { ThemePreference } from "@/lib/theme/theme-preference";
 import { useT, useTranslations } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
-import { cn } from "@/lib/utils";
+import { useTheme } from "@/providers/theme-provider";
 
 const CertificatesQaDevPanel = isDevEnvironment
   ? dynamic(
@@ -102,52 +104,41 @@ export function MoreProfileScreen() {
 
 export function MoreAppearanceScreen() {
   const t = useT();
+  const { theme, setTheme } = useTheme();
+
+  const themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: "system", label: t("more.appearance.themeSystem") },
+    { value: "light", label: t("more.appearance.themeLight") },
+    { value: "dark", label: t("more.appearance.themeDark") },
+  ];
+
   return (
     <>
       <ScreenHeader mode="stack" title={t("more.appearance.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("more.appearance.stub")}
-        </p>
-        <div className="rounded-lg border border-border px-4 py-3">
+        <div className="space-y-3">
           <p className="text-sm font-medium">{t("more.appearance.theme")}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("more.appearance.themeSystem")}
-          </p>
+          <SettingsRadioList
+            name="theme-preference"
+            value={theme}
+            options={themeOptions}
+            onChange={setTheme}
+            ariaLabel={t("more.appearance.theme")}
+          />
         </div>
       </ScreenBody>
     </>
   );
 }
 
-function LocaleOption({
-  label,
-  active,
-  onSelect,
-}: {
-  label: string;
-  active: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={cn(
-        "flex min-h-11 flex-1 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors",
-        active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border bg-background text-foreground",
-      )}
-    >
-      {label}
-    </button>
-  );
-}
-
 export function MoreLanguageScreen() {
   const t = useT();
   const { locale } = useTranslations();
+
+  const languageOptions: { value: AppLocale; label: string }[] = [
+    { value: "en", label: t("more.language.english") },
+    { value: "ar", label: t("more.language.arabic") },
+  ];
 
   function handleLocaleChange(next: AppLocale) {
     if (next === locale) return;
@@ -158,23 +149,15 @@ export function MoreLanguageScreen() {
     <>
       <ScreenHeader mode="stack" title={t("more.language.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("more.language.stub")}
-        </p>
-        <div className="space-y-3 rounded-lg border border-border p-4">
+        <div className="space-y-3">
           <p className="text-sm font-medium">{t("more.language.description")}</p>
-          <div className="flex gap-2">
-            <LocaleOption
-              label={t("more.language.english")}
-              active={locale === "en"}
-              onSelect={() => handleLocaleChange("en")}
-            />
-            <LocaleOption
-              label={t("more.language.arabic")}
-              active={locale === "ar"}
-              onSelect={() => handleLocaleChange("ar")}
-            />
-          </div>
+          <SettingsRadioList
+            name="language-preference"
+            value={locale}
+            options={languageOptions}
+            onChange={handleLocaleChange}
+            ariaLabel={t("more.language.title")}
+          />
           <p className="text-xs text-muted-foreground">
             {t("more.language.previewNote")}
           </p>

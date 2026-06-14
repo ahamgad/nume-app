@@ -504,7 +504,6 @@ export const ar = {
       themeSystem: "النظام",
       themeLight: "فاتح",
       themeDark: "داكن",
-      stub: "اختيار السمة سيتاح بالكامل في تحديث لاحق.",
     },
     language: {
       title: "اللغة",
@@ -512,7 +511,6 @@ export const ar = {
       current: "العربية",
       english: "English",
       arabic: "العربية",
-      stub: "اختر اللغة التي تفضلها لـ NUME.",
       previewNote:
         "تغيير اللغة يعيد تشغيل التطبيق ويفتح لوحة التحكم باللغة التي اخترتها.",
     },

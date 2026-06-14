@@ -59,6 +59,11 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("nume-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);if(t==="light"||t==="dark"||t==="system"){document.documentElement.dataset.theme=t;}else{document.documentElement.dataset.theme="system";}}catch(e){}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `(function(){try{var p=location.pathname;if(p==="/splash")return;if(sessionStorage.getItem("nume-splash-complete")==="1")return;location.replace("/splash");}catch(e){}})();`,
           }}
         />

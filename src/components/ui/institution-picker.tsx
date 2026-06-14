@@ -165,27 +165,28 @@ export function InstitutionPicker({
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="institution-picker-title"
+        optionCount={entries.length + 1}
+        header={
+          <>
+            <h2
+              id="institution-picker-title"
+              className="text-base font-semibold"
+            >
+              {resolvedLabel}
+            </h2>
+            {showSearch ? (
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t("institutions.searchPlaceholder")}
+                className="mt-3"
+                autoComplete="off"
+              />
+            ) : null}
+          </>
+        }
       >
-        <div className="border-b border-border px-4 py-4">
-          <h2
-            id="institution-picker-title"
-            className="text-base font-semibold"
-          >
-            {resolvedLabel}
-          </h2>
-          {showSearch ? (
-            <Input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={t("institutions.searchPlaceholder")}
-              className="mt-3"
-              autoComplete="off"
-            />
-          ) : null}
-        </div>
-
-        <div className="px-2 py-2">
-          {!hasResults ? (
+        {!hasResults ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
               {t("institutions.noResults")}
             </p>
@@ -246,7 +247,6 @@ export function InstitutionPicker({
               ) : null}
             </>
           )}
-        </div>
       </SelectionBottomSheet>
     </div>
   );

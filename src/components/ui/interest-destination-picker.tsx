@@ -106,27 +106,28 @@ export function InterestDestinationPicker({
         open={open}
         onClose={closeSheet}
         ariaLabelledBy="interest-destination-picker-title"
+        optionCount={accounts.length + 1}
+        header={
+          <>
+            <h2
+              id="interest-destination-picker-title"
+              className="text-base font-semibold"
+            >
+              {label}
+            </h2>
+            {showSearch ? (
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t("certificates.fields.interestDestination.searchPlaceholder")}
+                className="mt-3"
+                autoComplete="off"
+              />
+            ) : null}
+          </>
+        }
       >
-        <div className="border-b border-border px-4 py-4">
-          <h2
-            id="interest-destination-picker-title"
-            className="text-base font-semibold"
-          >
-            {label}
-          </h2>
-          {showSearch ? (
-            <Input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={t("certificates.fields.interestDestination.searchPlaceholder")}
-              className="mt-3"
-              autoComplete="off"
-            />
-          ) : null}
-        </div>
-
-        <div className="px-2 py-2">
-          {filteredAccounts.length === 0 && !showClearOption ? (
+        {filteredAccounts.length === 0 && !showClearOption ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
               {t("certificates.fields.interestDestination.noResults")}
             </p>
@@ -176,7 +177,6 @@ export function InterestDestinationPicker({
               ))}
             </div>
           )}
-        </div>
       </SelectionBottomSheet>
     </div>
   );

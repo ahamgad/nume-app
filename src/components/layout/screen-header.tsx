@@ -6,7 +6,10 @@ import { type ReactNode, useCallback, useRef } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
-import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
+import {
+  getScreenBodyScrollPadding,
+  SCREEN_BODY_TOP_PADDING,
+} from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
@@ -32,7 +35,7 @@ export function ScreenHeader({
   return (
     <header
       className={cn(
-        "z-30 shrink-0 border-b border-border bg-background/95 backdrop-blur-sm pt-[env(safe-area-inset-top)]",
+        "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg shrink-0 border-b border-border bg-background/95 backdrop-blur-sm pt-[env(safe-area-inset-top)]",
         className,
       )}
     >
@@ -61,6 +64,15 @@ export function ScreenHeader({
         )}
       </div>
     </header>
+  );
+}
+
+/** Ensures header + body column layout inside AppShell. */
+export function ScreenLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      {children}
+    </div>
   );
 }
 
@@ -103,6 +115,7 @@ export function ScreenBody({
   const scrollContainerClassName = cn(
     "flex-1 min-h-0 overflow-x-hidden",
     "min-w-0 w-full max-w-full overscroll-y-contain",
+    SCREEN_BODY_TOP_PADDING,
     isModalOpen
       ? "overflow-hidden touch-none"
       : "overflow-y-auto",
@@ -122,7 +135,7 @@ export function ScreenBody({
       <main
         ref={scrollRef}
         data-app-scroll
-        className={cn(scrollContainerClassName, "px-4 pt-4", className)}
+        className={cn(scrollContainerClassName, "px-4", className)}
       >
         {children}
       </main>
@@ -158,7 +171,7 @@ export function ScreenBody({
           offset > 0 || isAnimating ? "will-change-transform" : undefined,
         )}
       >
-        <div className={cn("px-4 pt-4", className)}>{children}</div>
+        <div className={cn("px-4", className)}>{children}</div>
       </div>
     </main>
   );

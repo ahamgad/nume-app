@@ -504,7 +504,6 @@ export const en = {
       themeSystem: "System",
       themeLight: "Light",
       themeDark: "Dark",
-      stub: "Theme selection will be fully available in a future update.",
     },
     language: {
       title: "Language",
@@ -512,7 +511,6 @@ export const en = {
       current: "English",
       english: "English",
       arabic: "Arabic",
-      stub: "Choose the language you prefer for NUME.",
       previewNote:
         "Switching language restarts the app and opens the dashboard in your chosen language.",
     },
