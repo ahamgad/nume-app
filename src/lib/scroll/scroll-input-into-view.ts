@@ -1,13 +1,7 @@
-/** Header bar (h-14) + safe-area clearance for scroll positioning. */
-export const HEADER_CLEARANCE_PX = 56;
-/** Gap between header zone and focused field top. */
-export const FOCUS_TOP_GAP_PX = 20;
 /** Breathing room below focused field before keyboard. */
 export const FOCUS_CONTEXT_BELOW_PX = 40;
 
 interface ScrollInputOptions {
-  headerClearance?: number;
-  topGap?: number;
   contextBelow?: number;
 }
 
@@ -17,20 +11,25 @@ function getKeyboardTop(): number {
   return viewport.offsetTop + viewport.height;
 }
 
-function getVisibleRegion(
+function getVisibleBottom(
   container: HTMLElement,
   options?: ScrollInputOptions,
-) {
-  const headerClearance = options?.headerClearance ?? HEADER_CLEARANCE_PX;
-  const topGap = options?.topGap ?? FOCUS_TOP_GAP_PX;
-  const contextBelow = options?.contextBelow ?? FOCUS_CONTEXT_BELOW_PX;
+): number {
+  const comfortMargin = options?.contextBelow ?? FOCUS_CONTEXT_BELOW_PX;
   const containerRect = container.getBoundingClientRect();
   const keyboardTop = getKeyboardTop();
 
-  return {
-    idealInputTop: Math.max(containerRect.top, 0) + headerClearance + topGap,
-    visibleBottom: Math.min(containerRect.bottom, keyboardTop) - contextBelow,
-  };
+  return Math.min(containerRect.bottom, keyboardTop) - comfortMargin;
+}
+
+/** True when the keyboard (or viewport shrink) would cover the focused field. */
+export function isInputObscuredByKeyboard(
+  container: HTMLElement,
+  target: HTMLElement,
+  options?: ScrollInputOptions,
+): boolean {
+  const targetRect = target.getBoundingClientRect();
+  return targetRect.bottom > getVisibleBottom(container, options);
 }
 
 export function getKeyboardOverlapPx(): number {
@@ -40,32 +39,27 @@ export function getKeyboardOverlapPx(): number {
 }
 
 /**
- * Scroll within container so the focused field sits below the header with
- * context visible beneath it — never uses scrollIntoView.
+ * Scroll within the container only when the keyboard would obscure the focused
+ * field — never uses scrollIntoView and never repositions already-visible fields.
  */
 export function scrollInputIntoContainer(
   container: HTMLElement,
   target: HTMLElement,
   options?: ScrollInputOptions,
-): void {
+): boolean {
+  if (!isInputObscuredByKeyboard(container, target, options)) {
+    return false;
+  }
+
   const targetRect = target.getBoundingClientRect();
-  const { idealInputTop, visibleBottom } = getVisibleRegion(container, options);
+  const visibleBottom = getVisibleBottom(container, options);
+  const delta = targetRect.bottom - visibleBottom;
 
-  let delta = 0;
-
-  if (targetRect.top > idealInputTop + 4) {
-    delta = targetRect.top - idealInputTop;
-  } else if (targetRect.top < idealInputTop - 4) {
-    delta = targetRect.top - idealInputTop;
-  }
-
-  if (targetRect.bottom > visibleBottom) {
-    delta = Math.max(delta, targetRect.bottom - visibleBottom);
-  }
-
-  if (delta !== 0) {
+  if (delta > 0) {
     container.scrollTop += delta;
   }
+
+  return delta > 0;
 }
 
 export function readContainerPaddingBottom(container: HTMLElement): number {
