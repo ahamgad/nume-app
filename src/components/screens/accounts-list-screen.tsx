@@ -2,7 +2,7 @@
 
 import { Landmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
@@ -10,12 +10,18 @@ import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ScrollChipSelect,
+  type ScrollChipOption,
+} from "@/components/ui/scroll-chip-select";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { formatCurrency } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
+
+type AccountsFilter = "active" | "archived";
 
 function AddAccountHeaderAction({
   label,
@@ -91,11 +97,30 @@ export function AccountsListScreen() {
   const formatLocale = useFormatLocale();
   const router = useRouter();
   const { accounts, isFinanceReady, refresh } = useFinance();
+  const [filter, setFilter] = useState<AccountsFilter>("active");
+
+  const filterOptions = useMemo(
+    (): ScrollChipOption<AccountsFilter>[] => [
+      { value: "active", label: t("accounts.filters.active") },
+      { value: "archived", label: t("accounts.filters.archived") },
+    ],
+    [t],
+  );
+
+  const filteredAccounts = useMemo(
+    () =>
+      accounts.filter((account) =>
+        filter === "active"
+          ? account.status === "active"
+          : account.status === "archived",
+      ),
+    [accounts, filter],
+  );
 
   const { moneyAccounts, certificateAccounts } = useMemo(() => {
     const money: Account[] = [];
     const certificates: Account[] = [];
-    for (const account of accounts) {
+    for (const account of filteredAccounts) {
       if (account.type === "certificate") {
         certificates.push(account);
       } else {
@@ -103,7 +128,7 @@ export function AccountsListScreen() {
       }
     }
     return { moneyAccounts: money, certificateAccounts: certificates };
-  }, [accounts]);
+  }, [filteredAccounts]);
 
   const addAccountAction = (
     <AddAccountHeaderAction
@@ -124,27 +149,46 @@ export function AccountsListScreen() {
     );
   }
 
-  const hasAccounts = accounts.length > 0;
+  const hasFilteredAccounts = filteredAccounts.length > 0;
+  const activeCount = accounts.filter((account) => account.status === "active").length;
 
   return (
     <>
       <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
       <ScreenBody withTabBar onRefresh={refresh}>
-        {!hasAccounts ? (
-          <EmptyState
-            icon={<Landmark />}
-            title={t("accounts.empty.title")}
-            description={t("accounts.empty.description")}
-            action={
-              <Button
-                variant="outline"
-                className="h-11 w-full"
-                onClick={() => router.push("/accounts/new")}
-              >
-                {t("accounts.empty.action")}
-              </Button>
-            }
+        <div className="mb-4">
+          <ScrollChipSelect
+            value={filter}
+            options={filterOptions}
+            ariaLabel={t("accounts.filters.label")}
+            defaultToFirstOption={false}
+            onChange={setFilter}
           />
+        </div>
+
+        {!hasFilteredAccounts ? (
+          filter === "active" && activeCount === 0 ? (
+            <EmptyState
+              icon={<Landmark />}
+              title={t("accounts.empty.title")}
+              description={t("accounts.empty.description")}
+              action={
+                <Button
+                  variant="outline"
+                  className="h-11 w-full"
+                  onClick={() => router.push("/accounts/new")}
+                >
+                  {t("accounts.empty.action")}
+                </Button>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={<Landmark />}
+              title={t("accounts.archived.empty.title")}
+              description={t("accounts.archived.empty.description")}
+            />
+          )
         ) : (
           <div className="space-y-6">
             <AccountSection

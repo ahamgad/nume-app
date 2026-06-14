@@ -75,7 +75,7 @@ export async function updateSession(request: NextRequest) {
 
   if (user && user.email_confirmed_at && onAuthRoute && !onResetPasswordRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/splash";
     return NextResponse.redirect(url);
   }
 

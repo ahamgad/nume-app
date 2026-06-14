@@ -54,6 +54,36 @@ export function calculateExpectedTotalReturn(
   return principalAmount + expectedProfit;
 }
 
+/** Per-period interest payout amount (informational — no automation in v1). */
+export function calculatePayoutAmount(
+  principalAmount: number,
+  annualInterestRate: number,
+  termMonths: number,
+  payoutFrequency: PayoutFrequency,
+): number {
+  const expectedProfit = calculateExpectedProfit(
+    principalAmount,
+    annualInterestRate,
+    termMonths,
+  );
+
+  if (termMonths <= 0) return 0;
+
+  switch (payoutFrequency) {
+    case "instantly":
+    case "at_maturity":
+      return expectedProfit;
+    case "monthly":
+      return expectedProfit / termMonths;
+    case "quarterly":
+      return expectedProfit / Math.max(termMonths / 3, 1);
+    case "semi_annual":
+      return expectedProfit / Math.max(termMonths / 6, 1);
+    case "annual":
+      return expectedProfit / Math.max(termMonths / 12, 1);
+  }
+}
+
 export function calculateCurrentValue(
   principalAmount: number,
   status: CertificateStatus,

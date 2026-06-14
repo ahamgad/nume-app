@@ -182,6 +182,26 @@ export const ar = {
     list: {
       meta: "{institution} · {type}",
     },
+    filters: {
+      label: "تصفية الحسابات",
+      active: "نشطة",
+      archived: "مؤرشفة",
+    },
+    status: {
+      archived: "مؤرشف",
+    },
+    archived: {
+      empty: {
+        title: "لا توجد حسابات مؤرشفة",
+        description: "تظهر الحسابات المؤرشفة هنا ولا تُحسب في صافي الثروة.",
+      },
+    },
+    edit: {
+      title: "تعديل الحساب",
+      submit: "حفظ التغييرات",
+      saving: "جارٍ الحفظ…",
+      success: "تم تحديث الحساب",
+    },
     add: {
       title: "إضافة حساب",
       chooseType: "نوع الحساب",
@@ -234,13 +254,18 @@ export const ar = {
         empty: "لا توجد سجلات بعد. أضف سجلًا لتتبع تغيّرات الرصيد.",
       },
       addRecord: "إضافة سجل",
-      deleteAccount: "حذف الحساب",
-      deleteSuccess: "تم حذف الحساب",
-      deleteConfirm: {
-        title: "حذف هذا الحساب؟",
-        description: "سيُزال الحساب وسجلاته. لا يمكن التراجع عن هذا الإجراء.",
-        confirm: "حذف الحساب",
-        deleting: "جارٍ الحذف…",
+      edit: "تعديل الحساب",
+      archiveAccount: "أرشفة الحساب",
+      archiveSuccess: "تمت أرشفة الحساب",
+      restoreAccount: "استعادة الحساب",
+      restoreRestoring: "جارٍ الاستعادة…",
+      restoreSuccess: "تمت استعادة الحساب",
+      archiveConfirm: {
+        title: "أرشفة هذا الحساب؟",
+        description:
+          "سيُزال من العرض النشط وصافي الثروة. تُحفظ السجلات.",
+        confirm: "أرشفة الحساب",
+        archiving: "جارٍ الأرشفة…",
         cancel: "إلغاء",
       },
       notFound: "الحساب غير موجود",
@@ -251,6 +276,7 @@ export const ar = {
       balanceRequired: "الرصيد الحالي مطلوب",
       balanceInvalid: "أدخل مبلغًا صالحًا",
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
+      institutionRequired: "المؤسسة مطلوبة",
     },
   },
   institutions: {
@@ -371,6 +397,7 @@ export const ar = {
       interestPayout: {
         title: "العائد",
         frequency: "وتيرة الدفع",
+        amount: "المبلغ",
         destination: "وجهة العائد",
         notSelected: "غير محدد",
       },

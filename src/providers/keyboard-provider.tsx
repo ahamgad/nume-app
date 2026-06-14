@@ -1,16 +1,13 @@
 "use client";
 
 /**
- * Shared keyboard strategy (NUME platform — frozen before Gold).
+ * NUME keyboard strategy (Phase 3.5 — frozen before Gold).
  *
- * Root cause: iOS keeps `position: fixed` UI anchored to the layout viewport.
- * Shrinking AppShell height alone does not lift StickyFooter or resize bottom sheets.
+ * The keyboard overlays the bottom of the layout viewport naturally.
+ * We do NOT resize the app shell or lift fixed CTAs.
  *
- * Strategy:
- * 1. Single visualViewport listener publishes inset + visible rect.
- * 2. StickyFooter uses dynamic `bottom: keyboardInset`.
- * 3. ScreenBody adds keyboard padding + scrolls focused inputs into view.
- * 4. BottomSheet anchors its overlay to the visual viewport rect.
+ * Consumers use `useKeyboardScroll` for focused-input positioning,
+ * temporary spacers, and scroll lock while typing.
  */
 import {
   createContext,
@@ -21,18 +18,13 @@ import {
 } from "react";
 
 export interface KeyboardState {
-  /** Pixels the on-screen keyboard overlaps the layout viewport. */
+  isOpen: boolean;
   keyboardInset: number;
-  /** Visible viewport height (`visualViewport.height`). */
-  viewportHeight: number | null;
-  /** Visible viewport offset from layout top (`visualViewport.offsetTop`). */
-  viewportOffsetTop: number;
 }
 
 const defaultState: KeyboardState = {
+  isOpen: false,
   keyboardInset: 0,
-  viewportHeight: null,
-  viewportOffsetTop: 0,
 };
 
 const KeyboardContext = createContext<KeyboardState>(defaultState);
@@ -53,11 +45,13 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const overlap = window.innerHeight - vv.height - vv.offsetTop;
+      const overlap = Math.max(
+        0,
+        Math.round(window.innerHeight - vv.height - vv.offsetTop),
+      );
       setState({
-        keyboardInset: Math.max(0, Math.round(overlap)),
-        viewportHeight: vv.height,
-        viewportOffsetTop: vv.offsetTop,
+        isOpen: overlap > 0,
+        keyboardInset: overlap,
       });
     }
 

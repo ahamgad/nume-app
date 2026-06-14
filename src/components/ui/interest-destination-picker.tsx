@@ -40,18 +40,26 @@ export function InterestDestinationPicker({
     [accounts, value],
   );
 
+  const showSearch = accounts.length > 10;
+
   const filteredAccounts = useMemo(
-    () => filterAccountsForDestinationSearch(accounts, searchQuery, t),
-    [accounts, searchQuery, t],
+    () =>
+      filterAccountsForDestinationSearch(
+        accounts,
+        showSearch ? searchQuery : "",
+        t,
+      ),
+    [accounts, searchQuery, showSearch, t],
   );
 
   const showClearOption = useMemo(() => {
+    if (!showSearch) return true;
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
     return t("certificates.fields.interestDestination.notSelected")
       .toLowerCase()
       .includes(query);
-  }, [searchQuery, t]);
+  }, [searchQuery, showSearch, t]);
 
   const displayLabel = selectedAccount
     ? formatAccountDestinationDisplay(selectedAccount, t)
@@ -106,13 +114,15 @@ export function InterestDestinationPicker({
           >
             {label}
           </h2>
-          <Input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={t("certificates.fields.interestDestination.searchPlaceholder")}
-            className="mt-3"
-            autoComplete="off"
-          />
+          {showSearch ? (
+            <Input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={t("certificates.fields.interestDestination.searchPlaceholder")}
+              className="mt-3"
+              autoComplete="off"
+            />
+          ) : null}
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">

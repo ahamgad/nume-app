@@ -1,10 +1,10 @@
-import { EditCertificateScreen } from "@/components/screens/edit-certificate-screen";
+import { EditAccountRouterScreen } from "@/components/screens/edit-account-router-screen";
 
-interface EditCertificatePageProps {
+interface EditAccountPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditCertificatePage({ params }: EditCertificatePageProps) {
+export default async function EditAccountPage({ params }: EditAccountPageProps) {
   const { id } = await params;
-  return <EditCertificateScreen accountId={id} />;
+  return <EditAccountRouterScreen accountId={id} />;
 }

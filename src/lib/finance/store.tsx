@@ -22,12 +22,14 @@ import type {
 } from "@/lib/certificates/types";
 import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
+  archiveAccount as archiveAccountService,
   deleteAccount as deleteAccountService,
   fetchAccounts,
   fetchRecords,
   insertAccount,
   insertRecordWithBalanceUpdate,
   patchAccount,
+  restoreAccount as restoreAccountService,
 } from "@/lib/finance/service";
 import type {
   Account,
@@ -64,6 +66,8 @@ interface FinanceContextValue {
   ) => Promise<Certificate>;
   archiveCertificate: (certificateId: string) => Promise<void>;
   deleteAccount: (id: string) => Promise<void>;
+  archiveAccount: (id: string) => Promise<void>;
+  restoreAccount: (id: string) => Promise<void>;
   updateAccount: (
     id: string,
     patch: Partial<
@@ -261,18 +265,68 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         (current: FinanceData | undefined) => {
           if (!current) return current;
           return {
-            accounts: current.accounts.filter(
-              (account) => account.id !== existing.accountId,
+            accounts: current.accounts.map((account) =>
+              account.id === existing.accountId
+                ? { ...account, status: "archived" as const, includeInNetWorth: false }
+                : account,
             ),
             records: current.records,
-            certificates: current.certificates.filter(
-              (certificate) => certificate.id !== certificateId,
+            certificates: current.certificates.map((certificate) =>
+              certificate.id === certificateId
+                ? { ...certificate, status: "archived" as const }
+                : certificate,
             ),
           };
         },
       );
     },
     [userId, certificates, queryClient],
+  );
+
+  const archiveAccount = useCallback(
+    async (id: string): Promise<void> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      await archiveAccountService(supabase, userId, id);
+      queryClient.setQueryData(
+        [FINANCE_QUERY_KEY, userId],
+        (current: FinanceData | undefined) => {
+          if (!current) return current;
+          return {
+            accounts: current.accounts.map((account) =>
+              account.id === id
+                ? { ...account, status: "archived" as const, includeInNetWorth: false }
+                : account,
+            ),
+            records: current.records,
+            certificates: current.certificates,
+          };
+        },
+      );
+    },
+    [userId, queryClient],
+  );
+
+  const restoreAccount = useCallback(
+    async (id: string): Promise<void> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      await restoreAccountService(supabase, userId, id);
+      queryClient.setQueryData(
+        [FINANCE_QUERY_KEY, userId],
+        (current: FinanceData | undefined) => {
+          if (!current) return current;
+          return {
+            accounts: current.accounts.map((account) =>
+              account.id === id ? { ...account, status: "active" as const } : account,
+            ),
+            records: current.records,
+            certificates: current.certificates,
+          };
+        },
+      );
+    },
+    [userId, queryClient],
   );
 
   const deleteAccount = useCallback(
@@ -396,6 +450,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       createCertificate,
       updateCertificate,
       archiveCertificate,
+      archiveAccount,
+      restoreAccount,
       deleteAccount,
       updateAccount,
       getAccount,
@@ -418,6 +474,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       createCertificate,
       updateCertificate,
       archiveCertificate,
+      archiveAccount,
+      restoreAccount,
       deleteAccount,
       updateAccount,
       getAccount,

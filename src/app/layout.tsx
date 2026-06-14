@@ -57,6 +57,11 @@ export default function RootLayout({
             __html: `(function(){try{var l=localStorage.getItem("nume-locale");if(l==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl";document.documentElement.dataset.locale="ar";}}catch(e){}})();`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=location.pathname;if(p==="/splash")return;if(sessionStorage.getItem("nume-splash-complete")==="1")return;location.replace("/splash");}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="h-dvh overflow-hidden bg-background font-latin text-foreground">
         <AppProviders>{children}</AppProviders>

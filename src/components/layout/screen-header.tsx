@@ -2,12 +2,11 @@
 
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useMemo, useRef } from "react";
+import { type ReactNode, useCallback, useRef } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { useScrollFocusedInput } from "@/hooks/use-scroll-focused-input";
+import { useKeyboardScroll } from "@/hooks/use-keyboard-scroll";
 import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
-import { useKeyboard } from "@/providers/keyboard-provider";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -80,26 +79,10 @@ export function ScreenBody({
   onRefresh,
 }: ScreenBodyProps) {
   const scrollRef = useRef<HTMLElement>(null);
-  const { keyboardInset } = useKeyboard();
 
-  const bottomReservePx = withStickyFooter ? 88 : withTabBar ? 72 : 56;
+  const bottomReservePx = withStickyFooter ? 88 : withTabBar ? 72 : 16;
 
-  useScrollFocusedInput(scrollRef, {
-    bottomReservePx,
-    keyboardInset,
-  });
-
-  const keyboardPaddingStyle = useMemo(() => {
-    if (keyboardInset <= 0) return undefined;
-    const base = withStickyFooter
-      ? "5.5rem"
-      : withTabBar
-        ? "4.5rem"
-        : "3.5rem";
-    return {
-      paddingBottom: `calc(${base} + env(safe-area-inset-bottom) + ${keyboardInset}px)`,
-    };
-  }, [keyboardInset, withStickyFooter, withTabBar]);
+  useKeyboardScroll(scrollRef, { bottomReservePx });
 
   const {
     elementRef,
@@ -135,7 +118,6 @@ export function ScreenBody({
           scrollPadding,
           className,
         )}
-        style={keyboardPaddingStyle}
       >
         {children}
       </main>
@@ -150,7 +132,6 @@ export function ScreenBody({
         "min-w-0 w-full max-w-full overscroll-y-contain",
         scrollPadding,
       )}
-      style={keyboardPaddingStyle}
     >
       {showIndicator ? (
         <div

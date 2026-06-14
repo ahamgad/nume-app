@@ -182,6 +182,26 @@ export const en = {
     list: {
       meta: "{institution} · {type}",
     },
+    filters: {
+      label: "Account filter",
+      active: "Active",
+      archived: "Archived",
+    },
+    status: {
+      archived: "Archived",
+    },
+    archived: {
+      empty: {
+        title: "No archived accounts",
+        description: "Archived accounts appear here and stay out of net worth.",
+      },
+    },
+    edit: {
+      title: "Edit account",
+      submit: "Save changes",
+      saving: "Saving…",
+      success: "Account updated",
+    },
     add: {
       title: "Add account",
       chooseType: "Account type",
@@ -234,14 +254,18 @@ export const en = {
         empty: "No records yet. Add a record to track balance changes.",
       },
       addRecord: "Add record",
-      deleteAccount: "Delete account",
-      deleteSuccess: "Account deleted",
-      deleteConfirm: {
-        title: "Delete this account?",
+      edit: "Edit account",
+      archiveAccount: "Archive account",
+      archiveSuccess: "Account archived",
+      restoreAccount: "Restore account",
+      restoreRestoring: "Restoring…",
+      restoreSuccess: "Account restored",
+      archiveConfirm: {
+        title: "Archive this account?",
         description:
-          "This removes the account and its records. This action cannot be undone.",
-        confirm: "Delete account",
-        deleting: "Deleting…",
+          "This removes the account from active views and net worth. Records are preserved.",
+        confirm: "Archive account",
+        archiving: "Archiving…",
         cancel: "Cancel",
       },
       notFound: "Account not found",
@@ -252,6 +276,7 @@ export const en = {
       balanceRequired: "Current balance is required",
       balanceInvalid: "Enter a valid amount",
       balanceNegative: "Balance cannot be negative",
+      institutionRequired: "Institution is required",
     },
   },
   institutions: {
@@ -372,6 +397,7 @@ export const en = {
       interestPayout: {
         title: "Interest payout",
         frequency: "Frequency",
+        amount: "Amount",
         destination: "Destination",
         notSelected: "Not selected",
       },

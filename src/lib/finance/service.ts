@@ -17,7 +17,7 @@ export async function fetchAccounts(
     .from("accounts")
     .select("*")
     .eq("user_id", userId)
-    .eq("status", "active")
+    .in("status", ["active", "archived"])
     .order("created_at", { ascending: true });
 
   if (error) throw error;
@@ -119,6 +119,42 @@ export async function patchAccount(
   if (error) throw error;
 }
 
+export async function archiveAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  id: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("accounts")
+    .update({
+      status: "archived",
+      include_in_net_worth: false,
+    })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+}
+
+export async function restoreAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  id: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("accounts")
+    .update({ status: "active" })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(getSupabaseErrorMessage(error));
+  }
+}
+
+/** @deprecated v1 — use archiveAccount. Hard delete retained for internal cleanup only. */
 export async function deleteAccount(
   supabase: SupabaseClient,
   userId: string,

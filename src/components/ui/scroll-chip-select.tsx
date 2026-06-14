@@ -24,6 +24,8 @@ interface ScrollChipSelectProps<T extends string | number> {
    * See `resolveDefaultChipValue` in this module.
    */
   defaultToFirstOption?: boolean;
+  /** Primary chips for high-emphasis decisions (e.g. Add Account type). */
+  emphasis?: "primary" | "secondary";
 }
 
 /** Shared rule for horizontal chip selectors — first enabled chip wins when unset. */
@@ -50,6 +52,7 @@ export function ScrollChipSelect<T extends string | number>({
   ariaLabel,
   className,
   defaultToFirstOption = true,
+  emphasis = "secondary",
 }: ScrollChipSelectProps<T>) {
   const onChangeRef = useRef(onChange);
 
@@ -91,10 +94,17 @@ export function ScrollChipSelect<T extends string | number>({
               if (!disabled) onChange(option.value);
             }}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              selected
-                ? "border-foreground/25 bg-muted text-foreground"
-                : "border-border bg-background text-foreground",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border font-medium transition-colors",
+              emphasis === "primary"
+                ? "px-5 py-2.5 text-[0.9375rem]"
+                : "px-4 py-2 text-sm",
+              emphasis === "primary"
+                ? selected
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-foreground"
+                : selected
+                  ? "border-foreground/25 bg-muted text-foreground"
+                  : "border-border bg-background text-foreground",
               disabled && "cursor-not-allowed opacity-45",
             )}
           >

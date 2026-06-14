@@ -304,6 +304,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
               value={accountType}
               options={accountTypeOptions}
               ariaLabel={t("accounts.add.chooseType")}
+              emphasis="primary"
               onChange={handleAccountTypeChange}
             />
           </div>

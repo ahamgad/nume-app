@@ -1,24 +1,46 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 
 import { isSplashComplete } from "@/lib/app/splash-session";
 import { useColdResumeSplash } from "@/hooks/use-cold-resume-splash";
 
+function subscribeSplashGate(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("pageshow", onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("pageshow", onStoreChange);
+  };
+}
+
+function getSplashGateSnapshot(pathname: string) {
+  if (pathname === "/splash") return true;
+  return isSplashComplete();
+}
+
+function getSplashGateServerSnapshot() {
+  return false;
+}
+
 /**
- * Redirects cold app entry to the official splash before dashboard.
- * Splash always lands on `/` (dashboard) — never the previous route.
+ * True bootstrap gate: app routes do not render until splash completes.
+ * Inline script in root layout prevents the first paint flash.
  */
 export function AppBootstrap({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   useColdResumeSplash();
 
-  useEffect(() => {
-    if (pathname === "/splash") return;
-    if (isSplashComplete()) return;
-    window.location.replace("/splash");
-  }, [pathname]);
+  const splashReady = useSyncExternalStore(
+    subscribeSplashGate,
+    () => getSplashGateSnapshot(pathname),
+    getSplashGateServerSnapshot,
+  );
+
+  if (!splashReady && pathname !== "/splash") {
+    return null;
+  }
 
   return children;
 }

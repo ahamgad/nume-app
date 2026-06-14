@@ -4,6 +4,7 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  Pencil,
   Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -50,28 +51,50 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const formatLocale = useFormatLocale();
   const router = useRouter();
   const { showToast } = useToast();
-  const { getAccount, getAccountRecords, updateAccount, deleteAccount, isFinanceReady } =
-    useFinance();
+  const {
+    getAccount,
+    getAccountRecords,
+    updateAccount,
+    archiveAccount,
+    restoreAccount,
+    isFinanceReady,
+  } = useFinance();
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
+  const isArchived = account?.status === "archived";
 
-  async function handleDeleteConfirm() {
+  async function handleArchiveConfirm() {
     if (!account) return;
-    setDeleting(true);
+    setArchiving(true);
     try {
-      await deleteAccount(account.id);
-      showToast(t("accounts.details.deleteSuccess"));
+      await archiveAccount(account.id);
+      showToast(t("accounts.details.archiveSuccess"));
       router.replace("/accounts");
     } catch (error) {
-      logSupabaseError("deleteAccount", error);
+      logSupabaseError("archiveAccount", error);
       showToast(getSupabaseErrorMessage(error) || t("common.retry"));
     } finally {
-      setDeleting(false);
-      setShowDeleteConfirm(false);
+      setArchiving(false);
+      setShowArchiveConfirm(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (!account) return;
+    setRestoring(true);
+    try {
+      await restoreAccount(account.id);
+      showToast(t("accounts.details.restoreSuccess"));
+    } catch (error) {
+      logSupabaseError("restoreAccount", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+    } finally {
+      setRestoring(false);
     }
   }
 
@@ -118,15 +141,18 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       <ScreenHeader
         mode="stack"
         title={account.name}
+        onBack={() => router.push("/accounts")}
         rightAction={
-          <button
-            type="button"
-            onClick={() => router.push(`/accounts/${account.id}/records/new`)}
-            className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
-            aria-label={t("accounts.details.addRecord")}
-          >
-            <Plus className="size-5" />
-          </button>
+          !isArchived ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/accounts/${account.id}/records/new`)}
+              className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
+              aria-label={t("accounts.details.addRecord")}
+            >
+              <Plus className="size-5" />
+            </button>
+          ) : undefined
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6">
@@ -139,7 +165,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           <div className="mt-1 flex flex-wrap gap-2">
             <AccountTypeBadge type={account.type} />
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {t("common.active")}
+              {isArchived ? t("accounts.status.archived") : t("common.active")}
             </span>
           </div>
         </div>
@@ -154,42 +180,65 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           />
         </WidgetCard>
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("accounts.details.settingsTitle")}
-          </h2>
-          <div className="rounded-lg border border-border px-4">
-            <ToggleSettingRow
-              label={t("accounts.settings.includeInNetWorth.label")}
-              description={t("accounts.settings.includeInNetWorth.description")}
-              checked={account.includeInNetWorth}
-              onCheckedChange={(checked) =>
-                void updateAccount(account.id, { includeInNetWorth: checked })
-              }
-            />
-            <div className="border-t border-border">
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInEmergencyFund.label")}
-                description={t(
-                  "accounts.settings.includeInEmergencyFund.description",
-                )}
-                checked={account.includeInEmergencyFund}
-                onCheckedChange={(checked) =>
-                  void updateAccount(account.id, {
-                    includeInEmergencyFund: checked,
-                  })
-                }
-              />
-            </div>
-          </div>
+        {!isArchived ? (
           <Button
             variant="outline"
-            className="mt-4 h-11 w-full text-destructive hover:text-destructive"
-            onClick={() => setShowDeleteConfirm(true)}
+            className="h-11 w-full"
+            onClick={() => router.push(`/accounts/${account.id}/edit`)}
           >
-            {t("accounts.details.deleteAccount")}
+            <Pencil className="me-2 size-4" />
+            {t("accounts.details.edit")}
           </Button>
-        </section>
+        ) : null}
+
+        {!isArchived ? (
+          <section>
+            <h2 className="mb-2 text-start text-lg font-semibold">
+              {t("accounts.details.settingsTitle")}
+            </h2>
+            <div className="rounded-lg border border-border px-4">
+              <ToggleSettingRow
+                label={t("accounts.settings.includeInNetWorth.label")}
+                description={t("accounts.settings.includeInNetWorth.description")}
+                checked={account.includeInNetWorth}
+                onCheckedChange={(checked) =>
+                  void updateAccount(account.id, { includeInNetWorth: checked })
+                }
+              />
+              <div className="border-t border-border">
+                <ToggleSettingRow
+                  label={t("accounts.settings.includeInEmergencyFund.label")}
+                  description={t(
+                    "accounts.settings.includeInEmergencyFund.description",
+                  )}
+                  checked={account.includeInEmergencyFund}
+                  onCheckedChange={(checked) =>
+                    void updateAccount(account.id, {
+                      includeInEmergencyFund: checked,
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="mt-4 h-11 w-full text-destructive hover:text-destructive"
+              onClick={() => setShowArchiveConfirm(true)}
+            >
+              {t("accounts.details.archiveAccount")}
+            </Button>
+          </section>
+        ) : (
+          <Button
+            className="h-11 w-full"
+            disabled={restoring}
+            onClick={handleRestore}
+          >
+            {restoring
+              ? t("accounts.details.restoreRestoring")
+              : t("accounts.details.restoreAccount")}
+          </Button>
+        )}
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
@@ -216,16 +265,16 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       </ScreenBody>
 
       <ConfirmBottomSheet
-        open={showDeleteConfirm}
-        titleId="delete-account-title"
-        title={t("accounts.details.deleteConfirm.title")}
-        description={t("accounts.details.deleteConfirm.description")}
-        confirmLabel={t("accounts.details.deleteConfirm.confirm")}
-        confirmLoadingLabel={t("accounts.details.deleteConfirm.deleting")}
-        cancelLabel={t("accounts.details.deleteConfirm.cancel")}
-        confirmDisabled={deleting}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setShowDeleteConfirm(false)}
+        open={showArchiveConfirm}
+        titleId="archive-account-title"
+        title={t("accounts.details.archiveConfirm.title")}
+        description={t("accounts.details.archiveConfirm.description")}
+        confirmLabel={t("accounts.details.archiveConfirm.confirm")}
+        confirmLoadingLabel={t("accounts.details.archiveConfirm.archiving")}
+        cancelLabel={t("accounts.details.archiveConfirm.cancel")}
+        confirmDisabled={archiving}
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setShowArchiveConfirm(false)}
       />
     </>
   );

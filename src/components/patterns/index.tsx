@@ -6,7 +6,6 @@ import { ChevronRight } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { useKeyboard } from "@/providers/keyboard-provider";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
@@ -112,15 +111,12 @@ interface StickyFooterProps {
 }
 
 export function StickyFooter({ children, className }: StickyFooterProps) {
-  const { keyboardInset } = useKeyboard();
-
   return (
     <div
       className={cn(
-        "fixed inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm transition-[bottom] duration-200 ease-out",
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm",
         className,
       )}
-      style={{ bottom: keyboardInset }}
     >
       <div className="px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         {children}

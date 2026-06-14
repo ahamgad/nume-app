@@ -125,6 +125,8 @@ export function InstitutionPicker({
     filteredFinancial.length > 0 ||
     showOtherOption;
 
+  const showSearch = entries.length + 1 > 10;
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{resolvedLabel}</Label>
@@ -171,13 +173,15 @@ export function InstitutionPicker({
           >
             {resolvedLabel}
           </h2>
-          <Input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={t("institutions.searchPlaceholder")}
-            className="mt-3"
-            autoComplete="off"
-          />
+          {showSearch ? (
+            <Input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={t("institutions.searchPlaceholder")}
+              className="mt-3"
+              autoComplete="off"
+            />
+          ) : null}
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">

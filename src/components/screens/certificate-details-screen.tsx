@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { computeCertificateMetrics } from "@/lib/certificates/certificate-engine";
+import { computeCertificateMetrics, calculatePayoutAmount } from "@/lib/certificates/certificate-engine";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -141,6 +141,15 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     ? formatAccountDestinationDisplay(destinationAccount, t)
     : t("certificates.details.interestPayout.notSelected");
 
+  const payoutAmount = calculatePayoutAmount(
+    certificate.principalAmount,
+    certificate.annualInterestRate,
+    certificate.termMonths,
+    certificate.payoutFrequency,
+  );
+
+  const isArchived = account.status === "archived";
+
   return (
     <>
       <ScreenHeader
@@ -205,6 +214,10 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={t(payoutFrequencyKey)}
             />
             <DetailRow
+              label={t("certificates.details.interestPayout.amount")}
+              value={formatCurrency(payoutAmount, formatLocale)}
+            />
+            <DetailRow
               label={t("certificates.details.interestPayout.destination")}
               value={destinationDisplay}
             />
@@ -228,53 +241,57 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           </div>
         </section>
 
-        <Button
-          variant="outline"
-          className="h-11 w-full"
-          onClick={() => router.push(`/accounts/${account.id}/edit`)}
-        >
-          <Pencil className="me-2 size-4" />
-          {t("certificates.details.edit")}
-        </Button>
+        {!isArchived ? (
+          <Button
+            variant="outline"
+            className="h-11 w-full"
+            onClick={() => router.push(`/accounts/${account.id}/edit`)}
+          >
+            <Pencil className="me-2 size-4" />
+            {t("certificates.details.edit")}
+          </Button>
+        ) : null}
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("accounts.details.settingsTitle")}
-          </h2>
-          <div className="rounded-lg border border-border px-4">
-            <ToggleSettingRow
-              label={t("accounts.settings.includeInNetWorth.label")}
-              description={t("accounts.settings.includeInNetWorth.description")}
-              checked={account.includeInNetWorth}
-              onCheckedChange={(checked) =>
-                void updateCertificate(certificate.id, {
-                  includeInNetWorth: checked,
-                })
-              }
-            />
-            <div className="border-t border-border">
+        {!isArchived ? (
+          <section>
+            <h2 className="mb-2 text-start text-lg font-semibold">
+              {t("accounts.details.settingsTitle")}
+            </h2>
+            <div className="rounded-lg border border-border px-4">
               <ToggleSettingRow
-                label={t("accounts.settings.includeInEmergencyFund.label")}
-                description={t(
-                  "accounts.settings.includeInEmergencyFund.description",
-                )}
-                checked={account.includeInEmergencyFund}
+                label={t("accounts.settings.includeInNetWorth.label")}
+                description={t("accounts.settings.includeInNetWorth.description")}
+                checked={account.includeInNetWorth}
                 onCheckedChange={(checked) =>
                   void updateCertificate(certificate.id, {
-                    includeInEmergencyFund: checked,
+                    includeInNetWorth: checked,
                   })
                 }
               />
+              <div className="border-t border-border">
+                <ToggleSettingRow
+                  label={t("accounts.settings.includeInEmergencyFund.label")}
+                  description={t(
+                    "accounts.settings.includeInEmergencyFund.description",
+                  )}
+                  checked={account.includeInEmergencyFund}
+                  onCheckedChange={(checked) =>
+                    void updateCertificate(certificate.id, {
+                      includeInEmergencyFund: checked,
+                    })
+                  }
+                />
+              </div>
             </div>
-          </div>
-          <Button
-            variant="outline"
-            className="mt-4 h-11 w-full text-destructive hover:text-destructive"
-            onClick={() => setShowArchiveConfirm(true)}
-          >
-            {t("certificates.details.archive")}
-          </Button>
-        </section>
+            <Button
+              variant="outline"
+              className="mt-4 h-11 w-full text-destructive hover:text-destructive"
+              onClick={() => setShowArchiveConfirm(true)}
+            >
+              {t("certificates.details.archive")}
+            </Button>
+          </section>
+        ) : null}
       </ScreenBody>
 
       <ConfirmBottomSheet
