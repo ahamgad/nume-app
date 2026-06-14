@@ -253,6 +253,41 @@ export const en = {
       balanceNegative: "Balance cannot be negative",
     },
   },
+  institutions: {
+    categories: {
+      banks: "Banks",
+      financialServices: "Financial services",
+    },
+    searchPlaceholder: "Search institutions",
+    noResults: "No institutions found",
+    other: "Other",
+    customName: {
+      label: "Custom institution name",
+      placeholder: "Enter institution name",
+    },
+    banks: {
+      nbe: "National Bank of Egypt",
+      banqueMisr: "Banque Misr",
+      cib: "CIB",
+      qnb: "QNB",
+      hsbc: "HSBC",
+      alexBank: "AlexBank",
+      fab: "FAB",
+      adib: "ADIB",
+    },
+    financialServices: {
+      thndr: "Thndr",
+      klivvr: "Klivvr",
+      souhoula: "Souhoula",
+      valu: "ValU",
+      contact: "Contact",
+      mntHalan: "MNT-Halan",
+      telda: "Telda",
+      bokra: "Bokra",
+      fawry: "Fawry",
+      lucky: "Lucky",
+    },
+  },
   certificates: {
     create: {
       title: "Add certificate",
@@ -273,7 +308,7 @@ export const en = {
       },
       institution: {
         label: "Institution name",
-        placeholder: "e.g. National Bank",
+        placeholder: "Select institution",
       },
       principal: {
         label: "Principal amount",

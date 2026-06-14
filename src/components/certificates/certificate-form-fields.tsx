@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import { DateField } from "@/components/ui/date-field";
+import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -115,19 +116,17 @@ export function CertificateFormFields({
         ) : null}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="certificate-institution">
-          {t("certificates.fields.institution.label")}
-        </Label>
-        <Input
-          id="certificate-institution"
-          value={values.institution}
-          disabled={disabled}
-          onChange={(event) => onChange({ institution: event.target.value })}
-          placeholder={t("certificates.fields.institution.placeholder")}
-          autoComplete="organization"
-        />
-      </div>
+      <InstitutionPicker
+        id="certificate-institution"
+        accountType="certificate"
+        value={values.institution}
+        disabled={disabled}
+        label={t("certificates.fields.institution.label")}
+        placeholder={t("certificates.fields.institution.placeholder")}
+        customLabel={t("institutions.customName.label")}
+        customPlaceholder={t("institutions.customName.placeholder")}
+        onChange={(institution) => onChange({ institution })}
+      />
 
       <div className="space-y-2">
         <Label htmlFor="certificate-principal">

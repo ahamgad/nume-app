@@ -21,11 +21,16 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
+import { InstitutionPicker } from "@/components/ui/institution-picker";
 import {
   ADD_ACCOUNT_TYPES,
   isCertificateAccountType,
   ONBOARDING_ACCOUNT_TYPES,
 } from "@/lib/finance/add-account-types";
+import {
+  shouldShowInstitutionPicker,
+  type InstitutionPickerContext,
+} from "@/lib/institutions/catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import type { AccountType, MoneyAccountType } from "@/lib/finance/types";
 import {
@@ -78,6 +83,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
 
   const [accountType, setAccountType] = useState<AccountType>("current_account");
   const [name, setName] = useState("");
+  const [institution, setInstitution] = useState("");
   const [balance, setBalance] = useState("");
   const [certificateValues, setCertificateValues] = useState<CertificateFormValues>(
     DEFAULT_CERTIFICATE_FORM_VALUES,
@@ -94,7 +100,9 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       certificateValues.principalAmount.trim().length > 0 ||
       certificateValues.annualInterestRate.trim().length > 0 ||
       certificateValues.customTermYears.trim().length > 0
-    : name.trim().length > 0 || balance.trim().length > 0;
+    : name.trim().length > 0 ||
+      institution.trim().length > 0 ||
+      balance.trim().length > 0;
 
   useEffect(() => {
     nameInputRef.current?.focus();
@@ -202,6 +210,8 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       const account = await createAccount({
         type: accountType as MoneyAccountType,
         name,
+        institution:
+          accountType === "cash" ? null : institution.trim() || null,
         currentBalance: parsedBalance,
       });
       showToast(t("common.accountCreated"));
@@ -219,10 +229,15 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   function handleAccountTypeChange(type: AccountType) {
     setAccountType(type);
     setErrors({});
+    setInstitution("");
     if (isCertificateAccountType(type)) {
       setCertificateValues(DEFAULT_CERTIFICATE_FORM_VALUES);
     }
   }
+
+  const showMoneyInstitutionPicker = shouldShowInstitutionPicker(
+    accountType as InstitutionPickerContext,
+  );
 
   function handleBack() {
     if (submitting) return;
@@ -305,6 +320,17 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
                   <p className="text-sm text-destructive">{errors.name}</p>
                 ) : null}
               </div>
+
+              {showMoneyInstitutionPicker ? (
+                <InstitutionPicker
+                  key={accountType}
+                  id="account-institution"
+                  accountType={accountType as InstitutionPickerContext}
+                  value={institution}
+                  disabled={submitting}
+                  onChange={setInstitution}
+                />
+              ) : null}
 
               <div className="space-y-2">
                 <Label htmlFor="balance">

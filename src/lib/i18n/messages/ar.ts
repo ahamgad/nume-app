@@ -252,6 +252,41 @@ export const ar = {
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
     },
   },
+  institutions: {
+    categories: {
+      banks: "البنوك",
+      financialServices: "الخدمات المالية",
+    },
+    searchPlaceholder: "ابحث عن مؤسسة",
+    noResults: "لم يُعثر على مؤسسات",
+    other: "أخرى",
+    customName: {
+      label: "اسم المؤسسة المخصص",
+      placeholder: "أدخل اسم المؤسسة",
+    },
+    banks: {
+      nbe: "البنك الأهلي المصري",
+      banqueMisr: "بنك مصر",
+      cib: "CIB",
+      qnb: "QNB",
+      hsbc: "HSBC",
+      alexBank: "AlexBank",
+      fab: "FAB",
+      adib: "ADIB",
+    },
+    financialServices: {
+      thndr: "Thndr",
+      klivvr: "Klivvr",
+      souhoula: "Souhoula",
+      valu: "ValU",
+      contact: "Contact",
+      mntHalan: "MNT-Halan",
+      telda: "Telda",
+      bokra: "Bokra",
+      fawry: "Fawry",
+      lucky: "Lucky",
+    },
+  },
   certificates: {
     create: {
       title: "إضافة شهادة",
@@ -272,7 +307,7 @@ export const ar = {
       },
       institution: {
         label: "اسم المؤسسة",
-        placeholder: "مثال: البنك الأهلي",
+        placeholder: "اختر المؤسسة",
       },
       principal: {
         label: "المبلغ الأساسي",
