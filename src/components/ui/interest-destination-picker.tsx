@@ -125,7 +125,7 @@ export function InterestDestinationPicker({
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+        <div className="px-2 py-2">
           {filteredAccounts.length === 0 && !showClearOption ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
               {t("certificates.fields.interestDestination.noResults")}

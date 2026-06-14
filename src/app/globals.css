@@ -142,6 +142,8 @@
   }
   html {
     @apply font-sans antialiased;
+    overflow: hidden;
+    overscroll-behavior: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
@@ -181,6 +183,12 @@
 
   .animate-nume-splash-pulse {
     animation: nume-splash-pulse 1.4s ease-in-out infinite;
+  }
+
+  html[data-modal-open="true"] [data-app-scroll] {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+    touch-action: none;
   }
 }
 

@@ -184,7 +184,7 @@ export function InstitutionPicker({
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+        <div className="px-2 py-2">
           {!hasResults ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
               {t("institutions.noResults")}
@@ -201,6 +201,14 @@ export function InstitutionPicker({
                 />
               ) : null}
 
+              {filteredBanks.length > 0 && filteredFinancial.length > 0 ? (
+                <div
+                  role="separator"
+                  aria-hidden
+                  className="mx-3 my-2 border-t border-border"
+                />
+              ) : null}
+
               {filteredFinancial.length > 0 ? (
                 <InstitutionSection
                   title={t("institutions.categories.financialServices")}
@@ -212,7 +220,14 @@ export function InstitutionPicker({
               ) : null}
 
               {showOtherOption ? (
-                <div className="mt-2 border-t border-border pt-2">
+                <>
+                  {(filteredBanks.length > 0 || filteredFinancial.length > 0) ? (
+                    <div
+                      role="separator"
+                      aria-hidden
+                      className="mx-3 my-2 border-t border-border"
+                    />
+                  ) : null}
                   <button
                     type="button"
                     role="option"
@@ -227,7 +242,7 @@ export function InstitutionPicker({
                   >
                     {t("institutions.other")}
                   </button>
-                </div>
+                </>
               ) : null}
             </>
           )}

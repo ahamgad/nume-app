@@ -8,6 +8,7 @@ import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
 import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
+import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
 
 interface ScreenHeaderProps {
@@ -79,8 +80,9 @@ export function ScreenBody({
   onRefresh,
 }: ScreenBodyProps) {
   const scrollRef = useRef<HTMLElement>(null);
+  const { isModalOpen } = useModalLayer();
 
-  useFocusScrollIntoView(scrollRef);
+  useFocusScrollIntoView(scrollRef, !isModalOpen);
 
   const {
     elementRef,
@@ -98,6 +100,15 @@ export function ScreenBody({
     withStickyFooter,
   });
 
+  const scrollContainerClassName = cn(
+    "flex-1 min-h-0 overflow-x-hidden",
+    "min-w-0 w-full max-w-full overscroll-y-contain",
+    isModalOpen
+      ? "overflow-hidden touch-none"
+      : "overflow-y-auto",
+    scrollPadding,
+  );
+
   const setScrollContainerRef = useCallback(
     (node: HTMLElement | null) => {
       scrollRef.current = node;
@@ -110,12 +121,8 @@ export function ScreenBody({
     return (
       <main
         ref={scrollRef}
-        className={cn(
-          "flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 pt-4",
-          "min-w-0 w-full max-w-full overscroll-y-contain",
-          scrollPadding,
-          className,
-        )}
+        data-app-scroll
+        className={cn(scrollContainerClassName, "px-4 pt-4", className)}
       >
         {children}
       </main>
@@ -125,11 +132,8 @@ export function ScreenBody({
   return (
     <main
       ref={setScrollContainerRef}
-      className={cn(
-        "relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden",
-        "min-w-0 w-full max-w-full overscroll-y-contain",
-        scrollPadding,
-      )}
+      data-app-scroll
+      className={cn("relative", scrollContainerClassName)}
     >
       {showIndicator ? (
         <div

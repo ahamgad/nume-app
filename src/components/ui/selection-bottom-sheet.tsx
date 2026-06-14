@@ -9,19 +9,19 @@ import {
 } from "react";
 
 import { useT } from "@/providers/i18n-provider";
+import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
 
-/** Half-sheet height (Apple Maps style default). */
 const HALF_SHEET_HEIGHT = "50dvh";
 const FULL_SHEET_HEIGHT = "min(92dvh, 640px)";
 const DISMISS_DRAG_THRESHOLD_PX = 72;
+const EXPAND_DRAG_THRESHOLD_PX = 40;
 
 type SheetSnap = "half" | "full";
 
 /**
  * Selection bottom sheet — pickers and searchable lists.
- * Half sheet by default; drag handle up → full; drag down → dismiss.
- * Internal scroll only. No keyboard/viewport adjustments.
+ * States: closed → half → full. Drag down from full → half; from half → dismiss.
  */
 interface SelectionBottomSheetProps {
   open: boolean;
@@ -42,6 +42,31 @@ export function SelectionBottomSheet({
   className,
   panelClassName,
 }: SelectionBottomSheetProps) {
+  useModalLayerLock(open);
+
+  if (!open) return null;
+
+  return (
+    <SelectionBottomSheetContent
+      onClose={onClose}
+      ariaLabelledBy={ariaLabelledBy}
+      ariaLabel={ariaLabel}
+      className={className}
+      panelClassName={panelClassName}
+    >
+      {children}
+    </SelectionBottomSheetContent>
+  );
+}
+
+function SelectionBottomSheetContent({
+  onClose,
+  children,
+  ariaLabelledBy,
+  ariaLabel,
+  className,
+  panelClassName,
+}: Omit<SelectionBottomSheetProps, "open">) {
   const t = useT();
   const [snap, setSnap] = useState<SheetSnap>("half");
   const [dragOffset, setDragOffset] = useState(0);
@@ -51,6 +76,7 @@ export function SelectionBottomSheet({
 
   const handleDismiss = useCallback(() => {
     setDragOffset(0);
+    dragging.current = false;
     onClose();
   }, [onClose]);
 
@@ -64,14 +90,17 @@ export function SelectionBottomSheet({
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!dragging.current) return;
       const delta = event.clientY - dragStartY.current;
+
       if (delta > 0) {
         setDragOffset(delta);
         return;
       }
-      if (delta < -40 && snap === "half") {
+
+      if (delta < -EXPAND_DRAG_THRESHOLD_PX && snap === "half") {
         setSnap("full");
         setDragOffset(0);
         dragging.current = false;
+        event.currentTarget.releasePointerCapture(event.pointerId);
       }
     },
     [snap],
@@ -82,16 +111,23 @@ export function SelectionBottomSheet({
       if (!dragging.current) return;
       dragging.current = false;
       event.currentTarget.releasePointerCapture(event.pointerId);
+
       if (dragOffset >= DISMISS_DRAG_THRESHOLD_PX) {
+        if (snap === "full") {
+          setSnap("half");
+          setDragOffset(0);
+          return;
+        }
         handleDismiss();
         return;
       }
+
       setDragOffset(0);
     },
-    [dragOffset, handleDismiss],
+    [dragOffset, handleDismiss, snap],
   );
 
-  if (!open) return null;
+  const isDragging = dragOffset > 0;
 
   return (
     <div className={cn("fixed inset-0 z-50 bg-black/40", className)}>
@@ -102,18 +138,18 @@ export function SelectionBottomSheet({
         onClick={handleDismiss}
       />
       <div
-        key={open ? "open" : "closed"}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col rounded-t-xl border border-border bg-background shadow-sm transition-[height] duration-200 ease-out",
+          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col rounded-t-xl border border-border bg-background shadow-sm",
+          !isDragging && "transition-[height,transform] duration-200 ease-out",
           panelClassName,
         )}
         style={{
           height: snap === "half" ? HALF_SHEET_HEIGHT : FULL_SHEET_HEIGHT,
-          transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
+          transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
         }}
       >
         <div
@@ -127,6 +163,7 @@ export function SelectionBottomSheet({
         </div>
         <div
           ref={scrollRef}
+          data-sheet-scroll
           className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain pb-[env(safe-area-inset-bottom)]"
         >
           {children}

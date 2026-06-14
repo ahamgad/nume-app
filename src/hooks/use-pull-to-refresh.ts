@@ -1,4 +1,8 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type TransitionEvent } from "react";
+
+import { useModalLayer } from "@/providers/modal-layer-provider";
 
 /** Visual offset required to trigger refresh after release. */
 const PULL_THRESHOLD = 56;
@@ -32,11 +36,13 @@ function isAtScrollTop(scrollContainer: HTMLElement): boolean {
 }
 
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
+  const { isModalOpen } = useModalLayer();
   const [offset, setOffset] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const elementRef = useRef<HTMLElement | null>(null);
+  const isModalOpenRef = useRef(isModalOpen);
   const startYRef = useRef(0);
   /** Touch began while the scroll container was at the top. */
   const startedAtTopRef = useRef(false);
@@ -49,6 +55,10 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
+
+  useEffect(() => {
+    isModalOpenRef.current = isModalOpen;
+  }, [isModalOpen]);
 
   useEffect(() => {
     offsetRef.current = offset;
@@ -109,10 +119,10 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
 
   useEffect(() => {
     const element = elementRef.current;
-    if (!element || !onRefresh) return;
+    if (!element || !onRefresh || isModalOpen) return;
 
     function handleTouchStart(event: TouchEvent) {
-      if (isRefreshingRef.current) return;
+      if (isModalOpenRef.current || isRefreshingRef.current) return;
 
       if (!isAtScrollTop(element!)) {
         startedAtTopRef.current = false;
@@ -127,7 +137,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     }
 
     function handleTouchMove(event: TouchEvent) {
-      if (isRefreshingRef.current) return;
+      if (isModalOpenRef.current || isRefreshingRef.current) return;
 
       if (!isAtScrollTop(element!)) {
         if (isPullingRef.current || offsetRef.current > 0) {
@@ -162,7 +172,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     }
 
     function handleTouchEnd() {
-      if (isRefreshingRef.current) return;
+      if (isModalOpenRef.current || isRefreshingRef.current) return;
 
       if (!isPullingRef.current && offsetRef.current <= 0) {
         startedAtTopRef.current = false;
@@ -184,7 +194,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
     }
 
     function handleTouchCancel() {
-      if (isRefreshingRef.current) return;
+      if (isModalOpenRef.current || isRefreshingRef.current) return;
 
       if (!isPullingRef.current && offsetRef.current <= 0) {
         startedAtTopRef.current = false;
@@ -205,19 +215,22 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       element.removeEventListener("touchend", handleTouchEnd);
       element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [onRefresh, runRefresh, resetPull, snapBack]);
+  }, [isModalOpen, onRefresh, runRefresh, resetPull, snapBack]);
 
-  const showIndicator = isRefreshing || offset > 0;
+  const activeOffset = isModalOpen ? 0 : offset;
+  const activeAnimating = isModalOpen ? false : isAnimating;
+
+  const showIndicator = !isModalOpen && (isRefreshing || activeOffset > 0);
 
   const indicatorOpacity = isRefreshing
     ? 1
-    : Math.min(offset / PULL_THRESHOLD, 1);
+    : Math.min(activeOffset / PULL_THRESHOLD, 1);
 
   const contentStyle: CSSProperties =
-    offset > 0 || isAnimating
+    activeOffset > 0 || activeAnimating
       ? {
-          transform: `translate3d(0, ${offset}px, 0)`,
-          transition: isAnimating
+          transform: `translate3d(0, ${activeOffset}px, 0)`,
+          transition: activeAnimating
             ? `transform ${SNAP_BACK_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
             : undefined,
         }
@@ -226,10 +239,10 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   return {
     elementRef,
     isRefreshing,
-    isAnimating,
+    isAnimating: activeAnimating,
     showIndicator,
     indicatorOpacity,
-    offset,
+    offset: activeOffset,
     contentStyle,
     handleTransitionEnd,
   };

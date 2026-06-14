@@ -94,10 +94,7 @@ export function ScrollChipSelect<T extends string | number>({
               if (!disabled) onChange(option.value);
             }}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border font-medium transition-colors",
-              emphasis === "primary"
-                ? "px-5 py-2.5 text-[0.9375rem]"
-                : "px-4 py-2 text-sm",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               emphasis === "primary"
                 ? selected
                   ? "border-foreground bg-foreground text-background"

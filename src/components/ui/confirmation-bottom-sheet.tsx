@@ -3,11 +3,12 @@
 import { type ReactNode } from "react";
 
 import { useT } from "@/providers/i18n-provider";
+import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
 
 /**
  * Confirmation bottom sheet — compact, bottom-anchored, fixed height.
- * No expansion, internal scroll, search, or keyboard logic.
+ * No expansion, internal scroll, search, or drag logic.
  */
 interface ConfirmationBottomSheetProps {
   open: boolean;
@@ -29,6 +30,8 @@ export function ConfirmationBottomSheet({
   panelClassName,
 }: ConfirmationBottomSheetProps) {
   const t = useT();
+
+  useModalLayerLock(open);
 
   if (!open) return null;
 
