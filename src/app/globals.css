@@ -131,6 +131,18 @@
 
   body {
     @apply bg-background text-[0.9375rem] leading-normal text-foreground;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable]:not([contenteditable="false"]) {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
   html {
     @apply font-sans antialiased;

@@ -67,7 +67,7 @@ export function ConfirmationBottomSheet({
         )}
       >
         <BottomSheetDragHandle />
-        <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2">
+        <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-5">
           {children}
         </div>
       </div>
