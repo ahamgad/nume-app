@@ -1,20 +1,27 @@
 "use client";
 
+import { CalendarDays, ChevronDown } from "lucide-react";
 import * as React from "react";
 
+import { DatePickerBottomSheet } from "@/components/ui/date-picker-bottom-sheet";
 import { formatDisplayDate } from "@/lib/format/date";
 import { cn } from "@/lib/utils";
 
 import { inputClassName } from "@/components/ui/input";
 
-export interface DateFieldProps
-  extends Omit<React.ComponentProps<"input">, "type" | "value" | "onChange"> {
+export interface DateFieldProps {
   value: string;
   onChange: (value: string) => void;
   locale?: string;
+  disabled?: boolean;
+  id?: string;
+  className?: string;
+  "aria-invalid"?: boolean;
+  label?: string;
+  placeholder?: string;
 }
 
-export const DateField = React.forwardRef<HTMLInputElement, DateFieldProps>(
+export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
   (
     {
       className,
@@ -24,39 +31,50 @@ export const DateField = React.forwardRef<HTMLInputElement, DateFieldProps>(
       disabled,
       id,
       "aria-invalid": ariaInvalid,
-      ...props
+      label,
+      placeholder,
     },
     ref,
   ) => {
-    const nativeRef = React.useRef<HTMLInputElement>(null);
-
-    React.useImperativeHandle(ref, () => nativeRef.current as HTMLInputElement);
+    const [open, setOpen] = React.useState(false);
 
     return (
-      <div className="relative">
-        <div
-          aria-hidden="true"
+      <>
+        <button
+          ref={ref}
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-label={label}
+          onClick={() => setOpen(true)}
           className={cn(
             inputClassName,
-            "flex items-center truncate tabular-nums",
+            "flex items-center justify-between gap-2 text-start tabular-nums",
+            !value && "text-muted-foreground",
             disabled && "pointer-events-none",
+            ariaInvalid && "border-destructive ring-destructive/20",
             className,
           )}
         >
-          {value ? formatDisplayDate(value, locale) : null}
-        </div>
-        <input
-          {...props}
-          ref={nativeRef}
-          id={id}
-          type="date"
+          <span className="flex min-w-0 items-center gap-2 truncate">
+            <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
+            <span className="truncate">
+              {value ? formatDisplayDate(value, locale) : placeholder}
+            </span>
+          </span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+        </button>
+
+        <DatePickerBottomSheet
+          open={open}
+          onClose={() => setOpen(false)}
           value={value}
-          disabled={disabled}
-          aria-invalid={ariaInvalid}
-          onChange={(event) => onChange(event.target.value)}
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          onChange={onChange}
+          title={label}
         />
-      </div>
+      </>
     );
   },
 );

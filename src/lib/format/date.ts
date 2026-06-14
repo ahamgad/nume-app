@@ -43,6 +43,17 @@ function formatLocalIsoDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Parse an ISO date string as a local calendar date. */
+export function parseIsoDate(isoDate: string): Date {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/** Format a local calendar date as ISO YYYY-MM-DD. */
+export function toIsoDate(date: Date): string {
+  return formatLocalIsoDate(date);
+}
+
 /** Today's date in the user's local calendar (matches native date inputs). */
 export function todayIsoDate(): string {
   return formatLocalIsoDate(new Date());

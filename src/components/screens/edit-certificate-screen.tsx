@@ -9,7 +9,6 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
   certificateFormValuesFromCertificate,
@@ -127,9 +126,7 @@ function EditCertificateForm({
     router.back();
   }
 
-  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
-    isDirty: isDirty && !submitting,
-  });
+  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   function handleDiscardConfirm() {
     setShowDiscard(false);
@@ -138,7 +135,6 @@ function EditCertificateForm({
 
   return (
     <>
-      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader
         mode="stack"
         title={t("certificates.edit.title")}

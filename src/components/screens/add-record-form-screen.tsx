@@ -10,7 +10,6 @@ import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { DateField } from "@/components/ui/date-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
   formatAmountInput,
@@ -157,9 +156,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     router.back();
   }
 
-  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
-    isDirty: isDirty && !submitting,
-  });
+  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   function handleDiscardConfirm() {
     setShowDiscard(false);
@@ -179,7 +176,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
 
   return (
     <>
-      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader mode="stack" title={t(titleKey)} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
         {account ? (
@@ -252,6 +248,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
             id="record-date"
             value={date}
             locale={formatLocale}
+            label={t("records.fields.date")}
             onChange={(nextDate) => {
               setDate(nextDate);
               clearFieldError("date");

@@ -210,6 +210,7 @@ export function CertificateFormFields({
           id="certificate-purchase-date"
           value={values.purchaseDate}
           disabled={disabled}
+          label={t("certificates.fields.purchaseDate.label")}
           onChange={(value) => {
             onChange({ purchaseDate: value });
             onClearError("purchaseDate");

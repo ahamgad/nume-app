@@ -43,7 +43,6 @@ import {
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -260,9 +259,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
     router.back();
   }
 
-  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
-    isDirty: isDirty && !submitting,
-  });
+  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   function handleDiscardConfirm() {
     setShowDiscard(false);
@@ -271,7 +268,6 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
 
   return (
     <>
-      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader
         mode="stack"
         title={

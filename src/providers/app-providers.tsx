@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { FinanceProvider } from "@/lib/finance/store";
 import { AppBootstrap } from "@/components/app/app-bootstrap";
+import { NavigationEdgeGuard } from "@/components/platform/navigation-edge-guard";
 import { AuthProvider } from "@/providers/auth-provider";
 import { I18nProvider } from "@/providers/i18n-provider";
 import { LocaleFontProvider } from "@/providers/locale-font-provider";
@@ -22,6 +23,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
               <ToastProvider>
                 <ModalLayerProvider>
                   <FinanceProvider>
+                    <NavigationEdgeGuard />
                     <AppBootstrap>{children}</AppBootstrap>
                   </FinanceProvider>
                 </ModalLayerProvider>

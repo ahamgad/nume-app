@@ -88,6 +88,9 @@ export const ar = {
       confirm: "تجاهل",
       cancel: "متابعة التعديل",
     },
+    datePicker: {
+      title: "اختر التاريخ",
+    },
     accountCreated: "تم إنشاء الحساب",
     recordSaved: "تم حفظ السجل",
     incomeRecorded: "تم تسجيل الدخل",

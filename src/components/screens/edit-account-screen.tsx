@@ -10,7 +10,6 @@ import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
-import { DirtyFormEdgeGuard } from "@/components/platform/dirty-form-edge-guard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
@@ -54,9 +53,7 @@ function EditAccountForm({
   const isDirty = isMoneyAccountFormDirty(values, initialValues);
   const showInstitution = shouldShowInstitutionPicker(accountType);
 
-  const { confirmDiscardNavigation, showEdgeGuard } = useDirtyFormNavigation({
-    isDirty: isDirty && !submitting,
-  });
+  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -105,7 +102,6 @@ function EditAccountForm({
 
   return (
     <>
-      <DirtyFormEdgeGuard active={showEdgeGuard} />
       <ScreenHeader
         mode="stack"
         title={t("accounts.edit.title")}

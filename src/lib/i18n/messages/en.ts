@@ -86,6 +86,9 @@ export const en = {
       confirm: "Discard",
       cancel: "Keep editing",
     },
+    datePicker: {
+      title: "Select date",
+    },
     accountCreated: "Account created",
     recordSaved: "Record saved",
     incomeRecorded: "Income recorded",

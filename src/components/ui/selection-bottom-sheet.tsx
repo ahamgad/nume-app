@@ -22,7 +22,13 @@ const EXPAND_DRAG_THRESHOLD_PX = 40;
 
 type SheetSnap = "half" | "full";
 
-function resolveHalfSheetHeight(optionCount?: number) {
+function resolveHalfSheetHeight(
+  optionCount?: number,
+  defaultHalfSize?: "default" | "large",
+) {
+  if (defaultHalfSize === "large") {
+    return LARGE_HALF_SHEET_HEIGHT;
+  }
   if (optionCount !== undefined && optionCount > LARGE_DATASET_THRESHOLD) {
     return LARGE_HALF_SHEET_HEIGHT;
   }
@@ -39,6 +45,7 @@ interface SelectionBottomSheetProps {
   children: ReactNode;
   header?: ReactNode;
   optionCount?: number;
+  defaultHalfSize?: "default" | "large";
   ariaLabelledBy?: string;
   ariaLabel?: string;
   className?: string;
@@ -51,6 +58,7 @@ export function SelectionBottomSheet({
   children,
   header,
   optionCount,
+  defaultHalfSize,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -65,6 +73,7 @@ export function SelectionBottomSheet({
       onClose={onClose}
       header={header}
       optionCount={optionCount}
+      defaultHalfSize={defaultHalfSize}
       ariaLabelledBy={ariaLabelledBy}
       ariaLabel={ariaLabel}
       className={className}
@@ -80,6 +89,7 @@ function SelectionBottomSheetContent({
   children,
   header,
   optionCount,
+  defaultHalfSize,
   ariaLabelledBy,
   ariaLabel,
   className,
@@ -92,8 +102,8 @@ function SelectionBottomSheetContent({
   const dragStartY = useRef(0);
   const dragging = useRef(false);
   const halfSheetHeight = useMemo(
-    () => resolveHalfSheetHeight(optionCount),
-    [optionCount],
+    () => resolveHalfSheetHeight(optionCount, defaultHalfSize),
+    [defaultHalfSize, optionCount],
   );
 
   const handleDismiss = useCallback(() => {
