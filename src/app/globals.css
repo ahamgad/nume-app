@@ -199,8 +199,26 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .animate-nume-splash-pulse {
-    animation: nume-splash-pulse 1.4s ease-in-out infinite;
+  .animate-nume-logo-reveal {
+    animation: nume-logo-reveal 500ms ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-nume-wordmark-reveal {
+    animation: nume-wordmark-reveal 500ms ease-out 300ms forwards;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-nume-logo-reveal,
+    .animate-nume-wordmark-reveal {
+      animation: nume-splash-fade-in 400ms ease-out forwards;
+      transform: none;
+    }
+
+    .animate-nume-wordmark-reveal {
+      animation-delay: 150ms;
+    }
   }
 
   html[data-modal-open="true"] [data-app-scroll] {
@@ -210,14 +228,33 @@
   }
 }
 
-@keyframes nume-splash-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
+@keyframes nume-logo-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.96) rotate(-2deg);
   }
-  50% {
-    opacity: 0.88;
-    transform: scale(1.06);
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes nume-wordmark-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nume-splash-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

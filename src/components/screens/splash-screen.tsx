@@ -47,23 +47,31 @@ export function SplashScreen() {
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center bg-background px-6">
-      <div className="animate-nume-splash-pulse">
-        <Image
-          src="/brand-flatten-black.svg"
-          alt="NUME"
-          width={88}
-          height={88}
-          priority
-          className="dark:hidden"
-        />
-        <Image
-          src="/brand-flatten-white.svg"
-          alt="NUME"
-          width={88}
-          height={88}
-          priority
-          className="hidden dark:block"
-        />
+      <div className="flex flex-col items-center">
+        <div className="animate-nume-logo-reveal">
+          <Image
+            src="/brand-flatten-black.svg"
+            alt="NUME"
+            width={88}
+            height={88}
+            priority
+            className="dark:hidden"
+          />
+          <Image
+            src="/brand-flatten-white.svg"
+            alt="NUME"
+            width={88}
+            height={88}
+            priority
+            className="hidden dark:block"
+          />
+        </div>
+        <p
+          aria-hidden
+          className="animate-nume-wordmark-reveal mt-4 text-xl font-semibold tracking-[0.24em] text-foreground"
+        >
+          NUME
+        </p>
       </div>
     </div>
   );
