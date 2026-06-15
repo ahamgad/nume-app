@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { SelectionBottomSheet } from "@/components/ui/selection-bottom-sheet";
+import { SearchBottomSheet } from "@/components/ui/search-bottom-sheet";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -161,28 +161,19 @@ export function InstitutionPicker({
         />
       ) : null}
 
-      <SelectionBottomSheet
+      <SearchBottomSheet
         open={open}
         onClose={closeSheet}
-        ariaLabelledBy="institution-picker-title"
-        header={
-          <>
-            <h2
-              id="institution-picker-title"
-              className="text-base font-semibold"
-            >
-              {resolvedLabel}
-            </h2>
-            {showSearch ? (
-              <Input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t("institutions.searchPlaceholder")}
-                className="mt-3"
-                autoComplete="off"
-              />
-            ) : null}
-          </>
+        title={resolvedLabel}
+        titleId="institution-picker-title"
+        search={
+          showSearch
+            ? {
+                value: searchQuery,
+                onChange: setSearchQuery,
+                placeholder: t("institutions.searchPlaceholder"),
+              }
+            : undefined
         }
       >
         {!hasResults ? (
@@ -246,7 +237,7 @@ export function InstitutionPicker({
               ) : null}
             </>
           )}
-      </SelectionBottomSheet>
+      </SearchBottomSheet>
     </div>
   );
 }

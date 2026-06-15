@@ -4,8 +4,8 @@ import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
-import { SelectionBottomSheet } from "@/components/ui/selection-bottom-sheet";
-import { Input, inputClassName } from "@/components/ui/input";
+import { SearchBottomSheet } from "@/components/ui/search-bottom-sheet";
+import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   filterAccountsForDestinationSearch,
@@ -102,28 +102,21 @@ export function InterestDestinationPicker({
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
       </button>
 
-      <SelectionBottomSheet
+      <SearchBottomSheet
         open={open}
         onClose={closeSheet}
-        ariaLabelledBy="interest-destination-picker-title"
-        header={
-          <>
-            <h2
-              id="interest-destination-picker-title"
-              className="text-base font-semibold"
-            >
-              {label}
-            </h2>
-            {showSearch ? (
-              <Input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t("certificates.fields.interestDestination.searchPlaceholder")}
-                className="mt-3"
-                autoComplete="off"
-              />
-            ) : null}
-          </>
+        title={label}
+        titleId="interest-destination-picker-title"
+        search={
+          showSearch
+            ? {
+                value: searchQuery,
+                onChange: setSearchQuery,
+                placeholder: t(
+                  "certificates.fields.interestDestination.searchPlaceholder",
+                ),
+              }
+            : undefined
         }
       >
         {filteredAccounts.length === 0 && !showClearOption ? (
@@ -176,7 +169,7 @@ export function InterestDestinationPicker({
               ))}
             </div>
           )}
-      </SelectionBottomSheet>
+      </SearchBottomSheet>
     </div>
   );
 }
