@@ -62,7 +62,7 @@ export function NumeMonthYearPicker({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex h-full flex-col">
       <div className="px-4 pt-4">
         <button
           type="button"
@@ -80,7 +80,7 @@ export function NumeMonthYearPicker({
 
       <div
         className={cn(
-          "flex min-h-0 flex-1 gap-3 px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-2",
+          "flex gap-3 px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-2",
           "flex-row rtl:flex-row-reverse",
         )}
       >

@@ -7,6 +7,7 @@ import { NumeCalendarGrid } from "@/components/ui/date-picker/nume-calendar-grid
 import { NumeMonthYearPicker } from "@/components/ui/date-picker/nume-month-year-picker";
 import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
 import { parseIsoDate, todayIsoDate } from "@/lib/format/date";
+import { DATE_PICKER_SHEET_HEIGHT } from "@/lib/layout/date-picker-sheet";
 import { cn } from "@/lib/utils";
 import { useLocale, useT } from "@/providers/i18n-provider";
 
@@ -36,7 +37,6 @@ function DatePickerSheetContent({
   onClose,
   onChange,
 }: DatePickerSheetContentProps) {
-  const t = useT();
   const localeCode = useLocale();
   const dayPickerLocale = localeCode === "ar" ? arEG : enGB;
 
@@ -73,12 +73,12 @@ function DatePickerSheetContent({
       title={title}
       onDismiss={handleDismiss}
       onConfirm={handleConfirm}
-      confirmAriaLabel={t("fieldEditor.confirm")}
       confirmDisabled={!draftDate}
+      sheetHeight={DATE_PICKER_SHEET_HEIGHT}
       ariaLabel={title}
       bodyClassName="min-h-0"
     >
-      <div className="relative flex min-h-0 flex-1 flex-col">
+      <div className="relative h-full min-h-0">
         <div
           className={cn(
             "absolute inset-0 flex min-h-0 flex-col transition-opacity duration-200",

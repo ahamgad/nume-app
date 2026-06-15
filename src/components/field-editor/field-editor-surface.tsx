@@ -52,7 +52,7 @@ export function FieldEditorSurface({
   }
 
   return (
-    <div className="relative flex min-w-0 shrink-0 items-baseline gap-2">
+    <div className="relative flex min-w-0 shrink-0 touch-auto items-baseline gap-2">
       {prefixLabel ? (
         <span
           aria-hidden

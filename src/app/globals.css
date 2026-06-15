@@ -265,6 +265,12 @@
     overscroll-behavior: none;
     touch-action: none;
   }
+
+  html[data-immersive-workspace="true"],
+  html[data-immersive-workspace="true"] body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 }
 
 @keyframes nume-logo-arrival {

@@ -6,7 +6,6 @@ import { FieldEditorSurface } from "@/components/field-editor/field-editor-surfa
 import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
 import { useFieldEditorKeyboardInset } from "@/hooks/use-field-editor-keyboard-inset";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
-import { useT } from "@/providers/i18n-provider";
 
 interface FieldEditorBottomSheetProps {
   config: FieldEditorOpenConfig;
@@ -17,7 +16,6 @@ export function FieldEditorBottomSheet({
   config,
   onDismiss,
 }: FieldEditorBottomSheetProps) {
-  const t = useT();
   const [draft, setDraft] = useState(config.value);
   const [sheetError, setSheetError] = useState<string | undefined>();
   const keyboardInsetPx = useFieldEditorKeyboardInset(true);
@@ -50,9 +48,9 @@ export function FieldEditorBottomSheet({
       title={config.title}
       onDismiss={onDismiss}
       onConfirm={handleConfirm}
-      confirmAriaLabel={t("fieldEditor.confirm")}
+      variant="workspace"
       ariaLabel={config.title}
-      bodyClassName="overflow-y-auto px-6 py-8"
+      bodyClassName="px-6 py-8"
       bodyStyle={{ paddingBottom: bodyPaddingBottom }}
     >
       <FieldEditorSurface

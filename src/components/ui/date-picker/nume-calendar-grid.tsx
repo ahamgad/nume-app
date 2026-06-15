@@ -20,6 +20,7 @@ import { useMemo } from "react";
 
 import { SCREEN_HEADER_ICON_CLASS } from "@/components/layout/screen-header";
 import { parseIsoDate, toIsoDate } from "@/lib/format/date";
+import { CALENDAR_WEEK_ROWS } from "@/lib/layout/date-picker-sheet";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -66,7 +67,19 @@ export function NumeCalendarGrid({
     const monthEnd = endOfMonth(visibleMonth);
     const gridStart = startOfWeek(monthStart, { weekStartsOn, locale });
     const gridEnd = endOfWeek(monthEnd, { weekStartsOn, locale });
-    return eachDayOfInterval({ start: gridStart, end: gridEnd });
+    const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
+    const targetCells = CALENDAR_WEEK_ROWS * 7;
+
+    if (days.length >= targetCells) {
+      return days.slice(0, targetCells);
+    }
+
+    const padded = [...days];
+    while (padded.length < targetCells) {
+      const last = padded[padded.length - 1];
+      padded.push(new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1));
+    }
+    return padded;
   }, [locale, visibleMonth, weekStartsOn]);
 
   const canGoNext =
@@ -99,7 +112,7 @@ export function NumeCalendarGrid({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4">
+    <div className="flex flex-col px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4">
       <div className="mb-6 flex items-center justify-between gap-3">
         <button
           type="button"

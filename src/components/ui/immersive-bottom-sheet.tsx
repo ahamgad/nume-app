@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
+import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock";
 import {
   SCREEN_HEADER_BAR_CLASS,
   SCREEN_HEADER_ICON_CLASS,
@@ -21,9 +22,13 @@ interface ImmersiveBottomSheetProps {
   title: string;
   onDismiss: () => void;
   onConfirm: () => void;
-  confirmAriaLabel: string;
   confirmDisabled?: boolean;
+  confirmLabel?: string;
+  confirmAriaLabel?: string;
   ariaLabel?: string;
+  sheetHeight?: string;
+  /** Workspace mode locks document scroll and fixes the sheet body (Field Editor). */
+  variant?: "default" | "workspace";
   bodyClassName?: string;
   bodyStyle?: CSSProperties;
   children: ReactNode;
@@ -33,16 +38,23 @@ export function ImmersiveBottomSheet({
   title,
   onDismiss,
   onConfirm,
-  confirmAriaLabel,
   confirmDisabled = false,
+  confirmLabel,
+  confirmAriaLabel,
   ariaLabel,
+  sheetHeight = IMMERSIVE_SHEET_HEIGHT,
+  variant = "default",
   bodyClassName,
   bodyStyle,
   children,
 }: ImmersiveBottomSheetProps) {
   const t = useT();
+  const saveLabel = confirmLabel ?? t("common.save");
+  const saveAriaLabel = confirmAriaLabel ?? saveLabel;
+  const isWorkspace = variant === "workspace";
 
   useModalLayerLock(true);
+  useImmersiveWorkspaceLock(isWorkspace);
 
   return (
     <div
@@ -61,10 +73,11 @@ export function ImmersiveBottomSheet({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel ?? title}
-        style={{ height: IMMERSIVE_SHEET_HEIGHT, maxHeight: IMMERSIVE_SHEET_HEIGHT }}
+        style={{ height: sheetHeight, maxHeight: sheetHeight }}
         className={cn(
           "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm",
           BOTTOM_SHEET_ENTER_CLASS,
+          isWorkspace && "touch-none overscroll-none",
         )}
       >
         <header className="shrink-0 border-b border-border">
@@ -82,17 +95,18 @@ export function ImmersiveBottomSheet({
               type="button"
               onClick={onConfirm}
               disabled={confirmDisabled}
-              className="inline-flex size-11 items-center justify-center rounded-md text-foreground disabled:opacity-40"
-              aria-label={confirmAriaLabel}
+              className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-semibold text-foreground disabled:opacity-40"
+              aria-label={saveAriaLabel}
             >
-              <Check className={SCREEN_HEADER_ICON_CLASS} strokeWidth={2.25} />
+              {saveLabel}
             </button>
           </div>
         </header>
 
         <div
           className={cn(
-            "flex min-h-0 flex-1 flex-col overflow-hidden overscroll-y-contain",
+            "flex min-h-0 flex-1 flex-col overscroll-y-contain",
+            isWorkspace ? "overflow-hidden touch-none" : "overflow-hidden",
             bodyClassName,
           )}
           style={bodyStyle}
