@@ -5,6 +5,7 @@ import { type RefObject, useEffect } from "react";
 import {
   applyKeyboardScrollInset,
   clearKeyboardScrollInset,
+  isInputFullyVisibleInContainer,
   isInputObscuredByKeyboard,
   isKeyboardPresent,
   scrollInputIntoContainer,
@@ -30,17 +31,14 @@ function isInputInContainer(
 /**
  * Focus-scoped keyboard scroll support.
  *
- * Spec: scroll only when obscured; minimum delta; ScreenBody-only scroll;
- * no movement while keyboard opens if the field is already visible; preserve
- * scroll position on blur (padding cleared, scrollTop untouched).
+ * Isolation experiment: upper fields already fully visible in the scroll
+ * container bypass the entire keyboard pipeline — no visualViewport listeners,
+ * no rAF follow-ups, no inset, no scroll mutation.
  *
- * Lifecycle (keyboardInset forms only):
- *   focusin  → attach visualViewport.resize (once) → scroll if obscured;
- *              padding-bottom inset only when obscured or user has scrolled
- *   focusout → defer check → if no input focused: detach listener, clear padding
+ * Lifecycle (when pipeline engages):
+ *   focusin  → obscured check after keyboard presents → minimal scroll + inset
+ *   focusout → defer check → teardown when no input focused
  *   unmount  → full teardown
- *
- * No global viewport listeners. No listener survives blur.
  */
 export function useFocusScrollIntoView(
   containerRef: RefObject<HTMLElement | null>,
@@ -54,6 +52,7 @@ export function useFocusScrollIntoView(
     if (!container) return;
 
     let focusedTarget: HTMLElement | null = null;
+    let pipelineBypassed = false;
     let adjustRaf = 0;
     let followUpTimer: number | null = null;
     let focusOutRaf = 0;
@@ -61,23 +60,17 @@ export function useFocusScrollIntoView(
     let viewportListenerAttached = false;
 
     function onViewportResize() {
-      if (!focusedTarget) return;
+      if (!focusedTarget || pipelineBypassed) return;
       if (viewportCoalesceRaf) return;
       viewportCoalesceRaf = requestAnimationFrame(() => {
         viewportCoalesceRaf = 0;
-        if (!focusedTarget) return;
+        if (!focusedTarget || pipelineBypassed) return;
         adjustForTarget(focusedTarget);
       });
     }
 
     function attachViewportListener() {
-      if (
-        !keyboardInset ||
-        viewportListenerAttached ||
-        !window.visualViewport
-      ) {
-        return;
-      }
+      if (viewportListenerAttached || !window.visualViewport) return;
       window.visualViewport.addEventListener("resize", onViewportResize);
       viewportListenerAttached = true;
     }
@@ -106,53 +99,8 @@ export function useFocusScrollIntoView(
       }
     }
 
-    function adjustForTarget(target: HTMLElement) {
-      const scrollContainer = containerRef.current;
-      if (!scrollContainer?.contains(target)) return;
-
-      // Wait until the keyboard is presenting — avoids false reads and early jumps.
-      if (!isKeyboardPresent()) return;
-
-      if (keyboardInset) {
-        const needsScrollInset =
-          isInputObscuredByKeyboard(scrollContainer, target) ||
-          scrollContainer.scrollTop > 0;
-        if (needsScrollInset) {
-          applyKeyboardScrollInset(scrollContainer);
-        } else {
-          clearKeyboardScrollInset(scrollContainer);
-        }
-      }
-
-      scrollInputIntoContainer(scrollContainer, target);
-    }
-
-    function runFollowUpAdjust(target: HTMLElement) {
-      followUpTimer = window.setTimeout(() => {
-        followUpTimer = null;
-        if (focusedTarget === target) {
-          adjustForTarget(target);
-        }
-      }, 120);
-    }
-
-    function scheduleAdjust(target: HTMLElement) {
+    function clearKeyboardPipelineState() {
       cancelAdjustPending();
-      cancelFocusOutCheck();
-      focusedTarget = target;
-      attachViewportListener();
-
-      adjustRaf = requestAnimationFrame(() => {
-        adjustRaf = 0;
-        adjustForTarget(target);
-        runFollowUpAdjust(target);
-      });
-    }
-
-    function teardownFocusSession() {
-      focusedTarget = null;
-      cancelAdjustPending();
-      cancelFocusOutCheck();
       if (viewportCoalesceRaf) {
         cancelAnimationFrame(viewportCoalesceRaf);
         viewportCoalesceRaf = 0;
@@ -165,13 +113,75 @@ export function useFocusScrollIntoView(
       }
     }
 
+    function adjustForTarget(target: HTMLElement) {
+      const scrollContainer = containerRef.current;
+      if (!scrollContainer?.contains(target)) return;
+
+      if (!isKeyboardPresent()) return;
+
+      if (!isInputObscuredByKeyboard(scrollContainer, target)) return;
+
+      attachViewportListener();
+
+      if (keyboardInset) {
+        applyKeyboardScrollInset(scrollContainer);
+      }
+
+      scrollInputIntoContainer(scrollContainer, target);
+    }
+
+    function runFollowUpAdjust(target: HTMLElement) {
+      followUpTimer = window.setTimeout(() => {
+        followUpTimer = null;
+        if (focusedTarget === target && !pipelineBypassed) {
+          adjustForTarget(target);
+        }
+      }, 120);
+    }
+
+    function scheduleAdjust(target: HTMLElement) {
+      cancelAdjustPending();
+      cancelFocusOutCheck();
+      focusedTarget = target;
+      pipelineBypassed = false;
+
+      adjustRaf = requestAnimationFrame(() => {
+        adjustRaf = 0;
+        adjustForTarget(target);
+        runFollowUpAdjust(target);
+      });
+    }
+
+    function engageFocusTarget(target: HTMLElement) {
+      const scrollContainer = containerRef.current;
+      if (!scrollContainer?.contains(target)) return;
+
+      cancelFocusOutCheck();
+
+      if (isInputFullyVisibleInContainer(scrollContainer, target)) {
+        clearKeyboardPipelineState();
+        focusedTarget = target;
+        pipelineBypassed = true;
+        return;
+      }
+
+      scheduleAdjust(target);
+    }
+
+    function teardownFocusSession() {
+      focusedTarget = null;
+      pipelineBypassed = false;
+      cancelFocusOutCheck();
+      clearKeyboardPipelineState();
+    }
+
     function handleFocusIn(event: FocusEvent) {
       const target = event.target;
       const scrollContainer = containerRef.current;
       if (!(target instanceof HTMLElement) || !isFocusableInput(target)) return;
       if (!scrollContainer) return;
 
-      scheduleAdjust(target);
+      engageFocusTarget(target);
     }
 
     function handleFocusOut(event: FocusEvent) {
@@ -187,7 +197,7 @@ export function useFocusScrollIntoView(
         if (!scrollContainer) return;
 
         if (isInputInContainer(scrollContainer, document.activeElement)) {
-          scheduleAdjust(document.activeElement);
+          engageFocusTarget(document.activeElement);
           return;
         }
 

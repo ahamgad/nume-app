@@ -22,6 +22,22 @@ function getVisibleBottom(
   return Math.min(containerRect.bottom, keyboardTop) - comfortMargin;
 }
 
+/** True when the input is fully within the scroll container's visible clip. */
+export function isInputFullyVisibleInContainer(
+  container: HTMLElement,
+  target: HTMLElement,
+): boolean {
+  const containerRect = container.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  return (
+    targetRect.top >= containerRect.top &&
+    targetRect.bottom <= containerRect.bottom &&
+    targetRect.left >= containerRect.left &&
+    targetRect.right <= containerRect.right
+  );
+}
+
 /** True when the keyboard (or viewport shrink) would cover the focused field. */
 export function isInputObscuredByKeyboard(
   container: HTMLElement,

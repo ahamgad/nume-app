@@ -23,8 +23,10 @@ function resetDocumentScroll() {
 }
 
 /** Keeps window/document scroll at zero — ScreenBody is the sole scroll owner. */
-export function useDocumentScrollGuard() {
+export function useDocumentScrollGuard(enabled = true) {
   useEffect(() => {
+    if (!enabled) return;
+
     let rafId = 0;
 
     function enforceZeroScroll() {
@@ -48,5 +50,5 @@ export function useDocumentScrollGuard() {
       window.removeEventListener("scroll", enforceZeroScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [enabled]);
 }

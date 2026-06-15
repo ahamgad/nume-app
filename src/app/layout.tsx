@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 
 import { AppProviders } from "@/providers/app-providers";
 import { fontVariables, geistSans } from "@/lib/fonts";
+import { getRootBodyHeightClass } from "@/lib/layout/keyboard-snap-investigation";
+import { cn } from "@/lib/utils";
 
 import "./globals.css";
 
@@ -68,7 +70,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="h-dvh overflow-hidden bg-background font-latin text-foreground">
+      <body
+        className={cn(
+          "overflow-hidden bg-background font-latin text-foreground",
+          getRootBodyHeightClass(),
+        )}
+      >
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
