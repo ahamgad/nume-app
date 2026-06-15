@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronLeft } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { FieldEditorSurface } from "@/components/field-editor/field-editor-surface";
 import {
@@ -32,19 +32,9 @@ export function FieldEditorBottomSheet({
   const t = useT();
   const [draft, setDraft] = useState(config.value);
   const [sheetError, setSheetError] = useState<string | undefined>();
-  const [focusReady, setFocusReady] = useState(false);
-  const keyboardInsetPx = useFieldEditorKeyboardInset(focusReady);
+  const keyboardInsetPx = useFieldEditorKeyboardInset(true);
 
   useModalLayerLock(true);
-
-  const markFocusReady = useCallback(() => {
-    setFocusReady(true);
-  }, []);
-
-  useEffect(() => {
-    const timer = window.setTimeout(markFocusReady, 240);
-    return () => clearTimeout(timer);
-  }, [markFocusReady]);
 
   function handleBack() {
     onDismiss();
@@ -91,7 +81,6 @@ export function FieldEditorBottomSheet({
         aria-modal="true"
         aria-label={config.title}
         style={{ height: FIELD_EDITOR_SHEET_HEIGHT, maxHeight: FIELD_EDITOR_SHEET_HEIGHT }}
-        onAnimationEnd={markFocusReady}
         className={cn(
           "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm",
           BOTTOM_SHEET_ENTER_CLASS,
@@ -128,7 +117,6 @@ export function FieldEditorBottomSheet({
           style={{ paddingBottom: bodyPaddingBottom }}
         >
           <FieldEditorSurface
-            focusReady={focusReady}
             mode={config.mode}
             inputMode={config.inputMode}
             displayValue={displayValue}

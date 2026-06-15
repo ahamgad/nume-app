@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import type { FieldEditorInputMode, FieldEditorMode } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
 
 interface FieldEditorSurfaceProps {
-  /** When true, focus the input and present the keyboard. */
-  focusReady: boolean;
   mode: FieldEditorMode;
   inputMode?: FieldEditorInputMode;
   displayValue: string;
@@ -22,7 +20,6 @@ interface FieldEditorSurfaceProps {
  * Not a traditional Input — minimal chrome, large type, premium focus.
  */
 export function FieldEditorSurface({
-  focusReady,
   mode,
   inputMode,
   displayValue,
@@ -32,25 +29,17 @@ export function FieldEditorSurface({
   onChange,
 }: FieldEditorSurfaceProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const hasFocusedRef = useRef(false);
   const isNumeric = mode === "numeric";
   const resolvedInputMode =
     inputMode ?? (isNumeric ? "decimal" : "text");
 
-  useEffect(() => {
-    if (!focusReady || hasFocusedRef.current) return;
-
-    const frame = requestAnimationFrame(() => {
-      const input = inputRef.current;
-      if (!input) return;
-      input.focus({ preventScroll: true });
-      const length = input.value.length;
-      input.setSelectionRange(length, length);
-      hasFocusedRef.current = true;
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [focusReady]);
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.focus({ preventScroll: true });
+    const length = input.value.length;
+    input.setSelectionRange(length, length);
+  }, []);
 
   function handleChange(raw: string) {
     onChange(raw);

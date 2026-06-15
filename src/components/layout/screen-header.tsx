@@ -26,15 +26,15 @@ interface ScreenHeaderProps {
 /** Inner bar — matches `h-14` touch layout across stack/tab headers. */
 export const SCREEN_HEADER_BAR_CLASS = "flex h-14 items-center px-2";
 
-/** Leading/trailing header icons — one step above default inline icons. */
-export const SCREEN_HEADER_ICON_CLASS = "size-7";
+/** Leading header icons (back, confirm). */
+export const SCREEN_HEADER_ICON_CLASS = "size-6";
 
-/** Trailing header action icons (e.g. Plus) — one step above inline `size-5`. */
-export const SCREEN_HEADER_ACTION_ICON_CLASS = "size-6";
+/** Trailing header action icons (e.g. Plus). */
+export const SCREEN_HEADER_ACTION_ICON_CLASS = "size-5";
 
-/** Stack/tab header titles — one step above body default. */
+/** Stack/tab header titles. */
 export const SCREEN_HEADER_TITLE_CLASS =
-  "min-w-0 flex-1 truncate px-1 text-lg font-semibold";
+  "min-w-0 flex-1 truncate px-1 text-base font-semibold";
 
 export function ScreenHeader({
   title,
