@@ -3,6 +3,12 @@
 import { type RefObject, useEffect } from "react";
 
 import {
+  applyIosFocusDeadZoneNudge,
+  restoreIosFocusDeadZoneNudge,
+  shouldApplyIosFocusDeadZoneNudge,
+  type IosFocusDeadZoneNudgeSession,
+} from "@/lib/scroll/ios-focus-dead-zone";
+import {
   applyKeyboardScrollInset,
   clearKeyboardScrollInset,
   isInputFullyVisibleInContainer,
@@ -31,9 +37,8 @@ function isInputInContainer(
 /**
  * Focus-scoped keyboard scroll support.
  *
- * Isolation experiment: upper fields already fully visible in the scroll
- * container bypass the entire keyboard pipeline — no visualViewport listeners,
- * no rAF follow-ups, no inset, no scroll mutation.
+ * Experiment C: on iOS, a small smooth dead-zone nudge may run before bypass
+ * when scrollTop is 0 and the field sits in the upper band — not scroll-into-view.
  *
  * Lifecycle (when pipeline engages):
  *   focusin  → obscured check after keyboard presents → minimal scroll + inset
@@ -53,6 +58,7 @@ export function useFocusScrollIntoView(
 
     let focusedTarget: HTMLElement | null = null;
     let pipelineBypassed = false;
+    let deadZoneNudgeSession: IosFocusDeadZoneNudgeSession | null = null;
     let adjustRaf = 0;
     let followUpTimer: number | null = null;
     let focusOutRaf = 0;
@@ -113,6 +119,13 @@ export function useFocusScrollIntoView(
       }
     }
 
+    function restoreDeadZoneNudgeIfNeeded() {
+      const scrollContainer = containerRef.current;
+      if (!scrollContainer || !deadZoneNudgeSession) return;
+      restoreIosFocusDeadZoneNudge(scrollContainer, deadZoneNudgeSession);
+      deadZoneNudgeSession = null;
+    }
+
     function adjustForTarget(target: HTMLElement) {
       const scrollContainer = containerRef.current;
       if (!scrollContainer?.contains(target)) return;
@@ -144,12 +157,26 @@ export function useFocusScrollIntoView(
       cancelFocusOutCheck();
       focusedTarget = target;
       pipelineBypassed = false;
+      deadZoneNudgeSession = null;
 
       adjustRaf = requestAnimationFrame(() => {
         adjustRaf = 0;
         adjustForTarget(target);
         runFollowUpAdjust(target);
       });
+    }
+
+    function bypassVisibleField(
+      scrollContainer: HTMLElement,
+      target: HTMLElement,
+    ) {
+      clearKeyboardPipelineState();
+      focusedTarget = target;
+      pipelineBypassed = true;
+
+      if (shouldApplyIosFocusDeadZoneNudge(scrollContainer, target)) {
+        deadZoneNudgeSession = applyIosFocusDeadZoneNudge(scrollContainer);
+      }
     }
 
     function engageFocusTarget(target: HTMLElement) {
@@ -159,12 +186,11 @@ export function useFocusScrollIntoView(
       cancelFocusOutCheck();
 
       if (isInputFullyVisibleInContainer(scrollContainer, target)) {
-        clearKeyboardPipelineState();
-        focusedTarget = target;
-        pipelineBypassed = true;
+        bypassVisibleField(scrollContainer, target);
         return;
       }
 
+      deadZoneNudgeSession = null;
       scheduleAdjust(target);
     }
 
@@ -173,6 +199,7 @@ export function useFocusScrollIntoView(
       pipelineBypassed = false;
       cancelFocusOutCheck();
       clearKeyboardPipelineState();
+      restoreDeadZoneNudgeIfNeeded();
     }
 
     function handleFocusIn(event: FocusEvent) {
