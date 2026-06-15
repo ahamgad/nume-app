@@ -5,6 +5,7 @@ import { type RefObject, useEffect } from "react";
 import {
   applyKeyboardScrollInset,
   clearKeyboardScrollInset,
+  isInputObscuredByKeyboard,
   isKeyboardPresent,
   scrollInputIntoContainer,
 } from "@/lib/scroll/scroll-input-into-view";
@@ -34,7 +35,8 @@ function isInputInContainer(
  * scroll position on blur (padding cleared, scrollTop untouched).
  *
  * Lifecycle (keyboardInset forms only):
- *   focusin  → attach visualViewport.resize (once) → adjust padding + scroll
+ *   focusin  → attach visualViewport.resize (once) → scroll if obscured;
+ *              padding-bottom inset only when obscured or user has scrolled
  *   focusout → defer check → if no input focused: detach listener, clear padding
  *   unmount  → full teardown
  *
@@ -112,7 +114,14 @@ export function useFocusScrollIntoView(
       if (!isKeyboardPresent()) return;
 
       if (keyboardInset) {
-        applyKeyboardScrollInset(scrollContainer);
+        const needsScrollInset =
+          isInputObscuredByKeyboard(scrollContainer, target) ||
+          scrollContainer.scrollTop > 0;
+        if (needsScrollInset) {
+          applyKeyboardScrollInset(scrollContainer);
+        } else {
+          clearKeyboardScrollInset(scrollContainer);
+        }
       }
 
       scrollInputIntoContainer(scrollContainer, target);
