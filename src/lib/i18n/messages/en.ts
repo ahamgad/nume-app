@@ -88,6 +88,12 @@ export const en = {
     },
     datePicker: {
       title: "Select date",
+      previousMonth: "Previous month",
+      nextMonth: "Next month",
+      openMonthYear: "Choose month and year",
+      backToCalendar: "Back to calendar",
+      selectMonth: "Select month",
+      selectYear: "Select year",
     },
     accountCreated: "Account created",
     recordSaved: "Record saved",

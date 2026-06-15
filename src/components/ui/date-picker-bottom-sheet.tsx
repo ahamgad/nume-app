@@ -3,16 +3,11 @@
 import { arEG, enGB } from "date-fns/locale";
 import { useMemo, useState } from "react";
 
-import { Calendar } from "@/components/ui/calendar";
-import {
-  SELECTION_SHEET_HEADER_HEIGHT_PX,
-  SelectionBottomSheet,
-} from "@/components/ui/selection-bottom-sheet";
-import {
-  parseIsoDate,
-  todayIsoDate,
-  toIsoDate,
-} from "@/lib/format/date";
+import { NumeCalendarGrid } from "@/components/ui/date-picker/nume-calendar-grid";
+import { NumeMonthYearPicker } from "@/components/ui/date-picker/nume-month-year-picker";
+import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
+import { parseIsoDate, todayIsoDate } from "@/lib/format/date";
+import { cn } from "@/lib/utils";
 import { useLocale, useT } from "@/providers/i18n-provider";
 
 interface DatePickerBottomSheetProps {
@@ -24,68 +19,104 @@ interface DatePickerBottomSheetProps {
   maxDate?: string;
 }
 
-interface DatePickerCalendarProps {
+type DatePickerView = "grid" | "month-year";
+
+interface DatePickerSheetContentProps {
   value: string;
   maxDate: string;
-  locale: "en" | "ar";
-  onChange: (value: string) => void;
+  title: string;
   onClose: () => void;
+  onChange: (value: string) => void;
 }
 
-/** Six week rows + caption — keeps sheet height stable across months. */
-const CALENDAR_GRID_MIN_HEIGHT_PX =
-  SELECTION_SHEET_HEADER_HEIGHT_PX + 40 + 6 * 40 + 24;
-
-function DatePickerCalendar({
+function DatePickerSheetContent({
   value,
   maxDate,
-  locale,
-  onChange,
+  title,
   onClose,
-}: DatePickerCalendarProps) {
-  const dayPickerLocale = locale === "ar" ? arEG : enGB;
-  const maxDateValue = useMemo(() => parseIsoDate(maxDate), [maxDate]);
-  const selectedDate = useMemo(
-    () => (value ? parseIsoDate(value) : undefined),
-    [value],
-  );
-  const startMonth = useMemo(
-    () => new Date(maxDateValue.getFullYear() - 100, 0),
-    [maxDateValue],
-  );
-  const initialMonth = selectedDate ?? maxDateValue;
-  const [visibleMonth, setVisibleMonth] = useState(initialMonth);
+  onChange,
+}: DatePickerSheetContentProps) {
+  const t = useT();
+  const localeCode = useLocale();
+  const dayPickerLocale = localeCode === "ar" ? arEG : enGB;
 
-  function handleSelect(date: Date | undefined) {
-    if (!date) return;
-    onChange(toIsoDate(date));
+  const initialMonth = useMemo(
+    () => parseIsoDate(value || maxDate),
+    [maxDate, value],
+  );
+
+  const [draftDate, setDraftDate] = useState<string | null>(value || null);
+  const [visibleMonth, setVisibleMonth] = useState(initialMonth);
+  const [view, setView] = useState<DatePickerView>("grid");
+
+  function handleDismiss() {
     onClose();
   }
 
+  function handleConfirm() {
+    if (!draftDate) return;
+    onChange(draftDate);
+    onClose();
+  }
+
+  function handleSelectDate(isoDate: string) {
+    setDraftDate(isoDate);
+    setVisibleMonth(parseIsoDate(isoDate));
+  }
+
+  function handleMonthYearChange(month: Date) {
+    setVisibleMonth(month);
+  }
+
   return (
-    <div
-      className="flex justify-center px-2"
-      style={{
-        minHeight: CALENDAR_GRID_MIN_HEIGHT_PX,
-        paddingBottom: SELECTION_SHEET_HEADER_HEIGHT_PX,
-      }}
+    <ImmersiveBottomSheet
+      title={title}
+      onDismiss={handleDismiss}
+      onConfirm={handleConfirm}
+      confirmAriaLabel={t("fieldEditor.confirm")}
+      confirmDisabled={!draftDate}
+      ariaLabel={title}
+      bodyClassName="min-h-0"
     >
-      <Calendar
-        mode="single"
-        fixedWeeks
-        captionLayout="dropdown"
-        navLayout="after"
-        locale={dayPickerLocale}
-        selected={selectedDate}
-        month={visibleMonth}
-        onMonthChange={setVisibleMonth}
-        startMonth={startMonth}
-        endMonth={maxDateValue}
-        onSelect={handleSelect}
-        disabled={{ after: maxDateValue }}
-        className="w-full [--cell-size:2.5rem]"
-      />
-    </div>
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div
+          className={cn(
+            "absolute inset-0 flex min-h-0 flex-col transition-opacity duration-200",
+            view === "grid"
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0",
+          )}
+        >
+          <NumeCalendarGrid
+            visibleMonth={visibleMonth}
+            selectedIsoDate={draftDate}
+            maxDate={maxDate}
+            locale={dayPickerLocale}
+            onVisibleMonthChange={setVisibleMonth}
+            onSelectDate={handleSelectDate}
+            onOpenMonthYearPicker={() => setView("month-year")}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "absolute inset-0 flex min-h-0 flex-col transition-opacity duration-200",
+            view === "month-year"
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0",
+          )}
+        >
+          <NumeMonthYearPicker
+            visibleMonth={visibleMonth}
+            maxDate={maxDate}
+            locale={dayPickerLocale}
+            monthYearExpanded
+            onMonthYearChange={handleMonthYearChange}
+            onCloseMonthYearPicker={() => setView("grid")}
+          />
+        </div>
+      </div>
+    </ImmersiveBottomSheet>
   );
 }
 
@@ -98,28 +129,18 @@ export function DatePickerBottomSheet({
   maxDate = todayIsoDate(),
 }: DatePickerBottomSheetProps) {
   const t = useT();
-  const locale = useLocale();
   const sheetTitle = title ?? t("common.datePicker.title");
 
+  if (!open) return null;
+
   return (
-    <SelectionBottomSheet
-      open={open}
+    <DatePickerSheetContent
+      key={`${value}-${maxDate}`}
+      value={value}
+      maxDate={maxDate}
+      title={sheetTitle}
       onClose={onClose}
-      ariaLabelledBy="date-picker-title"
-      header={
-        <h2 id="date-picker-title" className="text-base font-semibold">
-          {sheetTitle}
-        </h2>
-      }
-    >
-      <DatePickerCalendar
-        key={`${value}-${maxDate}`}
-        value={value}
-        maxDate={maxDate}
-        locale={locale}
-        onChange={onChange}
-        onClose={onClose}
-      />
-    </SelectionBottomSheet>
+      onChange={onChange}
+    />
   );
 }

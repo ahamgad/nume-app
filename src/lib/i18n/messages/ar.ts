@@ -90,6 +90,12 @@ export const ar = {
     },
     datePicker: {
       title: "اختر التاريخ",
+      previousMonth: "الشهر السابق",
+      nextMonth: "الشهر التالي",
+      openMonthYear: "اختر الشهر والسنة",
+      backToCalendar: "العودة إلى التقويم",
+      selectMonth: "اختر الشهر",
+      selectYear: "اختر السنة",
     },
     accountCreated: "تم إنشاء الحساب",
     recordSaved: "تم حفظ السجل",
