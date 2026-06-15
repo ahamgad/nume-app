@@ -1,8 +1,8 @@
 /**
- * Search / picker bottom sheet sizing (NUME Foundation v1).
- *
- * Fixed immersive height — same peek-above pattern as workspace sheets.
- * Only the results area scrolls; the sheet container never resizes with keyboard.
+ * @deprecated Use `lib/layout/picker-sheet` — Foundation v1 picker sizing.
  */
-
-export { IMMERSIVE_SHEET_HEIGHT as SEARCH_SHEET_HEIGHT } from "@/lib/layout/immersive-sheet";
+export {
+  PICKER_SHEET_MAX_HEIGHT as SEARCH_SHEET_HEIGHT,
+  PICKER_SEARCH_ITEM_THRESHOLD,
+  shouldShowPickerSearch,
+} from "@/lib/layout/picker-sheet";

@@ -1,12 +1,11 @@
 /**
- * @deprecated Use `SearchBottomSheet` — Foundation v1 picker/search sheet.
- * Re-exported for import compatibility during migration.
+ * @deprecated Use `PickerBottomSheet` — Foundation v1 generic picker sheet.
  */
 export {
-  SearchBottomSheet as SelectionBottomSheet,
-  type SearchBottomSheetProps as SelectionBottomSheetProps,
-  type SearchBottomSheetSearchConfig as SelectionBottomSheetSearchConfig,
-} from "@/components/ui/search-bottom-sheet";
+  PickerBottomSheet as SelectionBottomSheet,
+  type PickerBottomSheetProps as SelectionBottomSheetProps,
+  type PickerBottomSheetSearchConfig as SelectionBottomSheetSearchConfig,
+} from "@/components/ui/picker-bottom-sheet";
 
-/** @deprecated No longer used — search sheets use fixed immersive height. */
+/** @deprecated Use `PICKER_SHEET_MAX_HEIGHT` from `lib/layout/picker-sheet`. */
 export const SELECTION_SHEET_HEADER_HEIGHT_PX = 56;

@@ -4,9 +4,10 @@ import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
-import { SearchBottomSheet } from "@/components/ui/search-bottom-sheet";
+import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterAccountsForDestinationSearch,
   formatAccountDestinationDisplay,
@@ -40,7 +41,7 @@ export function InterestDestinationPicker({
     [accounts, value],
   );
 
-  const showSearch = accounts.length > 10;
+  const showSearch = shouldShowPickerSearch(accounts.length);
 
   const filteredAccounts = useMemo(
     () =>
@@ -102,7 +103,7 @@ export function InterestDestinationPicker({
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
       </button>
 
-      <SearchBottomSheet
+      <PickerBottomSheet
         open={open}
         onClose={closeSheet}
         title={label}
@@ -169,7 +170,7 @@ export function InterestDestinationPicker({
               ))}
             </div>
           )}
-      </SearchBottomSheet>
+      </PickerBottomSheet>
     </div>
   );
 }

@@ -10,32 +10,33 @@ Before implementing a new interaction, ask: **"Which Foundation pattern does thi
 |---|---|---|
 | Workspace | `ImmersiveBottomSheet` (`variant="workspace"`) | Focused text/numeric input (Field Editor, future notes) |
 | Calendar | `DatePickerBottomSheet` | All date selection |
-| Search / Picker | `SearchBottomSheet` | Searchable lists, institution pickers, account pickers |
+| Picker | `PickerBottomSheet` | Selection lists, institution pickers, category pickers |
 | Editable field | `EditableField` + Field Editor provider | Form fields that accept keyboard input |
 | Confirmation | `ConfirmationBottomSheet` | Destructive / irreversible confirms only |
 
 If none apply → propose a new Foundation pattern **before** implementation.
 
+**Patterns do not overlap.** No screen-specific implementations. No undocumented exceptions.
+
 ---
 
 ## 1. Immersive Bottom Sheets
 
-All immersive experiences use shared infrastructure:
+Shared chrome for all sheet types:
 
-- `ImmersiveBottomSheet`
 - `SCREEN_HEADER_*` tokens from `screen-header.tsx`
-- `BOTTOM_SHEET_*` chrome from `bottom-sheet-chrome.tsx`
+- `BOTTOM_SHEET_*` from `bottom-sheet-chrome.tsx`
 - Shared backdrop, safe-area handling, motion
 
 **Do not** create custom sheet implementations.
 
 ### Height tokens
 
-| Experience | Token | Location |
+| Experience | Sizing | Location |
 |---|---|---|
-| Field Editor (workspace) | `IMMERSIVE_SHEET_HEIGHT` | `lib/layout/immersive-sheet.ts` |
-| Date picker | `DATE_PICKER_SHEET_HEIGHT` | `lib/layout/date-picker-sheet.ts` |
-| Search / picker | `SEARCH_SHEET_HEIGHT` | `lib/layout/search-sheet.ts` |
+| Workspace (Field Editor) | Fixed immersive max | `lib/layout/immersive-sheet.ts` |
+| Calendar | Fixed content height | `lib/layout/date-picker-sheet.ts` |
+| Picker | Content-fitted clamp | `lib/layout/picker-sheet.ts` |
 
 ---
 
@@ -53,60 +54,91 @@ Focused user input → `ImmersiveBottomSheet` with `variant="workspace"`.
 - Keyboard interacts only with the workspace
 - Body `overflow-hidden` for typical short fields
 
-**Do not** apply workspace lock or auto-focus to search sheets.
-
 **Examples:** Field Editor, future rich text / note editing.
 
 ---
 
-## 3. Search Sheets
+## 3. Picker Sheets
 
-Search-based pickers → `SearchBottomSheet`.
+Generic selection → `PickerBottomSheet`.
 
-**NOT workspace sheets.** Do not use `useImmersiveWorkspaceLock` or auto-focus.
+**NOT workspace or calendar sheets.**
 
-**Rules:**
+### Height
 
-- Fixed sheet height (`SEARCH_SHEET_HEIGHT`)
-- **No auto-focus** — keyboard opens only when user taps search
-- **No automatic keyboard** on sheet open
-- Page frozen via `useModalLayerLock` + `useSearchSheetLock` (not workspace lock)
-- Sheet container fixed — never shifts with keyboard (`interactive-widget=overlays-content`)
-- Fixed search header — title + search input stay pinned
-- Keyboard inset via `useVisualViewportKeyboardInset` applied **only** to results padding
-- Only the results area scrolls (`data-sheet-scroll`)
-- Backdrop tap dismisses (selection is immediate on row tap)
-- Manual search focus uses `preventScroll` to avoid document pan
+```text
+clamp(
+  viewport / 3,
+  content height + chrome + bottom padding,
+  viewport − (header zone × 2)
+)
+```
 
-**Examples:** Institution picker (current account, wallet, certificate), interest destination picker, future searchable pickers.
+| Bound | Token |
+|---|---|
+| Minimum | `PICKER_SHEET_MIN_HEIGHT` — `calc(100dvh / 3)` |
+| Maximum | `PICKER_SHEET_MAX_HEIGHT` — same as immersive upper bound |
+| Bottom padding | `PICKER_SHEET_BOTTOM_PADDING` — tab bar + safe area |
+
+Small lists grow naturally. Large lists cap at the immersive maximum and scroll internally.
+
+### Layout
+
+```text
+Header (pinned)
+↓
+Optional Search (pinned, item count > 10)
+↓
+Scrollable content
+↓
+Bottom padding = tab bar + safe area (+ keyboard inset when searching)
+```
+
+### Scrolling
+
+- Sheet container fixed — no drag, no snap points
+- Only `[data-sheet-scroll]` content scrolls
+- Page frozen (`useModalLayerLock` + `useSearchSheetLock`)
+
+### Search (conditional)
+
+Show search when `shouldShowPickerSearch(itemCount)` — item count **> 10**.
+
+When search is shown:
+
+- No auto-focus, no automatic keyboard
+- Search pinned below title
+- Keyboard inset on content padding only
+- Manual focus uses `preventScroll`
+
+Selection is immediate on row tap (no Save).
+
+**Examples:** Institution pickers, interest destination, future category pickers.
 
 ---
 
-## 4. Date Picker
+## 4. Calendar Sheets
 
 All date selection → `DatePickerBottomSheet`.
 
-- Immersive calendar with fixed content height (`DATE_PICKER_SHEET_HEIGHT`)
-- Draft state inside sheet; **Save** commits, **Back** / backdrop discards
+- Fixed calendar content height (`DATE_PICKER_SHEET_HEIGHT`)
+- Draft state; **Save** commits, **Back** / backdrop discards
 - Month grid + month/year wheel picker
-- No alternate date picker implementations
 
-Trigger: `DateField` only — never native date inputs on form screens.
+Trigger: `DateField` only.
 
 ---
 
 ## 5. Editable Fields
 
-All editable form fields → `EditableField` (Field Editor pattern).
+All editable form fields → `EditableField`.
 
-**Excluded (existing interaction models):**
+**Excluded:**
 
-- Search fields inside `SearchBottomSheet`
-- Dropdown / picker triggers (institution, interest destination, date, chips)
-- Authentication credential screens
-- Institution custom name inline `Input` (Other institution — documented exception)
-
-No inline keyboard editing outside these rules.
+- Search inside `PickerBottomSheet`
+- Picker triggers (institution, destination, date, chips)
+- Auth credentials
+- Institution "Other" custom name inline `Input` (documented exception)
 
 ---
 
@@ -114,51 +146,37 @@ No inline keyboard editing outside these rules.
 
 | Action | Behavior |
 |---|---|
-| **Save** | Explicit save; updates canonical form state |
+| **Save** | Explicit save; updates canonical state (Workspace, Calendar) |
 | **Back** | Discards draft |
 | **Backdrop** | Same as Back |
 
-No confirmation dialogs for discard. No alternative semantics.
+Pickers: row tap selects immediately — no draft.
 
-Applies to: Field Editor, Date Picker. Search pickers select immediately on row tap (no draft).
+Confirmations: separate destructive flow.
 
 ---
 
 ## 7. Keyboard Ownership
 
-The active immersive surface owns the keyboard.
-
-**Rules:**
-
-- No page scrolling behind sheets
-- No layout shifts on underlying form
-- No viewport reconciliation hacks
-- No screen-specific keyboard fixes
+The active surface owns the keyboard. No page scroll, layout shifts, or screen-specific keyboard hacks behind sheets.
 
 ---
 
 ## 8. Shared Tokens
 
-All immersive experiences inherit from `screen-header.tsx` and layout tokens — no duplicated values, no local overrides for:
-
-- Header typography (`SCREEN_HEADER_TITLE_CLASS`)
-- Icon sizes (`SCREEN_HEADER_ICON_CLASS`, `SCREEN_HEADER_ACTION_ICON_CLASS`)
-- Touch targets (`size-11` header actions)
-- Safe areas (`env(safe-area-inset-*)`)
-- RTL (chevron rotation, flex direction)
-- Motion (`BOTTOM_SHEET_ENTER_CLASS`)
+No duplicated values or local overrides for header typography, icon sizes, touch targets, safe areas, RTL, or motion.
 
 ---
 
-## Audit status (v1 freeze)
+## Audit status (v1 final)
 
 | Surface | Pattern | Status |
 |---|---|---|
-| Field Editor | Workspace | ✅ Aligned |
-| Date Picker | Calendar | ✅ Aligned |
-| Institution picker (all account types) | Search | ✅ Aligned |
-| Interest destination picker | Search | ✅ Aligned |
-| Confirmation / discard dialogs | Confirmation | ✅ Separate pattern (intentional) |
+| Field Editor | Workspace | ✅ |
+| Date Picker | Calendar | ✅ |
+| Institution picker (all types) | Picker | ✅ |
+| Interest destination picker | Picker | ✅ |
+| Confirmation / discard | Confirmation | ✅ Intentional |
 | Auth screens | — | ✅ Excluded |
 | Institution "Other" custom name | Inline input | ⚠️ Documented exception |
 
@@ -166,12 +184,9 @@ All immersive experiences inherit from `screen-header.tsx` and layout tokens —
 
 ## Governance checklist
 
-When adding a new form field or sheet:
-
 1. Identify the Foundation pattern
-2. Reuse the existing component — do not fork
-3. Use shared layout tokens for sizing
-4. Use shared header tokens for chrome
-5. If deviating, add a row to the audit table above with justification
+2. Reuse the component — do not fork
+3. Use shared layout tokens
+4. Document any deviation in the audit table
 
-**Foundation is frozen.** All future screens inherit from it.
+**Foundation v1 is frozen.**

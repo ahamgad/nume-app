@@ -13,8 +13,10 @@ Quick reference:
 
 - **Workspace input** → `ImmersiveBottomSheet` (`variant="workspace"`) + `EditableField`
 - **Date selection** → `DatePickerBottomSheet` + `DateField`
-- **Search / pickers** → `SearchBottomSheet`
+- **Pickers / selection lists** → `PickerBottomSheet` (+ `shouldShowPickerSearch` when > 10 items)
 - **Confirmations** → `ConfirmationBottomSheet` (destructive actions only)
 
-Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Reuse shared header and layout tokens.
+Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard ownership.
+
+Do not create custom sheet implementations. Do not inline keyboard editing on form screens.
 <!-- END:foundation-rules -->

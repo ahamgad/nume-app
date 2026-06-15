@@ -3,9 +3,10 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { SearchBottomSheet } from "@/components/ui/search-bottom-sheet";
+import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterInstitutions,
   getInstitutionFullName,
@@ -125,7 +126,8 @@ export function InstitutionPicker({
     filteredFinancial.length > 0 ||
     showOtherOption;
 
-  const showSearch = entries.length + 1 > 10;
+  const selectableCount = entries.length + 1;
+  const showSearch = shouldShowPickerSearch(selectableCount);
 
   return (
     <div className="space-y-2">
@@ -161,7 +163,7 @@ export function InstitutionPicker({
         />
       ) : null}
 
-      <SearchBottomSheet
+      <PickerBottomSheet
         open={open}
         onClose={closeSheet}
         title={resolvedLabel}
@@ -237,7 +239,7 @@ export function InstitutionPicker({
               ) : null}
             </>
           )}
-      </SearchBottomSheet>
+      </PickerBottomSheet>
     </div>
   );
 }
