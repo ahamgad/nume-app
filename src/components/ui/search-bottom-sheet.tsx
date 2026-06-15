@@ -1,8 +1,8 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import type { FocusEvent, ReactNode } from "react";
 
-import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock";
+import { useSearchSheetLock } from "@/hooks/use-search-sheet-lock";
 import { useVisualViewportKeyboardInset } from "@/hooks/use-visual-viewport-keyboard-inset";
 import { SCREEN_HEADER_TITLE_CLASS } from "@/components/layout/screen-header";
 import {
@@ -32,11 +32,20 @@ export interface SearchBottomSheetProps {
   className?: string;
 }
 
+function handleSearchFocus(event: FocusEvent<HTMLInputElement>) {
+  const input = event.currentTarget;
+  requestAnimationFrame(() => {
+    if (document.activeElement === input) {
+      input.focus({ preventScroll: true });
+    }
+  });
+}
+
 /**
  * Foundation search / picker sheet.
  *
- * Fixed sheet, locked underlying page, keyboard owned by the sheet.
- * Only the results area scrolls — the container never shifts with keyboard.
+ * NOT a workspace sheet — no auto-focus, no automatic keyboard.
+ * Fixed sheet container; fixed search header; results-only scrolling.
  */
 export function SearchBottomSheet({
   open,
@@ -49,21 +58,15 @@ export function SearchBottomSheet({
   className,
 }: SearchBottomSheetProps) {
   const t = useT();
-  const searchRef = useRef<HTMLInputElement>(null);
   const keyboardInsetPx = useVisualViewportKeyboardInset(open && Boolean(search));
 
   useModalLayerLock(open);
-  useImmersiveWorkspaceLock(open);
-
-  useLayoutEffect(() => {
-    if (!open || !search) return;
-    searchRef.current?.focus({ preventScroll: true });
-  }, [open, search]);
+  useSearchSheetLock(open);
 
   if (!open) return null;
 
   const resolvedTitleId = titleId ?? "search-bottom-sheet-title";
-  const scrollPaddingBottom = `calc(0.5rem + env(safe-area-inset-bottom) + ${keyboardInsetPx}px)`;
+  const resultsPaddingBottom = `calc(0.5rem + env(safe-area-inset-bottom) + ${keyboardInsetPx}px)`;
 
   return (
     <div
@@ -76,7 +79,7 @@ export function SearchBottomSheet({
       <button
         type="button"
         aria-label={t("common.back")}
-        className="absolute inset-0"
+        className="absolute inset-0 touch-none"
         onClick={onClose}
       />
       <div
@@ -88,20 +91,19 @@ export function SearchBottomSheet({
         className={cn(
           "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm",
           BOTTOM_SHEET_ENTER_CLASS,
-          "touch-none overscroll-none",
         )}
       >
-        <header className="shrink-0 border-b border-border px-4 py-4">
+        <header className="shrink-0 border-b border-border bg-background px-4 py-4">
           <h2 id={resolvedTitleId} className={SCREEN_HEADER_TITLE_CLASS}>
             {title}
           </h2>
           {search ? (
             <Input
-              ref={searchRef}
               value={search.value}
               onChange={(event) => search.onChange(event.target.value)}
+              onFocus={handleSearchFocus}
               placeholder={search.placeholder}
-              className="mt-3 touch-auto"
+              className="mt-3"
               autoComplete="off"
             />
           ) : null}
@@ -109,8 +111,8 @@ export function SearchBottomSheet({
 
         <div
           data-sheet-scroll
-          className="flex min-h-0 flex-1 touch-auto flex-col overflow-y-auto overscroll-y-contain px-2 py-2"
-          style={{ paddingBottom: scrollPaddingBottom }}
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-2 py-2"
+          style={{ paddingBottom: resultsPaddingBottom }}
         >
           {children}
         </div>

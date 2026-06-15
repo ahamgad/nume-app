@@ -49,8 +49,11 @@ Focused user input → `ImmersiveBottomSheet` with `variant="workspace"`.
 - Underlying form locked (`html[data-modal-open]` → `[data-app-scroll]` frozen)
 - Document scroll locked (`html[data-immersive-workspace]`)
 - Sheet container fixed — no drag, no resize
+- **Auto-focus** on open with immediate keyboard
 - Keyboard interacts only with the workspace
 - Body `overflow-hidden` for typical short fields
+
+**Do not** apply workspace lock or auto-focus to search sheets.
 
 **Examples:** Field Editor, future rich text / note editing.
 
@@ -60,15 +63,20 @@ Focused user input → `ImmersiveBottomSheet` with `variant="workspace"`.
 
 Search-based pickers → `SearchBottomSheet`.
 
+**NOT workspace sheets.** Do not use `useImmersiveWorkspaceLock` or auto-focus.
+
 **Rules:**
 
 - Fixed sheet height (`SEARCH_SHEET_HEIGHT`)
-- Keyboard opens inside the sheet only (auto-focus search input)
-- Underlying page frozen (modal + workspace lock)
-- Sheet container fixed — never shifts with keyboard
+- **No auto-focus** — keyboard opens only when user taps search
+- **No automatic keyboard** on sheet open
+- Page frozen via `useModalLayerLock` + `useSearchSheetLock` (not workspace lock)
+- Sheet container fixed — never shifts with keyboard (`interactive-widget=overlays-content`)
+- Fixed search header — title + search input stay pinned
+- Keyboard inset via `useVisualViewportKeyboardInset` applied **only** to results padding
 - Only the results area scrolls (`data-sheet-scroll`)
-- Keyboard inset applied to results padding via `useVisualViewportKeyboardInset`
-- Backdrop tap dismisses (no save — selection is immediate on row tap)
+- Backdrop tap dismisses (selection is immediate on row tap)
+- Manual search focus uses `preventScroll` to avoid document pan
 
 **Examples:** Institution picker (current account, wallet, certificate), interest destination picker, future searchable pickers.
 

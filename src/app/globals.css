@@ -271,6 +271,12 @@
     overflow: hidden;
     overscroll-behavior: none;
   }
+
+  html[data-search-sheet-open="true"],
+  html[data-search-sheet-open="true"] body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 }
 
 @keyframes nume-logo-arrival {
