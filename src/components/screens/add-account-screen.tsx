@@ -1,15 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
+import { EditableField } from "@/components/field-editor";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -43,6 +43,10 @@ import {
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
+import {
+  validateAccountBalanceField,
+  validateAccountNameField,
+} from "@/lib/field-editor/field-validators";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -81,8 +85,6 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   const router = useRouter();
   const { accounts, createAccount, createCertificate } = useFinance();
   const { showToast } = useToast();
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const balanceInputRef = useRef<HTMLInputElement>(null);
 
   const [accountType, setAccountType] = useState<AccountType>("current_account");
   const [name, setName] = useState("");
@@ -112,10 +114,6 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       institution.trim().length > 0 ||
       balance.trim().length > 0;
 
-  useEffect(() => {
-    nameInputRef.current?.focus();
-  }, []);
-
   const accountTypeOptions = useMemo((): ScrollChipOption<AccountType>[] => {
     if (isFirstAccountFlow) {
       return ONBOARDING_ACCOUNT_TYPES.map((option) => ({
@@ -140,18 +138,6 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       const next = { ...prev };
       delete next[field];
       return next;
-    });
-  }
-
-  function handleBalanceChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const sanitized = sanitizeAmountInput(e.target.value);
-    setBalance(sanitized);
-    clearFieldError("balance");
-    requestAnimationFrame(() => {
-      const input = balanceInputRef.current;
-      if (!input) return;
-      const displayLength = formatAmountInput(sanitized, amountInputLocale).length;
-      input.setSelectionRange(displayLength, displayLength);
     });
   }
 
@@ -319,27 +305,19 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
             />
           ) : (
             <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="account-name">
-                  {t("accounts.fields.name.label")}
-                </Label>
-                <Input
-                  ref={nameInputRef}
-                  id="account-name"
-                  value={name}
-                  disabled={submitting}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    clearFieldError("name");
-                  }}
-                  placeholder={t("accounts.fields.name.placeholder")}
-                  aria-invalid={Boolean(errors.name)}
-                  autoComplete="off"
-                />
-                {errors.name ? (
-                  <p className="text-sm text-destructive">{errors.name}</p>
-                ) : null}
-              </div>
+              <EditableField
+                id="account-name"
+                label={t("accounts.fields.name.label")}
+                value={name}
+                placeholder={t("accounts.fields.name.placeholder")}
+                disabled={submitting}
+                error={errors.name}
+                validate={(next) => validateAccountNameField(next, t)}
+                onSave={(nextValue) => {
+                  setName(nextValue);
+                  clearFieldError("name");
+                }}
+              />
 
               {showMoneyInstitutionPicker ? (
                 <InstitutionPicker
@@ -352,34 +330,30 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
                 />
               ) : null}
 
-              <div className="space-y-2">
-                <Label htmlFor="balance">
-                  {t("accounts.fields.balance.label")}
-                </Label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-base font-medium text-muted-foreground">
-                    {t("common.currency.code")}
-                  </span>
-                  <Input
-                    ref={balanceInputRef}
-                    id="balance"
-                    inputMode="decimal"
-                    disabled={submitting}
-                    value={formatAmountInput(balance, amountInputLocale)}
-                    onChange={handleBalanceChange}
-                    placeholder={t("common.currency.zeroPlaceholder")}
-                    className="h-14 ps-16 text-2xl font-semibold tabular-nums tracking-tight"
-                    aria-invalid={Boolean(errors.balance)}
-                  />
-                </div>
-                {errors.balance ? (
-                  <p className="text-sm text-destructive">{errors.balance}</p>
-                ) : (
-                  <p className="text-[0.8125rem] text-muted-foreground">
-                    {t("accounts.add.balanceHint")}
-                  </p>
-                )}
-              </div>
+              <EditableField
+                id="balance"
+                label={t("accounts.fields.balance.label")}
+                mode="numeric"
+                inputMode="decimal"
+                value={balance}
+                placeholder={t("common.currency.zeroPlaceholder")}
+                disabled={submitting}
+                error={errors.balance}
+                hint={
+                  errors.balance ? undefined : t("accounts.add.balanceHint")
+                }
+                prefixLabel={t("common.currency.code")}
+                sanitizeInput={sanitizeAmountInput}
+                formatDisplay={(amount) =>
+                  formatAmountInput(amount, amountInputLocale)
+                }
+                triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
+                validate={(next) => validateAccountBalanceField(next, t)}
+                onSave={(nextBalance) => {
+                  setBalance(nextBalance);
+                  clearFieldError("balance");
+                }}
+              />
             </div>
           )}
 

@@ -95,6 +95,9 @@ export const en = {
     expenseRecorded: "Expense recorded",
     adjustmentRecorded: "Adjustment recorded",
   },
+  fieldEditor: {
+    confirm: "Save changes",
+  },
   dashboard: {
     title: "Dashboard",
     netWorth: {

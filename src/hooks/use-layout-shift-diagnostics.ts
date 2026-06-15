@@ -68,21 +68,25 @@ export function useLayoutShiftDiagnostics(
     function onFocusIn(event: FocusEvent) {
       if (!isFocusableInput(event.target)) return;
 
+      const target =
+        event.target instanceof HTMLElement ? event.target : null;
+
       if (
         !focusBaseline ||
-        focusBaseline.activeId !==
-          (event.target instanceof HTMLElement ? event.target.id : null)
+        focusBaseline.activeId !== (target?.id ?? null)
       ) {
-        focusBaseline = snap("before-focus", event.target);
+        focusBaseline = snap("before-focus", target);
         logLayoutSnapshot(focusBaseline);
       }
 
-      const immediate = snap("focus-immediate", event.target);
+      const immediate = snap("focus-immediate", target);
       logLayoutSnapshot(immediate);
-      diffLayoutSnapshots(focusBaseline, immediate);
+      if (focusBaseline) {
+        diffLayoutSnapshots(focusBaseline, immediate);
+      }
 
       requestAnimationFrame(() => {
-        const afterRaf = snap("focus-after-raf", event.target);
+        const afterRaf = snap("focus-after-raf", target);
         logLayoutSnapshot(afterRaf);
         if (focusBaseline) {
           diffLayoutSnapshots(focusBaseline, afterRaf);
@@ -90,7 +94,7 @@ export function useLayoutShiftDiagnostics(
       });
 
       window.setTimeout(() => {
-        const delayed = snap("focus-after-120ms", event.target);
+        const delayed = snap("focus-after-120ms", target);
         logLayoutSnapshot(delayed);
         if (focusBaseline) {
           diffLayoutSnapshots(focusBaseline, delayed);

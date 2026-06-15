@@ -1,15 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
+import { EditableField } from "@/components/field-editor";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { DateField } from "@/components/ui/date-field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
   formatAmountInput,
@@ -37,7 +36,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
   const router = useRouter();
   const { getAccount, createRecord } = useFinance();
   const { showToast } = useToast();
-  const amountInputRef = useRef<HTMLInputElement>(null);
 
   const account = getAccount(accountId);
 
@@ -77,18 +75,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
       const next = { ...prev };
       delete next[field];
       return next;
-    });
-  }
-
-  function handleAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const sanitized = sanitizeAmountInput(e.target.value);
-    setAmount(sanitized);
-    clearFieldError("amount");
-    requestAnimationFrame(() => {
-      const input = amountInputRef.current;
-      if (!input) return;
-      const displayLength = formatAmountInput(sanitized, amountInputLocale).length;
-      input.setSelectionRange(displayLength, displayLength);
     });
   }
 
@@ -174,6 +160,40 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     parsedAmount !== null &&
     parsedAmount > account.currentBalance;
 
+  const amountLabel =
+    type === "adjustment"
+      ? t("records.fields.correctBalance")
+      : t("records.fields.amount");
+
+  const descriptionLabel =
+    type !== "adjustment"
+      ? t("records.fields.description.label")
+      : t("records.fields.reason.label");
+
+  const descriptionPlaceholder =
+    type !== "adjustment"
+      ? t(`records.fields.description.placeholder.${type}`)
+      : t("records.fields.reason.placeholder");
+
+  function validateRecordAmount(value: string): string | undefined {
+    const parsed = parseAmount(value);
+    if (parsed === null) {
+      return type === "adjustment"
+        ? t("records.validation.correctBalanceRequired")
+        : t("records.validation.amountRequired");
+    }
+    if (parsed <= 0 && type !== "adjustment") {
+      return t("records.validation.amountZero");
+    }
+    if (
+      type === "adjustment" &&
+      account &&
+      parsed === account.currentBalance
+    ) {
+      return t("records.adjustmentNoChange");
+    }
+  }
+
   return (
     <>
       <ScreenHeader mode="stack" title={t(titleKey)} onBack={handleBack} />
@@ -184,66 +204,40 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </p>
         ) : null}
 
-        <div className="min-w-0 w-full max-w-full space-y-2">
-          <Label htmlFor="record-amount">
-            {type === "adjustment"
-              ? t("records.fields.correctBalance")
-              : t("records.fields.amount")}
-          </Label>
-          <div className="relative min-w-0">
-            <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-sm text-muted-foreground">
-              {t("common.currency.code")}
-            </span>
-            <Input
-              ref={amountInputRef}
-              id="record-amount"
-              inputMode="decimal"
-              value={formatAmountInput(amount, amountInputLocale)}
-              onChange={handleAmountChange}
-              className="w-full min-w-0 ps-14 tabular-nums"
-              aria-invalid={Boolean(errors.amount)}
-            />
-          </div>
-          {errors.amount ? (
-            <p className="text-sm text-destructive">{errors.amount}</p>
-          ) : null}
-          {showInsufficientBalance ? (
-            <p className="text-sm text-muted-foreground">
-              {t("records.insufficientBalance")}
-            </p>
-          ) : null}
-        </div>
+        <EditableField
+          id="record-amount"
+          label={amountLabel}
+          mode="numeric"
+          inputMode="decimal"
+          value={amount}
+          disabled={submitting}
+          error={errors.amount}
+          prefixLabel={t("common.currency.code")}
+          sanitizeInput={sanitizeAmountInput}
+          formatDisplay={(value) => formatAmountInput(value, amountInputLocale)}
+          triggerClassName="tabular-nums"
+          validate={validateRecordAmount}
+          onSave={(nextAmount) => {
+            setAmount(nextAmount);
+            clearFieldError("amount");
+          }}
+        />
+        {showInsufficientBalance ? (
+          <p className="-mt-3 text-sm text-muted-foreground">
+            {t("records.insufficientBalance")}
+          </p>
+        ) : null}
 
-        {type !== "adjustment" ? (
-          <div className="min-w-0 w-full max-w-full space-y-2">
-            <Label htmlFor="description">
-              {t("records.fields.description.label")}{" "}
-              <span className="text-muted-foreground">({t("common.optional")})</span>
-            </Label>
-            <Input
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t(`records.fields.description.placeholder.${type}`)}
-            />
-          </div>
-        ) : (
-          <div className="min-w-0 w-full max-w-full space-y-2">
-            <Label htmlFor="reason">
-              {t("records.fields.reason.label")}{" "}
-              <span className="text-muted-foreground">({t("common.optional")})</span>
-            </Label>
-            <Input
-              id="reason"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("records.fields.reason.placeholder")}
-            />
-          </div>
-        )}
+        <EditableField
+          id={type !== "adjustment" ? "description" : "reason"}
+          label={`${descriptionLabel} (${t("common.optional")})`}
+          value={description}
+          placeholder={descriptionPlaceholder}
+          disabled={submitting}
+          onSave={setDescription}
+        />
 
         <div className="min-w-0 w-full max-w-full space-y-2">
-          <Label htmlFor="record-date">{t("records.fields.date")}</Label>
           <DateField
             id="record-date"
             value={date}

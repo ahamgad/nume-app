@@ -4,11 +4,10 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { EditableField } from "@/components/field-editor";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
@@ -22,6 +21,7 @@ import {
   shouldShowInstitutionPicker,
   type InstitutionPickerContext,
 } from "@/lib/institutions/catalog";
+import { validateAccountNameField } from "@/lib/field-editor/field-validators";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT } from "@/providers/i18n-provider";
@@ -109,25 +109,19 @@ function EditAccountForm({
       />
       <ScreenBody withTabBar={false} withStickyFooter>
         <div className="space-y-5 pt-2">
-          <div className="space-y-2">
-            <Label htmlFor="edit-account-name">
-              {t("accounts.fields.name.label")}
-            </Label>
-            <Input
-              id="edit-account-name"
-              value={values.name}
-              disabled={submitting}
-              onChange={(event) => {
-                setValues((current) => ({ ...current, name: event.target.value }));
-                clearFieldError("name");
-              }}
-              placeholder={t("accounts.fields.name.placeholder")}
-              aria-invalid={Boolean(errors.name)}
-            />
-            {errors.name ? (
-              <p className="text-sm text-destructive">{errors.name}</p>
-            ) : null}
-          </div>
+          <EditableField
+            id="edit-account-name"
+            label={t("accounts.fields.name.label")}
+            value={values.name}
+            placeholder={t("accounts.fields.name.placeholder")}
+            disabled={submitting}
+            error={errors.name}
+            validate={(name) => validateAccountNameField(name, t)}
+            onSave={(name) => {
+              setValues((current) => ({ ...current, name }));
+              clearFieldError("name");
+            }}
+          />
 
           {showInstitution ? (
             <InstitutionPicker

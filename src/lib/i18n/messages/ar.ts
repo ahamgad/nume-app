@@ -97,6 +97,9 @@ export const ar = {
     expenseRecorded: "تم تسجيل المصروف",
     adjustmentRecorded: "تم تسجيل التعديل",
   },
+  fieldEditor: {
+    confirm: "حفظ التغييرات",
+  },
   dashboard: {
     title: "لوحة التحكم",
     netWorth: {

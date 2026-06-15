@@ -1,11 +1,9 @@
 "use client";
 
-import { useRef } from "react";
-
 import { DateField } from "@/components/ui/date-field";
+import { EditableField } from "@/components/field-editor";
 import { InterestDestinationPicker } from "@/components/ui/interest-destination-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   ScrollChipSelect,
@@ -23,6 +21,12 @@ import {
   sanitizeAmountInput,
   sanitizeDecimalInput,
 } from "@/lib/format/currency";
+import {
+  validateCertificateCustomTermField,
+  validateCertificateNameField,
+  validateCertificatePrincipalField,
+  validateCertificateRateField,
+} from "@/lib/field-editor/field-validators";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
@@ -64,8 +68,6 @@ export function CertificateFormFields({
 }: CertificateFormFieldsProps) {
   const t = useT();
   const formatLocale = useFormatLocale();
-  const principalInputRef = useRef<HTMLInputElement>(null);
-  const rateInputRef = useRef<HTMLInputElement>(null);
 
   const termOptions: ScrollChipOption<CertificateTermPreset>[] = [
     ...CERTIFICATE_TERM_YEAR_PRESETS.map((years) => ({
@@ -85,42 +87,21 @@ export function CertificateFormFields({
     }),
   );
 
-  function handleAmountChange(
-    field: "principalAmount" | "annualInterestRate",
-    raw: string,
-    inputRef: React.RefObject<HTMLInputElement | null>,
-  ) {
-    const sanitized = sanitizeAmountInput(raw);
-    onChange({ [field]: sanitized });
-    onClearError(field);
-    requestAnimationFrame(() => {
-      const input = inputRef.current;
-      if (!input) return;
-      const displayLength = formatAmountInput(sanitized, amountInputLocale).length;
-      input.setSelectionRange(displayLength, displayLength);
-    });
-  }
-
   return (
     <div className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="certificate-name">{t("certificates.fields.name.label")}</Label>
-        <Input
-          id="certificate-name"
-          value={values.name}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({ name: event.target.value });
-            onClearError("name");
-          }}
-          placeholder={t("certificates.fields.name.placeholder")}
-          aria-invalid={Boolean(errors.name)}
-          autoComplete="off"
-        />
-        {errors.name ? (
-          <p className="text-sm text-destructive">{errors.name}</p>
-        ) : null}
-      </div>
+      <EditableField
+        id="certificate-name"
+        label={t("certificates.fields.name.label")}
+        value={values.name}
+        placeholder={t("certificates.fields.name.placeholder")}
+        disabled={disabled}
+        error={errors.name}
+        validate={(name) => validateCertificateNameField(name, t)}
+        onSave={(name) => {
+          onChange({ name });
+          onClearError("name");
+        }}
+      />
 
       <InstitutionPicker
         id="certificate-institution"
@@ -134,73 +115,54 @@ export function CertificateFormFields({
         onChange={(institution) => onChange({ institution })}
       />
 
-      <div className="space-y-2">
-        <Label htmlFor="certificate-principal">
-          {t("certificates.fields.principal.label")}
-        </Label>
-        <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-base font-medium text-muted-foreground">
-            {t("common.currency.code")}
-          </span>
-          <Input
-            ref={principalInputRef}
-            id="certificate-principal"
-            inputMode="decimal"
-            disabled={disabled}
-            value={formatAmountInput(values.principalAmount, amountInputLocale)}
-            onChange={(event) =>
-              handleAmountChange(
-                "principalAmount",
-                event.target.value,
-                principalInputRef,
-              )
-            }
-            placeholder={t("common.currency.zeroPlaceholder")}
-            className="h-14 ps-16 text-2xl font-semibold tabular-nums tracking-tight"
-            aria-invalid={Boolean(errors.principalAmount)}
-          />
-        </div>
-        {errors.principalAmount ? (
-          <p className="text-sm text-destructive">{errors.principalAmount}</p>
-        ) : (
-          <p className="text-[0.8125rem] text-muted-foreground">
-            {t("certificates.fields.principal.hint")}
-          </p>
-        )}
-      </div>
+      <EditableField
+        id="certificate-principal"
+        label={t("certificates.fields.principal.label")}
+        mode="numeric"
+        inputMode="decimal"
+        value={values.principalAmount}
+        placeholder={t("common.currency.zeroPlaceholder")}
+        disabled={disabled}
+        error={errors.principalAmount}
+        hint={
+          errors.principalAmount
+            ? undefined
+            : t("certificates.fields.principal.hint")
+        }
+        prefixLabel={t("common.currency.code")}
+        sanitizeInput={sanitizeAmountInput}
+        formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
+        triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
+        validate={(amount) => validateCertificatePrincipalField(amount, t)}
+        onSave={(principalAmount) => {
+          onChange({ principalAmount });
+          onClearError("principalAmount");
+        }}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="certificate-rate">{t("certificates.fields.rate.label")}</Label>
-        <div className="relative">
-          <Input
-            ref={rateInputRef}
-            id="certificate-rate"
-            inputMode="decimal"
-            disabled={disabled}
-            value={formatAmountInput(values.annualInterestRate, amountInputLocale)}
-            onChange={(event) =>
-              handleAmountChange(
-                "annualInterestRate",
-                event.target.value,
-                rateInputRef,
-              )
-            }
-            placeholder="0"
-            className="pe-10 tabular-nums"
-            aria-invalid={Boolean(errors.annualInterestRate)}
-          />
-          <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-4 text-sm text-muted-foreground">
-            %
-          </span>
-        </div>
-        {errors.annualInterestRate ? (
-          <p className="text-sm text-destructive">{errors.annualInterestRate}</p>
-        ) : (
-          <p className="text-[0.8125rem] text-muted-foreground">
-            {t("certificates.fields.rate.hint")}
-          </p>
-        )}
-      </div>
+      <EditableField
+        id="certificate-rate"
+        label={t("certificates.fields.rate.label")}
+        mode="numeric"
+        inputMode="decimal"
+        value={values.annualInterestRate}
+        placeholder="0"
+        disabled={disabled}
+        error={errors.annualInterestRate}
+        hint={
+          errors.annualInterestRate
+            ? undefined
+            : t("certificates.fields.rate.hint")
+        }
+        suffixLabel="%"
+        sanitizeInput={sanitizeAmountInput}
+        formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
+        validate={(rate) => validateCertificateRateField(rate, t)}
+        onSave={(annualInterestRate) => {
+          onChange({ annualInterestRate });
+          onClearError("annualInterestRate");
+        }}
+      />
 
       <div className="space-y-2">
         <Label htmlFor="certificate-purchase-date">
@@ -238,20 +200,24 @@ export function CertificateFormFields({
           }}
         />
         {values.termPreset === "custom" ? (
-          <Input
+          <EditableField
+            id="certificate-custom-term"
+            hideLabel
+            label={t("certificates.fields.term.custom")}
+            mode="numeric"
             inputMode="decimal"
-            disabled={disabled}
             value={values.customTermYears}
-            onChange={(event) => {
-              const sanitized = sanitizeDecimalInput(event.target.value, 1);
-              onChange({ customTermYears: sanitized });
+            placeholder={t("certificates.fields.term.custom")}
+            disabled={disabled}
+            error={errors.term}
+            sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
+            validate={(term) => validateCertificateCustomTermField(term, t)}
+            onSave={(customTermYears) => {
+              onChange({ customTermYears });
               onClearError("term");
             }}
-            placeholder={t("certificates.fields.term.custom")}
-            aria-invalid={Boolean(errors.term)}
           />
-        ) : null}
-        {errors.term ? (
+        ) : errors.term ? (
           <p className="text-sm text-destructive">{errors.term}</p>
         ) : null}
       </div>

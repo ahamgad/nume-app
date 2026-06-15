@@ -10,6 +10,7 @@ import { I18nProvider } from "@/providers/i18n-provider";
 import { LocaleFontProvider } from "@/providers/locale-font-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { ModalLayerProvider } from "@/providers/modal-layer-provider";
+import { FieldEditorProvider } from "@/providers/field-editor-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ToastProvider } from "@/providers/toast-provider";
 
@@ -22,10 +23,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
             <AuthProvider>
               <ToastProvider>
                 <ModalLayerProvider>
-                  <FinanceProvider>
-                    <NavigationEdgeGuard />
-                    <AppBootstrap>{children}</AppBootstrap>
-                  </FinanceProvider>
+                  <FieldEditorProvider>
+                    <FinanceProvider>
+                      <NavigationEdgeGuard />
+                      <AppBootstrap>{children}</AppBootstrap>
+                    </FinanceProvider>
+                  </FieldEditorProvider>
                 </ModalLayerProvider>
               </ToastProvider>
             </AuthProvider>
