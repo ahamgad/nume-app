@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import {
   MetricHero,
   RecordRow,
@@ -150,7 +150,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
               aria-label={t("accounts.details.addRecord")}
             >
-              <Plus className="size-5" />
+              <Plus className={SCREEN_HEADER_ACTION_ICON_CLASS} />
             </button>
           ) : undefined
         }

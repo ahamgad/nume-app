@@ -23,6 +23,19 @@ interface ScreenHeaderProps {
   className?: string;
 }
 
+/** Inner bar — matches `h-14` touch layout across stack/tab headers. */
+export const SCREEN_HEADER_BAR_CLASS = "flex h-14 items-center px-2";
+
+/** Leading/trailing header icons — one step above default inline icons. */
+export const SCREEN_HEADER_ICON_CLASS = "size-7";
+
+/** Trailing header action icons (e.g. Plus) — one step above inline `size-5`. */
+export const SCREEN_HEADER_ACTION_ICON_CLASS = "size-6";
+
+/** Stack/tab header titles — one step above body default. */
+export const SCREEN_HEADER_TITLE_CLASS =
+  "min-w-0 flex-1 truncate px-1 text-lg font-semibold";
+
 export function ScreenHeader({
   title,
   mode = "tab",
@@ -44,7 +57,7 @@ export function ScreenHeader({
         className,
       )}
     >
-      <div className="flex h-14 items-center px-2">
+      <div className={SCREEN_HEADER_BAR_CLASS}>
         {mode === "stack" ? (
           <button
             type="button"
@@ -52,14 +65,12 @@ export function ScreenHeader({
             className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
             aria-label={t("common.back")}
           >
-            <ChevronLeft className="size-6 rtl:rotate-180" />
+            <ChevronLeft className={cn(SCREEN_HEADER_ICON_CLASS, "rtl:rotate-180")} />
           </button>
         ) : (
           <div className="size-11 shrink-0" />
         )}
-        <h1 className="min-w-0 flex-1 truncate px-1 text-base font-semibold">
-          {title}
-        </h1>
+        <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
         {rightAction ? (
           <div className="flex size-11 shrink-0 items-center justify-center">
             {rightAction}

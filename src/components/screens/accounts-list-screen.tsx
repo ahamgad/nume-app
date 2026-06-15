@@ -4,7 +4,7 @@ import { Landmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ function AddAccountHeaderAction({
       className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
       aria-label={label}
     >
-      <Plus className="size-5" />
+      <Plus className={SCREEN_HEADER_ACTION_ICON_CLASS} />
     </button>
   );
 }
