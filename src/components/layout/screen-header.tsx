@@ -6,7 +6,11 @@ import { type ReactNode, useCallback, useRef } from "react";
 
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
-import { getScreenBodyScrollPadding } from "@/lib/layout/screen-spacing";
+import { KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER } from "@/lib/layout/keyboard-snap-investigation";
+import {
+  getScreenBodyScrollPadding,
+  getScreenBodyTopPadding,
+} from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
@@ -31,8 +35,12 @@ export function ScreenHeader({
 
   return (
     <header
+      data-screen-header
       className={cn(
-        "z-30 shrink-0 border-b border-border bg-background pt-[env(safe-area-inset-top)]",
+        "border-b border-border bg-background pt-[env(safe-area-inset-top)]",
+        KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER
+          ? "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg"
+          : "z-30 shrink-0",
         className,
       )}
     >
@@ -108,9 +116,13 @@ export function ScreenBody({
     withTabBar,
     withStickyFooter,
   });
+  const topPadding = getScreenBodyTopPadding(
+    KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER,
+  );
 
   const scrollContainerClassName = cn(
-    "flex-1 min-h-0 overflow-x-hidden px-4 pt-4",
+    "flex-1 min-h-0 overflow-x-hidden px-4",
+    topPadding,
     "min-w-0 w-full max-w-full overscroll-y-contain",
     isModalOpen
       ? "overflow-hidden touch-none"

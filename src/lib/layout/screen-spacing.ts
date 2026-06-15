@@ -21,6 +21,16 @@ export const TAB_SCREEN_BOTTOM_PADDING =
 export const STICKY_FOOTER_BOTTOM_PADDING =
   "pb-[calc(5.5rem+env(safe-area-inset-bottom))]";
 
+/**
+ * Diagnostic: compensates for fixed ScreenHeader (h-14 + safe area + ScreenBody pt-4).
+ */
+export const FIXED_HEADER_BODY_TOP_PADDING =
+  "pt-[calc(3.5rem+env(safe-area-inset-top)+1rem)]";
+
+export function getScreenBodyTopPadding(fixedHeader: boolean): string {
+  return fixedHeader ? FIXED_HEADER_BODY_TOP_PADDING : "pt-4";
+}
+
 export function getScreenBodyScrollPadding(options: {
   withTabBar: boolean;
   withStickyFooter: boolean;

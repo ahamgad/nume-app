@@ -2,6 +2,13 @@
 
 import { useEffect } from "react";
 
+import {
+  captureLayoutSnapshot,
+  diffLayoutSnapshots,
+  LAYOUT_SHIFT_DIAGNOSTICS_ENABLED,
+  logLayoutSnapshot,
+} from "@/lib/layout/layout-shift-diagnostics";
+
 function documentScrollIsZero() {
   return (
     window.scrollY === 0 &&
@@ -11,6 +18,10 @@ function documentScrollIsZero() {
 }
 
 function resetDocumentScroll() {
+  const before = LAYOUT_SHIFT_DIAGNOSTICS_ENABLED
+    ? captureLayoutSnapshot("before-focus")
+    : null;
+
   if (window.scrollY !== 0) {
     window.scrollTo(0, 0);
   }
@@ -19,6 +30,12 @@ function resetDocumentScroll() {
   }
   if (document.body.scrollTop !== 0) {
     document.body.scrollTop = 0;
+  }
+
+  if (before && LAYOUT_SHIFT_DIAGNOSTICS_ENABLED) {
+    const after = captureLayoutSnapshot("document-scroll-guard-reset");
+    logLayoutSnapshot(after);
+    diffLayoutSnapshots(before, after);
   }
 }
 
