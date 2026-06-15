@@ -112,7 +112,7 @@ export function ScreenBody({
   const scrollContainerClassName = cn(
     "flex-1 min-h-0 overflow-x-hidden px-4 pt-4",
     "min-w-0 w-full max-w-full overscroll-y-contain",
-    "transition-[padding-bottom] duration-200 ease-out",
+    "transition-[padding-bottom] duration-200 ease-out data-[keyboard-open=true]:transition-none",
     isModalOpen
       ? "overflow-hidden touch-none"
       : "overflow-y-auto",

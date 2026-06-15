@@ -5,6 +5,7 @@ import { type RefObject, useEffect } from "react";
 import {
   applyKeyboardScrollInset,
   clearKeyboardScrollInset,
+  isKeyboardPresent,
   scrollInputIntoContainer,
 } from "@/lib/scroll/scroll-input-into-view";
 
@@ -27,6 +28,10 @@ function isInputInContainer(
 
 /**
  * Focus-scoped keyboard scroll support.
+ *
+ * Spec: scroll only when obscured; minimum delta; ScreenBody-only scroll;
+ * no movement while keyboard opens if the field is already visible; preserve
+ * scroll position on blur (padding cleared, scrollTop untouched).
  *
  * Lifecycle (keyboardInset forms only):
  *   focusin  → attach visualViewport.resize (once) → adjust padding + scroll
@@ -103,9 +108,13 @@ export function useFocusScrollIntoView(
       const scrollContainer = containerRef.current;
       if (!scrollContainer?.contains(target)) return;
 
+      // Wait until the keyboard is presenting — avoids false reads and early jumps.
+      if (!isKeyboardPresent()) return;
+
       if (keyboardInset) {
         applyKeyboardScrollInset(scrollContainer);
       }
+
       scrollInputIntoContainer(scrollContainer, target);
     }
 

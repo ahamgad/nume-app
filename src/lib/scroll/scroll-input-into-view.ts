@@ -41,6 +41,9 @@ export function getKeyboardOverlapPx(): number {
 /**
  * Scroll within the container only when the keyboard would obscure the focused
  * field — never uses scrollIntoView and never repositions already-visible fields.
+ *
+ * Uses instant scroll so each visualViewport frame stays aligned with the
+ * keyboard animation (Apple Notes–style). Minimum delta only; no centering.
  */
 export function scrollInputIntoContainer(
   container: HTMLElement,
@@ -60,6 +63,11 @@ export function scrollInputIntoContainer(
   }
 
   return delta > 0;
+}
+
+/** True when the on-screen keyboard is presenting (visual viewport shrunk). */
+export function isKeyboardPresent(): boolean {
+  return getKeyboardOverlapPx() > 0;
 }
 
 export function readContainerPaddingBottom(container: HTMLElement): number {
