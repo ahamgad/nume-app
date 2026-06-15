@@ -70,6 +70,7 @@ export function PickerBottomSheet({
     open,
     chromeRef,
     contentMeasureRef,
+    Boolean(search),
   );
 
   useModalLayerLock(open);
@@ -133,6 +134,7 @@ export function PickerBottomSheet({
           className="overflow-y-auto overscroll-y-contain px-2 py-2"
           style={{
             maxHeight: contentMaxHeightPx,
+            minHeight: search ? contentMaxHeightPx : undefined,
             paddingBottom: contentPaddingBottom,
           }}
         >

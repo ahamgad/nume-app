@@ -108,10 +108,15 @@ When search is shown:
 
 - No auto-focus, no automatic keyboard
 - Search pinned below title
+- **Height locked on open** — initial unfiltered content sets sheet height; filtering does not resize the sheet
 - Keyboard inset on content padding only
 - Manual focus uses `preventScroll`
 
 Selection is immediate on row tap (no Save).
+
+**Search-enabled pickers** (item count > 10): height is calculated once from initial unfiltered content and locked for the sheet session. Filtering and empty states do not resize the container.
+
+**Non-search pickers**: content-driven height with `ResizeObserver` — clamp(min, content, max).
 
 **Examples:** Institution pickers, interest destination, future category pickers.
 
