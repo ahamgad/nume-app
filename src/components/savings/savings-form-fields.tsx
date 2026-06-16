@@ -144,17 +144,13 @@ export function SavingsFormFields({
           accountType="savings_account"
           value={values.institution}
           disabled={disabled}
-          label={t("accounts.fields.institution.label")}
-          placeholder={t("accounts.fields.institution.placeholder")}
-          customLabel={t("institutions.customName.label")}
-          customPlaceholder={t("institutions.customName.placeholder")}
           onChange={(institution) => onChange({ institution })}
         />
 
         {mode === "create" ? (
           <EditableField
             id="savings-balance"
-            label={t("savings.fields.currentBalance.label")}
+            label={t("accounts.fields.balance.label")}
             mode="numeric"
             inputMode="decimal"
             value={values.balance}
@@ -200,7 +196,7 @@ export function SavingsFormFields({
         {values.interestModel === "fixed" ? (
           <EditableField
             id="savings-rate"
-            label={t("savings.fields.annualRate.label")}
+            label={t("accounts.fields.annualRate.label")}
             mode="numeric"
             inputMode="decimal"
             value={values.annualInterestRate}
@@ -273,7 +269,7 @@ export function SavingsFormFields({
                 />
                 <EditableField
                   id={`tier-rate-${index}`}
-                  label={t("savings.fields.annualRate.label")}
+                  label={t("accounts.fields.annualRate.label")}
                   mode="numeric"
                   inputMode="decimal"
                   value={tier.annualInterestRate}
@@ -364,8 +360,8 @@ export function SavingsFormFields({
           <>
             <AccountPicker
               id="savings-destination"
-              label={t("savings.fields.destinationAccount.label")}
-              placeholder={t("savings.fields.destinationAccount.label")}
+              label={t("accounts.fields.destinationAccount.label")}
+              placeholder={t("accounts.fields.destinationAccount.placeholder")}
               value={values.destinationAccountId || null}
               accounts={transferAccounts}
               disabled={disabled}

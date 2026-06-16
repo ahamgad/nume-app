@@ -120,6 +120,15 @@ export async function patchAccount(
     .eq("user_id", userId);
 
   if (error) throw error;
+
+  if (patch.currentBalance !== undefined) {
+    await updateSavingsCycleMinimum(
+      supabase,
+      userId,
+      id,
+      patch.currentBalance,
+    );
+  }
 }
 
 export async function archiveAccount(

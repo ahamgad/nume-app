@@ -60,9 +60,11 @@ export function isEditableMoneyAccountType(type: AccountType): boolean {
   return type === "current_account" || type === "wallet" || type === "cash";
 }
 
-/** Money accounts that support inline balance editing on the details screen. */
+/** Money accounts and savings that support inline balance editing on the details screen. */
 export function supportsQuickBalanceEdit(type: AccountType): boolean {
-  return isEditableMoneyAccountType(type);
+  return (
+    isEditableMoneyAccountType(type) || type === "savings_account"
+  );
 }
 
 export function showsBalanceField(

@@ -272,6 +272,13 @@ export const ar = {
       balance: {
         label: "الرصيد الحالي",
       },
+      annualRate: {
+        label: "المعدل السنوي",
+      },
+      destinationAccount: {
+        label: "حساب الوجهة",
+        placeholder: "اختر حسابًا",
+      },
       settings: {
         title: "إعدادات الحساب",
       },
@@ -403,7 +410,7 @@ export const ar = {
         label: "نموذج العائد",
       },
       annualRate: {
-        label: "معدل العائد السنوي",
+        label: "المعدل السنوي",
       },
       tiers: {
         label: "شرائح العائد",
@@ -472,7 +479,7 @@ export const ar = {
         placeholder: "مثال: وديعة 12 شهرًا",
       },
       institution: {
-        label: "اسم المؤسسة",
+        label: "المؤسسة",
         placeholder: "اختر المؤسسة",
       },
       principal: {
@@ -480,7 +487,7 @@ export const ar = {
         hint: "المبلغ المقفول في هذه الشهادة.",
       },
       rate: {
-        label: "معدل الفائدة السنوي (%)",
+        label: "المعدل السنوي",
         hint: "معدل سنوي ثابت قبل الضريبة.",
       },
       purchaseDate: {
@@ -546,7 +553,7 @@ export const ar = {
       summary: "الملخص",
       outcomes: "النتائج المتوقعة",
       principal: "المبلغ الأساسي",
-      rate: "معدل الفائدة السنوي",
+      rate: "المعدل السنوي",
       purchaseDate: "تاريخ الشراء",
       maturityDate: "تاريخ الاستحقاق",
       remaining: "المتبقي",

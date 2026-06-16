@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef } from "react";
@@ -11,6 +12,7 @@ import {
   getScreenBodyScrollPadding,
   getScreenBodyTopPadding,
 } from "@/lib/layout/screen-spacing";
+import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
@@ -95,6 +97,7 @@ export function ScreenLayout({ children }: { children: ReactNode }) {
 interface ScreenBodyProps {
   children: ReactNode;
   className?: string;
+  /** When omitted, inferred from the current route (tab bar visible or not). */
   withTabBar?: boolean;
   withStickyFooter?: boolean;
   onRefresh?: () => Promise<void>;
@@ -103,14 +106,17 @@ interface ScreenBodyProps {
 export function ScreenBody({
   children,
   className,
-  withTabBar = true,
+  withTabBar,
   withStickyFooter = false,
   onRefresh,
 }: ScreenBodyProps) {
+  const pathname = usePathname();
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
 
   useFocusScrollIntoView(scrollRef, !isModalOpen, withStickyFooter);
+
+  const tabBarVisible = withTabBar ?? isTabBarVisible(pathname);
 
   const {
     elementRef,
@@ -124,7 +130,7 @@ export function ScreenBody({
   } = usePullToRefresh(onRefresh);
 
   const scrollPadding = getScreenBodyScrollPadding({
-    withTabBar,
+    tabBarVisible,
     withStickyFooter,
   });
   const topPadding = getScreenBodyTopPadding(

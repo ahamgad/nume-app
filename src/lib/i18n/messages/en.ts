@@ -272,6 +272,13 @@ export const en = {
       balance: {
         label: "Current balance",
       },
+      annualRate: {
+        label: "Annual rate",
+      },
+      destinationAccount: {
+        label: "Destination account",
+        placeholder: "Select account",
+      },
       settings: {
         title: "Account settings",
       },
@@ -403,7 +410,7 @@ export const en = {
         label: "Interest model",
       },
       annualRate: {
-        label: "Annual interest rate",
+        label: "Annual rate",
       },
       tiers: {
         label: "Interest tiers",
@@ -472,7 +479,7 @@ export const en = {
         placeholder: "e.g. 12-month CD",
       },
       institution: {
-        label: "Institution name",
+        label: "Institution",
         placeholder: "Select institution",
       },
       principal: {
@@ -480,7 +487,7 @@ export const en = {
         hint: "The amount locked in this certificate.",
       },
       rate: {
-        label: "Annual interest rate (%)",
+        label: "Annual rate",
         hint: "Fixed annual rate before tax.",
       },
       purchaseDate: {
@@ -546,7 +553,7 @@ export const en = {
       summary: "Summary",
       outcomes: "Expected outcomes",
       principal: "Principal",
-      rate: "Annual interest rate",
+      rate: "Annual rate",
       purchaseDate: "Purchase date",
       maturityDate: "Maturity date",
       remaining: "Remaining",

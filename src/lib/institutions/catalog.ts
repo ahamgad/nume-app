@@ -176,11 +176,10 @@ export function getAllowedCategories(
 ): InstitutionCategory[] {
   switch (context) {
     case "current_account":
-      return ["bank", "financial_service"];
+      return ["bank"];
     case "wallet":
       return ["financial_service"];
     case "certificate":
-      return ["bank"];
     case "savings_account":
       return ["bank", "financial_service"];
     case "cash":

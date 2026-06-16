@@ -3,11 +3,12 @@
 import {
   BadgePercent,
   Banknote,
-  CircleDollarSign,
   CreditCard,
+  Gem,
+  Hand,
+  Hourglass,
   Landmark,
   LineChart,
-  Vault,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -21,10 +22,10 @@ const ACCOUNT_TYPE_ICONS: Partial<Record<AccountType, LucideIcon>> = {
   current_account: Landmark,
   cash: Banknote,
   wallet: Wallet,
-  savings_account: Vault,
+  savings_account: Hourglass,
   certificate: BadgePercent,
-  gold: CircleDollarSign,
-  loan: CircleDollarSign,
+  gold: Gem,
+  loan: Hand,
   credit_card: CreditCard,
   stocks: LineChart,
 };

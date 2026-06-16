@@ -189,7 +189,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
         {!isArchived ? (
           <AccountDetailActions
-            editLabel={t("accounts.details.edit")}
+            editLabel={t("accounts.edit.title")}
             archiveLabel={t("accounts.details.archiveAccount")}
             disabled={archiving}
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}

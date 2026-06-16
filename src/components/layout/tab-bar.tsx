@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useT } from "@/providers/i18n-provider";
+import { isStackScreen } from "@/lib/layout/tab-bar-visibility";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -24,14 +25,6 @@ const tabs = [
 function isTabActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function isStackScreen(pathname: string) {
-  return (
-    pathname.startsWith("/accounts/") ||
-    pathname.startsWith("/more/") ||
-    pathname.includes("/records/")
-  );
 }
 
 export function TabBar() {

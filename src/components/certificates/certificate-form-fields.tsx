@@ -114,10 +114,6 @@ export function CertificateFormFields({
           accountType="certificate"
           value={values.institution}
           disabled={disabled}
-          label={t("certificates.fields.institution.label")}
-          placeholder={t("certificates.fields.institution.placeholder")}
-          customLabel={t("institutions.customName.label")}
-          customPlaceholder={t("institutions.customName.placeholder")}
           onChange={(institution) => onChange({ institution })}
         />
 
@@ -174,7 +170,7 @@ export function CertificateFormFields({
       >
         <EditableField
           id="certificate-rate"
-          label={t("certificates.fields.rate.label")}
+          label={t("accounts.fields.annualRate.label")}
           mode="numeric"
           inputMode="decimal"
           value={values.annualInterestRate}

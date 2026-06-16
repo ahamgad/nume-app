@@ -10,16 +10,17 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
-import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
+import { ToggleSettingRow } from "@/components/patterns";
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
+import { formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -182,16 +183,17 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           </div>
         </div>
 
-        <WidgetCard>
-          <MetricHero
-            label={t("accounts.details.currentBalance")}
-            amount={account.currentBalance}
-            locale={formatLocale}
-            meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t, formatLocale),
-            })}
-          />
-        </WidgetCard>
+        <BalanceMetricCard
+          account={account}
+          label={t("accounts.details.currentBalance")}
+          meta={t("dashboard.netWorth.updated", {
+            time: formatRelativeTime(account.updatedAt, t, formatLocale),
+          })}
+          editable={!isArchived}
+          onBalanceSave={async (balance) => {
+            await updateAccount(account.id, { currentBalance: balance });
+          }}
+        />
 
         {!isArchived ? (
           <AccountDetailActions
@@ -216,7 +218,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
                   : "savings.interestModel.tiered",
               )}
             />
-            <DetailRow label={t("savings.details.annualRate")} value={rateLabel} />
+            <DetailRow label={t("accounts.fields.annualRate.label")} value={rateLabel} />
             <DetailRow
               label={t("savings.details.nextPosting")}
               value={

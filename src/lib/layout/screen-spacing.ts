@@ -1,25 +1,31 @@
 /**
  * Shared screen layout spacing (NUME v1).
  *
- * Tab screens reserve space for the fixed tab bar + safe area.
- * Stack screens (no tab bar) use the same bottom inset so content never
- * sits flush against the device edge.
+ * All scrollable in-app screens use the same bottom inset so content never
+ * feels flush with the bottom edge. Tab-root screens reserve this space for
+ * the fixed tab bar; stack screens use the same inset for perceived consistency.
  */
 
 /** Matches TabBar `h-14` (3.5rem). */
 export const TAB_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Bottom inset for stack/detail screens without the tab bar visible. */
-export const STACK_SCREEN_BOTTOM_PADDING =
+/** Standard scroll padding — tab bar height + safe area. */
+export const TAB_BAR_SCROLL_PADDING =
   "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";
 
-/** Bottom inset for tab-root screens (tab bar + breathing room). */
-export const TAB_SCREEN_BOTTOM_PADDING =
-  "pb-[calc(4.5rem+env(safe-area-inset-bottom))]";
+/** @deprecated Use {@link TAB_BAR_SCROLL_PADDING}. */
+export const TAB_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;
 
-/** Bottom inset when a sticky footer action bar is present. */
+/** Stack/detail screens use the same inset for consistent bottom breathing room. */
+export const STACK_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;
+
+/** Bottom inset when a sticky footer action bar is present (no tab bar). */
 export const STICKY_FOOTER_BOTTOM_PADDING =
   "pb-[calc(5.5rem+env(safe-area-inset-bottom))]";
+
+/** Sticky footer + fixed tab bar. */
+export const STICKY_FOOTER_TAB_BAR_PADDING =
+  "pb-[calc(9rem+env(safe-area-inset-bottom))]";
 
 /**
  * Diagnostic: compensates for fixed ScreenHeader (h-14 + safe area + ScreenBody pt-4).
@@ -32,10 +38,14 @@ export function getScreenBodyTopPadding(fixedHeader: boolean): string {
 }
 
 export function getScreenBodyScrollPadding(options: {
-  withTabBar: boolean;
+  tabBarVisible: boolean;
   withStickyFooter: boolean;
 }): string {
-  if (options.withStickyFooter) return STICKY_FOOTER_BOTTOM_PADDING;
-  if (options.withTabBar) return TAB_SCREEN_BOTTOM_PADDING;
+  if (options.withStickyFooter) {
+    return options.tabBarVisible
+      ? STICKY_FOOTER_TAB_BAR_PADDING
+      : STICKY_FOOTER_BOTTOM_PADDING;
+  }
+  if (options.tabBarVisible) return TAB_BAR_SCROLL_PADDING;
   return STACK_SCREEN_BOTTOM_PADDING;
 }

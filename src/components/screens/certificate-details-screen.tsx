@@ -265,7 +265,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
             <DetailRow
-              label={t("certificates.details.rate")}
+              label={t("accounts.fields.annualRate.label")}
               value={`${certificate.annualInterestRate}%`}
             />
             <DetailRow

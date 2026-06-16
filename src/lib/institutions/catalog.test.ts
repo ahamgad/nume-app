@@ -4,6 +4,7 @@ import {
   formatInstitutionDisplay,
   formatInstitutionEntityLabel,
   formatInstitutionShortcut,
+  getAllowedCategories,
   institutionMatchesSearch,
 } from "@/lib/institutions/catalog";
 
@@ -31,6 +32,23 @@ describe("formatInstitutionEntityLabel", () => {
     expect(formatInstitutionDisplay(value, t)).toBe("Banque Misr");
     expect(formatInstitutionShortcut(value, t)).toBe("Banque Misr");
     expect(formatInstitutionDisplay(value, t)).not.toContain(" · ");
+  });
+});
+
+describe("getAllowedCategories", () => {
+  it("limits current accounts to banks only", () => {
+    expect(getAllowedCategories("current_account")).toEqual(["bank"]);
+  });
+
+  it("includes banks and financial services for savings and certificates", () => {
+    expect(getAllowedCategories("savings_account")).toEqual([
+      "bank",
+      "financial_service",
+    ]);
+    expect(getAllowedCategories("certificate")).toEqual([
+      "bank",
+      "financial_service",
+    ]);
   });
 });
 
