@@ -1,28 +1,26 @@
 "use client";
 
-import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
+import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
-import { renewalTypeLabel } from "@/components/certificates/renewal-type-picker";
 import { countDueEntries } from "@/lib/certificates/certificate-insights";
 import {
   computeCertificateMetrics,
-  calculatePayoutAmount,
+  formatCertificateRemainingLabel,
 } from "@/lib/certificates/certificate-engine";
 import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
 import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
-import { formatDisplayDate, todayIsoDate } from "@/lib/format/date";
+import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { CertificateScheduleStatus } from "@/lib/certificates/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -39,13 +37,6 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <span className="text-end text-[0.9375rem] font-medium tabular-nums">{value}</span>
     </div>
   );
-}
-
-function scheduleStatusLabel(
-  status: CertificateScheduleStatus,
-  t: ReturnType<typeof useT>,
-): string {
-  return t(`certificates.schedule.status.${status}` as TranslationKey);
 }
 
 export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreenProps) {
@@ -161,26 +152,11 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   }
 
   const statusKey = `certificates.status.${certificate.status}` as TranslationKey;
-  const remainingDaysValue =
-    metrics.remainingDays === 1
-      ? t("certificates.details.remainingDayCount")
-      : t("certificates.details.remainingDaysCount", {
-          count: metrics.remainingDays,
-        });
-
-  const nextPayoutLabel =
-    certificate.payoutFrequency === "instantly"
-      ? t("certificates.details.upfrontPayout")
-      : t("certificates.details.nextPayoutDate");
-
-  const nextPayoutValue =
-    certificate.payoutFrequency === "instantly"
-      ? formatDisplayDate(certificate.purchaseDate, formatLocale)
-      : certificate.nextInterestDate
-        ? formatDisplayDate(certificate.nextInterestDate, formatLocale)
-        : metrics.nextPayoutDate
-          ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
-          : t("certificates.details.noNextPayout");
+  const remainingValue = formatCertificateRemainingLabel(
+    metrics.maturityDate,
+    todayIsoDate(),
+    t,
+  );
 
   const destinationAccount = certificate.destinationAccountId
     ? accounts.find((item) => item.id === certificate.destinationAccountId) ?? null
@@ -189,13 +165,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const destinationDisplay = destinationAccount
     ? formatAccountDestinationDisplay(destinationAccount, t)
     : t("certificates.details.interestPayout.notSelected");
-
-  const payoutAmount = calculatePayoutAmount(
-    certificate.principalAmount,
-    certificate.annualInterestRate,
-    certificate.termMonths,
-    certificate.payoutFrequency,
-  );
 
   const isArchived = account.status === "archived";
   const canProcessInterest = certificate.status === "active" && dueCount > 0;
@@ -239,8 +208,21 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           <MetricHero
             label={t("certificates.details.principal")}
             value={formatCurrency(certificate.principalAmount, formatLocale)}
+            meta={t("dashboard.netWorth.updated", {
+              time: formatRelativeTime(account.updatedAt, t, formatLocale),
+            })}
           />
         </WidgetCard>
+
+        {!isArchived ? (
+          <AccountDetailActions
+            editLabel={t("certificates.details.edit")}
+            archiveLabel={t("certificates.details.archive")}
+            disabled={archiving}
+            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
+            onArchive={() => setShowArchiveConfirm(true)}
+          />
+        ) : null}
 
         {canProcessInterest ? (
           <Button
@@ -253,61 +235,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               : t("certificates.details.processInterest.action")}
           </Button>
         ) : null}
-
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.interestSummary.title")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("certificates.details.interestSummary.totalExpected")}
-              value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.interestSummary.totalProcessed")}
-              value={formatCurrency(scheduleSummary.totalProcessedInterest, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.interestSummary.remaining")}
-              value={formatCurrency(scheduleSummary.remainingInterest, formatLocale)}
-            />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.interestSchedule.title")}
-          </h2>
-          {schedules.length === 0 ? (
-            <p className="text-[0.9375rem] text-muted-foreground">
-              {t("certificates.details.interestSchedule.empty")}
-            </p>
-          ) : (
-            <div className="divide-y divide-border rounded-lg border border-border px-4">
-              {schedules.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex items-start justify-between gap-4 py-3"
-                >
-                  <div className="min-w-0">
-                    <p className="text-[0.9375rem] font-medium tabular-nums">
-                      {formatDisplayDate(entry.dueDate, formatLocale)}
-                    </p>
-                    <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
-                      {scheduleStatusLabel(entry.status, t)}
-                      {entry.transferFailed
-                        ? ` · ${t("certificates.details.interestSchedule.transferFailed")}`
-                        : null}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-[0.9375rem] font-medium tabular-nums">
-                    {formatCurrency(entry.interestAmount, formatLocale)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
@@ -327,26 +254,10 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={formatDisplayDate(metrics.maturityDate, formatLocale)}
             />
             <DetailRow
-              label={t("certificates.details.remainingDays")}
-              value={remainingDaysValue}
+              label={t("certificates.details.remaining")}
+              value={remainingValue}
             />
             <DetailRow label={t("certificates.details.status")} value={t(statusKey)} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.renewal.title")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("certificates.details.renewal.type")}
-              value={renewalTypeLabel(certificate.renewalType, t)}
-            />
-            <DetailRow
-              label={t("certificates.details.renewal.status")}
-              value={t(statusKey)}
-            />
           </div>
         </section>
 
@@ -356,12 +267,12 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
             <DetailRow
-              label={t("certificates.details.interestPayout.frequency")}
-              value={t(payoutFrequencyKey)}
+              label={t("certificates.details.interestPayout.totalExpected")}
+              value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
             />
             <DetailRow
-              label={t("certificates.details.interestPayout.amount")}
-              value={formatCurrency(payoutAmount, formatLocale)}
+              label={t("certificates.details.interestPayout.frequency")}
+              value={t(payoutFrequencyKey)}
             />
             <DetailRow
               label={t("certificates.details.interestPayout.destination")}
@@ -369,34 +280,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             />
           </div>
         </section>
-
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.outcomes")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("certificates.details.expectedProfit")}
-              value={formatCurrency(metrics.expectedProfit, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.expectedTotalReturn")}
-              value={formatCurrency(metrics.expectedTotalReturn, formatLocale)}
-            />
-            <DetailRow label={nextPayoutLabel} value={nextPayoutValue} />
-          </div>
-        </section>
-
-        {!isArchived ? (
-          <Button
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => router.push(`/accounts/${account.id}/edit`)}
-          >
-            <Pencil className="me-2 size-4" />
-            {t("certificates.details.edit")}
-          </Button>
-        ) : null}
 
         {!isArchived ? (
           <section>
@@ -429,13 +312,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                 />
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="mt-4 h-11 w-full text-destructive hover:text-destructive"
-              onClick={() => setShowArchiveConfirm(true)}
-            >
-              {t("certificates.details.archive")}
-            </Button>
           </section>
         ) : null}
       </ScreenBody>

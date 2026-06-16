@@ -3,6 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateMaturityDate } from "@/lib/certificates/certificate-engine";
 import { generateAndPersistSchedule } from "@/lib/certificates/schedule-service";
 import { mapCertificate, type DbCertificate } from "@/lib/certificates/mappers";
+import {
+  supportsRenewalTypeColumn,
+  isMissingRenewalTypeColumnError,
+} from "@/lib/certificates/schema-support";
 import type {
   Certificate,
   CreateCertificateInput,
@@ -127,24 +131,47 @@ export async function createCertificate(
     throw new Error(getSupabaseErrorMessage(accountError));
   }
 
+  const renewalTypeSupported = await supportsRenewalTypeColumn(supabase);
+  const certificateInsert: Record<string, unknown> = {
+    user_id: user.id,
+    account_id: accountRow.id,
+    principal_amount: input.principalAmount,
+    annual_interest_rate: input.annualInterestRate,
+    purchase_date: input.purchaseDate,
+    term_months: input.termMonths,
+    maturity_date: maturityDate,
+    payout_frequency: input.payoutFrequency,
+    destination_account_id: input.destinationAccountId ?? null,
+    auto_apply: input.autoApply ?? false,
+    status: "active",
+  };
+
+  if (renewalTypeSupported) {
+    certificateInsert.renewal_type = input.renewalType ?? "none";
+  }
+
   const { data: certificateRow, error: certificateError } = await supabase
     .from("certificates")
-    .insert({
-      user_id: user.id,
-      account_id: accountRow.id,
-      principal_amount: input.principalAmount,
-      annual_interest_rate: input.annualInterestRate,
-      purchase_date: input.purchaseDate,
-      term_months: input.termMonths,
-      maturity_date: maturityDate,
-      payout_frequency: input.payoutFrequency,
-      destination_account_id: input.destinationAccountId ?? null,
-      auto_apply: input.autoApply ?? false,
-      renewal_type: input.renewalType ?? "none",
-      status: "active",
-    })
+    .insert(certificateInsert)
     .select("*")
     .single();
+
+  if (certificateError && isMissingRenewalTypeColumnError(certificateError)) {
+    delete certificateInsert.renewal_type;
+    const retry = await supabase
+      .from("certificates")
+      .insert(certificateInsert)
+      .select("*")
+      .single();
+    if (retry.error) {
+      await supabase.from("accounts").delete().eq("id", accountRow.id).eq("user_id", userId);
+      throw new Error(getSupabaseErrorMessage(retry.error));
+    }
+    const certificate = mapCertificate(retry.data as DbCertificate);
+    await generateAndPersistSchedule(supabase, userId, certificate);
+    const refreshed = await getCertificate(supabase, userId, certificate.id);
+    return refreshed ?? certificate;
+  }
 
   if (certificateError) {
     await supabase.from("accounts").delete().eq("id", accountRow.id).eq("user_id", userId);
@@ -190,7 +217,9 @@ export async function updateCertificate(
     if (existing.status !== "active") {
       throw new Error("Renewal configuration cannot change on inactive certificates");
     }
-    certificatePayload.renewal_type = input.renewalType;
+    if (await supportsRenewalTypeColumn(supabase)) {
+      certificatePayload.renewal_type = input.renewalType;
+    }
   }
 
   if (input.principalAmount !== undefined) {

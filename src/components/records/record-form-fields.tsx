@@ -5,9 +5,8 @@ import { useMemo } from "react";
 import { EditableField } from "@/components/field-editor";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { DateField } from "@/components/ui/date-field";
-import {
-  filterTransferAccounts,
-} from "@/lib/finance/account-capabilities";
+import { Label } from "@/components/ui/label";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import type { RecordFormValues } from "@/lib/finance/record-form";
 import { validateRecordAmountField } from "@/lib/finance/record-form";
 import type { Account, RecordType } from "@/lib/finance/types";
@@ -31,6 +30,38 @@ interface RecordFormFieldsProps {
   onClearError: (field: string) => void;
 }
 
+function RecordDateField({
+  value,
+  error,
+  disabled,
+  formatLocale,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  disabled?: boolean;
+  formatLocale: string;
+  onChange: (date: string) => void;
+}) {
+  const t = useT();
+
+  return (
+    <div className="min-w-0 w-full max-w-full space-y-2">
+      <Label htmlFor="record-date">{t("records.fields.date")}</Label>
+      <DateField
+        id="record-date"
+        value={value}
+        locale={formatLocale}
+        label={t("records.fields.date")}
+        disabled={disabled}
+        onChange={onChange}
+        aria-invalid={Boolean(error)}
+      />
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
 export function RecordFormFields({
   type,
   values,
@@ -45,11 +76,6 @@ export function RecordFormFields({
   const t = useT();
   const formatLocale = useFormatLocale();
   const parsedAmount = parseAmount(values.amount);
-
-  const transferAccounts = useMemo(
-    () => filterTransferAccounts(accounts),
-    [accounts],
-  );
 
   const fromAccounts = useMemo(
     () =>
@@ -140,6 +166,17 @@ export function RecordFormFields({
         </p>
       ) : null}
 
+      <RecordDateField
+        value={values.date}
+        error={errors.date}
+        disabled={disabled}
+        formatLocale={formatLocale}
+        onChange={(date) => {
+          onChange({ date });
+          onClearError("date");
+        }}
+      />
+
       {type === "transfer" ? (
         <>
           <AccountPicker
@@ -184,23 +221,6 @@ export function RecordFormFields({
         disabled={disabled}
         onSave={(description) => onChange({ description })}
       />
-
-      <div className="min-w-0 w-full max-w-full space-y-2">
-        <DateField
-          id="record-date"
-          value={values.date}
-          locale={formatLocale}
-          label={t("records.fields.date")}
-          onChange={(date) => {
-            onChange({ date });
-            onClearError("date");
-          }}
-          aria-invalid={Boolean(errors.date)}
-        />
-        {errors.date ? (
-          <p className="text-sm text-destructive">{errors.date}</p>
-        ) : null}
-      </div>
 
       {preview && parsedAmount !== null && type !== "transfer" ? (
         <div className="space-y-1">

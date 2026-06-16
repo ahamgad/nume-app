@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 
 import {
   MoneyAccountFormFields,
-  showsBalanceField,
   type MoneyAccountFormValues,
 } from "@/components/accounts/money-account-form-fields";
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
@@ -145,13 +144,11 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       nextErrors.name = t("accounts.validation.nameRequired");
     }
 
-    if (showsBalanceField(type)) {
-      const parsedBalance = parseAmount(moneyValues.balance);
-      if (parsedBalance === null) {
-        nextErrors.balance = t("accounts.validation.balanceRequired");
-      } else if (parsedBalance < 0) {
-        nextErrors.balance = t("accounts.validation.balanceNegative");
-      }
+    const parsedBalance = parseAmount(moneyValues.balance);
+    if (parsedBalance === null) {
+      nextErrors.balance = t("accounts.validation.balanceRequired");
+    } else if (parsedBalance < 0) {
+      nextErrors.balance = t("accounts.validation.balanceNegative");
     }
 
     setErrors(nextErrors);
@@ -207,9 +204,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
     const moneyType = accountType as MoneyAccountType;
     if (!validateMoneyForm(moneyType)) return;
 
-    const parsedBalance = showsBalanceField(moneyType)
-      ? parseAmount(moneyValues.balance)
-      : 0;
+    const parsedBalance = parseAmount(moneyValues.balance);
     if (parsedBalance === null) return;
 
     setSubmitting(true);
@@ -217,7 +212,8 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       const account = await createAccount({
         type: moneyType,
         name: moneyValues.name,
-        institution: moneyValues.institution.trim() || null,
+        institution:
+          moneyType === "cash" ? null : moneyValues.institution.trim() || null,
         currentBalance: parsedBalance,
       });
       showToast(t("common.accountCreated"));

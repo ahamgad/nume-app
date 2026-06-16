@@ -3,12 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { MoneyAccountFormFields } from "@/components/accounts/money-account-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { EditableField } from "@/components/field-editor";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
@@ -17,14 +16,12 @@ import {
   validateMoneyAccountForm,
   type MoneyAccountFormValues,
 } from "@/lib/finance/account-form";
-import {
-  shouldShowInstitutionPicker,
-  type InstitutionPickerContext,
-} from "@/lib/institutions/catalog";
-import { validateAccountNameField } from "@/lib/field-editor/field-validators";
+import type { MoneyAccountType } from "@/lib/finance/types";
+import { parseAmount } from "@/lib/format/currency";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
-import { useT } from "@/providers/i18n-provider";
+import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
 interface EditAccountScreenProps {
@@ -37,10 +34,12 @@ function EditAccountForm({
   initialValues,
 }: {
   accountId: string;
-  accountType: "current_account" | "wallet" | "cash";
+  accountType: MoneyAccountType;
   initialValues: MoneyAccountFormValues;
 }) {
   const t = useT();
+  const locale = useLocale();
+  const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
   const { updateAccount } = useFinance();
@@ -50,8 +49,7 @@ function EditAccountForm({
   const [submitting, setSubmitting] = useState(false);
   const [showDiscard, setShowDiscard] = useState(false);
 
-  const isDirty = isMoneyAccountFormDirty(values, initialValues);
-  const showInstitution = shouldShowInstitutionPicker(accountType);
+  const isDirty = isMoneyAccountFormDirty(values, initialValues, accountType);
 
   const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
@@ -71,11 +69,19 @@ function EditAccountForm({
 
     setSubmitting(true);
     try {
-      await updateAccount(accountId, {
+      const patch: Parameters<typeof updateAccount>[1] = {
         name: values.name.trim(),
         institution:
           accountType === "cash" ? null : values.institution.trim() || null,
-      });
+      };
+
+      if (accountType === "cash") {
+        const parsedBalance = parseAmount(values.balance);
+        if (parsedBalance === null) return;
+        patch.currentBalance = parsedBalance;
+      }
+
+      await updateAccount(accountId, patch);
       showToast(t("accounts.edit.success"));
       router.replace(`/accounts/${accountId}`);
     } catch (error) {
@@ -108,37 +114,17 @@ function EditAccountForm({
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <div className="space-y-5 pt-2">
-          <EditableField
-            id="edit-account-name"
-            label={t("accounts.fields.name.label")}
-            value={values.name}
-            placeholder={t("accounts.fields.name.placeholder")}
+        <div className="space-y-6 pt-2">
+          <MoneyAccountFormFields
+            accountType={accountType}
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
             disabled={submitting}
-            error={errors.name}
-            validate={(name) => validateAccountNameField(name, t)}
-            onSave={(name) => {
-              setValues((current) => ({ ...current, name }));
-              clearFieldError("name");
-            }}
+            mode="edit"
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
           />
-
-          {showInstitution ? (
-            <InstitutionPicker
-              id="edit-account-institution"
-              accountType={accountType as InstitutionPickerContext}
-              value={values.institution}
-              disabled={submitting}
-              onChange={(institution) => {
-                setValues((current) => ({ ...current, institution }));
-                clearFieldError("institution");
-              }}
-            />
-          ) : null}
-
-          {errors.institution ? (
-            <p className="text-sm text-destructive">{errors.institution}</p>
-          ) : null}
           {errors.form ? (
             <p className="text-sm text-destructive">{errors.form}</p>
           ) : null}
@@ -173,7 +159,14 @@ export function EditAccountScreen({ accountId }: EditAccountScreenProps) {
 
   const initialValues = useMemo(() => {
     if (!account) return null;
-    return moneyAccountFormValuesFromAccount(account);
+    if (
+      account.type !== "current_account" &&
+      account.type !== "wallet" &&
+      account.type !== "cash"
+    ) {
+      return null;
+    }
+    return moneyAccountFormValuesFromAccount(account, account.type);
   }, [account]);
 
   if (!isFinanceReady) {
@@ -187,13 +180,7 @@ export function EditAccountScreen({ accountId }: EditAccountScreenProps) {
     );
   }
 
-  if (
-    !account ||
-    !initialValues ||
-    (account.type !== "current_account" &&
-      account.type !== "wallet" &&
-      account.type !== "cash")
-  ) {
+  if (!account || !initialValues) {
     return (
       <>
         <ScreenHeader
@@ -214,7 +201,7 @@ export function EditAccountScreen({ accountId }: EditAccountScreenProps) {
     <EditAccountForm
       key={account.id}
       accountId={accountId}
-      accountType={account.type}
+      accountType={account.type as MoneyAccountType}
       initialValues={initialValues}
     />
   );

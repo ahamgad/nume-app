@@ -4,13 +4,13 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
-  Pencil,
   Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
+import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import {
   MetricHero,
@@ -182,14 +182,13 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         </WidgetCard>
 
         {!isArchived ? (
-          <Button
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => router.push(`/accounts/${account.id}/edit`)}
-          >
-            <Pencil className="me-2 size-4" />
-            {t("accounts.details.edit")}
-          </Button>
+          <AccountDetailActions
+            editLabel={t("accounts.details.edit")}
+            archiveLabel={t("accounts.details.archiveAccount")}
+            disabled={archiving}
+            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
+            onArchive={() => setShowArchiveConfirm(true)}
+          />
         ) : null}
 
         {!isArchived ? (
@@ -221,13 +220,6 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 />
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="mt-4 h-11 w-full text-destructive hover:text-destructive"
-              onClick={() => setShowArchiveConfirm(true)}
-            >
-              {t("accounts.details.archiveAccount")}
-            </Button>
           </section>
         ) : (
           <Button

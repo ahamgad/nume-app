@@ -4,6 +4,7 @@ import type {
   ComputedCertificateMetrics,
   PayoutFrequency,
 } from "@/lib/certificates/types";
+import type { TranslationKey } from "@/lib/i18n";
 import { todayIsoDate } from "@/lib/format/date";
 
 const MS_PER_DAY = 86_400_000;
@@ -156,6 +157,45 @@ export function calculateRemainingDays(
   const asOf = parseIsoDate(asOfDate).getTime();
   const diff = Math.ceil((maturity - asOf) / MS_PER_DAY);
   return Math.max(0, diff);
+}
+
+function calendarMonthsBetween(fromIso: string, toIso: string): number {
+  const from = parseIsoDate(fromIso);
+  const to = parseIsoDate(toIso);
+  let months =
+    (to.getUTCFullYear() - from.getUTCFullYear()) * 12 +
+    (to.getUTCMonth() - from.getUTCMonth());
+  if (to.getUTCDate() < from.getUTCDate()) {
+    months -= 1;
+  }
+  return Math.max(0, months);
+}
+
+export function formatCertificateRemainingLabel(
+  maturityDate: string,
+  asOfDate: string,
+  t: (key: TranslationKey, params?: Record<string, number>) => string,
+): string {
+  const remainingDays = calculateRemainingDays(maturityDate, asOfDate);
+
+  if (remainingDays <= 30) {
+    return remainingDays === 1
+      ? t("certificates.details.remainingDayCount")
+      : t("certificates.details.remainingDaysCount", { count: remainingDays });
+  }
+
+  const months = calendarMonthsBetween(asOfDate, maturityDate);
+  if (months >= 12 && months % 12 === 0) {
+    const years = months / 12;
+    return years === 1
+      ? t("certificates.details.remainingYearCount")
+      : t("certificates.details.remainingYearsCount", { count: years });
+  }
+
+  const displayMonths = Math.max(1, months);
+  return displayMonths === 1
+    ? t("certificates.details.remainingMonthCount")
+    : t("certificates.details.remainingMonthsCount", { count: displayMonths });
 }
 
 export function computeCertificateMetrics(

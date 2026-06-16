@@ -28,12 +28,21 @@ interface MoneyAccountFormFieldsProps {
   errors: Record<string, string>;
   amountInputLocale: string;
   disabled?: boolean;
+  mode?: "create" | "edit";
   onChange: (patch: Partial<MoneyAccountFormValues>) => void;
   onClearError: (field: string) => void;
 }
 
-export function showsBalanceField(accountType: MoneyAccountType): boolean {
+export function showsInstitutionField(accountType: MoneyAccountType): boolean {
   return accountType !== "cash";
+}
+
+export function showsBalanceField(
+  accountType: MoneyAccountType,
+  mode: "create" | "edit" = "create",
+): boolean {
+  if (mode === "create") return true;
+  return accountType === "cash";
 }
 
 export function MoneyAccountFormFields({
@@ -42,14 +51,13 @@ export function MoneyAccountFormFields({
   errors,
   amountInputLocale,
   disabled = false,
+  mode = "create",
   onChange,
   onClearError,
 }: MoneyAccountFormFieldsProps) {
   const t = useT();
-  const showInstitutionPicker = shouldShowInstitutionPicker(
-    accountType as InstitutionPickerContext,
-  );
-  const showBalance = showsBalanceField(accountType);
+  const showInstitution = showsInstitutionField(accountType);
+  const showBalance = showsBalanceField(accountType, mode);
 
   return (
     <FormSection title={t("accounts.formSections.accountDetails")}>
@@ -67,25 +75,27 @@ export function MoneyAccountFormFields({
         }}
       />
 
-      {showInstitutionPicker ? (
-        <InstitutionPicker
-          key={accountType}
-          id="account-institution"
-          accountType={accountType as InstitutionPickerContext}
-          value={values.institution}
-          disabled={disabled}
-          onChange={(institution) => onChange({ institution })}
-        />
-      ) : (
-        <EditableField
-          id="account-institution"
-          label={t("accounts.fields.institution.label")}
-          value={values.institution}
-          placeholder={t("accounts.fields.institution.placeholder")}
-          disabled={disabled}
-          onSave={(institution) => onChange({ institution })}
-        />
-      )}
+      {showInstitution ? (
+        shouldShowInstitutionPicker(accountType as InstitutionPickerContext) ? (
+          <InstitutionPicker
+            key={accountType}
+            id="account-institution"
+            accountType={accountType as InstitutionPickerContext}
+            value={values.institution}
+            disabled={disabled}
+            onChange={(institution) => onChange({ institution })}
+          />
+        ) : (
+          <EditableField
+            id="account-institution"
+            label={t("accounts.fields.institution.label")}
+            value={values.institution}
+            placeholder={t("accounts.fields.institution.placeholder")}
+            disabled={disabled}
+            onSave={(institution) => onChange({ institution })}
+          />
+        )
+      ) : null}
 
       {showBalance ? (
         <EditableField
