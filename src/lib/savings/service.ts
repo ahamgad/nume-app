@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { buildDailyBusinessDayContext, usesBusinessDayRules } from "@/lib/business-days/calendar";
+import { loadObservedHolidayDatesSafe } from "@/lib/business-days/holiday-sync";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
+import type { DailyBusinessDayContext } from "@/lib/business-days/types";
 import { assertDestinationAccount } from "@/lib/finance/interest-destination-accounts";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 import { todayIsoDate } from "@/lib/format/date";
@@ -59,6 +63,23 @@ export async function getSavingsAccounts(
 
 export { getSavingsByAccountId };
 
+async function resolveDailyContextForCreate(
+  supabase: SupabaseClient,
+  postingFrequency: CreateSavingsAccountInput["postingFrequency"],
+  excludeWeekends: boolean,
+  excludeEgyptianHolidays: boolean,
+): Promise<DailyBusinessDayContext | undefined> {
+  if (postingFrequency !== "daily") return undefined;
+  const settings = { excludeWeekends, excludeEgyptianHolidays };
+  if (!usesBusinessDayRules(settings)) return undefined;
+
+  const observedHolidayDates = excludeEgyptianHolidays
+    ? await loadObservedHolidayDatesSafe(supabase)
+    : new Set<string>();
+
+  return buildDailyBusinessDayContext(settings, observedHolidayDates);
+}
+
 export async function createSavingsAccount(
   supabase: SupabaseClient,
   userId: string,
@@ -81,10 +102,22 @@ export async function createSavingsAccount(
   }
 
   const cycleStartDate = todayIsoDate();
+  const excludeWeekends =
+    input.excludeWeekends ?? DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends;
+  const excludeEgyptianHolidays =
+    input.excludeEgyptianHolidays ??
+    DEFAULT_BUSINESS_DAY_SETTINGS.excludeEgyptianHolidays;
+  const dailyContext = await resolveDailyContextForCreate(
+    supabase,
+    input.postingFrequency,
+    excludeWeekends,
+    excludeEgyptianHolidays,
+  );
   const nextPostingDate = calculateInitialNextPostingDate(
     cycleStartDate,
     input.postingFrequency,
     input.postingDay,
+    dailyContext,
   );
 
   const { data: accountRow, error: accountError } = await supabase
@@ -124,6 +157,8 @@ export async function createSavingsAccount(
       cycle_start_date: cycleStartDate,
       cycle_minimum_balance: input.openingBalance,
       next_posting_date: nextPostingDate,
+      exclude_weekends: excludeWeekends,
+      exclude_egyptian_holidays: excludeEgyptianHolidays,
     })
     .select("*")
     .single();
@@ -210,6 +245,12 @@ export async function updateSavingsAccount(
   if (input.postingDay !== undefined) {
     savingsPatch.posting_day = input.postingDay;
   }
+  if (input.excludeWeekends !== undefined) {
+    savingsPatch.exclude_weekends = input.excludeWeekends;
+  }
+  if (input.excludeEgyptianHolidays !== undefined) {
+    savingsPatch.exclude_egyptian_holidays = input.excludeEgyptianHolidays;
+  }
   if (input.interestDestination !== undefined) {
     savingsPatch.interest_destination = input.interestDestination;
   }
@@ -223,15 +264,27 @@ export async function updateSavingsAccount(
 
   if (
     input.postingFrequency !== undefined ||
-    input.postingDay !== undefined
+    input.postingDay !== undefined ||
+    input.excludeWeekends !== undefined ||
+    input.excludeEgyptianHolidays !== undefined
   ) {
     const frequency =
       input.postingFrequency ?? existing.postingFrequency;
     const postingDay = input.postingDay ?? existing.postingDay;
+    const excludeWeekends = input.excludeWeekends ?? existing.excludeWeekends;
+    const excludeEgyptianHolidays =
+      input.excludeEgyptianHolidays ?? existing.excludeEgyptianHolidays;
+    const dailyContext = await resolveDailyContextForCreate(
+      supabase,
+      frequency,
+      excludeWeekends,
+      excludeEgyptianHolidays,
+    );
     savingsPatch.next_posting_date = calculateInitialNextPostingDate(
       existing.cycleStartDate,
       frequency,
       postingDay,
+      dailyContext,
     );
   }
 
@@ -288,11 +341,13 @@ export async function resetSavingsCycleAfterPosting(
   currentBalance: number,
   frequency: CreateSavingsAccountInput["postingFrequency"],
   postingDay: number,
+  dailyContext?: DailyBusinessDayContext,
 ): Promise<void> {
   const nextPostingDate = calculateNextPostingDateAfter(
     postingDate,
     frequency,
     postingDay,
+    dailyContext,
   );
 
   const { error } = await supabase
@@ -303,6 +358,32 @@ export async function resetSavingsCycleAfterPosting(
       next_posting_date: nextPostingDate,
       last_posting_processed_at: new Date().toISOString(),
     })
+    .eq("id", savingsAccountId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+}
+
+/** Advance next posting date on a skipped non-business day without creating interest. */
+export async function advanceSavingsNextPostingDateSkip(
+  supabase: SupabaseClient,
+  userId: string,
+  savingsAccountId: string,
+  skippedDate: string,
+  frequency: CreateSavingsAccountInput["postingFrequency"],
+  postingDay: number,
+  dailyContext?: DailyBusinessDayContext,
+): Promise<void> {
+  const nextPostingDate = calculateNextPostingDateAfter(
+    skippedDate,
+    frequency,
+    postingDay,
+    dailyContext,
+  );
+
+  const { error } = await supabase
+    .from("savings_accounts")
+    .update({ next_posting_date: nextPostingDate })
     .eq("id", savingsAccountId)
     .eq("user_id", userId);
 

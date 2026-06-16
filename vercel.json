@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-egyptian-holidays",
+      "schedule": "0 3 1,15 * *"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { loadObservedHolidayDatesSafe } from "@/lib/business-days/holiday-sync";
 import {
   mapCertificateSchedule,
   type DbCertificateSchedule,
@@ -52,7 +53,12 @@ export async function generateAndPersistSchedule(
     existingSchedules ??
     (await fetchCertificateSchedules(supabase, userId, certificate.id));
 
-  const input = certificateInputFromCertificate(certificate);
+  const input = certificateInputFromCertificate(
+    certificate,
+    certificate.payoutFrequency === "daily" && certificate.excludeEgyptianHolidays
+      ? await loadObservedHolidayDatesSafe(supabase)
+      : undefined,
+  );
   let regenerated;
   try {
     regenerated = generateValidatedScheduleEntries(input);

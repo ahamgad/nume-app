@@ -7,6 +7,8 @@ import {
   mergeScheduleRegeneration,
 } from "@/lib/certificates/schedule-generator";
 import { hasDuplicateScheduleDates } from "@/lib/certificates/schedule-validation";
+import { iterateEligibleDailyPayoutDates } from "@/lib/business-days/calendar";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import type { CertificateScheduleEntry } from "@/lib/certificates/types";
 
 const baseInput = {
@@ -27,16 +29,35 @@ describe("schedule-generator", () => {
     expect(entries[0]?.interestAmount).toBe(1000);
   });
 
-  it("generates daily schedule entries from day after purchase through maturity", () => {
+  it("generates daily schedule entries on business days by default", () => {
     const entries = generateScheduleEntries({
       ...baseInput,
       payoutFrequency: "daily",
     });
+    const expectedDates = iterateEligibleDailyPayoutDates(
+      baseInput.purchaseDate,
+      baseInput.maturityDate,
+      DEFAULT_BUSINESS_DAY_SETTINGS,
+      new Set(),
+    );
+
+    expect(entries.length).toBe(expectedDates.length);
+    expect(entries[0]?.dueDate).toBe("2026-01-18");
+    expect(entries.at(-1)?.dueDate).toBe(expectedDates.at(-1));
+    expect(entries[0]?.interestAmount).toBe(32.88);
+    expect(hasDuplicateScheduleDates(entries)).toBe(false);
+  });
+
+  it("generates daily schedule entries for every calendar day when toggles are off", () => {
+    const entries = generateScheduleEntries({
+      ...baseInput,
+      payoutFrequency: "daily",
+      excludeWeekends: false,
+      excludeEgyptianHolidays: false,
+    });
     expect(entries.length).toBe(365);
     expect(entries[0]?.dueDate).toBe("2026-01-16");
     expect(entries.at(-1)?.dueDate).toBe("2027-01-15");
-    expect(entries[0]?.interestAmount).toBe(32.88);
-    expect(hasDuplicateScheduleDates(entries)).toBe(false);
   });
 
   it("finds multiple due daily entries for catch-up processing", () => {
@@ -61,8 +82,23 @@ describe("schedule-generator", () => {
       }),
     );
 
-    expect(findDueScheduleEntries(schedules, "2026-01-20")).toHaveLength(5);
-    expect(deriveNextInterestDate(schedules, "2026-01-17")).toBe("2026-01-17");
+    expect(findDueScheduleEntries(schedules, "2026-01-20")).toHaveLength(3);
+    expect(deriveNextInterestDate(schedules, "2026-01-17")).toBe("2026-01-18");
+  });
+
+  it("skips holidays when generating daily schedules", () => {
+    const entries = generateScheduleEntries({
+      ...baseInput,
+      payoutFrequency: "daily",
+      observedHolidayDates: new Set(["2026-01-19"]),
+    });
+
+    expect(entries.slice(0, 4).map((entry) => entry.dueDate)).toEqual([
+      "2026-01-18",
+      "2026-01-20",
+      "2026-01-21",
+      "2026-01-22",
+    ]);
   });
 
   it("generates a single at-maturity entry", () => {

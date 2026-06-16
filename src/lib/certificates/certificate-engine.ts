@@ -1,3 +1,10 @@
+import {
+  firstEligibleDailyPayoutDateAfter,
+  iterateEligibleDailyPayoutDates,
+  nextEligibleDailyPayoutDateAfter,
+  usesBusinessDayRules,
+} from "@/lib/business-days/calendar";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import type {
   CertificateCalculationInput,
   CertificateStatus,
@@ -134,6 +141,11 @@ export function calculateNextPayoutDate(
   maturityDate: string,
   payoutFrequency: PayoutFrequency,
   asOfDate: string = todayIsoDate(),
+  dailyOptions?: {
+    excludeWeekends: boolean;
+    excludeEgyptianHolidays: boolean;
+    observedHolidayDates?: ReadonlySet<string>;
+  },
 ): string | null {
   if (payoutFrequency === "instantly") {
     return purchaseDate;
@@ -144,6 +156,27 @@ export function calculateNextPayoutDate(
   }
 
   if (payoutFrequency === "daily") {
+    const settings = {
+      excludeWeekends:
+        dailyOptions?.excludeWeekends ??
+        DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends,
+      excludeEgyptianHolidays:
+        dailyOptions?.excludeEgyptianHolidays ??
+        DEFAULT_BUSINESS_DAY_SETTINGS.excludeEgyptianHolidays,
+    };
+    const observedHolidayDates =
+      dailyOptions?.observedHolidayDates ?? new Set<string>();
+
+    if (usesBusinessDayRules(settings)) {
+      const eligibleDates = iterateEligibleDailyPayoutDates(
+        purchaseDate,
+        maturityDate,
+        settings,
+        observedHolidayDates,
+      );
+      return eligibleDates.find((date) => date >= asOfDate) ?? null;
+    }
+
     let candidate = addCalendarDays(purchaseDate, 1);
     let guard = 0;
     const maxIterations = Math.max(
@@ -260,6 +293,13 @@ export function computeCertificateMetrics(
     maturityDate,
     input.payoutFrequency,
     asOfDate,
+    input.payoutFrequency === "daily"
+      ? {
+          excludeWeekends: input.excludeWeekends,
+          excludeEgyptianHolidays: input.excludeEgyptianHolidays,
+          observedHolidayDates: input.observedHolidayDates,
+        }
+      : undefined,
   );
   const remainingDays = calculateRemainingDays(maturityDate, asOfDate);
 

@@ -106,6 +106,8 @@ function EditCertificateForm({
         purchaseDate: values.purchaseDate,
         termMonths,
         payoutFrequency: values.payoutFrequency,
+        excludeWeekends: values.excludeWeekends,
+        excludeEgyptianHolidays: values.excludeEgyptianHolidays,
         destinationAccountId: values.autoApplyInterest
           ? values.destinationAccountId
           : null,

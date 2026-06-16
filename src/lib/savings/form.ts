@@ -1,3 +1,4 @@
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import {
   parsePostingDayFromForm,
   postingDayToFormValue,
@@ -32,6 +33,8 @@ export interface SavingsFormValues {
   tiers: TierFormRow[];
   postingFrequency: SavingsPostingFrequencyForm;
   postingDay: string;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
   interestDestination: SavingsInterestDestinationForm;
   destinationAccountId: string;
 }
@@ -45,6 +48,8 @@ export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
   tiers: [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
   postingFrequency: "monthly",
   postingDay: "1",
+  excludeWeekends: DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends,
+  excludeEgyptianHolidays: DEFAULT_BUSINESS_DAY_SETTINGS.excludeEgyptianHolidays,
   interestDestination: "same_account",
   destinationAccountId: "",
 };
@@ -73,6 +78,8 @@ export function savingsFormValuesFromAccount(
         : [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
     postingFrequency: savings.postingFrequency,
     postingDay: postingDayToFormValue(savings.postingDay),
+    excludeWeekends: savings.excludeWeekends,
+    excludeEgyptianHolidays: savings.excludeEgyptianHolidays,
     interestDestination: savings.interestDestination,
     destinationAccountId: savings.destinationAccountId ?? "",
   };
@@ -167,6 +174,8 @@ export function resolveSavingsFormForSubmit(
       values.postingFrequency === "daily"
         ? 1
         : parsedPostingDay ?? POSTING_DAY_LAST_OF_MONTH,
+    excludeWeekends: values.excludeWeekends,
+    excludeEgyptianHolidays: values.excludeEgyptianHolidays,
     interestDestination: values.interestDestination,
     destinationAccountId:
       values.interestDestination === "another_account"

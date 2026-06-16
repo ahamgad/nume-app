@@ -2,6 +2,7 @@
 
 import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
+import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { Label } from "@/components/ui/label";
@@ -333,7 +334,31 @@ export function SavingsFormFields({
               <p className="text-sm text-destructive">{errors.postingDay}</p>
             ) : null}
           </div>
-        ) : null}
+        ) : (
+          <div className="rounded-lg border border-border px-4">
+            <p className="border-b border-border py-3 text-sm font-medium">
+              {t("businessDays.title")}
+            </p>
+            <ToggleSettingRow
+              label={t("businessDays.excludeWeekends.label")}
+              description={t("businessDays.excludeWeekends.description")}
+              checked={values.excludeWeekends}
+              disabled={disabled}
+              onCheckedChange={(excludeWeekends) => onChange({ excludeWeekends })}
+            />
+            <ToggleSettingRow
+              label={t("businessDays.excludeEgyptianHolidays.label")}
+              description={t(
+                "businessDays.excludeEgyptianHolidays.description",
+              )}
+              checked={values.excludeEgyptianHolidays}
+              disabled={disabled}
+              onCheckedChange={(excludeEgyptianHolidays) =>
+                onChange({ excludeEgyptianHolidays })
+              }
+            />
+          </div>
+        )}
       </FormSection>
 
       <FormSection title={t("savings.sections.destination")} separator>

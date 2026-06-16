@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { useSyncExternalStore, type ReactNode } from "react";
 
 import { isSplashComplete } from "@/lib/app/splash-session";
-import { useColdResumeSplash } from "@/hooks/use-cold-resume-splash";
 
 function subscribeSplashGate(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
@@ -30,7 +29,6 @@ function getSplashGateServerSnapshot() {
  */
 export function AppBootstrap({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  useColdResumeSplash();
 
   const splashReady = useSyncExternalStore(
     subscribeSplashGate,

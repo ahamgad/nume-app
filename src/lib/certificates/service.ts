@@ -14,6 +14,7 @@ import type {
   UpdateCertificateInput,
 } from "@/lib/certificates/types";
 import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import { assertDestinationAccount } from "@/lib/finance/interest-destination-accounts";
 import { patchAccount } from "@/lib/finance/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
@@ -113,6 +114,11 @@ export async function createCertificate(
     term_months: input.termMonths,
     maturity_date: maturityDate,
     payout_frequency: input.payoutFrequency,
+    exclude_weekends:
+      input.excludeWeekends ?? DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends,
+    exclude_egyptian_holidays:
+      input.excludeEgyptianHolidays ??
+      DEFAULT_BUSINESS_DAY_SETTINGS.excludeEgyptianHolidays,
     destination_account_id: input.destinationAccountId ?? null,
     auto_apply: input.autoApply ?? false,
     status: "active",
@@ -215,6 +221,12 @@ export async function updateCertificate(
   if (input.payoutFrequency !== undefined) {
     certificatePayload.payout_frequency = input.payoutFrequency;
   }
+  if (input.excludeWeekends !== undefined) {
+    certificatePayload.exclude_weekends = input.excludeWeekends;
+  }
+  if (input.excludeEgyptianHolidays !== undefined) {
+    certificatePayload.exclude_egyptian_holidays = input.excludeEgyptianHolidays;
+  }
   if (input.destinationAccountId !== undefined) {
     certificatePayload.destination_account_id = input.destinationAccountId;
   }
@@ -272,7 +284,9 @@ export async function updateCertificate(
     input.annualInterestRate !== undefined ||
     input.purchaseDate !== undefined ||
     input.termMonths !== undefined ||
-    input.payoutFrequency !== undefined;
+    input.payoutFrequency !== undefined ||
+    input.excludeWeekends !== undefined ||
+    input.excludeEgyptianHolidays !== undefined;
 
   if (scheduleFieldsChanged && updated.status === "active") {
     await generateAndPersistSchedule(supabase, userId, updated);

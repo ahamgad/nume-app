@@ -30,6 +30,8 @@ export interface DbSavingsAccount {
   cycle_minimum_balance: number;
   next_posting_date: string | null;
   last_posting_processed_at: string | null;
+  exclude_weekends: boolean;
+  exclude_egyptian_holidays: boolean;
   created_at: string;
   updated_at: string;
   savings_interest_tiers?: DbSavingsInterestTier[];
@@ -67,6 +69,8 @@ export function mapSavingsAccount(row: DbSavingsAccount): SavingsAccount {
     cycleMinimumBalance: Number(row.cycle_minimum_balance),
     nextPostingDate: row.next_posting_date,
     lastPostingProcessedAt: row.last_posting_processed_at,
+    excludeWeekends: row.exclude_weekends,
+    excludeEgyptianHolidays: row.exclude_egyptian_holidays,
     tiers,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

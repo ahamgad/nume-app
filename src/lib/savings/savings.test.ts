@@ -17,6 +17,8 @@ import {
   parsePostingDayFromForm,
   postingDayToFormValue,
 } from "@/lib/savings/posting-schedule";
+import { buildDailyBusinessDayContext } from "@/lib/business-days/calendar";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import {
   findTierForBalance,
   parseTierRows,
@@ -180,6 +182,20 @@ describe("savings posting schedule", () => {
     expect(
       calculateNextPostingDateAfter("2026-01-11", "daily", 1),
     ).toBe("2026-01-12");
+  });
+
+  it("computes daily posting dates on business days when context is provided", () => {
+    const dailyContext = buildDailyBusinessDayContext(
+      DEFAULT_BUSINESS_DAY_SETTINGS,
+      new Set(["2026-01-19"]),
+    );
+
+    expect(
+      calculateInitialNextPostingDate("2026-01-15", "daily", 1, dailyContext),
+    ).toBe("2026-01-18");
+    expect(
+      calculateNextPostingDateAfter("2026-01-18", "daily", 1, dailyContext),
+    ).toBe("2026-01-20");
   });
 
   it("resolves last day of month for February and longer months", () => {

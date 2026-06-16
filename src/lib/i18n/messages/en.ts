@@ -372,6 +372,17 @@ export const en = {
       lucky: "Lucky",
     },
   },
+  businessDays: {
+    title: "Business days",
+    excludeWeekends: {
+      label: "Exclude weekends",
+      description: "Skip Friday and Saturday (Egypt weekend)",
+    },
+    excludeEgyptianHolidays: {
+      label: "Exclude official Egyptian holidays",
+      description: "Skip nationally observed public holidays",
+    },
+  },
   savings: {
     create: {
       title: "Add savings account",

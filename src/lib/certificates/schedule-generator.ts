@@ -1,5 +1,9 @@
 import { addCalendarDays, addCalendarMonths } from "@/lib/certificates/certificate-engine";
 import {
+  iterateEligibleDailyPayoutDates,
+} from "@/lib/business-days/calendar";
+import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
+import {
   calculateScheduleEntryInterest,
   roundCurrency,
 } from "@/lib/certificates/interest-calculator";
@@ -74,21 +78,25 @@ export function generateScheduleEntries(
 
     if (perPeriodAmount <= 0) return [];
 
-    const entries: GeneratedScheduleEntry[] = [];
-    let candidate = addCalendarDays(purchaseDate, 1);
-    const maxIterations = daysBetweenInclusive(purchaseDate, maturityDate);
-    let guard = 0;
+    const settings = {
+      excludeWeekends:
+        input.excludeWeekends ?? DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends,
+      excludeEgyptianHolidays:
+        input.excludeEgyptianHolidays ??
+        DEFAULT_BUSINESS_DAY_SETTINGS.excludeEgyptianHolidays,
+    };
+    const observedHolidayDates = input.observedHolidayDates ?? new Set<string>();
+    const dueDates = iterateEligibleDailyPayoutDates(
+      purchaseDate,
+      maturityDate,
+      settings,
+      observedHolidayDates,
+    );
 
-    while (candidate <= maturityDate && guard < maxIterations) {
-      entries.push({
-        dueDate: candidate,
-        interestAmount: perPeriodAmount,
-      });
-      candidate = addCalendarDays(candidate, 1);
-      guard += 1;
-    }
-
-    return entries;
+    return dueDates.map((dueDate) => ({
+      dueDate,
+      interestAmount: perPeriodAmount,
+    }));
   }
 
   const stepMonths = frequencyStepMonths(payoutFrequency);
@@ -205,7 +213,10 @@ export function certificateInputFromCertificate(
     termMonths: number;
     maturityDate: string;
     payoutFrequency: PayoutFrequency;
+    excludeWeekends: boolean;
+    excludeEgyptianHolidays: boolean;
   },
+  observedHolidayDates?: ReadonlySet<string>,
 ): ScheduleGenerationInput {
   return {
     principalAmount: certificate.principalAmount,
@@ -214,5 +225,8 @@ export function certificateInputFromCertificate(
     termMonths: certificate.termMonths,
     maturityDate: certificate.maturityDate,
     payoutFrequency: certificate.payoutFrequency,
+    excludeWeekends: certificate.excludeWeekends,
+    excludeEgyptianHolidays: certificate.excludeEgyptianHolidays,
+    observedHolidayDates,
   };
 }

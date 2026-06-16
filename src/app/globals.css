@@ -199,63 +199,52 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .animate-nume-logo-arrival {
-    animation: nume-logo-arrival 400ms ease-out forwards;
+  .animate-nume-splash-logo-arrival {
+    animation: nume-splash-logo-arrival 250ms ease-out forwards;
     opacity: 0;
   }
 
-  .nume-logo-shimmer-bar {
-    position: absolute;
-    top: -30%;
-    bottom: -30%;
-    width: 42%;
-    background: linear-gradient(
-      108deg,
-      transparent 0%,
-      transparent 38%,
-      rgba(255, 255, 255, 0.42) 50%,
-      transparent 62%,
-      transparent 100%
-    );
-    mix-blend-mode: soft-light;
+  .nume-splash-orbit {
+    color: var(--foreground);
     opacity: 0;
-    pointer-events: none;
+    transform: rotate(-130deg);
+    animation:
+      nume-splash-orbit-travel 700ms cubic-bezier(0.45, 0.05, 0.2, 1) 250ms
+        forwards,
+      nume-splash-orbit-fade-out 250ms ease-out 950ms forwards;
   }
 
-  html.dark .nume-logo-shimmer-bar {
-    background: linear-gradient(
-      108deg,
-      transparent 0%,
-      transparent 38%,
-      rgba(255, 255, 255, 0.22) 50%,
-      transparent 62%,
-      transparent 100%
-    );
-    mix-blend-mode: overlay;
+  .nume-splash-orbit-track {
+    opacity: 0.1;
   }
 
-  .animate-nume-logo-shimmer {
-    animation: nume-logo-shimmer 400ms ease-out 400ms forwards;
+  .nume-splash-orbit-arc {
+    stroke-dasharray: 56 44;
+    stroke-dashoffset: 0;
+    opacity: 0.42;
   }
 
-  .animate-nume-wordmark-reveal {
-    animation: nume-wordmark-reveal 400ms ease-out 700ms forwards;
+  html.dark .nume-splash-orbit-arc {
+    opacity: 0.55;
+  }
+
+  .animate-nume-splash-wordmark {
+    animation: nume-splash-wordmark 250ms ease-out 180ms forwards;
     opacity: 0;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-nume-logo-arrival,
-    .animate-nume-wordmark-reveal {
+    .animate-nume-splash-logo-arrival,
+    .animate-nume-splash-wordmark {
       animation: nume-splash-fade-in 350ms ease-out forwards;
       transform: none;
     }
 
-    .animate-nume-wordmark-reveal {
-      animation-delay: 150ms;
+    .animate-nume-splash-wordmark {
+      animation-delay: 120ms;
     }
 
-    .animate-nume-logo-shimmer,
-    .nume-logo-shimmer-bar {
+    .nume-splash-orbit {
       display: none;
     }
   }
@@ -279,45 +268,46 @@
   }
 }
 
-@keyframes nume-logo-arrival {
+@keyframes nume-splash-logo-arrival {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(2px);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
-@keyframes nume-logo-shimmer {
-  0% {
-    transform: translateX(-170%) skewX(-14deg);
-    opacity: 0;
-  }
-  18% {
-    opacity: 0.16;
-  }
-  50% {
-    opacity: 0.1;
-  }
-  82% {
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(270%) skewX(-14deg);
-    opacity: 0;
-  }
-}
-
-@keyframes nume-wordmark-reveal {
+@keyframes nume-splash-orbit-travel {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: rotate(-130deg);
+  }
+  12% {
+    opacity: 1;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes nume-splash-orbit-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nume-splash-wordmark {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

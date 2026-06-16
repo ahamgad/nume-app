@@ -1,8 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { isEligibleDailyPayoutDate } from "@/lib/business-days/calendar";
 import { canReceiveTransfers } from "@/lib/finance/account-capabilities";
 import { fetchAccounts, insertSavingsInterestRecord } from "@/lib/finance/service";
 import { todayIsoDate } from "@/lib/format/date";
+import { resolveSavingsDailyContext } from "@/lib/savings/business-days-context";
 import {
   calculateSavingsInterest,
   resolveInterestRate,
@@ -10,8 +12,12 @@ import {
 } from "@/lib/savings/interest-engine";
 import { isPostingDue } from "@/lib/savings/posting-schedule";
 import { getSavingsByAccountId } from "@/lib/savings/load-savings";
-import { resetSavingsCycleAfterPosting } from "@/lib/savings/service";
+import {
+  advanceSavingsNextPostingDateSkip,
+  resetSavingsCycleAfterPosting,
+} from "@/lib/savings/service";
 import type { SavingsAccount } from "@/lib/savings/types";
+import type { DailyBusinessDayContext } from "@/lib/business-days/types";
 
 const processingLocks = new Set<string>();
 const MAX_CATCH_UP_CYCLES = 240;
@@ -51,6 +57,7 @@ async function advanceCycleAfterPosting(
   savings: SavingsAccount,
   postingDate: string,
   balanceAfterPosting: number,
+  dailyContext?: DailyBusinessDayContext,
 ): Promise<void> {
   await resetSavingsCycleAfterPosting(
     supabase,
@@ -60,6 +67,25 @@ async function advanceCycleAfterPosting(
     balanceAfterPosting,
     savings.postingFrequency,
     savings.postingDay,
+    dailyContext,
+  );
+}
+
+async function skipNonBusinessPostingDay(
+  supabase: SupabaseClient,
+  userId: string,
+  savings: SavingsAccount,
+  skippedDate: string,
+  dailyContext: DailyBusinessDayContext,
+): Promise<void> {
+  await advanceSavingsNextPostingDateSkip(
+    supabase,
+    userId,
+    savings.id,
+    skippedDate,
+    savings.postingFrequency,
+    savings.postingDay,
+    dailyContext,
   );
 }
 
@@ -68,6 +94,7 @@ async function processDuePosting(
   userId: string,
   savings: SavingsAccount,
   postingDate: string,
+  dailyContext?: DailyBusinessDayContext,
 ): Promise<boolean> {
   const alreadyPosted = await hasInterestRecordForPosting(
     supabase,
@@ -88,6 +115,7 @@ async function processDuePosting(
       savings,
       postingDate,
       balance,
+      dailyContext,
     );
     return true;
   }
@@ -105,7 +133,14 @@ async function processDuePosting(
       userId,
       savings.accountId,
     );
-    await advanceCycleAfterPosting(supabase, userId, savings, postingDate, balance);
+    await advanceCycleAfterPosting(
+      supabase,
+      userId,
+      savings,
+      postingDate,
+      balance,
+      dailyContext,
+    );
     return true;
   }
 
@@ -121,7 +156,14 @@ async function processDuePosting(
       userId,
       savings.accountId,
     );
-    await advanceCycleAfterPosting(supabase, userId, savings, postingDate, balance);
+    await advanceCycleAfterPosting(
+      supabase,
+      userId,
+      savings,
+      postingDate,
+      balance,
+      dailyContext,
+    );
     return true;
   }
 
@@ -146,6 +188,7 @@ async function processDuePosting(
       savings,
       postingDate,
       currentBalance + interestAmount,
+      dailyContext,
     );
     return true;
   }
@@ -177,6 +220,7 @@ async function processDuePosting(
       savings,
       postingDate,
       savingsBalance,
+      dailyContext,
     );
     return true;
   }
@@ -186,7 +230,14 @@ async function processDuePosting(
     userId,
     savings.accountId,
   );
-  await advanceCycleAfterPosting(supabase, userId, savings, postingDate, balance);
+  await advanceCycleAfterPosting(
+    supabase,
+    userId,
+    savings,
+    postingDate,
+    balance,
+    dailyContext,
+  );
   return true;
 }
 
@@ -226,7 +277,34 @@ export async function processSavingsInterestCatchUp(
       }
 
       const postingDate = savings.nextPostingDate!;
-      await processDuePosting(supabase, userId, savings, postingDate);
+      const dailyContext = await resolveSavingsDailyContext(supabase, savings);
+
+      if (
+        dailyContext &&
+        !isEligibleDailyPayoutDate(
+          postingDate,
+          dailyContext.settings,
+          dailyContext.observedHolidayDates,
+        )
+      ) {
+        await skipNonBusinessPostingDay(
+          supabase,
+          userId,
+          savings,
+          postingDate,
+          dailyContext,
+        );
+        processedCount += 1;
+        continue;
+      }
+
+      await processDuePosting(
+        supabase,
+        userId,
+        savings,
+        postingDate,
+        dailyContext,
+      );
       processedCount += 1;
     }
 

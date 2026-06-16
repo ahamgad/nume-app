@@ -8,6 +8,8 @@ const CERTIFICATE_ROW_FIELDS: Array<keyof UpdateCertificateInput> = [
   "purchaseDate",
   "termMonths",
   "payoutFrequency",
+  "excludeWeekends",
+  "excludeEgyptianHolidays",
   "destinationAccountId",
   "autoApply",
   "renewalType",

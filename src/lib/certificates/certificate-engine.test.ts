@@ -73,13 +73,28 @@ describe("daily payout frequency", () => {
     expect(calculatePayoutAmount(100_000, 12, 12, "daily")).toBeCloseTo(32.88, 2);
   });
 
-  it("returns the first daily payout on the day after purchase", () => {
+  it("returns the first daily payout on the next business day by default", () => {
     expect(
       calculateNextPayoutDate(
         "2026-01-15",
         "2027-01-15",
         "daily",
         "2026-01-15",
+      ),
+    ).toBe("2026-01-18");
+  });
+
+  it("returns the first daily payout on the day after purchase when toggles are off", () => {
+    expect(
+      calculateNextPayoutDate(
+        "2026-01-15",
+        "2027-01-15",
+        "daily",
+        "2026-01-15",
+        {
+          excludeWeekends: false,
+          excludeEgyptianHolidays: false,
+        },
       ),
     ).toBe("2026-01-16");
   });

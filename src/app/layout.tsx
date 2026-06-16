@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { AppProviders } from "@/providers/app-providers";
 import { fontVariables, geistSans } from "@/lib/fonts";
 import { getRootBodyHeightClass } from "@/lib/layout/keyboard-snap-investigation";
+import { getSplashBootstrapScript } from "@/lib/app/splash-session";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
@@ -67,7 +68,7 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=location.pathname;if(p==="/splash")return;if(sessionStorage.getItem("nume-splash-complete")==="1")return;location.replace("/splash");}catch(e){}})();`,
+            __html: getSplashBootstrapScript(),
           }}
         />
       </head>

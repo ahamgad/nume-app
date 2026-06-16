@@ -1,5 +1,11 @@
 import type { SavingsPostingFrequency } from "@/lib/savings/types";
 import type { TranslationKey } from "@/lib/i18n";
+import {
+  firstEligibleDailyPayoutDateAfter,
+  nextEligibleDailyPayoutDateAfter,
+  usesBusinessDayRules,
+} from "@/lib/business-days/calendar";
+import type { DailyBusinessDayContext } from "@/lib/business-days/types";
 
 /** Stored DB value for "last day of month". */
 export const POSTING_DAY_LAST_OF_MONTH = 0;
@@ -110,8 +116,16 @@ export function calculateInitialNextPostingDate(
   cycleStartDate: string,
   frequency: SavingsPostingFrequency,
   postingDay: number,
+  dailyContext?: DailyBusinessDayContext,
 ): string {
   if (isDailyPostingFrequency(frequency)) {
+    if (dailyContext && usesBusinessDayRules(dailyContext.settings)) {
+      return firstEligibleDailyPayoutDateAfter(
+        cycleStartDate,
+        dailyContext.settings,
+        dailyContext.observedHolidayDates,
+      );
+    }
     return toIsoDate(addDays(toDate(cycleStartDate), 1));
   }
 
@@ -136,8 +150,16 @@ export function calculateNextPostingDateAfter(
   lastPostingDate: string,
   frequency: SavingsPostingFrequency,
   postingDay: number,
+  dailyContext?: DailyBusinessDayContext,
 ): string {
   if (isDailyPostingFrequency(frequency)) {
+    if (dailyContext && usesBusinessDayRules(dailyContext.settings)) {
+      return nextEligibleDailyPayoutDateAfter(
+        lastPostingDate,
+        dailyContext.settings,
+        dailyContext.observedHolidayDates,
+      );
+    }
     return toIsoDate(addDays(toDate(lastPostingDate), 1));
   }
 

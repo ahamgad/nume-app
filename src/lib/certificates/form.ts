@@ -19,6 +19,8 @@ export interface CertificateFormValues {
   termPreset: CertificateTermPreset;
   customTermYears: string;
   payoutFrequency: PayoutFrequency;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
   destinationAccountId: string | null;
   autoApplyInterest: boolean;
   renewalType: RenewalType;
@@ -33,6 +35,8 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   termPreset: 1,
   customTermYears: "",
   payoutFrequency: "monthly",
+  excludeWeekends: true,
+  excludeEgyptianHolidays: true,
   destinationAccountId: null,
   autoApplyInterest: false,
   renewalType: "none",
@@ -121,6 +125,8 @@ export function certificateFormValuesFromCertificate(
     purchaseDate: string;
     termMonths: number;
     payoutFrequency: PayoutFrequency;
+    excludeWeekends: boolean;
+    excludeEgyptianHolidays: boolean;
     destinationAccountId: string | null;
     autoApply: boolean;
     renewalType: RenewalType;
@@ -145,6 +151,8 @@ export function certificateFormValuesFromCertificate(
         ? String(Number.isInteger(years) ? years : Number(years.toFixed(2)))
         : "",
     payoutFrequency: certificate.payoutFrequency,
+    excludeWeekends: certificate.excludeWeekends,
+    excludeEgyptianHolidays: certificate.excludeEgyptianHolidays,
     destinationAccountId: certificate.destinationAccountId,
     autoApplyInterest: certificate.autoApply,
     renewalType: certificate.renewalType ?? "none",
@@ -164,6 +172,8 @@ export function isCertificateFormDirty(
     values.termPreset !== initial.termPreset ||
     values.customTermYears !== initial.customTermYears ||
     values.payoutFrequency !== initial.payoutFrequency ||
+    values.excludeWeekends !== initial.excludeWeekends ||
+    values.excludeEgyptianHolidays !== initial.excludeEgyptianHolidays ||
     values.destinationAccountId !== initial.destinationAccountId ||
     values.autoApplyInterest !== initial.autoApplyInterest ||
     values.renewalType !== initial.renewalType

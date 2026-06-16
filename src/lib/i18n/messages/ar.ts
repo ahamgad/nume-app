@@ -371,6 +371,17 @@ export const ar = {
       lucky: "Lucky",
     },
   },
+  businessDays: {
+    title: "أيام العمل",
+    excludeWeekends: {
+      label: "استبعاد عطلة نهاية الأسبوع",
+      description: "تخطّي يومي الجمعة والسبت (عطلة نهاية الأسبوع في مصر)",
+    },
+    excludeEgyptianHolidays: {
+      label: "استبعاد العطلات الرسمية المصرية",
+      description: "تخطّي العطلات الرسمية المعتمدة على مستوى الدولة",
+    },
+  },
   savings: {
     create: {
       title: "إضافة حساب توفير",

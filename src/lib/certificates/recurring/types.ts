@@ -25,6 +25,9 @@ export interface ScheduleGenerationInput {
   termMonths: number;
   maturityDate: string;
   payoutFrequency: PayoutFrequency;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
+  observedHolidayDates?: ReadonlySet<string>;
 }
 
 export interface GeneratedScheduleEntry {

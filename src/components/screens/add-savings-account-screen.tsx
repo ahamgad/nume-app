@@ -74,6 +74,8 @@ export function AddSavingsAccountScreen() {
         tiers: payload.tiers,
         postingFrequency: payload.postingFrequency,
         postingDay: payload.postingDay,
+        excludeWeekends: payload.excludeWeekends,
+        excludeEgyptianHolidays: payload.excludeEgyptianHolidays,
         interestDestination: payload.interestDestination,
         destinationAccountId: payload.destinationAccountId,
       });

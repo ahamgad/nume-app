@@ -56,6 +56,8 @@ export interface Certificate {
   renewedCertificateId: string | null;
   sourceCertificateId: string | null;
   renewalProcessedAt: string | null;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -77,6 +79,8 @@ export interface CreateCertificateInput {
   purchaseDate: string;
   termMonths: number;
   payoutFrequency: PayoutFrequency;
+  excludeWeekends?: boolean;
+  excludeEgyptianHolidays?: boolean;
   destinationAccountId?: string | null;
   autoApply?: boolean;
   renewalType?: RenewalType;
@@ -92,6 +96,8 @@ export interface UpdateCertificateInput {
   purchaseDate?: string;
   termMonths?: number;
   payoutFrequency?: PayoutFrequency;
+  excludeWeekends?: boolean;
+  excludeEgyptianHolidays?: boolean;
   destinationAccountId?: string | null;
   autoApply?: boolean;
   renewalType?: RenewalType;
@@ -108,7 +114,10 @@ export interface CertificateCalculationInput {
   termMonths: number;
   maturityDate: string;
   payoutFrequency: PayoutFrequency;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
   status: CertificateStatus;
+  observedHolidayDates?: ReadonlySet<string>;
 }
 
 export interface CertificateInsights {

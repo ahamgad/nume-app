@@ -239,6 +239,32 @@ export function CertificateFormFields({
             onChange={(payoutFrequency) => onChange({ payoutFrequency })}
           />
         </div>
+
+        {values.payoutFrequency === "daily" ? (
+          <div className="rounded-lg border border-border px-4">
+            <p className="border-b border-border py-3 text-sm font-medium">
+              {t("businessDays.title")}
+            </p>
+            <ToggleSettingRow
+              label={t("businessDays.excludeWeekends.label")}
+              description={t("businessDays.excludeWeekends.description")}
+              checked={values.excludeWeekends}
+              disabled={disabled}
+              onCheckedChange={(excludeWeekends) => onChange({ excludeWeekends })}
+            />
+            <ToggleSettingRow
+              label={t("businessDays.excludeEgyptianHolidays.label")}
+              description={t(
+                "businessDays.excludeEgyptianHolidays.description",
+              )}
+              checked={values.excludeEgyptianHolidays}
+              disabled={disabled}
+              onCheckedChange={(excludeEgyptianHolidays) =>
+                onChange({ excludeEgyptianHolidays })
+              }
+            />
+          </div>
+        ) : null}
       </FormSection>
 
       <FormSection title={t("accounts.formSections.recurring")} separator>

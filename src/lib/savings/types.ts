@@ -33,6 +33,8 @@ export interface SavingsAccount {
   cycleMinimumBalance: number;
   nextPostingDate: string | null;
   lastPostingProcessedAt: string | null;
+  excludeWeekends: boolean;
+  excludeEgyptianHolidays: boolean;
   tiers: SavingsInterestTier[];
   createdAt: string;
   updatedAt: string;
@@ -47,6 +49,8 @@ export interface CreateSavingsAccountInput {
   tiers?: Omit<SavingsInterestTier, "id" | "savingsAccountId" | "userId">[];
   postingFrequency: SavingsPostingFrequency;
   postingDay: number;
+  excludeWeekends?: boolean;
+  excludeEgyptianHolidays?: boolean;
   interestDestination: SavingsInterestDestination;
   destinationAccountId?: string | null;
   includeInNetWorth?: boolean;
@@ -61,6 +65,8 @@ export interface UpdateSavingsAccountInput {
   tiers?: Omit<SavingsInterestTier, "id" | "savingsAccountId" | "userId">[];
   postingFrequency?: SavingsPostingFrequency;
   postingDay?: number;
+  excludeWeekends?: boolean;
+  excludeEgyptianHolidays?: boolean;
   interestDestination?: SavingsInterestDestination;
   destinationAccountId?: string | null;
 }
