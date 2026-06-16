@@ -75,7 +75,7 @@ export function SplashScreen() {
         </div>
         <p
           aria-hidden
-          className="animate-nume-wordmark-reveal mt-4 text-xl font-semibold tracking-[0.24em] text-foreground"
+          className="animate-nume-wordmark-reveal mt-2.5 text-xl font-semibold tracking-[0.24em] text-foreground"
         >
           NUME
         </p>

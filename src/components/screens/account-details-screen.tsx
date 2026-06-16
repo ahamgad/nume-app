@@ -12,20 +12,20 @@ import { useState } from "react";
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
+import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import {
-  RecordRow,
   ToggleSettingRow,
 } from "@/components/patterns";
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
-import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
+import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { FinanceRecord, RecordType } from "@/lib/finance/types";
+import type { FinanceRecord } from "@/lib/finance/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -159,7 +159,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         <div>
           {account.institution ? (
             <p className="text-[0.8125rem] text-muted-foreground">
-              {formatInstitutionDisplay(account.institution, t)}
+              {formatInstitutionEntityLabel(account.institution, t)}
             </p>
           ) : null}
           <div className="mt-1 flex flex-wrap gap-2">
@@ -234,28 +234,18 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           </Button>
         )}
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("accounts.details.records.title")}
-          </h2>
-          {records.length === 0 ? (
-            <p className="text-[0.9375rem] text-muted-foreground">
-              {t("accounts.details.records.empty")}
-            </p>
-          ) : (
-            <div className="divide-y divide-border rounded-lg border border-border px-4">
-              {records.map((record) => (
-                <RecordRow
-                  key={record.id}
-                  label={recordLabel(record, t)}
-                  amount={formatSignedCurrency(record.amount, record.type, formatLocale)}
-                  meta={formatDisplayDate(record.date, formatLocale)}
-                  icon={recordIcon(record.type)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        <RecentRecordsSection
+          records={records}
+          formatLocale={formatLocale}
+          recordLabel={(record) => recordLabel(record, t)}
+          recordAmount={(record) =>
+            formatSignedCurrency(record.amount, record.type, formatLocale)
+          }
+          recordMeta={(record) =>
+            formatDisplayDate(record.date, formatLocale)
+          }
+          recordIcon={(record) => recordIcon(record.type)}
+        />
       </ScreenBody>
 
       <ConfirmBottomSheet

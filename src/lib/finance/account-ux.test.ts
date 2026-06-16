@@ -11,7 +11,7 @@ import {
 import {
   computeFittedFontSizePx,
 } from "@/lib/format/responsive-currency";
-import { formatInstitutionShortcut } from "@/lib/institutions/catalog";
+import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
 
 const t = vi.fn((key: string, params?: Record<string, string>) => {
   if (key === "accounts.list.meta" && params) {
@@ -53,10 +53,10 @@ describe("formatAccountListSubtitle", () => {
   });
 });
 
-describe("formatInstitutionShortcut", () => {
+describe("formatInstitutionEntityLabel", () => {
   it("returns catalog shortcut for known institutions", () => {
-    expect(formatInstitutionShortcut("CIB", t)).toBe("CIB");
-    expect(formatInstitutionShortcut("Banque Misr", t)).toBe("Banque Misr");
+    expect(formatInstitutionEntityLabel("CIB", t)).toBe("CIB");
+    expect(formatInstitutionEntityLabel("Banque Misr", t)).toBe("Banque Misr");
   });
 });
 

@@ -296,19 +296,49 @@ export function formatInstitutionShortcut(
   return trimmed;
 }
 
-/** List / details: `SHORTCUT · Full Name` (localized) for catalog entries. */
+/**
+ * Canonical read-only institution label — shortcut only.
+ * Full names appear only while editing institution information (picker sheets).
+ */
+export function formatInstitutionEntityLabel(
+  value: string,
+  t: InstitutionTranslator,
+): string {
+  return formatInstitutionShortcut(value, t);
+}
+
+/** Whether an institution value matches a search query (shortcut or full name). */
+export function institutionMatchesSearch(
+  value: string,
+  query: string,
+  t: InstitutionTranslator,
+): boolean {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+
+  if (trimmed.toLowerCase().includes(normalized)) return true;
+
+  const match = matchInstitutionEntryGlobal(trimmed, t);
+  if (!match) return false;
+
+  if (match.shortcut.toLowerCase().includes(normalized)) return true;
+  if (match.storageValue.toLowerCase().includes(normalized)) return true;
+  if (t(match.labelKey).toLowerCase().includes(normalized)) return true;
+
+  return (match.matchValues ?? []).some((alias) =>
+    alias.toLowerCase().includes(normalized),
+  );
+}
+
+/** Read-only display label — shortcut only. Alias of {@link formatInstitutionEntityLabel}. */
 export function formatInstitutionDisplay(
   value: string,
   t: InstitutionTranslator,
 ): string {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  const match = matchInstitutionEntryGlobal(trimmed, t);
-  if (match) {
-    return `${match.shortcut} · ${t(match.labelKey)}`;
-  }
-  return trimmed;
+  return formatInstitutionEntityLabel(value, t);
 }
 
 /** @deprecated Use getInstitutionTriggerLabel or formatInstitutionDisplay. */

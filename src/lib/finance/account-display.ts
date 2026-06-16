@@ -1,8 +1,8 @@
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import type { Account } from "@/lib/finance/types";
 import {
-  formatInstitutionDisplay,
-  formatInstitutionShortcut,
+  formatInstitutionEntityLabel,
+  institutionMatchesSearch,
 } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -16,7 +16,7 @@ export function formatAccountListSubtitle(
   const typeLabel = t(getAccountTypeLabelKey(account.type));
   if (account.institution?.trim()) {
     return t("accounts.list.meta", {
-      institution: formatInstitutionShortcut(account.institution, t),
+      institution: formatInstitutionEntityLabel(account.institution, t),
       type: typeLabel,
     });
   }
@@ -30,7 +30,7 @@ export function formatAccountDestinationSubtitle(
 ): string {
   const typeLabel = t(getAccountTypeLabelKey(account.type));
   if (account.institution) {
-    return `${formatInstitutionDisplay(account.institution, t)} · ${typeLabel}`;
+    return `${formatInstitutionEntityLabel(account.institution, t)} · ${typeLabel}`;
   }
   return typeLabel;
 }
@@ -56,9 +56,7 @@ export function filterAccountsForDestinationSearch(
     if (account.name.toLowerCase().includes(normalized)) return true;
     if (account.institution?.toLowerCase().includes(normalized)) return true;
     if (
-      formatInstitutionDisplay(account.institution ?? "", t)
-        .toLowerCase()
-        .includes(normalized)
+      institutionMatchesSearch(account.institution ?? "", normalized, t)
     ) {
       return true;
     }

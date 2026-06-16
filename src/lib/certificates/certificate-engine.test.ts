@@ -9,13 +9,22 @@ import { isMissingRenewalTypeColumnError } from "@/lib/certificates/schema-suppo
 describe("formatCertificateRemainingLabel", () => {
   const t = (key: string, params?: Record<string, number>) => {
     if (key === "certificates.details.remainingYearsCount" && params) {
-      return `${params.count} years remaining`;
+      return `${params.count} years`;
     }
     if (key === "certificates.details.remainingMonthsCount" && params) {
-      return `${params.count} months remaining`;
+      return `${params.count} months`;
     }
     if (key === "certificates.details.remainingDaysCount" && params) {
-      return `${params.count} days remaining`;
+      return `${params.count} days`;
+    }
+    if (key === "certificates.details.remainingDayCount") {
+      return "1 day";
+    }
+    if (key === "certificates.details.remainingMonthCount") {
+      return "1 month";
+    }
+    if (key === "certificates.details.remainingYearCount") {
+      return "1 year";
     }
     return key;
   };
@@ -23,19 +32,19 @@ describe("formatCertificateRemainingLabel", () => {
   it("shows days within the final month", () => {
     expect(
       formatCertificateRemainingLabel("2026-02-01", "2026-01-10", t),
-    ).toBe("22 days remaining");
+    ).toBe("22 days");
   });
 
   it("shows months when more than 30 days remain", () => {
     expect(
       formatCertificateRemainingLabel("2026-06-15", "2026-01-10", t),
-    ).toBe("5 months remaining");
+    ).toBe("5 months");
   });
 
   it("shows years for exact multi-year periods", () => {
     expect(
       formatCertificateRemainingLabel("2028-01-10", "2026-01-10", t),
-    ).toBe("2 years remaining");
+    ).toBe("2 years");
   });
 });
 
