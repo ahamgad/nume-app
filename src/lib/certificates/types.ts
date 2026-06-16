@@ -6,7 +6,34 @@ export type PayoutFrequency =
   | "annual"
   | "at_maturity";
 
-export type CertificateStatus = "active" | "matured" | "archived";
+export type CertificateStatus =
+  | "active"
+  | "matured"
+  | "renewed"
+  | "closed"
+  | "archived";
+
+export type RenewalType =
+  | "none"
+  | "renew_principal"
+  | "renew_principal_and_interest";
+
+export type CertificateScheduleStatus = "pending" | "processed" | "skipped";
+
+export interface CertificateScheduleEntry {
+  id: string;
+  certificateId: string;
+  userId: string;
+  dueDate: string;
+  interestAmount: number;
+  status: CertificateScheduleStatus;
+  processedAt: string | null;
+  interestRecordId: string | null;
+  transferFailed: boolean;
+  transferRecordId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Certificate {
   id: string;
@@ -21,6 +48,13 @@ export interface Certificate {
   destinationAccountId: string | null;
   autoApply: boolean;
   status: CertificateStatus;
+  nextInterestDate: string | null;
+  lastInterestProcessedAt: string | null;
+  renewalType: RenewalType;
+  renewedFromCertificateId: string | null;
+  renewedCertificateId: string | null;
+  sourceCertificateId: string | null;
+  renewalProcessedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +77,8 @@ export interface CreateCertificateInput {
   termMonths: number;
   payoutFrequency: PayoutFrequency;
   destinationAccountId?: string | null;
+  autoApply?: boolean;
+  renewalType?: RenewalType;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
 }
@@ -56,6 +92,8 @@ export interface UpdateCertificateInput {
   termMonths?: number;
   payoutFrequency?: PayoutFrequency;
   destinationAccountId?: string | null;
+  autoApply?: boolean;
+  renewalType?: RenewalType;
   status?: CertificateStatus;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
@@ -70,4 +108,18 @@ export interface CertificateCalculationInput {
   maturityDate: string;
   payoutFrequency: PayoutFrequency;
   status: CertificateStatus;
+}
+
+export interface CertificateInsights {
+  upcomingInterestAmount: number | null;
+  nextInterestDate: string | null;
+  upcomingInterestAutoRenewal: boolean;
+  maturingSoon: Array<{
+    certificateId: string;
+    accountId: string;
+    name: string;
+    maturityDate: string;
+    daysUntilMaturity: number;
+    renewalType: RenewalType;
+  }>;
 }

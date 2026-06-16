@@ -3,8 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import {
+  MoneyAccountFormFields,
+  showsBalanceField,
+  type MoneyAccountFormValues,
+} from "@/components/accounts/money-account-form-fields";
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
-import { EditableField } from "@/components/field-editor";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -22,35 +26,28 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
-import { InstitutionPicker } from "@/components/ui/institution-picker";
 import {
   ADD_ACCOUNT_TYPES,
   isCertificateAccountType,
   ONBOARDING_ACCOUNT_TYPES,
 } from "@/lib/finance/add-account-types";
-import {
-  shouldShowInstitutionPicker,
-  type InstitutionPickerContext,
-} from "@/lib/institutions/catalog";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
-import { filterSettlementAccounts } from "@/lib/finance/account-capabilities";
 import type { AccountType, MoneyAccountType } from "@/lib/finance/types";
-import {
-  formatAmountInput,
-  parseAmount,
-  sanitizeAmountInput,
-} from "@/lib/format/currency";
+import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import {
-  validateAccountBalanceField,
-  validateAccountNameField,
-} from "@/lib/field-editor/field-validators";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
+
+const EMPTY_MONEY_VALUES: MoneyAccountFormValues = {
+  name: "",
+  institution: "",
+  balance: "",
+};
 
 export function AddAccountScreen() {
   const t = useT();
@@ -87,9 +84,8 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   const { showToast } = useToast();
 
   const [accountType, setAccountType] = useState<AccountType>("current_account");
-  const [name, setName] = useState("");
-  const [institution, setInstitution] = useState("");
-  const [balance, setBalance] = useState("");
+  const [moneyValues, setMoneyValues] =
+    useState<MoneyAccountFormValues>(EMPTY_MONEY_VALUES);
   const [certificateValues, setCertificateValues] = useState<CertificateFormValues>(
     DEFAULT_CERTIFICATE_FORM_VALUES,
   );
@@ -99,8 +95,8 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
 
   const isCertificate = isCertificateAccountType(accountType);
 
-  const settlementAccounts = useMemo(
-    () => filterSettlementAccounts(accounts),
+  const transferAccounts = useMemo(
+    () => filterTransferAccounts(accounts),
     [accounts],
   );
 
@@ -109,10 +105,12 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       certificateValues.institution.trim().length > 0 ||
       certificateValues.principalAmount.trim().length > 0 ||
       certificateValues.annualInterestRate.trim().length > 0 ||
-      certificateValues.customTermYears.trim().length > 0
-    : name.trim().length > 0 ||
-      institution.trim().length > 0 ||
-      balance.trim().length > 0;
+      certificateValues.customTermYears.trim().length > 0 ||
+      certificateValues.autoApplyInterest ||
+      certificateValues.renewalType !== "none"
+    : moneyValues.name.trim().length > 0 ||
+      moneyValues.institution.trim().length > 0 ||
+      moneyValues.balance.trim().length > 0;
 
   const accountTypeOptions = useMemo((): ScrollChipOption<AccountType>[] => {
     if (isFirstAccountFlow) {
@@ -141,17 +139,21 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
     });
   }
 
-  function validateMoneyForm() {
+  function validateMoneyForm(type: MoneyAccountType) {
     const nextErrors: Record<string, string> = {};
-    if (!name.trim()) {
+    if (!moneyValues.name.trim()) {
       nextErrors.name = t("accounts.validation.nameRequired");
     }
-    const parsedBalance = parseAmount(balance);
-    if (parsedBalance === null) {
-      nextErrors.balance = t("accounts.validation.balanceRequired");
-    } else if (parsedBalance < 0) {
-      nextErrors.balance = t("accounts.validation.balanceNegative");
+
+    if (showsBalanceField(type)) {
+      const parsedBalance = parseAmount(moneyValues.balance);
+      if (parsedBalance === null) {
+        nextErrors.balance = t("accounts.validation.balanceRequired");
+      } else if (parsedBalance < 0) {
+        nextErrors.balance = t("accounts.validation.balanceNegative");
+      }
     }
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -183,7 +185,11 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
           purchaseDate: certificateValues.purchaseDate,
           termMonths,
           payoutFrequency: certificateValues.payoutFrequency,
-          destinationAccountId: certificateValues.destinationAccountId,
+          destinationAccountId: certificateValues.autoApplyInterest
+            ? certificateValues.destinationAccountId
+            : null,
+          autoApply: certificateValues.autoApplyInterest,
+          renewalType: certificateValues.renewalType,
         });
         showToast(t("certificates.create.success"));
         router.replace(`/accounts/${certificate.accountId}`);
@@ -198,17 +204,20 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
       return;
     }
 
-    if (!validateMoneyForm()) return;
-    const parsedBalance = parseAmount(balance);
+    const moneyType = accountType as MoneyAccountType;
+    if (!validateMoneyForm(moneyType)) return;
+
+    const parsedBalance = showsBalanceField(moneyType)
+      ? parseAmount(moneyValues.balance)
+      : 0;
     if (parsedBalance === null) return;
 
     setSubmitting(true);
     try {
       const account = await createAccount({
-        type: accountType as MoneyAccountType,
-        name,
-        institution:
-          accountType === "cash" ? null : institution.trim() || null,
+        type: moneyType,
+        name: moneyValues.name,
+        institution: moneyValues.institution.trim() || null,
         currentBalance: parsedBalance,
       });
       showToast(t("common.accountCreated"));
@@ -226,15 +235,11 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
   function handleAccountTypeChange(type: AccountType) {
     setAccountType(type);
     setErrors({});
-    setInstitution("");
+    setMoneyValues(EMPTY_MONEY_VALUES);
     if (isCertificateAccountType(type)) {
       setCertificateValues(DEFAULT_CERTIFICATE_FORM_VALUES);
     }
   }
-
-  const showMoneyInstitutionPicker = shouldShowInstitutionPicker(
-    accountType as InstitutionPickerContext,
-  );
 
   function handleBack() {
     if (submitting) return;
@@ -296,7 +301,7 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
               values={certificateValues}
               errors={errors}
               amountInputLocale={amountInputLocale}
-              settlementAccounts={settlementAccounts}
+              transferAccounts={transferAccounts}
               disabled={submitting}
               onChange={(patch) =>
                 setCertificateValues((current) => ({ ...current, ...patch }))
@@ -304,57 +309,17 @@ function AddAccountForm({ isFirstAccountFlow }: AddAccountFormProps) {
               onClearError={clearFieldError}
             />
           ) : (
-            <div className="space-y-5">
-              <EditableField
-                id="account-name"
-                label={t("accounts.fields.name.label")}
-                value={name}
-                placeholder={t("accounts.fields.name.placeholder")}
-                disabled={submitting}
-                error={errors.name}
-                validate={(next) => validateAccountNameField(next, t)}
-                onSave={(nextValue) => {
-                  setName(nextValue);
-                  clearFieldError("name");
-                }}
-              />
-
-              {showMoneyInstitutionPicker ? (
-                <InstitutionPicker
-                  key={accountType}
-                  id="account-institution"
-                  accountType={accountType as InstitutionPickerContext}
-                  value={institution}
-                  disabled={submitting}
-                  onChange={setInstitution}
-                />
-              ) : null}
-
-              <EditableField
-                id="balance"
-                label={t("accounts.fields.balance.label")}
-                mode="numeric"
-                inputMode="decimal"
-                value={balance}
-                placeholder={t("common.currency.zeroPlaceholder")}
-                disabled={submitting}
-                error={errors.balance}
-                hint={
-                  errors.balance ? undefined : t("accounts.add.balanceHint")
-                }
-                prefixLabel={t("common.currency.code")}
-                sanitizeInput={sanitizeAmountInput}
-                formatDisplay={(amount) =>
-                  formatAmountInput(amount, amountInputLocale)
-                }
-                triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
-                validate={(next) => validateAccountBalanceField(next, t)}
-                onSave={(nextBalance) => {
-                  setBalance(nextBalance);
-                  clearFieldError("balance");
-                }}
-              />
-            </div>
+            <MoneyAccountFormFields
+              accountType={accountType as MoneyAccountType}
+              values={moneyValues}
+              errors={errors}
+              amountInputLocale={amountInputLocale}
+              disabled={submitting}
+              onChange={(patch) =>
+                setMoneyValues((current) => ({ ...current, ...patch }))
+              }
+              onClearError={clearFieldError}
+            />
           )}
 
           {errors.form ? (

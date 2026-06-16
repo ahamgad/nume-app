@@ -31,9 +31,10 @@ import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
-function recordIcon(type: RecordType) {
+function recordIcon(type: FinanceRecord["type"]) {
   if (type === "income") return <ArrowDownLeft className="size-4" />;
   if (type === "expense") return <ArrowUpRight className="size-4" />;
+  if (type === "transfer") return <ArrowLeftRight className="size-4" />;
   return <ArrowLeftRight className="size-4" />;
 }
 

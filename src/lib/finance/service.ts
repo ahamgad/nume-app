@@ -1,11 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { canReceiveTransfers, canSendTransfers } from "@/lib/finance/account-capabilities";
 import { mapAccount, mapRecord, type DbAccount, type DbRecord } from "@/lib/finance/mappers";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 import type {
   Account,
   CreateAccountInput,
   CreateRecordInput,
+  CreateTransferInput,
   FinanceRecord,
 } from "@/lib/finance/types";
 
@@ -204,6 +206,145 @@ export async function insertRecordWithBalanceUpdate(
     .single();
 
   if (recordError) throw recordError;
+
+  const { error: accountError } = await supabase
+    .from("accounts")
+    .update({ current_balance: nextBalance })
+    .eq("id", input.accountId)
+    .eq("user_id", userId);
+
+  if (accountError) throw accountError;
+
+  return {
+    record: mapRecord(recordRow as DbRecord),
+    nextBalance,
+  };
+}
+
+export async function insertTransfer(
+  supabase: SupabaseClient,
+  userId: string,
+  input: CreateTransferInput,
+  fromAccount: Account,
+  toAccount: Account,
+): Promise<{ fromRecord: FinanceRecord; toRecord: FinanceRecord }> {
+  if (input.fromAccountId === input.toAccountId) {
+    throw new Error("Transfer source and destination must differ");
+  }
+  if (!canSendTransfers(fromAccount)) {
+    throw new Error("Source account cannot send transfers");
+  }
+  if (!canReceiveTransfers(toAccount)) {
+    throw new Error("Destination account cannot receive transfers");
+  }
+  if (input.amount <= 0) {
+    throw new Error("Transfer amount must be greater than zero");
+  }
+
+  const description = input.description?.trim() || null;
+  const fromNextBalance = fromAccount.currentBalance - input.amount;
+  const toNextBalance = toAccount.currentBalance + input.amount;
+
+  const { data: fromRecordRow, error: fromRecordError } = await supabase
+    .from("records")
+    .insert({
+      user_id: userId,
+      account_id: input.fromAccountId,
+      record_type: "transfer",
+      amount: -input.amount,
+      description,
+      record_date: input.date,
+    })
+    .select("*")
+    .single();
+
+  if (fromRecordError) throw fromRecordError;
+
+  const { error: fromBalanceError } = await supabase
+    .from("accounts")
+    .update({ current_balance: fromNextBalance })
+    .eq("id", input.fromAccountId)
+    .eq("user_id", userId);
+
+  if (fromBalanceError) throw fromBalanceError;
+
+  const { data: toRecordRow, error: toRecordError } = await supabase
+    .from("records")
+    .insert({
+      user_id: userId,
+      account_id: input.toAccountId,
+      record_type: "transfer",
+      amount: input.amount,
+      description,
+      record_date: input.date,
+    })
+    .select("*")
+    .single();
+
+  if (toRecordError) {
+    throw toRecordError;
+  }
+
+  const { error: toBalanceError } = await supabase
+    .from("accounts")
+    .update({ current_balance: toNextBalance })
+    .eq("id", input.toAccountId)
+    .eq("user_id", userId);
+
+  if (toBalanceError) throw toBalanceError;
+
+  return {
+    fromRecord: mapRecord(fromRecordRow as DbRecord),
+    toRecord: mapRecord(toRecordRow as DbRecord),
+  };
+}
+
+export interface InsertInterestRecordInput {
+  accountId: string;
+  amount: number;
+  date: string;
+  description?: string | null;
+  certificateId: string;
+  scheduleEntryId: string;
+  /** When true, credits the destination account balance. */
+  updateBalance: boolean;
+  currentBalance?: number;
+}
+
+export async function insertInterestRecord(
+  supabase: SupabaseClient,
+  userId: string,
+  input: InsertInterestRecordInput,
+): Promise<{ record: FinanceRecord; nextBalance?: number }> {
+  if (input.amount <= 0) {
+    throw new Error("Interest amount must be greater than zero");
+  }
+
+  const description = input.description?.trim() || "Certificate Interest";
+
+  const { data: recordRow, error: recordError } = await supabase
+    .from("records")
+    .insert({
+      user_id: userId,
+      account_id: input.accountId,
+      record_type: "interest",
+      amount: input.amount,
+      description,
+      record_date: input.date,
+      certificate_id: input.certificateId,
+      schedule_entry_id: input.scheduleEntryId,
+    })
+    .select("*")
+    .single();
+
+  if (recordError) throw recordError;
+
+  if (!input.updateBalance) {
+    return { record: mapRecord(recordRow as DbRecord) };
+  }
+
+  const currentBalance = input.currentBalance ?? 0;
+  const nextBalance = currentBalance + input.amount;
 
   const { error: accountError } = await supabase
     .from("accounts")

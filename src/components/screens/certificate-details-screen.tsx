@@ -2,20 +2,27 @@
 
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
+import { renewalTypeLabel } from "@/components/certificates/renewal-type-picker";
+import { countDueEntries } from "@/lib/certificates/certificate-insights";
+import {
+  computeCertificateMetrics,
+  calculatePayoutAmount,
+} from "@/lib/certificates/certificate-engine";
+import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
 import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { computeCertificateMetrics, calculatePayoutAmount } from "@/lib/certificates/certificate-engine";
 import { formatCurrency } from "@/lib/format/currency";
-import { formatDisplayDate } from "@/lib/format/date";
+import { formatDisplayDate, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
+import type { CertificateScheduleStatus } from "@/lib/certificates/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -34,6 +41,13 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function scheduleStatusLabel(
+  status: CertificateScheduleStatus,
+  t: ReturnType<typeof useT>,
+): string {
+  return t(`certificates.schedule.status.${status}` as TranslationKey);
+}
+
 export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreenProps) {
   const t = useT();
   const formatLocale = useFormatLocale();
@@ -42,26 +56,59 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const {
     getAccount,
     getCertificateByAccountId,
+    getCertificateSchedules,
     updateCertificate,
     archiveCertificate,
+    processCertificateInterest,
     accounts,
     isFinanceReady,
+    isProcessingCertificateInterest,
     refresh,
   } = useFinance();
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const processingInterestRef = useRef(false);
 
   const account = getAccount(accountId);
   const certificate = getCertificateByAccountId(accountId);
+  const schedules = certificate ? getCertificateSchedules(certificate.id) : [];
 
   const metrics = useMemo(() => {
     if (!certificate) return null;
     return computeCertificateMetrics(certificate);
   }, [certificate]);
 
+  const scheduleSummary = useMemo(
+    () => calculateScheduleSummary(schedules),
+    [schedules],
+  );
+
+  const dueCount = certificate
+    ? countDueEntries(schedules, certificate.id, todayIsoDate())
+    : 0;
+
   const payoutFrequencyKey =
     `certificates.payoutFrequency.${certificate?.payoutFrequency}` as TranslationKey;
+
+  async function handleProcessInterest() {
+    if (!certificate) return;
+    if (
+      processingInterestRef.current ||
+      isProcessingCertificateInterest(certificate.id)
+    ) {
+      return;
+    }
+
+    processingInterestRef.current = true;
+    try {
+      await processCertificateInterest(certificate.id);
+    } catch (error) {
+      logSupabaseError("processCertificateInterest", error);
+    } finally {
+      processingInterestRef.current = false;
+    }
+  }
 
   async function handleArchiveConfirm() {
     if (!certificate) return;
@@ -129,9 +176,11 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const nextPayoutValue =
     certificate.payoutFrequency === "instantly"
       ? formatDisplayDate(certificate.purchaseDate, formatLocale)
-      : metrics.nextPayoutDate
-        ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
-        : t("certificates.details.noNextPayout");
+      : certificate.nextInterestDate
+        ? formatDisplayDate(certificate.nextInterestDate, formatLocale)
+        : metrics.nextPayoutDate
+          ? formatDisplayDate(metrics.nextPayoutDate, formatLocale)
+          : t("certificates.details.noNextPayout");
 
   const destinationAccount = certificate.destinationAccountId
     ? accounts.find((item) => item.id === certificate.destinationAccountId) ?? null
@@ -149,6 +198,10 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   );
 
   const isArchived = account.status === "archived";
+  const canProcessInterest = certificate.status === "active" && dueCount > 0;
+  const isProcessingThisCertificate = isProcessingCertificateInterest(
+    certificate.id,
+  );
 
   return (
     <>
@@ -169,6 +222,16 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
               {t(statusKey)}
             </span>
+            {certificate.autoApply ? (
+              <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
+                {t("certificates.details.autoApplyActive")}
+              </span>
+            ) : null}
+            {certificate.renewalType !== "none" ? (
+              <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
+                {t("dashboard.certificates.autoRenewalIndicator")}
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -178,6 +241,73 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             value={formatCurrency(certificate.principalAmount, formatLocale)}
           />
         </WidgetCard>
+
+        {canProcessInterest ? (
+          <Button
+            className="h-11 w-full"
+            disabled={isProcessingThisCertificate}
+            onClick={() => void handleProcessInterest()}
+          >
+            {isProcessingThisCertificate
+              ? t("certificates.details.processInterest.processing")
+              : t("certificates.details.processInterest.action")}
+          </Button>
+        ) : null}
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("certificates.details.interestSummary.title")}
+          </h2>
+          <div className="divide-y divide-border rounded-lg border border-border px-4">
+            <DetailRow
+              label={t("certificates.details.interestSummary.totalExpected")}
+              value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
+            />
+            <DetailRow
+              label={t("certificates.details.interestSummary.totalProcessed")}
+              value={formatCurrency(scheduleSummary.totalProcessedInterest, formatLocale)}
+            />
+            <DetailRow
+              label={t("certificates.details.interestSummary.remaining")}
+              value={formatCurrency(scheduleSummary.remainingInterest, formatLocale)}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("certificates.details.interestSchedule.title")}
+          </h2>
+          {schedules.length === 0 ? (
+            <p className="text-[0.9375rem] text-muted-foreground">
+              {t("certificates.details.interestSchedule.empty")}
+            </p>
+          ) : (
+            <div className="divide-y divide-border rounded-lg border border-border px-4">
+              {schedules.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-start justify-between gap-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[0.9375rem] font-medium tabular-nums">
+                      {formatDisplayDate(entry.dueDate, formatLocale)}
+                    </p>
+                    <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+                      {scheduleStatusLabel(entry.status, t)}
+                      {entry.transferFailed
+                        ? ` · ${t("certificates.details.interestSchedule.transferFailed")}`
+                        : null}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[0.9375rem] font-medium tabular-nums">
+                    {formatCurrency(entry.interestAmount, formatLocale)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
@@ -201,6 +331,22 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={remainingDaysValue}
             />
             <DetailRow label={t("certificates.details.status")} value={t(statusKey)} />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("certificates.details.renewal.title")}
+          </h2>
+          <div className="divide-y divide-border rounded-lg border border-border px-4">
+            <DetailRow
+              label={t("certificates.details.renewal.type")}
+              value={renewalTypeLabel(certificate.renewalType, t)}
+            />
+            <DetailRow
+              label={t("certificates.details.renewal.status")}
+              value={t(statusKey)}
+            />
           </div>
         </section>
 

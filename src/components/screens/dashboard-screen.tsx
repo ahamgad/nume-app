@@ -26,6 +26,8 @@ import { useT, useFormatLocale } from "@/providers/i18n-provider";
 function recordIcon(type: RecordType) {
   if (type === "income") return <ArrowDownLeft className="size-4" />;
   if (type === "expense") return <ArrowUpRight className="size-4" />;
+  if (type === "interest") return <ArrowDownLeft className="size-4" />;
+  if (type === "transfer") return <ArrowLeftRight className="size-4" />;
   return <ArrowLeftRight className="size-4" />;
 }
 
@@ -45,7 +47,7 @@ export function DashboardScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, isFinanceReady, isFinanceLoading, refresh } =
+  const { accounts, netWorth, recentRecords, certificateInsights, isFinanceReady, isFinanceLoading, refresh } =
     useFinance();
 
   const hasAccounts = accounts.length > 0;
@@ -105,6 +107,76 @@ export function DashboardScreen() {
             </>
           )}
         </WidgetCard>
+
+        {isFinanceReady &&
+        certificateInsights.nextInterestDate &&
+        certificateInsights.upcomingInterestAmount !== null ? (
+          <WidgetCard>
+            <h2 className="text-start text-lg font-semibold">
+              {t("dashboard.certificates.upcomingInterest.title")}
+            </h2>
+            <div className="mt-3 space-y-1">
+              <p className="text-[2rem] font-semibold tabular-nums tracking-tight">
+                {formatCurrency(
+                  certificateInsights.upcomingInterestAmount,
+                  formatLocale,
+                )}
+              </p>
+              <p className="text-[0.9375rem] text-muted-foreground">
+                {t("dashboard.certificates.upcomingInterest.date", {
+                  date: formatDisplayDate(
+                    certificateInsights.nextInterestDate,
+                    formatLocale,
+                  ),
+                })}
+              </p>
+              {certificateInsights.upcomingInterestAutoRenewal ? (
+                <span className="inline-block rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
+                  {t("dashboard.certificates.autoRenewalIndicator")}
+                </span>
+              ) : null}
+            </div>
+          </WidgetCard>
+        ) : null}
+
+        {isFinanceReady && certificateInsights.maturingSoon.length > 0 ? (
+          <WidgetCard>
+            <h2 className="text-start text-lg font-semibold">
+              {t("dashboard.certificates.maturingSoon.title")}
+            </h2>
+            <div className="mt-2 divide-y divide-border">
+              {certificateInsights.maturingSoon.map((item) => (
+                <button
+                  key={item.certificateId}
+                  type="button"
+                  className="flex w-full items-center justify-between gap-4 py-3 text-start"
+                  onClick={() => router.push(`/accounts/${item.accountId}`)}
+                >
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-[0.9375rem] font-medium">
+                        {item.name}
+                      </p>
+                      {item.renewalType !== "none" ? (
+                        <span className="shrink-0 rounded-sm bg-muted px-1.5 py-0.5 text-[0.6875rem] text-muted-foreground">
+                          {t("dashboard.certificates.autoRenewalIndicator")}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+                      {formatDisplayDate(item.maturityDate, formatLocale)}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[0.8125rem] tabular-nums text-muted-foreground">
+                    {t("dashboard.certificates.maturingSoon.days", {
+                      count: item.daysUntilMaturity,
+                    })}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </WidgetCard>
+        ) : null}
 
         <EducationalWidget
           title={t("dashboard.widgets.financialHealth.title")}

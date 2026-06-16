@@ -100,6 +100,7 @@ export const en = {
     incomeRecorded: "Income recorded",
     expenseRecorded: "Expense recorded",
     adjustmentRecorded: "Adjustment recorded",
+    transferRecorded: "Transfer recorded",
   },
   fieldEditor: {
     confirm: "Save changes",
@@ -121,6 +122,17 @@ export const en = {
       title: "Add your first account",
       description: "Track your wealth starting here",
       action: "Add",
+    },
+    certificates: {
+      upcomingInterest: {
+        title: "Upcoming interest",
+        date: "Next payout on {date}",
+      },
+      maturingSoon: {
+        title: "Certificates maturing soon",
+        days: "{count} days",
+      },
+      autoRenewalIndicator: "Auto renewal",
     },
     widgets: {
       financialHealth: {
@@ -175,6 +187,11 @@ export const en = {
       certificates: "Certificates",
       basic: "Basic information",
       balance: "Balance",
+    },
+    formSections: {
+      accountDetails: "Account details",
+      interestDetails: "Interest details",
+      recurring: "Recurring",
     },
     types: {
       currentAccount: "Current account",
@@ -377,6 +394,17 @@ export const en = {
         noResults: "No matching accounts",
         notSelected: "Not selected",
       },
+      autoApplyInterest: {
+        label: "Automatic transfer interest",
+        description:
+          "When enabled, interest will be transferred to the destination account on each payout date.",
+      },
+      renewal: {
+        title: "Renewal",
+        type: {
+          label: "Renewal type",
+        },
+      },
     },
     payoutFrequency: {
       instantly: "Instantly",
@@ -389,7 +417,21 @@ export const en = {
     status: {
       active: "Active",
       matured: "Matured",
+      renewed: "Renewed",
+      closed: "Closed",
       archived: "Archived",
+    },
+    schedule: {
+      status: {
+        pending: "Pending",
+        processed: "Processed",
+        skipped: "Skipped",
+      },
+    },
+    renewalType: {
+      none: "None",
+      renew_principal: "Renew principal",
+      renew_principal_and_interest: "Renew principal and interest",
     },
     details: {
       summary: "Summary",
@@ -415,6 +457,27 @@ export const en = {
         notSelected: "Not selected",
       },
       noNextPayout: "No upcoming payout",
+      autoApplyActive: "Auto-transfer on",
+      processInterest: {
+        action: "Process interest",
+        processing: "Processing…",
+      },
+      interestSummary: {
+        title: "Interest summary",
+        totalExpected: "Total expected interest",
+        totalProcessed: "Total processed interest",
+        remaining: "Remaining interest",
+      },
+      interestSchedule: {
+        title: "Interest schedule",
+        empty: "No schedule entries yet.",
+        transferFailed: "Transfer failed",
+      },
+      renewal: {
+        title: "Renewal information",
+        type: "Renewal type",
+        status: "Certificate status",
+      },
       edit: "Edit certificate",
       archive: "Archive certificate",
       archiveSuccess: "Certificate archived",
@@ -443,6 +506,8 @@ export const en = {
       termMax: "Term cannot exceed 50 years",
       termYearsMin: "Enter at least 1 year",
       termYearsMax: "Term cannot exceed 50 years",
+      interestDestinationRequired:
+        "Select a destination account for automatic interest transfers",
     },
   },
   records: {
@@ -455,6 +520,10 @@ export const en = {
       expense: {
         title: "Add expense",
         description: "Money spent from account",
+      },
+      transfer: {
+        title: "Add transfer",
+        description: "Move money between accounts",
       },
       adjustment: {
         title: "Adjustment",
@@ -470,14 +539,24 @@ export const en = {
         placeholder: {
           income: "e.g. Salary",
           expense: "e.g. Groceries",
+          transfer: "e.g. Monthly savings",
         },
       },
       reason: {
         label: "Reason",
         placeholder: "e.g. Bank reconciliation",
       },
-      date: "Date",
+      date: "Transaction date",
       correctBalance: "Correct balance",
+      transfer: {
+        fromAccount: "From account",
+        toAccount: "Destination account",
+        fromPlaceholder: "Select source account",
+        toPlaceholder: "Select destination account",
+        searchPlaceholder: "Search accounts",
+        noResults: "No matching accounts",
+        notSelected: "Not selected",
+      },
     },
     preview: {
       newBalance: "New balance",
@@ -494,11 +573,16 @@ export const en = {
       correctBalanceRequired: "Correct balance is required",
       dateRequired: "Date is required",
       dateFuture: "Date cannot be in the future",
+      fromAccountRequired: "Select a source account",
+      toAccountRequired: "Select a destination account",
+      transferSameAccount: "Source and destination must be different accounts",
     },
     types: {
       income: "Income",
       expense: "Expense",
+      transfer: "Transfer",
       adjustment: "Adjustment",
+      interest: "Interest",
     },
   },
   more: {

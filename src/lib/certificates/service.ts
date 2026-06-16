@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { calculateMaturityDate } from "@/lib/certificates/certificate-engine";
+import { generateAndPersistSchedule } from "@/lib/certificates/schedule-service";
 import { mapCertificate, type DbCertificate } from "@/lib/certificates/mappers";
 import type {
   Certificate,
@@ -138,7 +139,8 @@ export async function createCertificate(
       maturity_date: maturityDate,
       payout_frequency: input.payoutFrequency,
       destination_account_id: input.destinationAccountId ?? null,
-      auto_apply: false,
+      auto_apply: input.autoApply ?? false,
+      renewal_type: input.renewalType ?? "none",
       status: "active",
     })
     .select("*")
@@ -149,7 +151,10 @@ export async function createCertificate(
     throw new Error(getSupabaseErrorMessage(certificateError));
   }
 
-  return mapCertificate(certificateRow as DbCertificate);
+  const certificate = mapCertificate(certificateRow as DbCertificate);
+  await generateAndPersistSchedule(supabase, userId, certificate);
+  const refreshed = await getCertificate(supabase, userId, certificate.id);
+  return refreshed ?? certificate;
 }
 
 export async function updateCertificate(
@@ -176,9 +181,17 @@ export async function updateCertificate(
       ? calculateMaturityDate(purchaseDate, termMonths)
       : existing.maturityDate;
 
-  const certificatePayload: Record<string, unknown> = {
-    auto_apply: false,
-  };
+  const certificatePayload: Record<string, unknown> = {};
+
+  if (input.autoApply !== undefined) {
+    certificatePayload.auto_apply = input.autoApply;
+  }
+  if (input.renewalType !== undefined) {
+    if (existing.status !== "active") {
+      throw new Error("Renewal configuration cannot change on inactive certificates");
+    }
+    certificatePayload.renewal_type = input.renewalType;
+  }
 
   if (input.principalAmount !== undefined) {
     certificatePayload.principal_amount = input.principalAmount;
@@ -245,7 +258,22 @@ export async function updateCertificate(
       .eq("user_id", userId);
   }
 
-  return mapCertificate(data as DbCertificate);
+  const updated = mapCertificate(data as DbCertificate);
+
+  const scheduleFieldsChanged =
+    input.principalAmount !== undefined ||
+    input.annualInterestRate !== undefined ||
+    input.purchaseDate !== undefined ||
+    input.termMonths !== undefined ||
+    input.payoutFrequency !== undefined;
+
+  if (scheduleFieldsChanged && updated.status === "active") {
+    await generateAndPersistSchedule(supabase, userId, updated);
+    const refreshed = await getCertificate(supabase, userId, certificateId);
+    return refreshed ?? updated;
+  }
+
+  return updated;
 }
 
 export async function archiveCertificate(

@@ -3,24 +3,23 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { EditableField } from "@/components/field-editor";
+import { RecordFormFields } from "@/components/records/record-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { DateField } from "@/components/ui/date-field";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
-import {
-  formatAmountInput,
-  formatCurrency,
-  parseAmount,
-  sanitizeAmountInput,
-} from "@/lib/format/currency";
-import { isFutureDate, todayIsoDate } from "@/lib/format/date";
+import { parseAmount } from "@/lib/format/currency";
+import { todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
+import {
+  validateRecordForm,
+  type RecordFormValues,
+} from "@/lib/finance/record-form";
 import type { RecordType } from "@/lib/finance/types";
+import type { TranslationKey } from "@/lib/i18n";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import { useT, useLocale, useFormatLocale } from "@/providers/i18n-provider";
+import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
 interface AddRecordFormScreenProps {
@@ -31,43 +30,45 @@ interface AddRecordFormScreenProps {
 export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProps) {
   const t = useT();
   const locale = useLocale();
-  const formatLocale = useFormatLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { getAccount, createRecord } = useFinance();
+  const { accounts, getAccount, createRecord, createTransfer } = useFinance();
   const { showToast } = useToast();
 
   const account = getAccount(accountId);
 
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(todayIsoDate());
+  const [values, setValues] = useState<RecordFormValues>(() => ({
+    amount: "",
+    description: "",
+    date: todayIsoDate(),
+    fromAccountId: type === "transfer" ? accountId : null,
+    toAccountId: null,
+  }));
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDiscard, setShowDiscard] = useState(false);
 
-  const parsedAmount = parseAmount(amount);
-
-  const preview = useMemo(() => {
-    if (!account || parsedAmount === null) return null;
-    if (type === "adjustment") {
-      const delta = parsedAmount - account.currentBalance;
-      return {
-        current: account.currentBalance,
-        delta,
-        next: parsedAmount,
-      };
-    }
-    if (type === "income") {
-      return { next: account.currentBalance + parsedAmount };
-    }
-    return { next: account.currentBalance - parsedAmount };
-  }, [account, parsedAmount, type]);
-
   const isDirty =
-    amount.trim().length > 0 ||
-    description.trim().length > 0 ||
-    date !== todayIsoDate();
+    values.amount.trim().length > 0 ||
+    values.description.trim().length > 0 ||
+    values.date !== todayIsoDate() ||
+    (type === "transfer" &&
+      (values.fromAccountId !== accountId || values.toAccountId !== null));
+
+  const fromAccount = useMemo(
+    () =>
+      values.fromAccountId
+        ? accounts.find((item) => item.id === values.fromAccountId)
+        : undefined,
+    [accounts, values.fromAccountId],
+  );
+
+  const parsedAmount = parseAmount(values.amount);
+  const showInsufficientTransferBalance =
+    type === "transfer" &&
+    fromAccount &&
+    parsedAmount !== null &&
+    parsedAmount > fromAccount.currentBalance;
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -78,48 +79,39 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     });
   }
 
-  function validate() {
-    const nextErrors: Record<string, string> = {};
-    const value = parseAmount(amount);
-
-    if (value === null) {
-      nextErrors.amount =
-        type === "adjustment"
-          ? t("records.validation.correctBalanceRequired")
-          : t("records.validation.amountRequired");
-    } else if (value <= 0 && type !== "adjustment") {
-      nextErrors.amount = t("records.validation.amountZero");
-    } else if (
-      type === "adjustment" &&
-      account &&
-      value === account.currentBalance
-    ) {
-      nextErrors.amount = t("records.adjustmentNoChange");
-    }
-
-    if (!date) {
-      nextErrors.date = t("records.validation.dateRequired");
-    } else if (isFutureDate(date)) {
-      nextErrors.date = t("records.validation.dateFuture");
-    }
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  }
-
   async function handleSubmit() {
-    if (!account || !validate()) return;
-    const value = parseAmount(amount);
-    if (value === null) return;
+    const nextErrors = validateRecordForm(type, values, t, {
+      currentBalance: account?.currentBalance,
+    });
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    const amount = parseAmount(values.amount);
+    if (amount === null) return;
 
     setSubmitting(true);
     try {
+      if (type === "transfer") {
+        if (!values.fromAccountId || !values.toAccountId) return;
+        await createTransfer({
+          fromAccountId: values.fromAccountId,
+          toAccountId: values.toAccountId,
+          amount,
+          description: values.description.trim() || null,
+          date: values.date,
+        });
+        showToast(t("common.transferRecorded"));
+        router.replace(`/accounts/${accountId}`);
+        return;
+      }
+
+      if (!account) return;
       await createRecord({
         accountId,
         type,
-        amount: value,
-        description: description.trim() || null,
-        date,
+        amount,
+        description: values.description.trim() || null,
+        date: values.date,
       });
 
       if (type === "income") showToast(t("common.incomeRecorded"));
@@ -149,50 +141,15 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     confirmDiscardNavigation(() => router.back());
   }
 
-  const titleKey =
+  const titleKey: TranslationKey =
     type === "adjustment"
       ? "records.add.adjustment.title"
-      : (`records.add.${type}.title` as const);
+      : type === "interest"
+        ? "records.types.interest"
+        : (`records.add.${type}.title` as TranslationKey);
 
-  const showInsufficientBalance =
-    type === "expense" &&
-    account &&
-    parsedAmount !== null &&
-    parsedAmount > account.currentBalance;
-
-  const amountLabel =
-    type === "adjustment"
-      ? t("records.fields.correctBalance")
-      : t("records.fields.amount");
-
-  const descriptionLabel =
-    type !== "adjustment"
-      ? t("records.fields.description.label")
-      : t("records.fields.reason.label");
-
-  const descriptionPlaceholder =
-    type !== "adjustment"
-      ? t(`records.fields.description.placeholder.${type}`)
-      : t("records.fields.reason.placeholder");
-
-  function validateRecordAmount(value: string): string | undefined {
-    const parsed = parseAmount(value);
-    if (parsed === null) {
-      return type === "adjustment"
-        ? t("records.validation.correctBalanceRequired")
-        : t("records.validation.amountRequired");
-    }
-    if (parsed <= 0 && type !== "adjustment") {
-      return t("records.validation.amountZero");
-    }
-    if (
-      type === "adjustment" &&
-      account &&
-      parsed === account.currentBalance
-    ) {
-      return t("records.adjustmentNoChange");
-    }
-  }
+  const canSubmit =
+    type === "transfer" ? Boolean(values.fromAccountId && values.toAccountId) : Boolean(account);
 
   return (
     <>
@@ -204,88 +161,33 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           </p>
         ) : null}
 
-        <EditableField
-          id="record-amount"
-          label={amountLabel}
-          mode="numeric"
-          inputMode="decimal"
-          value={amount}
+        <RecordFormFields
+          type={type}
+          values={values}
+          errors={errors}
+          amountInputLocale={amountInputLocale}
           disabled={submitting}
-          error={errors.amount}
-          prefixLabel={t("common.currency.code")}
-          sanitizeInput={sanitizeAmountInput}
-          formatDisplay={(value) => formatAmountInput(value, amountInputLocale)}
-          triggerClassName="tabular-nums"
-          validate={validateRecordAmount}
-          onSave={(nextAmount) => {
-            setAmount(nextAmount);
-            clearFieldError("amount");
-          }}
+          account={account}
+          accounts={accounts}
+          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+          onClearError={clearFieldError}
         />
-        {showInsufficientBalance ? (
-          <p className="-mt-3 text-sm text-muted-foreground">
+
+        {showInsufficientTransferBalance ? (
+          <p className="text-sm text-muted-foreground">
             {t("records.insufficientBalance")}
           </p>
         ) : null}
 
-        <EditableField
-          id={type !== "adjustment" ? "description" : "reason"}
-          label={`${descriptionLabel} (${t("common.optional")})`}
-          value={description}
-          placeholder={descriptionPlaceholder}
-          disabled={submitting}
-          onSave={setDescription}
-        />
-
-        <div className="min-w-0 w-full max-w-full space-y-2">
-          <DateField
-            id="record-date"
-            value={date}
-            locale={formatLocale}
-            label={t("records.fields.date")}
-            onChange={(nextDate) => {
-              setDate(nextDate);
-              clearFieldError("date");
-            }}
-            aria-invalid={Boolean(errors.date)}
-          />
-          {errors.date ? (
-            <p className="text-sm text-destructive">{errors.date}</p>
-          ) : null}
-        </div>
-
-        {preview && parsedAmount !== null ? (
-          <div className="space-y-1">
-            {type === "adjustment" && preview.current !== undefined ? (
-              <>
-                <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
-                  <span>{t("records.preview.currentBalance")}</span>
-                  <span className="shrink-0 tabular-nums">
-                    {formatCurrency(preview.current, formatLocale)}
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
-                  <span>{t("records.preview.adjustment")}</span>
-                  <span className="shrink-0 tabular-nums">
-                    {formatCurrency("delta" in preview ? preview.delta : 0, formatLocale)}
-                  </span>
-                </div>
-              </>
-            ) : null}
-            <div className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium text-foreground">
-              <span>{t("records.preview.newBalance")}</span>
-              <span className="shrink-0 tabular-nums">
-                {formatCurrency(preview.next, formatLocale)}
-              </span>
-            </div>
-          </div>
+        {errors.form ? (
+          <p className="text-sm text-destructive">{errors.form}</p>
         ) : null}
       </ScreenBody>
 
       <StickyFooter>
         <Button
           className="h-12 w-full"
-          disabled={submitting || !account}
+          disabled={submitting || !canSubmit}
           onClick={handleSubmit}
         >
           {submitting ? t("records.add.saving") : t("records.add.save")}

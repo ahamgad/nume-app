@@ -17,12 +17,16 @@ export function formatCurrency(
 
 export function formatSignedCurrency(
   amount: number,
-  type: "income" | "expense" | "adjustment",
+  type: "income" | "expense" | "adjustment" | "transfer" | "interest",
   locale: string = DEFAULT_LOCALE,
 ): string {
   const formatted = formatCurrency(Math.abs(amount), locale);
-  if (type === "income") return `+${formatted}`;
+  if (type === "income" || type === "interest") return `+${formatted}`;
   if (type === "expense") return `−${formatted}`;
+  if (type === "transfer") {
+    const sign = amount >= 0 ? "+" : "−";
+    return `${sign}${formatted}`;
+  }
   const sign = amount >= 0 ? "+" : "−";
   return `${sign}${formatCurrency(Math.abs(amount), locale)}`;
 }

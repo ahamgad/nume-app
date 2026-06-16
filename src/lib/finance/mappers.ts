@@ -18,10 +18,12 @@ export interface DbRecord {
   id: string;
   user_id: string;
   account_id: string;
-  record_type: RecordType | "transfer" | "system";
+  record_type: RecordType | "system";
   amount: number;
   description: string | null;
   record_date: string;
+  certificate_id: string | null;
+  schedule_entry_id: string | null;
   created_at: string;
 }
 
@@ -48,6 +50,8 @@ export function mapRecord(row: DbRecord): FinanceRecord {
     amount: Number(row.amount),
     description: row.description,
     date: row.record_date,
+    certificateId: row.certificate_id ?? null,
+    scheduleEntryId: row.schedule_entry_id ?? null,
     createdAt: row.created_at,
   };
 }

@@ -102,6 +102,7 @@ export const ar = {
     incomeRecorded: "تم تسجيل الدخل",
     expenseRecorded: "تم تسجيل المصروف",
     adjustmentRecorded: "تم تسجيل التعديل",
+    transferRecorded: "تم تسجيل التحويل",
   },
   fieldEditor: {
     confirm: "حفظ التغييرات",
@@ -122,6 +123,17 @@ export const ar = {
       title: "أضف حسابك الأول",
       description: "ابدأ تتبع ثروتك من هنا",
       action: "إضافة",
+    },
+    certificates: {
+      upcomingInterest: {
+        title: "العائد القادم",
+        date: "الدفعة التالية في {date}",
+      },
+      maturingSoon: {
+        title: "شهادات تستحق قريبًا",
+        days: "{count} يومًا",
+      },
+      autoRenewalIndicator: "تجديد تلقائي",
     },
     widgets: {
       financialHealth: {
@@ -176,6 +188,11 @@ export const ar = {
       certificates: "الشهادات",
       basic: "المعلومات الأساسية",
       balance: "الرصيد",
+    },
+    formSections: {
+      accountDetails: "تفاصيل الحساب",
+      interestDetails: "تفاصيل العائد",
+      recurring: "متكرر",
     },
     types: {
       currentAccount: "حساب جاري",
@@ -377,6 +394,17 @@ export const ar = {
         noResults: "لا توجد حسابات مطابقة",
         notSelected: "غير محدد",
       },
+      autoApplyInterest: {
+        label: "تحويل العائد تلقائيًا",
+        description:
+          "عند التفعيل، يُحوَّل العائد إلى حساب الوجهة في كل تاريخ دفع.",
+      },
+      renewal: {
+        title: "التجديد",
+        type: {
+          label: "نوع التجديد",
+        },
+      },
     },
     payoutFrequency: {
       instantly: "فورًا",
@@ -389,7 +417,21 @@ export const ar = {
     status: {
       active: "نشطة",
       matured: "مستحقة",
+      renewed: "مجددة",
+      closed: "مغلقة",
       archived: "مؤرشفة",
+    },
+    schedule: {
+      status: {
+        pending: "معلقة",
+        processed: "تمت المعالجة",
+        skipped: "تم التخطي",
+      },
+    },
+    renewalType: {
+      none: "بدون",
+      renew_principal: "تجديد المبلغ الأساسي",
+      renew_principal_and_interest: "تجديد المبلغ والعائد",
     },
     details: {
       summary: "الملخص",
@@ -415,6 +457,27 @@ export const ar = {
         notSelected: "غير محدد",
       },
       noNextPayout: "لا توجد دفعة قادمة",
+      autoApplyActive: "تحويل تلقائي مفعّل",
+      processInterest: {
+        action: "معالجة العائد",
+        processing: "جارٍ المعالجة…",
+      },
+      interestSummary: {
+        title: "ملخص العائد",
+        totalExpected: "إجمالي العائد المتوقع",
+        totalProcessed: "إجمالي العائد المُعالَج",
+        remaining: "العائد المتبقي",
+      },
+      interestSchedule: {
+        title: "جدول العائد",
+        empty: "لا توجد بنود في الجدول بعد.",
+        transferFailed: "فشل التحويل",
+      },
+      renewal: {
+        title: "معلومات التجديد",
+        type: "نوع التجديد",
+        status: "حالة الشهادة",
+      },
       edit: "تعديل الشهادة",
       archive: "أرشفة الشهادة",
       archiveSuccess: "تمت أرشفة الشهادة",
@@ -443,6 +506,8 @@ export const ar = {
       termMax: "لا يمكن أن تتجاوز المدة 50 سنة",
       termYearsMin: "أدخل سنة واحدة على الأقل",
       termYearsMax: "لا يمكن أن تتجاوز المدة 50 سنة",
+      interestDestinationRequired:
+        "اختر حساب وجهة لتحويل العائد تلقائيًا",
     },
   },
   records: {
@@ -455,6 +520,10 @@ export const ar = {
       expense: {
         title: "إضافة مصروف",
         description: "أموال خرجت من الحساب",
+      },
+      transfer: {
+        title: "إضافة تحويل",
+        description: "نقل أموال بين الحسابات",
       },
       adjustment: {
         title: "تعديل",
@@ -470,14 +539,24 @@ export const ar = {
         placeholder: {
           income: "مثال: الراتب",
           expense: "مثال: البقالة",
+          transfer: "مثال: ادخار شهري",
         },
       },
       reason: {
         label: "السبب",
         placeholder: "مثال: مطابقة بنكية",
       },
-      date: "التاريخ",
+      date: "تاريخ المعاملة",
       correctBalance: "الرصيد الصحيح",
+      transfer: {
+        fromAccount: "من حساب",
+        toAccount: "إلى حساب",
+        fromPlaceholder: "اختر حساب المصدر",
+        toPlaceholder: "اختر حساب الوجهة",
+        searchPlaceholder: "ابحث في الحسابات",
+        noResults: "لا توجد حسابات مطابقة",
+        notSelected: "غير محدد",
+      },
     },
     preview: {
       newBalance: "الرصيد الجديد",
@@ -494,11 +573,16 @@ export const ar = {
       correctBalanceRequired: "الرصيد الصحيح مطلوب",
       dateRequired: "التاريخ مطلوب",
       dateFuture: "لا يمكن أن يكون التاريخ في المستقبل",
+      fromAccountRequired: "اختر حساب المصدر",
+      toAccountRequired: "اختر حساب الوجهة",
+      transferSameAccount: "يجب أن يختلف حساب المصدر عن الوجهة",
     },
     types: {
       income: "دخل",
       expense: "مصروف",
+      transfer: "تحويل",
       adjustment: "تعديل",
+      interest: "عائد",
     },
   },
   more: {

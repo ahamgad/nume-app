@@ -88,7 +88,13 @@ export function calculateCurrentValue(
   principalAmount: number,
   status: CertificateStatus,
 ): number {
-  if (status === "archived") return 0;
+  if (
+    status === "archived" ||
+    status === "closed" ||
+    status === "renewed"
+  ) {
+    return 0;
+  }
   return principalAmount;
 }
 

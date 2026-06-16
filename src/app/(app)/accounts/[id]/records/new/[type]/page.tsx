@@ -6,7 +6,12 @@ interface NewRecordTypePageProps {
 }
 
 function isRecordType(value: string): value is RecordType {
-  return value === "income" || value === "expense" || value === "adjustment";
+  return (
+    value === "income" ||
+    value === "expense" ||
+    value === "transfer" ||
+    value === "adjustment"
+  );
 }
 
 export default async function NewRecordTypePage({

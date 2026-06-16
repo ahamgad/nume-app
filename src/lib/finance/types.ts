@@ -23,7 +23,7 @@ export function isEnabledAddAccountType(
   return ENABLED_ADD_ACCOUNT_TYPES.includes(type as MoneyAccountType);
 }
 
-export type RecordType = "income" | "expense" | "adjustment";
+export type RecordType = "income" | "expense" | "transfer" | "adjustment" | "interest";
 
 export interface Account {
   id: string;
@@ -45,6 +45,8 @@ export interface FinanceRecord {
   amount: number;
   description: string | null;
   date: string;
+  certificateId: string | null;
+  scheduleEntryId: string | null;
   createdAt: string;
 }
 
@@ -59,7 +61,15 @@ export interface CreateAccountInput {
 
 export interface CreateRecordInput {
   accountId: string;
-  type: RecordType;
+  type: Exclude<RecordType, "transfer">;
+  amount: number;
+  description?: string | null;
+  date: string;
+}
+
+export interface CreateTransferInput {
+  fromAccountId: string;
+  toAccountId: string;
   amount: number;
   description?: string | null;
   date: string;

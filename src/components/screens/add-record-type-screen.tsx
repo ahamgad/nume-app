@@ -11,16 +11,16 @@ import { useRouter } from "next/navigation";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Card } from "@/components/ui/card";
 import { useFinance } from "@/lib/finance/store";
-import type { RecordType } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
 
 interface AddRecordTypeScreenProps {
   accountId: string;
 }
 
-const recordTypes: RecordType[] = ["income", "expense", "adjustment"];
+const recordTypes = ["income", "expense", "transfer"] as const;
+type AddRecordType = (typeof recordTypes)[number];
 
-function typeIcon(type: RecordType) {
+function typeIcon(type: AddRecordType) {
   if (type === "income") return <ArrowDownLeft className="size-5" />;
   if (type === "expense") return <ArrowUpRight className="size-5" />;
   return <ArrowLeftRight className="size-5" />;

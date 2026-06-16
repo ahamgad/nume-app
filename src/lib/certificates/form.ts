@@ -1,4 +1,4 @@
-import type { PayoutFrequency } from "@/lib/certificates/types";
+import type { PayoutFrequency, RenewalType } from "@/lib/certificates/types";
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import type { TranslationKey } from "@/lib/i18n";
 import { parseAmount } from "@/lib/format/currency";
@@ -20,6 +20,8 @@ export interface CertificateFormValues {
   customTermYears: string;
   payoutFrequency: PayoutFrequency;
   destinationAccountId: string | null;
+  autoApplyInterest: boolean;
+  renewalType: RenewalType;
 }
 
 export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
@@ -32,6 +34,8 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   customTermYears: "",
   payoutFrequency: "monthly",
   destinationAccountId: null,
+  autoApplyInterest: false,
+  renewalType: "none",
 };
 
 export function yearsToTermMonths(years: number): number {
@@ -101,6 +105,12 @@ export function validateCertificateForm(
     }
   }
 
+  if (values.autoApplyInterest && !values.destinationAccountId) {
+    errors.destinationAccountId = t(
+      "certificates.validation.interestDestinationRequired",
+    );
+  }
+
   return errors;
 }
 
@@ -112,6 +122,8 @@ export function certificateFormValuesFromCertificate(
     termMonths: number;
     payoutFrequency: PayoutFrequency;
     destinationAccountId: string | null;
+    autoApply: boolean;
+    renewalType: RenewalType;
   },
   account: { name: string; institution: string | null },
 ): CertificateFormValues {
@@ -134,6 +146,8 @@ export function certificateFormValuesFromCertificate(
         : "",
     payoutFrequency: certificate.payoutFrequency,
     destinationAccountId: certificate.destinationAccountId,
+    autoApplyInterest: certificate.autoApply,
+    renewalType: certificate.renewalType ?? "none",
   };
 }
 
@@ -150,6 +164,8 @@ export function isCertificateFormDirty(
     values.termPreset !== initial.termPreset ||
     values.customTermYears !== initial.customTermYears ||
     values.payoutFrequency !== initial.payoutFrequency ||
-    values.destinationAccountId !== initial.destinationAccountId
+    values.destinationAccountId !== initial.destinationAccountId ||
+    values.autoApplyInterest !== initial.autoApplyInterest ||
+    values.renewalType !== initial.renewalType
   );
 }

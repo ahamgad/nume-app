@@ -6,20 +6,36 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
+  useState,
   type ReactNode,
 } from "react";
 
+import {
+  buildCertificateAccountNameKey,
+  buildCertificateAccountNameLookup,
+  computeCertificateInsights,
+  getCertificateSchedules as selectCertificateSchedules,
+} from "@/lib/certificates/certificate-insights";
+import {
+  processAllDueCertificateInterest,
+  processCertificateInterest as processCertificateInterestService,
+} from "@/lib/certificates/interest-processor";
+import { getCertificateSchedulesSafe } from "@/lib/certificates/load-schedules";
+import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import {
   archiveCertificate as archiveCertificateService,
   createCertificate as createCertificateService,
   updateCertificate as updateCertificateService,
 } from "@/lib/certificates/service";
-import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import type {
   Certificate,
+  CertificateInsights,
+  CertificateScheduleEntry,
   CreateCertificateInput,
   UpdateCertificateInput,
 } from "@/lib/certificates/types";
+import type { ProcessCertificateInterestResult } from "@/lib/certificates/recurring/types";
 import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
   archiveAccount as archiveAccountService,
@@ -28,6 +44,7 @@ import {
   fetchRecords,
   insertAccount,
   insertRecordWithBalanceUpdate,
+  insertTransfer,
   patchAccount,
   restoreAccount as restoreAccountService,
 } from "@/lib/finance/service";
@@ -35,6 +52,7 @@ import type {
   Account,
   CreateAccountInput,
   CreateRecordInput,
+  CreateTransferInput,
   FinanceRecord,
 } from "@/lib/finance/types";
 import { createClient } from "@/lib/supabase/client";
@@ -47,16 +65,21 @@ interface FinanceData {
   accounts: Account[];
   records: FinanceRecord[];
   certificates: Certificate[];
+  certificateSchedules: CertificateScheduleEntry[];
 }
 
 interface FinanceContextValue {
   accounts: Account[];
   records: FinanceRecord[];
   certificates: Certificate[];
+  certificateSchedules: CertificateScheduleEntry[];
+  certificateInsights: CertificateInsights;
   isLoading: boolean;
   isHydrated: boolean;
   isFinanceReady: boolean;
   isFinanceLoading: boolean;
+  isProcessingInterest: boolean;
+  isProcessingCertificateInterest: (certificateId: string) => boolean;
   netWorth: ReturnType<typeof calculateNetWorth>;
   createAccount: (input: CreateAccountInput) => Promise<Account>;
   createCertificate: (input: CreateCertificateInput) => Promise<Certificate>;
@@ -65,6 +88,10 @@ interface FinanceContextValue {
     input: UpdateCertificateInput,
   ) => Promise<Certificate>;
   archiveCertificate: (certificateId: string) => Promise<void>;
+  processCertificateInterest: (
+    certificateId: string,
+  ) => Promise<ProcessCertificateInterestResult>;
+  getCertificateSchedules: (certificateId: string) => CertificateScheduleEntry[];
   deleteAccount: (id: string) => Promise<void>;
   archiveAccount: (id: string) => Promise<void>;
   restoreAccount: (id: string) => Promise<void>;
@@ -85,25 +112,30 @@ interface FinanceContextValue {
   getCertificateByAccountId: (accountId: string) => Certificate | undefined;
   getAccountRecords: (accountId: string) => FinanceRecord[];
   createRecord: (input: CreateRecordInput) => Promise<FinanceRecord>;
+  createTransfer: (input: CreateTransferInput) => Promise<void>;
   recentRecords: (limit?: number) => FinanceRecord[];
   refresh: () => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
 
-async function loadFinanceData(userId: string): Promise<FinanceData> {
-  const supabase = createClient();
-  // Core money data must never depend on optional Certificates migration.
+async function fetchFinanceSnapshot(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<FinanceData> {
   const [accounts, records] = await Promise.all([
     fetchAccounts(supabase, userId),
     fetchRecords(supabase, userId),
   ]);
 
   let certificates: Certificate[] = [];
+  let certificateSchedules: CertificateScheduleEntry[] = [];
+
   try {
     certificates = await getCertificatesSafe(supabase, userId);
+    certificateSchedules = await getCertificateSchedulesSafe(supabase, userId);
   } catch (error) {
-    logSupabaseError("loadFinanceData:certificates", error);
+    logSupabaseError("fetchFinanceSnapshot:certificates", error);
   }
 
   const activeAccountIds = new Set(accounts.map((account) => account.id));
@@ -111,32 +143,45 @@ async function loadFinanceData(userId: string): Promise<FinanceData> {
     activeAccountIds.has(certificate.accountId),
   );
 
-  return { accounts, records, certificates };
+  return { accounts, records, certificates, certificateSchedules };
 }
 
-function accountFromCertificateInput(
-  certificate: Certificate,
-  input: CreateCertificateInput,
-): Account {
-  const now = certificate.createdAt;
-  return {
-    id: certificate.accountId,
-    type: "certificate",
-    name: input.name.trim(),
-    institution: input.institution?.trim() || null,
-    currentBalance: certificate.principalAmount,
-    includeInNetWorth: input.includeInNetWorth ?? true,
-    includeInEmergencyFund: input.includeInEmergencyFund ?? false,
-    status: "active",
-    createdAt: now,
-    updatedAt: certificate.updatedAt,
-  };
+async function loadFinanceData(userId: string): Promise<FinanceData> {
+  const supabase = createClient();
+  let snapshot = await fetchFinanceSnapshot(supabase, userId);
+
+  const activeCertificateIds = snapshot.certificates
+    .filter((certificate) => certificate.status === "active")
+    .map((certificate) => certificate.id);
+
+  if (activeCertificateIds.length > 0) {
+    try {
+      await processAllDueCertificateInterest(
+        supabase,
+        userId,
+        activeCertificateIds,
+      );
+      snapshot = await fetchFinanceSnapshot(supabase, userId);
+    } catch (error) {
+      logSupabaseError("loadFinanceData:processInterest", error);
+    }
+  }
+
+  return snapshot;
 }
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id;
+  const processingCertificatesRef = useRef<Set<string>>(new Set());
+  const [processingCertificateIds, setProcessingCertificateIds] = useState<
+    string[]
+  >([]);
+
+  const syncProcessingCertificateIds = useCallback(() => {
+    setProcessingCertificateIds([...processingCertificatesRef.current]);
+  }, []);
 
   const { data, isLoading: financeLoading, isFetched } = useQuery({
     queryKey: [FINANCE_QUERY_KEY, userId],
@@ -150,6 +195,38 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const certificates = useMemo(
     () => data?.certificates ?? [],
     [data?.certificates],
+  );
+  const certificateSchedules = useMemo(
+    () => data?.certificateSchedules ?? [],
+    [data?.certificateSchedules],
+  );
+
+  const certificateAccountNameKey = useMemo(
+    () => buildCertificateAccountNameKey(accounts),
+    [accounts],
+  );
+
+  const certificateAccountNames = useMemo(
+    () => buildCertificateAccountNameLookup(accounts),
+    [certificateAccountNameKey],
+  );
+
+  const certificateInsights = useMemo(
+    () =>
+      computeCertificateInsights(
+        certificates,
+        certificateSchedules,
+        certificateAccountNames,
+      ),
+    [certificates, certificateSchedules, certificateAccountNames],
+  );
+
+  const isProcessingInterest = processingCertificateIds.length > 0;
+
+  const isProcessingCertificateInterest = useCallback(
+    (certificateId: string) =>
+      processingCertificatesRef.current.has(certificateId),
+    [processingCertificateIds],
   );
 
   const invalidate = useCallback(async () => {
@@ -173,30 +250,26 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           accounts: [...(current?.accounts ?? []), account],
           records: current?.records ?? [],
           certificates: current?.certificates ?? [],
+          certificateSchedules: current?.certificateSchedules ?? [],
         }),
       );
       return account;
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const createCertificate = useCallback(
     async (input: CreateCertificateInput): Promise<Certificate> => {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
-      const certificate = await createCertificateService(supabase, userId, input);
-      const account = accountFromCertificateInput(certificate, input);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => ({
-          accounts: [...(current?.accounts ?? []), account],
-          records: current?.records ?? [],
-          certificates: [...(current?.certificates ?? []), certificate],
-        }),
-      );
+      await createCertificateService(supabase, userId, input);
+      await invalidate();
+      const refreshed = await fetchFinanceSnapshot(supabase, userId);
+      const certificate = refreshed.certificates.at(-1);
+      if (!certificate) throw new Error("Certificate not found after create");
       return certificate;
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const updateCertificate = useCallback(
@@ -212,75 +285,63 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         certificateId,
         input,
       );
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => {
-          if (!current) return current;
-          const nextCertificates = current.certificates.map((certificate) =>
-            certificate.id === certificateId ? updated : certificate,
-          );
-          const nextAccounts = current.accounts.map((account) => {
-            if (account.id !== updated.accountId) return account;
-            return {
-              ...account,
-              name: input.name ?? account.name,
-              institution:
-                input.institution !== undefined
-                  ? input.institution
-                  : account.institution,
-              currentBalance: input.principalAmount ?? account.currentBalance,
-              includeInNetWorth:
-                input.includeInNetWorth ?? account.includeInNetWorth,
-              includeInEmergencyFund:
-                input.includeInEmergencyFund ?? account.includeInEmergencyFund,
-              status:
-                input.status === "archived" ? ("archived" as const) : account.status,
-              updatedAt: updated.updatedAt,
-            };
-          });
-          return {
-            ...current,
-            accounts: nextAccounts,
-            certificates: nextCertificates,
-          };
-        },
-      );
+      await invalidate();
       return updated;
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const archiveCertificate = useCallback(
     async (certificateId: string): Promise<void> => {
       if (!userId) throw new Error("Not authenticated");
-      const existing = certificates.find(
-        (certificate) => certificate.id === certificateId,
-      );
-      if (!existing) throw new Error("Certificate not found");
-
       const supabase = createClient();
       await archiveCertificateService(supabase, userId, certificateId);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => {
-          if (!current) return current;
-          return {
-            accounts: current.accounts.map((account) =>
-              account.id === existing.accountId
-                ? { ...account, status: "archived" as const, includeInNetWorth: false }
-                : account,
-            ),
-            records: current.records,
-            certificates: current.certificates.map((certificate) =>
-              certificate.id === certificateId
-                ? { ...certificate, status: "archived" as const }
-                : certificate,
-            ),
-          };
-        },
-      );
+      await invalidate();
     },
-    [userId, certificates, queryClient],
+    [userId, invalidate],
+  );
+
+  const processCertificateInterest = useCallback(
+    async (certificateId: string): Promise<ProcessCertificateInterestResult> => {
+      if (!userId) throw new Error("Not authenticated");
+      if (processingCertificatesRef.current.has(certificateId)) {
+        const current = certificates.find(
+          (certificate) => certificate.id === certificateId,
+        );
+        return {
+          certificateId,
+          processedCount: 0,
+          matured: false,
+          renewed: false,
+          closed: false,
+          entries: [],
+        };
+      }
+
+      processingCertificatesRef.current.add(certificateId);
+      syncProcessingCertificateIds();
+
+      try {
+        const supabase = createClient();
+        const result = await processCertificateInterestService(
+          supabase,
+          userId,
+          certificateId,
+        );
+        await invalidate();
+        return result;
+      } finally {
+        processingCertificatesRef.current.delete(certificateId);
+        syncProcessingCertificateIds();
+      }
+    },
+    [userId, invalidate, certificates, syncProcessingCertificateIds],
+  );
+
+  const getCertificateSchedules = useCallback(
+    (certificateId: string) =>
+      selectCertificateSchedules(certificateSchedules, certificateId),
+    [certificateSchedules],
   );
 
   const archiveAccount = useCallback(
@@ -288,23 +349,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       await archiveAccountService(supabase, userId, id);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => {
-          if (!current) return current;
-          return {
-            accounts: current.accounts.map((account) =>
-              account.id === id
-                ? { ...account, status: "archived" as const, includeInNetWorth: false }
-                : account,
-            ),
-            records: current.records,
-            certificates: current.certificates,
-          };
-        },
-      );
+      await invalidate();
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const restoreAccount = useCallback(
@@ -312,21 +359,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       await restoreAccountService(supabase, userId, id);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => {
-          if (!current) return current;
-          return {
-            accounts: current.accounts.map((account) =>
-              account.id === id ? { ...account, status: "active" as const } : account,
-            ),
-            records: current.records,
-            certificates: current.certificates,
-          };
-        },
-      );
+      await invalidate();
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const deleteAccount = useCallback(
@@ -334,20 +369,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       await deleteAccountService(supabase, userId, id);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => ({
-          accounts: (current?.accounts ?? []).filter((account) => account.id !== id),
-          records: (current?.records ?? []).filter(
-            (record) => record.accountId !== id,
-          ),
-          certificates: (current?.certificates ?? []).filter(
-            (certificate) => certificate.accountId !== id,
-          ),
-        }),
-      );
+      await invalidate();
     },
-    [userId, queryClient],
+    [userId, invalidate],
   );
 
   const updateAccount = useCallback(
@@ -414,6 +438,28 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [userId, accounts, invalidate],
   );
 
+  const createTransfer = useCallback(
+    async (input: CreateTransferInput): Promise<void> => {
+      if (!userId) throw new Error("Not authenticated");
+      const fromAccount = accounts.find((a) => a.id === input.fromAccountId);
+      const toAccount = accounts.find((a) => a.id === input.toAccountId);
+      if (!fromAccount || !toAccount) {
+        throw new Error("Account not found");
+      }
+
+      const supabase = createClient();
+      await insertTransfer(
+        supabase,
+        userId,
+        input,
+        fromAccount,
+        toAccount,
+      );
+      await invalidate();
+    },
+    [userId, accounts, invalidate],
+  );
+
   const recentRecords = useCallback(
     (limit = 3) =>
       [...records]
@@ -441,15 +487,21 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       accounts,
       records,
       certificates,
+      certificateSchedules,
+      certificateInsights,
       isLoading,
       isHydrated,
       isFinanceReady,
       isFinanceLoading,
+      isProcessingInterest,
+      isProcessingCertificateInterest,
       netWorth,
       createAccount,
       createCertificate,
       updateCertificate,
       archiveCertificate,
+      processCertificateInterest,
+      getCertificateSchedules,
       archiveAccount,
       restoreAccount,
       deleteAccount,
@@ -458,6 +510,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getCertificateByAccountId,
       getAccountRecords,
       createRecord,
+      createTransfer,
       recentRecords,
       refresh,
     }),
@@ -465,15 +518,21 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       accounts,
       records,
       certificates,
+      certificateSchedules,
+      certificateInsights,
       isLoading,
       isHydrated,
       isFinanceReady,
       isFinanceLoading,
+      isProcessingInterest,
+      isProcessingCertificateInterest,
       netWorth,
       createAccount,
       createCertificate,
       updateCertificate,
       archiveCertificate,
+      processCertificateInterest,
+      getCertificateSchedules,
       archiveAccount,
       restoreAccount,
       deleteAccount,
@@ -482,6 +541,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getCertificateByAccountId,
       getAccountRecords,
       createRecord,
+      createTransfer,
       recentRecords,
       refresh,
     ],

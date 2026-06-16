@@ -17,7 +17,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
-import { filterSettlementAccounts } from "@/lib/finance/account-capabilities";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
@@ -33,12 +33,14 @@ interface EditCertificateFormProps {
   accountId: string;
   certificateId: string;
   initialValues: CertificateFormValues;
+  renewalEditable: boolean;
 }
 
 function EditCertificateForm({
   accountId,
   certificateId,
   initialValues,
+  renewalEditable,
 }: EditCertificateFormProps) {
   const t = useT();
   const locale = useLocale();
@@ -54,8 +56,8 @@ function EditCertificateForm({
 
   const isDirty = isCertificateFormDirty(values, initialValues);
 
-  const settlementAccounts = useMemo(() => {
-    const eligible = filterSettlementAccounts(accounts, {
+  const transferAccounts = useMemo(() => {
+    const eligible = filterTransferAccounts(accounts, {
       excludeAccountIds: [accountId],
     });
     if (!values.destinationAccountId) return eligible;
@@ -104,7 +106,11 @@ function EditCertificateForm({
         purchaseDate: values.purchaseDate,
         termMonths,
         payoutFrequency: values.payoutFrequency,
-        destinationAccountId: values.destinationAccountId,
+        destinationAccountId: values.autoApplyInterest
+          ? values.destinationAccountId
+          : null,
+        autoApply: values.autoApplyInterest,
+        ...(renewalEditable ? { renewalType: values.renewalType } : {}),
       });
       showToast(t("certificates.edit.success"));
       router.replace(`/accounts/${accountId}`);
@@ -146,8 +152,9 @@ function EditCertificateForm({
             values={values}
             errors={errors}
             amountInputLocale={amountInputLocale}
-            settlementAccounts={settlementAccounts}
+            transferAccounts={transferAccounts}
             disabled={submitting}
+            renewalEditable={renewalEditable}
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
@@ -223,6 +230,7 @@ export function EditCertificateScreen({ accountId }: EditCertificateScreenProps)
       accountId={accountId}
       certificateId={certificate.id}
       initialValues={initialValues}
+      renewalEditable={certificate.status === "active"}
     />
   );
 }
