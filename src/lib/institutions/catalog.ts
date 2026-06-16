@@ -283,6 +283,19 @@ export function getInstitutionTriggerLabel(
   return trimmed;
 }
 
+/** List rows: shortcut only for catalog entries; custom values as-is. */
+export function formatInstitutionShortcut(
+  value: string,
+  t: InstitutionTranslator,
+): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const match = matchInstitutionEntryGlobal(trimmed, t);
+  if (match) return match.shortcut;
+  return trimmed;
+}
+
 /** List / details: `SHORTCUT · Full Name` (localized) for catalog entries. */
 export function formatInstitutionDisplay(
   value: string,

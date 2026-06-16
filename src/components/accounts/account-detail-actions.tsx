@@ -1,7 +1,5 @@
 "use client";
 
-import { Pencil } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 
 interface AccountDetailActionsProps {
@@ -27,7 +25,6 @@ export function AccountDetailActions({
         disabled={disabled}
         onClick={onEdit}
       >
-        <Pencil className="me-2 size-4" />
         {editLabel}
       </Button>
       <Button

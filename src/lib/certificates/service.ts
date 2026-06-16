@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateMaturityDate } from "@/lib/certificates/certificate-engine";
 import { generateAndPersistSchedule } from "@/lib/certificates/schedule-service";
 import { mapCertificate, type DbCertificate } from "@/lib/certificates/mappers";
+import { hasCertificateRowUpdates } from "@/lib/certificates/update-certificate-logic";
 import {
   supportsRenewalTypeColumn,
   isMissingRenewalTypeColumnError,
@@ -250,16 +251,22 @@ export async function updateCertificate(
     certificatePayload.status = input.status;
   }
 
-  const { data, error } = await supabase
-    .from("certificates")
-    .update(certificatePayload)
-    .eq("id", certificateId)
-    .eq("user_id", userId)
-    .select("*")
-    .single();
+  let updatedCertificate = existing;
 
-  if (error) {
-    throw new Error(getSupabaseErrorMessage(error));
+  if (hasCertificateRowUpdates(input)) {
+    const { data, error } = await supabase
+      .from("certificates")
+      .update(certificatePayload)
+      .eq("id", certificateId)
+      .eq("user_id", userId)
+      .select("*")
+      .single();
+
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
+
+    updatedCertificate = mapCertificate(data as DbCertificate);
   }
 
   const accountPatch: Parameters<typeof patchAccount>[3] = {};
@@ -287,7 +294,7 @@ export async function updateCertificate(
       .eq("user_id", userId);
   }
 
-  const updated = mapCertificate(data as DbCertificate);
+  const updated = updatedCertificate;
 
   const scheduleFieldsChanged =
     input.principalAmount !== undefined ||

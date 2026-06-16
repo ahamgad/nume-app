@@ -48,7 +48,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     getAccount,
     getCertificateByAccountId,
     getCertificateSchedules,
-    updateCertificate,
+    updateAccount,
     archiveCertificate,
     processCertificateInterest,
     accounts,
@@ -207,7 +207,8 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         <WidgetCard>
           <MetricHero
             label={t("certificates.details.principal")}
-            value={formatCurrency(certificate.principalAmount, formatLocale)}
+            amount={certificate.principalAmount}
+            locale={formatLocale}
             meta={t("dashboard.netWorth.updated", {
               time: formatRelativeTime(account.updatedAt, t, formatLocale),
             })}
@@ -292,9 +293,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                 description={t("accounts.settings.includeInNetWorth.description")}
                 checked={account.includeInNetWorth}
                 onCheckedChange={(checked) =>
-                  void updateCertificate(certificate.id, {
-                    includeInNetWorth: checked,
-                  })
+                  void updateAccount(account.id, { includeInNetWorth: checked })
                 }
               />
               <div className="border-t border-border">
@@ -305,7 +304,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                   )}
                   checked={account.includeInEmergencyFund}
                   onCheckedChange={(checked) =>
-                    void updateCertificate(certificate.id, {
+                    void updateAccount(account.id, {
                       includeInEmergencyFund: checked,
                     })
                   }

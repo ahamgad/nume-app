@@ -14,7 +14,10 @@ import {
 } from "@/lib/format/currency";
 import type { MoneyAccountType } from "@/lib/finance/types";
 import { shouldShowInstitutionPicker } from "@/lib/institutions/catalog";
+import { showsBalanceField, showsInstitutionField } from "@/lib/finance/account-form";
 import { useT } from "@/providers/i18n-provider";
+
+export { showsBalanceField, showsInstitutionField } from "@/lib/finance/account-form";
 
 export interface MoneyAccountFormValues {
   name: string;
@@ -31,18 +34,6 @@ interface MoneyAccountFormFieldsProps {
   mode?: "create" | "edit";
   onChange: (patch: Partial<MoneyAccountFormValues>) => void;
   onClearError: (field: string) => void;
-}
-
-export function showsInstitutionField(accountType: MoneyAccountType): boolean {
-  return accountType !== "cash";
-}
-
-export function showsBalanceField(
-  accountType: MoneyAccountType,
-  mode: "create" | "edit" = "create",
-): boolean {
-  if (mode === "create") return true;
-  return accountType === "cash";
 }
 
 export function MoneyAccountFormFields({

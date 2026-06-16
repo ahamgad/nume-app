@@ -14,9 +14,8 @@ import {
   ScrollChipSelect,
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
-import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
-import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
-import { formatCurrency } from "@/lib/format/currency";
+import { formatAccountListSubtitle } from "@/lib/finance/account-display";
+import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -68,18 +67,14 @@ function AccountSection({
             <ListRow
               primary={account.name}
               leading={<AccountTypeIcon type={account.type} />}
-              secondary={
-                account.institution
-                  ? t("accounts.list.meta", {
-                      institution: formatInstitutionDisplay(
-                        account.institution,
-                        t,
-                      ),
-                      type: t(getAccountTypeLabelKey(account.type)),
-                    })
-                  : t(getAccountTypeLabelKey(account.type))
+              secondary={formatAccountListSubtitle(account, t)}
+              trailing={
+                <ResponsiveCurrencyAmount
+                  amount={account.currentBalance}
+                  locale={formatLocale}
+                  variant="row"
+                />
               }
-              trailing={formatCurrency(account.currentBalance, formatLocale)}
               onClick={() => onSelect(account.id)}
             />
             {index < accounts.length - 1 ? (

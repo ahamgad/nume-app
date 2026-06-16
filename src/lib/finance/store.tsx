@@ -38,6 +38,11 @@ import type {
 import type { ProcessCertificateInterestResult } from "@/lib/certificates/recurring/types";
 import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
+  applyAccountPatch,
+  isAccountSettingsOnlyPatch,
+  type AccountUpdatableFields,
+} from "@/lib/finance/account-settings-cache";
+import {
   archiveAccount as archiveAccountService,
   deleteAccount as deleteAccountService,
   fetchAccounts,
@@ -95,19 +100,7 @@ interface FinanceContextValue {
   deleteAccount: (id: string) => Promise<void>;
   archiveAccount: (id: string) => Promise<void>;
   restoreAccount: (id: string) => Promise<void>;
-  updateAccount: (
-    id: string,
-    patch: Partial<
-      Pick<
-        Account,
-        | "name"
-        | "institution"
-        | "includeInNetWorth"
-        | "includeInEmergencyFund"
-        | "currentBalance"
-      >
-    >,
-  ) => Promise<void>;
+  updateAccount: (id: string, patch: AccountUpdatableFields) => Promise<void>;
   getAccount: (id: string) => Account | undefined;
   getCertificateByAccountId: (accountId: string) => Certificate | undefined;
   getAccountRecords: (accountId: string) => FinanceRecord[];
@@ -272,6 +265,35 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [userId, invalidate],
   );
 
+  const updateAccount = useCallback(
+    async (id: string, patch: AccountUpdatableFields) => {
+      if (!userId) throw new Error("Not authenticated");
+
+      const queryKey = [FINANCE_QUERY_KEY, userId];
+      const previous = queryClient.getQueryData<FinanceData>(queryKey);
+      const settingsOnly = isAccountSettingsOnlyPatch(patch);
+
+      queryClient.setQueryData<FinanceData>(queryKey, (current) =>
+        applyAccountPatch(current, id, patch),
+      );
+
+      try {
+        const supabase = createClient();
+        await patchAccount(supabase, userId, id, patch);
+        if (!settingsOnly) {
+          await invalidate();
+        }
+      } catch (error) {
+        if (previous) {
+          queryClient.setQueryData(queryKey, previous);
+        }
+        logSupabaseError("updateAccount", error);
+        throw error;
+      }
+    },
+    [userId, queryClient, invalidate],
+  );
+
   const updateCertificate = useCallback(
     async (
       certificateId: string,
@@ -369,28 +391,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       await deleteAccountService(supabase, userId, id);
-      await invalidate();
-    },
-    [userId, invalidate],
-  );
-
-  const updateAccount = useCallback(
-    async (
-      id: string,
-      patch: Partial<
-        Pick<
-          Account,
-          | "name"
-          | "institution"
-          | "includeInNetWorth"
-          | "includeInEmergencyFund"
-          | "currentBalance"
-        >
-      >,
-    ) => {
-      if (!userId) throw new Error("Not authenticated");
-      const supabase = createClient();
-      await patchAccount(supabase, userId, id, patch);
       await invalidate();
     },
     [userId, invalidate],

@@ -1,9 +1,27 @@
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import type { Account } from "@/lib/finance/types";
-import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
+import {
+  formatInstitutionDisplay,
+  formatInstitutionShortcut,
+} from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
 
-type AccountLabelTranslator = (key: TranslationKey) => string;
+type AccountLabelTranslator = (key: TranslationKey, params?: Record<string, string>) => string;
+
+/** Secondary line for accounts list rows (Active and Archived). */
+export function formatAccountListSubtitle(
+  account: Pick<Account, "type" | "institution">,
+  t: AccountLabelTranslator,
+): string {
+  const typeLabel = t(getAccountTypeLabelKey(account.type));
+  if (account.institution?.trim()) {
+    return t("accounts.list.meta", {
+      institution: formatInstitutionShortcut(account.institution, t),
+      type: typeLabel,
+    });
+  }
+  return typeLabel;
+}
 
 /** Secondary line for destination picker rows. */
 export function formatAccountDestinationSubtitle(

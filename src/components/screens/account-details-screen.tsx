@@ -11,19 +11,18 @@ import { useState } from "react";
 
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import {
-  MetricHero,
   RecordRow,
   ToggleSettingRow,
-  WidgetCard,
 } from "@/components/patterns";
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { formatInstitutionDisplay } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
+import { formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord, RecordType } from "@/lib/finance/types";
@@ -171,15 +170,17 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           </div>
         </div>
 
-        <WidgetCard>
-          <MetricHero
-            label={t("accounts.details.currentBalance")}
-            value={formatCurrency(account.currentBalance, formatLocale)}
-            meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t, formatLocale),
-            })}
-          />
-        </WidgetCard>
+        <BalanceMetricCard
+          account={account}
+          label={t("accounts.details.currentBalance")}
+          meta={t("dashboard.netWorth.updated", {
+            time: formatRelativeTime(account.updatedAt, t, formatLocale),
+          })}
+          editable={!isArchived}
+          onBalanceSave={async (balance) => {
+            await updateAccount(account.id, { currentBalance: balance });
+          }}
+        />
 
         {!isArchived ? (
           <AccountDetailActions

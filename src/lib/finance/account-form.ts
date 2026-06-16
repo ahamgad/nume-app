@@ -14,36 +14,31 @@ export function moneyAccountFormValuesFromAccount(
     institution: string | null;
     currentBalance: number;
   },
-  accountType: AccountType,
+  _accountType: AccountType,
 ): MoneyAccountFormValues {
   return {
     name: account.name,
     institution: account.institution ?? "",
-    balance:
-      accountType === "cash" ? String(account.currentBalance) : "",
+    balance: "",
   };
 }
 
 export function isMoneyAccountFormDirty(
   values: MoneyAccountFormValues,
   initial: MoneyAccountFormValues,
-  accountType: AccountType,
+  _accountType: AccountType,
 ): boolean {
-  const baseDirty =
+  return (
     values.name.trim() !== initial.name.trim() ||
-    values.institution.trim() !== initial.institution.trim();
-
-  if (accountType === "cash") {
-    return baseDirty || values.balance.trim() !== initial.balance.trim();
-  }
-
-  return baseDirty;
+    values.institution.trim() !== initial.institution.trim()
+  );
 }
 
 export function validateMoneyAccountForm(
   values: MoneyAccountFormValues,
   accountType: AccountType,
   t: (key: TranslationKey) => string,
+  mode: "create" | "edit" = "create",
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const nameError = validateAccountNameField(values.name, t);
@@ -53,7 +48,7 @@ export function validateMoneyAccountForm(
     errors.institution = t("accounts.validation.institutionRequired");
   }
 
-  if (accountType === "cash") {
+  if (mode === "create") {
     const balanceError = validateAccountBalanceField(values.balance, t);
     if (balanceError) errors.balance = balanceError;
   }
@@ -63,4 +58,20 @@ export function validateMoneyAccountForm(
 
 export function isEditableMoneyAccountType(type: AccountType): boolean {
   return type === "current_account" || type === "wallet" || type === "cash";
+}
+
+/** Money accounts that support inline balance editing on the details screen. */
+export function supportsQuickBalanceEdit(type: AccountType): boolean {
+  return isEditableMoneyAccountType(type);
+}
+
+export function showsBalanceField(
+  _accountType: AccountType,
+  mode: "create" | "edit" = "create",
+): boolean {
+  return mode === "create";
+}
+
+export function showsInstitutionField(accountType: AccountType): boolean {
+  return accountType !== "cash";
 }

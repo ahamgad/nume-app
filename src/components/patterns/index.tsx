@@ -4,8 +4,10 @@ import type { ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
 
+import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
@@ -43,20 +45,49 @@ export function EducationalWidget({ title, body, hint }: EducationalWidgetProps)
 
 interface MetricHeroProps {
   label: string;
-  value: string;
+  /** Preformatted display value (non-currency). */
+  value?: string;
+  /** Numeric amount — rendered with responsive currency scaling. */
+  amount?: number;
+  locale?: string;
+  amountVariant?: ResponsiveCurrencyVariant;
+  amountAction?: ReactNode;
   subline?: string;
   meta?: string;
 }
 
-export function MetricHero({ label, value, subline, meta }: MetricHeroProps) {
+export function MetricHero({
+  label,
+  value,
+  amount,
+  locale,
+  amountVariant = "hero",
+  amountAction,
+  subline,
+  meta,
+}: MetricHeroProps) {
   return (
     <div className="w-full min-w-0 text-start">
       <p className="text-xs font-medium tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className="mt-1.5 text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums">
-        {value}
-      </p>
+      <div className="mt-1.5 flex min-w-0 items-center gap-2">
+        {amount !== undefined && locale ? (
+          <ResponsiveCurrencyAmount
+            amount={amount}
+            locale={locale}
+            variant={amountVariant}
+            className="min-w-0 flex-1"
+          />
+        ) : (
+          <p className="min-w-0 flex-1 truncate text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums">
+            {value}
+          </p>
+        )}
+        {amountAction ? (
+          <div className="shrink-0">{amountAction}</div>
+        ) : null}
+      </div>
       {subline ? (
         <p className="mt-2.5 text-[0.9375rem] font-medium leading-snug text-muted-foreground">
           {subline}
@@ -196,7 +227,7 @@ export function SetupBanner({
 interface ListRowProps {
   primary: string;
   secondary?: string;
-  trailing?: string;
+  trailing?: ReactNode;
   leading?: ReactNode;
   onClick?: () => void;
   showChevron?: boolean;
@@ -233,9 +264,9 @@ export function ListRow({
         ) : null}
       </div>
       {trailing ? (
-        <span className="shrink-0 text-[0.9375rem] font-semibold tabular-nums">
+        <div className="min-w-0 max-w-[50%] shrink text-end">
           {trailing}
-        </span>
+        </div>
       ) : null}
       {showChevron && onClick ? (
         <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />

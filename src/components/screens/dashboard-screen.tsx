@@ -16,6 +16,7 @@ import {
   WidgetCard,
 } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
+import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -81,7 +82,8 @@ export function DashboardScreen() {
             <>
               <MetricHero
                 label={t("dashboard.netWorth.title")}
-                value={formatCurrency(netWorth.netWorth, formatLocale)}
+                amount={netWorth.netWorth}
+                locale={formatLocale}
                 subline={t("dashboard.netWorth.subline", {
                   assetsLabel: t("dashboard.netWorth.assets"),
                   assets: formatCurrency(netWorth.assets, formatLocale),
@@ -116,12 +118,11 @@ export function DashboardScreen() {
               {t("dashboard.certificates.upcomingInterest.title")}
             </h2>
             <div className="mt-3 space-y-1">
-              <p className="text-[2rem] font-semibold tabular-nums tracking-tight">
-                {formatCurrency(
-                  certificateInsights.upcomingInterestAmount,
-                  formatLocale,
-                )}
-              </p>
+              <ResponsiveCurrencyAmount
+                amount={certificateInsights.upcomingInterestAmount}
+                locale={formatLocale}
+                variant="large"
+              />
               <p className="text-[0.9375rem] text-muted-foreground">
                 {t("dashboard.certificates.upcomingInterest.date", {
                   date: formatDisplayDate(

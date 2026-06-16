@@ -17,7 +17,6 @@ import {
   type MoneyAccountFormValues,
 } from "@/lib/finance/account-form";
 import type { MoneyAccountType } from "@/lib/finance/types";
-import { parseAmount } from "@/lib/format/currency";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
@@ -63,7 +62,7 @@ function EditAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateMoneyAccountForm(values, accountType, t);
+    const nextErrors = validateMoneyAccountForm(values, accountType, t, "edit");
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -74,12 +73,6 @@ function EditAccountForm({
         institution:
           accountType === "cash" ? null : values.institution.trim() || null,
       };
-
-      if (accountType === "cash") {
-        const parsedBalance = parseAmount(values.balance);
-        if (parsedBalance === null) return;
-        patch.currentBalance = parsedBalance;
-      }
 
       await updateAccount(accountId, patch);
       showToast(t("accounts.edit.success"));
