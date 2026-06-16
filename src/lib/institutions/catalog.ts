@@ -182,7 +182,7 @@ export function getAllowedCategories(
     case "certificate":
       return ["bank"];
     case "savings_account":
-      return ["bank"];
+      return ["bank", "financial_service"];
     case "cash":
       return [];
   }

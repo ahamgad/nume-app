@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
@@ -66,7 +67,12 @@ export function AccountTypePickerSheet({
                     <span className="text-xs text-muted-foreground">
                       {t("accounts.add.comingSoon")}
                     </span>
-                  ) : null}
+                  ) : (
+                    <ChevronRight
+                      className="size-4 shrink-0 text-muted-foreground"
+                      aria-hidden
+                    />
+                  )}
                 </button>
               ))}
             </div>

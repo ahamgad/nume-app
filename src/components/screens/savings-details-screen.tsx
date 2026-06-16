@@ -16,14 +16,13 @@ import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns"
 import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
-import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
+import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord } from "@/lib/finance/types";
-import type { TranslationKey } from "@/lib/i18n";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -92,14 +91,21 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
   }, [savings, accounts, t]);
 
   const rateLabel = useMemo(() => {
-    if (!savings) return "—";
-    if (savings.interestModel === "fixed") {
-      return savings.annualInterestRate === null
-        ? "—"
-        : `${savings.annualInterestRate}%`;
+    if (!savings || !account) return "—";
+
+    const { rate, belowMinimumTier } = resolveEffectiveAnnualRate(
+      savings.interestModel,
+      savings.annualInterestRate,
+      savings.tiers,
+      account.currentBalance,
+    );
+
+    if (belowMinimumTier || rate === null || rate <= 0) {
+      return t("savings.details.annualRateBelowTier");
     }
-    return t("savings.interestModel.tiered");
-  }, [savings, t]);
+
+    return `${rate}%`;
+  }, [savings, account, t]);
 
   async function handleArchiveConfirm() {
     if (!account) return;
@@ -199,9 +205,9 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("accounts.formSections.interestDetails")}
+            {t("savings.details.summary")}
           </h2>
-          <WidgetCard>
+          <div className="divide-y divide-border rounded-lg border border-border px-4">
             <DetailRow
               label={t("savings.details.interestModel")}
               value={t(
@@ -212,14 +218,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             />
             <DetailRow label={t("savings.details.annualRate")} value={rateLabel} />
             <DetailRow
-              label={t("savings.fields.cycleStartDate.label")}
-              value={formatDisplayDate(savings.cycleStartDate, formatLocale)}
-            />
-            <DetailRow
-              label={t("savings.details.postingSchedule")}
-              value={`${t(`savings.postingFrequency.${savings.postingFrequency}` as TranslationKey)} · ${formatPostingDayLabel(savings.postingDay, t)}`}
-            />
-            <DetailRow
               label={t("savings.details.nextPosting")}
               value={
                 savings.nextPostingDate
@@ -228,27 +226,11 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
               }
             />
             <DetailRow
-              label={t("savings.details.cycleMinimum")}
-              value={formatCurrency(savings.cycleMinimumBalance, formatLocale)}
-            />
-            <DetailRow
               label={t("savings.details.destination")}
               value={destinationLabel}
             />
-          </WidgetCard>
+          </div>
         </section>
-
-        <RecentRecordsSection
-          records={records}
-          isArchived={isArchived}
-          formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) =>
-            formatSignedCurrency(record.amount, record.type, formatLocale)
-          }
-          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
-          recordIcon={(record) => recordIcon(record.type)}
-        />
 
         {!isArchived ? (
           <section>
@@ -277,6 +259,18 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             </div>
           </section>
         ) : null}
+
+        <RecentRecordsSection
+          records={records}
+          isArchived={isArchived}
+          formatLocale={formatLocale}
+          recordLabel={(record) => recordLabel(record, t)}
+          recordAmount={(record) =>
+            formatSignedCurrency(record.amount, record.type, formatLocale)
+          }
+          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
+          recordIcon={(record) => recordIcon(record.type)}
+        />
       </ScreenBody>
 
       <ConfirmBottomSheet

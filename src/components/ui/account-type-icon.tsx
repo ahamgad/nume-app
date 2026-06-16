@@ -7,7 +7,7 @@ import {
   CreditCard,
   Landmark,
   LineChart,
-  PiggyBank,
+  Vault,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -21,7 +21,7 @@ const ACCOUNT_TYPE_ICONS: Partial<Record<AccountType, LucideIcon>> = {
   current_account: Landmark,
   cash: Banknote,
   wallet: Wallet,
-  savings_account: PiggyBank,
+  savings_account: Vault,
   certificate: BadgePercent,
   gold: CircleDollarSign,
   loan: CircleDollarSign,

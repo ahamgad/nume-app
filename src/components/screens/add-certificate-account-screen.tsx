@@ -23,6 +23,7 @@ import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
+import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 
 export function AddCertificateAccountScreen() {
   const t = useT();
@@ -120,7 +121,7 @@ export function AddCertificateAccountScreen() {
     <>
       <ScreenHeader
         mode="stack"
-        title={t("certificates.create.title")}
+        title={getAddAccountScreenTitle("certificate", t)}
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>

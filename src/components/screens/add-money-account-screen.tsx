@@ -12,6 +12,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import type { MoneyAccountType } from "@/lib/finance/types";
+import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
@@ -120,7 +121,7 @@ export function AddMoneyAccountScreen({
         title={
           isFirstAccountFlow
             ? t("accounts.add.firstAccount.title")
-            : t("accounts.add.title")
+            : getAddAccountScreenTitle(accountType, t)
         }
         onBack={handleBack}
       />

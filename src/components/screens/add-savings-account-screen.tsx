@@ -9,6 +9,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import {
   DEFAULT_SAVINGS_FORM_VALUES,
   resolveSavingsFormForSubmit,
@@ -75,7 +76,6 @@ export function AddSavingsAccountScreen() {
         postingDay: payload.postingDay,
         interestDestination: payload.interestDestination,
         destinationAccountId: payload.destinationAccountId,
-        cycleStartDate: payload.cycleStartDate,
       });
       showToast(t("savings.create.success"));
       router.replace(`/accounts/${savings.accountId}`);
@@ -103,7 +103,7 @@ export function AddSavingsAccountScreen() {
     <>
       <ScreenHeader
         mode="stack"
-        title={t("savings.create.title")}
+        title={getAddAccountScreenTitle("savings_account", t)}
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>

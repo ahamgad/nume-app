@@ -57,11 +57,6 @@ export function validateTierStructure(
 
   const sorted = [...tiers].sort((a, b) => a.minBalance - b.minBalance);
 
-  if (sorted[0].minBalance !== 0) {
-    errors.tiers = t("savings.validation.tiersMustStartAtZero");
-    return errors;
-  }
-
   for (let index = 0; index < sorted.length; index += 1) {
     const tier = sorted[index];
     const isLast = index === sorted.length - 1;

@@ -11,11 +11,11 @@ import {
 } from "@/lib/savings/tier-validation";
 import { parseAmount } from "@/lib/format/currency";
 import type { TranslationKey } from "@/lib/i18n";
-import { todayIsoDate } from "@/lib/format/date";
 
 export type SavingsInterestModelForm = "fixed" | "tiered";
 
 export type SavingsPostingFrequencyForm =
+  | "daily"
   | "monthly"
   | "quarterly"
   | "semi_annual"
@@ -32,7 +32,6 @@ export interface SavingsFormValues {
   tiers: TierFormRow[];
   postingFrequency: SavingsPostingFrequencyForm;
   postingDay: string;
-  cycleStartDate: string;
   interestDestination: SavingsInterestDestinationForm;
   destinationAccountId: string;
 }
@@ -46,7 +45,6 @@ export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
   tiers: [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
   postingFrequency: "monthly",
   postingDay: "1",
-  cycleStartDate: todayIsoDate(),
   interestDestination: "same_account",
   destinationAccountId: "",
 };
@@ -75,7 +73,6 @@ export function savingsFormValuesFromAccount(
         : [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
     postingFrequency: savings.postingFrequency,
     postingDay: postingDayToFormValue(savings.postingDay),
-    cycleStartDate: savings.cycleStartDate,
     interestDestination: savings.interestDestination,
     destinationAccountId: savings.destinationAccountId ?? "",
   };
@@ -123,12 +120,8 @@ export function validateSavingsForm(
   }
 
   const postingDay = parsePostingDayFromForm(values.postingDay);
-  if (postingDay === null) {
+  if (values.postingFrequency !== "daily" && postingDay === null) {
     errors.postingDay = t("savings.validation.postingDayInvalid");
-  }
-
-  if (!values.cycleStartDate.trim()) {
-    errors.cycleStartDate = t("savings.validation.cycleStartDateRequired");
   }
 
   if (
@@ -168,12 +161,14 @@ export function resolveSavingsFormForSubmit(
         sortOrder: index,
       })) ?? [],
     postingFrequency: values.postingFrequency,
-    postingDay: parsedPostingDay ?? POSTING_DAY_LAST_OF_MONTH,
+    postingDay:
+      values.postingFrequency === "daily"
+        ? 1
+        : parsedPostingDay ?? POSTING_DAY_LAST_OF_MONTH,
     interestDestination: values.interestDestination,
     destinationAccountId:
       values.interestDestination === "another_account"
         ? values.destinationAccountId
         : null,
-    cycleStartDate: values.cycleStartDate.trim() || todayIsoDate(),
   };
 }

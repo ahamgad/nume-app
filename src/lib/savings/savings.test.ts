@@ -6,6 +6,7 @@ import {
 } from "@/lib/finance/account-type-catalog";
 import {
   calculateSavingsInterest,
+  resolveEffectiveAnnualRate,
   resolveInterestRate,
 } from "@/lib/savings/interest-engine";
 import {
@@ -47,6 +48,15 @@ describe("savings tier validation", () => {
     expect(validateTierStructure(tiers!, t)).toEqual({});
   });
 
+  it("accepts tiers that do not start at zero", () => {
+    const tiers = parseTierRows([
+      { minBalance: "50000", maxBalance: "100000", annualInterestRate: "15" },
+      { minBalance: "100001", maxBalance: "", annualInterestRate: "18" },
+    ]);
+    expect(tiers).not.toBeNull();
+    expect(validateTierStructure(tiers!, t)).toEqual({});
+  });
+
   it("rejects gaps between tiers", () => {
     const tiers = parseTierRows([
       { minBalance: "0", maxBalance: "100", annualInterestRate: "10" },
@@ -66,11 +76,23 @@ describe("savings tier validation", () => {
     ]);
     expect(tier?.annualInterestRate).toBe(18);
   });
+
+  it("returns null when balance is below first tier minimum", () => {
+    const tier = findTierForBalance(40000, [
+      { minBalance: 50000, maxBalance: 100000, annualInterestRate: 15 },
+      { minBalance: 100001, maxBalance: null, annualInterestRate: 18 },
+    ]);
+    expect(tier).toBeNull();
+  });
 });
 
 describe("savings interest engine", () => {
   it("calculates simple interest from minimum balance", () => {
     expect(calculateSavingsInterest(100000, 12, "monthly")).toBe(1000);
+  });
+
+  it("calculates daily interest from minimum balance", () => {
+    expect(calculateSavingsInterest(365000, 10, "daily")).toBe(100);
   });
 
   it("resolves fixed and tiered rates", () => {
@@ -89,6 +111,56 @@ describe("savings interest engine", () => {
       ], 1000),
     ).toBe(14);
   });
+
+  it("returns null when cycle minimum is below first tier", () => {
+    expect(
+      resolveInterestRate("tiered", null, [
+        {
+          id: "1",
+          savingsAccountId: "s",
+          userId: "u",
+          minBalance: 50000,
+          maxBalance: null,
+          annualInterestRate: 15,
+          sortOrder: 0,
+        },
+      ], 40000),
+    ).toBeNull();
+  });
+
+  it("resolves effective annual rate from current balance", () => {
+    expect(
+      resolveEffectiveAnnualRate("fixed", 12, [], 5000),
+    ).toEqual({ rate: 12, belowMinimumTier: false });
+
+    expect(
+      resolveEffectiveAnnualRate("tiered", null, [
+        {
+          id: "1",
+          savingsAccountId: "s",
+          userId: "u",
+          minBalance: 50001,
+          maxBalance: 200000,
+          annualInterestRate: 18,
+          sortOrder: 0,
+        },
+      ], 75000),
+    ).toEqual({ rate: 18, belowMinimumTier: false });
+
+    expect(
+      resolveEffectiveAnnualRate("tiered", null, [
+        {
+          id: "1",
+          savingsAccountId: "s",
+          userId: "u",
+          minBalance: 50000,
+          maxBalance: null,
+          annualInterestRate: 15,
+          sortOrder: 0,
+        },
+      ], 40000),
+    ).toEqual({ rate: null, belowMinimumTier: true });
+  });
 });
 
 describe("savings posting schedule", () => {
@@ -99,6 +171,15 @@ describe("savings posting schedule", () => {
     expect(
       calculateNextPostingDateAfter("2026-01-15", "monthly", 15),
     ).toBe("2026-02-15");
+  });
+
+  it("computes daily posting dates", () => {
+    expect(
+      calculateInitialNextPostingDate("2026-01-10", "daily", 1),
+    ).toBe("2026-01-11");
+    expect(
+      calculateNextPostingDateAfter("2026-01-11", "daily", 1),
+    ).toBe("2026-01-12");
   });
 
   it("resolves last day of month for February and longer months", () => {

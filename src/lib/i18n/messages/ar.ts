@@ -242,6 +242,7 @@ export const ar = {
     },
     add: {
       title: "إضافة حساب",
+      createTitle: "إضافة {type}",
       chooseType: "نوع الحساب",
       lead: "أدخل اسم الحساب ورصيده اليوم.",
       certificateLead: "تتبّع وديعة لأجل بعائد متوقّع.",
@@ -379,6 +380,7 @@ export const ar = {
       tiered: "عائد متدرج",
     },
     postingFrequency: {
+      daily: "يومي",
       monthly: "شهري",
       quarterly: "ربع سنوي",
       semi_annual: "نصف سنوي",
@@ -394,8 +396,8 @@ export const ar = {
       currency: {
         label: "العملة",
       },
-      openingBalance: {
-        label: "الرصيد الافتتاحي",
+      currentBalance: {
+        label: "الرصيد الحالي",
       },
       interestModel: {
         label: "نموذج العائد",
@@ -431,11 +433,11 @@ export const ar = {
       },
     },
     details: {
+      summary: "الملخص",
       interestModel: "نموذج العائد",
       annualRate: "المعدل السنوي",
-      postingSchedule: "جدول الترحيل",
+      annualRateBelowTier: "أقل من الحد الأدنى للشريحة",
       nextPosting: "الترحيل التالي",
-      cycleMinimum: "أدنى رصيد في الدورة",
       destination: "وجهة العائد",
     },
     validation: {

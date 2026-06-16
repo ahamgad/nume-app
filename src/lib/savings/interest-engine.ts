@@ -18,13 +18,43 @@ export function calculateSavingsInterest(
   annualInterestRate: number,
   frequency: SavingsPostingFrequency,
 ): number {
+  if (minimumBalance <= 0 || annualInterestRate <= 0) {
+    return 0;
+  }
+
+  if (frequency === "daily") {
+    return roundCurrency(
+      (minimumBalance * annualInterestRate) / 36500,
+    );
+  }
+
   const periodMonths = periodLengthMonths(frequency);
-  if (minimumBalance <= 0 || periodMonths <= 0 || annualInterestRate <= 0) {
+  if (periodMonths === null || periodMonths <= 0) {
     return 0;
   }
   return roundCurrency(
     (minimumBalance * annualInterestRate * periodMonths) / 1200,
   );
+}
+
+export function resolveEffectiveAnnualRate(
+  interestModel: SavingsInterestModel,
+  fixedRate: number | null,
+  tiers: SavingsInterestTier[],
+  currentBalance: number,
+): { rate: number | null; belowMinimumTier: boolean } {
+  if (interestModel === "fixed") {
+    return {
+      rate: fixedRate,
+      belowMinimumTier: fixedRate === null || fixedRate <= 0,
+    };
+  }
+
+  const tier = findTierForBalance(currentBalance, tiers);
+  if (!tier) {
+    return { rate: null, belowMinimumTier: true };
+  }
+  return { rate: tier.annualInterestRate, belowMinimumTier: false };
 }
 
 export function resolveInterestRate(

@@ -17,6 +17,9 @@ export const PICKER_SHEET_MIN_HEIGHT = "calc(100dvh / 3)";
 export const PICKER_SHEET_BOTTOM_PADDING =
   "calc(3.5rem + env(safe-area-inset-bottom))";
 
+/** Standard top padding between picker header and first content row. */
+export const PICKER_SHEET_CONTENT_TOP_PADDING = "pt-4";
+
 /** Show search field when item count exceeds this threshold. */
 export const PICKER_SEARCH_ITEM_THRESHOLD = 10;
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { DateField } from "@/components/ui/date-field";
 import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
 import { AccountPicker } from "@/components/ui/account-picker";
@@ -25,10 +24,11 @@ import {
   validateCertificateRateField,
 } from "@/lib/field-editor/field-validators";
 import type { TranslationKey } from "@/lib/i18n";
-import { useT, useFormatLocale } from "@/providers/i18n-provider";
+import { useT } from "@/providers/i18n-provider";
 import { Plus, Trash2 } from "lucide-react";
 
 const POSTING_FREQUENCIES = [
+  "daily",
   "monthly",
   "quarterly",
   "semi_annual",
@@ -59,7 +59,6 @@ export function SavingsFormFields({
   onClearError,
 }: SavingsFormFieldsProps) {
   const t = useT();
-  const formatLocale = useFormatLocale();
 
   const interestModelOptions: ScrollChipOption<SavingsFormValues["interestModel"]>[] =
     [
@@ -152,18 +151,10 @@ export function SavingsFormFields({
           onChange={(institution) => onChange({ institution })}
         />
 
-        <EditableField
-          id="savings-currency"
-          label={t("savings.fields.currency.label")}
-          value={t("common.currency.code")}
-          disabled
-          onSave={() => undefined}
-        />
-
         {mode === "create" ? (
           <EditableField
             id="savings-balance"
-            label={t("savings.fields.openingBalance.label")}
+            label={t("savings.fields.currentBalance.label")}
             mode="numeric"
             inputMode="decimal"
             value={values.balance}
@@ -257,7 +248,7 @@ export function SavingsFormFields({
                   mode="numeric"
                   inputMode="decimal"
                   value={tier.minBalance}
-                  disabled={disabled || index === 0}
+                  disabled={disabled}
                   prefixLabel={t("common.currency.code")}
                   sanitizeInput={sanitizeDecimalInput}
                   formatDisplay={(amount) =>
@@ -321,31 +312,6 @@ export function SavingsFormFields({
         </p>
 
         <div className="space-y-2">
-          <Label htmlFor="savings-cycle-start-date">
-            {t("savings.fields.cycleStartDate.label")}
-          </Label>
-          <DateField
-            id="savings-cycle-start-date"
-            value={values.cycleStartDate}
-            disabled={disabled}
-            label={t("savings.fields.cycleStartDate.label")}
-            onChange={(cycleStartDate) => {
-              onChange({ cycleStartDate });
-              onClearError("cycleStartDate");
-            }}
-            locale={formatLocale}
-            aria-invalid={Boolean(errors.cycleStartDate)}
-          />
-          {errors.cycleStartDate ? (
-            <p className="text-sm text-destructive">{errors.cycleStartDate}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              {t("savings.fields.cycleStartDate.hint")}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
           <Label>{t("savings.fields.postingFrequency.label")}</Label>
           <ScrollChipSelect
             value={values.postingFrequency}
@@ -355,21 +321,23 @@ export function SavingsFormFields({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>{t("savings.fields.postingDay.label")}</Label>
-          <ScrollChipSelect
-            value={values.postingDay}
-            options={postingDayOptions}
-            ariaLabel={t("savings.fields.postingDay.label")}
-            onChange={(postingDay) => {
-              onChange({ postingDay });
-              onClearError("postingDay");
-            }}
-          />
-          {errors.postingDay ? (
-            <p className="text-sm text-destructive">{errors.postingDay}</p>
-          ) : null}
-        </div>
+        {values.postingFrequency !== "daily" ? (
+          <div className="space-y-2">
+            <Label>{t("savings.fields.postingDay.label")}</Label>
+            <ScrollChipSelect
+              value={values.postingDay}
+              options={postingDayOptions}
+              ariaLabel={t("savings.fields.postingDay.label")}
+              onChange={(postingDay) => {
+                onChange({ postingDay });
+                onClearError("postingDay");
+              }}
+            />
+            {errors.postingDay ? (
+              <p className="text-sm text-destructive">{errors.postingDay}</p>
+            ) : null}
+          </div>
+        ) : null}
       </FormSection>
 
       <FormSection title={t("savings.sections.destination")} separator>

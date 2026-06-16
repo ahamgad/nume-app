@@ -6,9 +6,13 @@ export const POSTING_DAY_LAST_OF_MONTH = 0;
 
 export const POSTING_DAY_FORM_LAST = "last_day";
 
-/** Period length in months for simple-interest formula. */
-export function periodLengthMonths(frequency: SavingsPostingFrequency): number {
+/** Period length in months for simple-interest formula. Returns null for daily. */
+export function periodLengthMonths(
+  frequency: SavingsPostingFrequency,
+): number | null {
   switch (frequency) {
+    case "daily":
+      return null;
     case "monthly":
       return 1;
     case "quarterly":
@@ -18,6 +22,12 @@ export function periodLengthMonths(frequency: SavingsPostingFrequency): number {
     case "annual":
       return 12;
   }
+}
+
+export function isDailyPostingFrequency(
+  frequency: SavingsPostingFrequency,
+): boolean {
+  return frequency === "daily";
 }
 
 export function isLastDayOfMonthPosting(postingDay: number): boolean {
@@ -87,6 +97,12 @@ function addMonths(date: Date, months: number): Date {
   return new Date(targetYear, normalizedMonth, day);
 }
 
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
 /**
  * First posting date on or after cycle start.
  */
@@ -95,11 +111,20 @@ export function calculateInitialNextPostingDate(
   frequency: SavingsPostingFrequency,
   postingDay: number,
 ): string {
+  if (isDailyPostingFrequency(frequency)) {
+    return toIsoDate(addDays(toDate(cycleStartDate), 1));
+  }
+
   const start = toDate(cycleStartDate);
+  const periodMonths = periodLengthMonths(frequency);
+  if (periodMonths === null) {
+    return toIsoDate(addDays(toDate(cycleStartDate), 1));
+  }
+
   let candidate = setPostingDayOnMonth(start, postingDay);
   if (candidate < start) {
     candidate = setPostingDayOnMonth(
-      addMonths(start, periodLengthMonths(frequency)),
+      addMonths(start, periodMonths),
       postingDay,
     );
   }
@@ -112,7 +137,16 @@ export function calculateNextPostingDateAfter(
   frequency: SavingsPostingFrequency,
   postingDay: number,
 ): string {
-  const base = addMonths(toDate(lastPostingDate), periodLengthMonths(frequency));
+  if (isDailyPostingFrequency(frequency)) {
+    return toIsoDate(addDays(toDate(lastPostingDate), 1));
+  }
+
+  const periodMonths = periodLengthMonths(frequency);
+  if (periodMonths === null) {
+    return toIsoDate(addDays(toDate(lastPostingDate), 1));
+  }
+
+  const base = addMonths(toDate(lastPostingDate), periodMonths);
   return toIsoDate(setPostingDayOnMonth(base, postingDay));
 }
 

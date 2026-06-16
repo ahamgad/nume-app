@@ -1,6 +1,7 @@
 export type SavingsInterestModel = "fixed" | "tiered";
 
 export type SavingsPostingFrequency =
+  | "daily"
   | "monthly"
   | "quarterly"
   | "semi_annual"
@@ -48,7 +49,6 @@ export interface CreateSavingsAccountInput {
   postingDay: number;
   interestDestination: SavingsInterestDestination;
   destinationAccountId?: string | null;
-  cycleStartDate?: string;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
 }
@@ -63,7 +63,6 @@ export interface UpdateSavingsAccountInput {
   postingDay?: number;
   interestDestination?: SavingsInterestDestination;
   destinationAccountId?: string | null;
-  cycleStartDate?: string;
 }
 
 export interface ProcessSavingsInterestResult {

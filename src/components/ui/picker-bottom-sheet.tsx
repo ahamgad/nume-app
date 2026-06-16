@@ -1,17 +1,23 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useRef, type FocusEvent, type ReactNode } from "react";
 
 import { usePickerSheetHeight } from "@/hooks/use-picker-sheet-height";
 import { useSearchSheetLock } from "@/hooks/use-search-sheet-lock";
 import { useVisualViewportKeyboardInset } from "@/hooks/use-visual-viewport-keyboard-inset";
-import { SCREEN_HEADER_TITLE_CLASS } from "@/components/layout/screen-header";
+import {
+  SCREEN_HEADER_ACTION_ICON_CLASS,
+  SCREEN_HEADER_BAR_CLASS,
+  SCREEN_HEADER_TITLE_CLASS,
+} from "@/components/layout/screen-header";
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
 } from "@/components/ui/bottom-sheet-chrome";
 import { Input } from "@/components/ui/input";
 import {
+  PICKER_SHEET_CONTENT_TOP_PADDING,
   PICKER_SHEET_MAX_HEIGHT,
   PICKER_SHEET_MIN_HEIGHT,
 } from "@/lib/layout/picker-sheet";
@@ -35,6 +41,8 @@ export interface PickerBottomSheetProps {
   children: ReactNode;
   ariaLabel?: string;
   className?: string;
+  /** When false, hides the header close control (e.g. sheets with Back/Save). Default true. */
+  showCloseButton?: boolean;
 }
 
 function handleSearchFocus(event: FocusEvent<HTMLInputElement>) {
@@ -61,6 +69,7 @@ export function PickerBottomSheet({
   children,
   ariaLabel,
   className,
+  showCloseButton = true,
 }: PickerBottomSheetProps) {
   const t = useT();
   const chromeRef = useRef<HTMLDivElement>(null);
@@ -110,28 +119,44 @@ export function PickerBottomSheet({
           BOTTOM_SHEET_ENTER_CLASS,
         )}
       >
-        <div
-          ref={chromeRef}
-          className="shrink-0 border-b border-border bg-background px-4 py-4"
-        >
-          <h2 id={resolvedTitleId} className={SCREEN_HEADER_TITLE_CLASS}>
-            {title}
-          </h2>
+        <div ref={chromeRef} className="shrink-0 border-b border-border bg-background">
+          <div className={cn(SCREEN_HEADER_BAR_CLASS, "gap-3")}>
+            <h2
+              id={resolvedTitleId}
+              className={cn(SCREEN_HEADER_TITLE_CLASS, "min-w-0 flex-1 text-start")}
+            >
+              {title}
+            </h2>
+            {showCloseButton ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-foreground"
+                aria-label={t("a11y.dismiss")}
+              >
+                <X className={SCREEN_HEADER_ACTION_ICON_CLASS} />
+              </button>
+            ) : null}
+          </div>
           {search ? (
-            <Input
-              value={search.value}
-              onChange={(event) => search.onChange(event.target.value)}
-              onFocus={handleSearchFocus}
-              placeholder={search.placeholder}
-              className="mt-3"
-              autoComplete="off"
-            />
+            <div className="px-4 pb-4">
+              <Input
+                value={search.value}
+                onChange={(event) => search.onChange(event.target.value)}
+                onFocus={handleSearchFocus}
+                placeholder={search.placeholder}
+                autoComplete="off"
+              />
+            </div>
           ) : null}
         </div>
 
         <div
           data-sheet-scroll
-          className="overflow-y-auto overscroll-y-contain px-2 py-2"
+          className={cn(
+            "overflow-y-auto overscroll-y-contain px-2 pb-2",
+            PICKER_SHEET_CONTENT_TOP_PADDING,
+          )}
           style={{
             maxHeight: contentMaxHeightPx,
             minHeight: search ? contentMaxHeightPx : undefined,

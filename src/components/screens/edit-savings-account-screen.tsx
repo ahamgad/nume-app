@@ -138,7 +138,6 @@ function EditSavingsAccountForm({
         postingDay: payload.postingDay,
         interestDestination: payload.interestDestination,
         destinationAccountId: payload.destinationAccountId,
-        cycleStartDate: payload.cycleStartDate,
       });
       showToast(t("savings.edit.success"));
       router.replace(`/accounts/${accountId}`);

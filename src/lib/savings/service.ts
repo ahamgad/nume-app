@@ -110,7 +110,7 @@ export async function createSavingsAccount(
     await assertDestinationAccount(supabase, userId, input.destinationAccountId);
   }
 
-  const cycleStartDate = input.cycleStartDate ?? todayIsoDate();
+  const cycleStartDate = todayIsoDate();
   const nextPostingDate = calculateInitialNextPostingDate(
     cycleStartDate,
     input.postingFrequency,
@@ -251,21 +251,15 @@ export async function updateSavingsAccount(
       destination === "another_account" ? destinationAccountId : null;
   }
 
-  if (input.cycleStartDate !== undefined) {
-    savingsPatch.cycle_start_date = input.cycleStartDate;
-  }
-
   if (
     input.postingFrequency !== undefined ||
-    input.postingDay !== undefined ||
-    input.cycleStartDate !== undefined
+    input.postingDay !== undefined
   ) {
     const frequency =
       input.postingFrequency ?? existing.postingFrequency;
     const postingDay = input.postingDay ?? existing.postingDay;
-    const cycleStart = input.cycleStartDate ?? existing.cycleStartDate;
     savingsPatch.next_posting_date = calculateInitialNextPostingDate(
-      cycleStart,
+      existing.cycleStartDate,
       frequency,
       postingDay,
     );

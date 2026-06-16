@@ -242,6 +242,7 @@ export const en = {
     },
     add: {
       title: "Add account",
+      createTitle: "Add {type}",
       chooseType: "Account type",
       lead: "Enter the account name and today's balance.",
       certificateLead: "Track a fixed-term deposit with expected returns.",
@@ -379,6 +380,7 @@ export const en = {
       tiered: "Tiered interest",
     },
     postingFrequency: {
+      daily: "Daily",
       monthly: "Monthly",
       quarterly: "Quarterly",
       semi_annual: "Semi-annual",
@@ -394,8 +396,8 @@ export const en = {
       currency: {
         label: "Currency",
       },
-      openingBalance: {
-        label: "Opening balance",
+      currentBalance: {
+        label: "Current balance",
       },
       interestModel: {
         label: "Interest model",
@@ -431,11 +433,11 @@ export const en = {
       },
     },
     details: {
+      summary: "Summary",
       interestModel: "Interest model",
       annualRate: "Annual rate",
-      postingSchedule: "Posting schedule",
+      annualRateBelowTier: "Below minimum tier",
       nextPosting: "Next posting",
-      cycleMinimum: "Cycle minimum balance",
       destination: "Interest destination",
     },
     validation: {

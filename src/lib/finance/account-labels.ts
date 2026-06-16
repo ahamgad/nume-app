@@ -20,3 +20,10 @@ export function getAccountTypeLabelKey(type: AccountType): TranslationKey {
 export function isKnownAccountTypeLabel(type: AccountType): type is MoneyAccountType | "certificate" | "gold" | "loan" {
   return type in TYPE_LABEL_KEYS;
 }
+
+export function getAddAccountScreenTitle(
+  type: AccountType,
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string,
+): string {
+  return t("accounts.add.createTitle", { type: t(getAccountTypeLabelKey(type)) });
+}
