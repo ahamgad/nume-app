@@ -36,7 +36,22 @@ describe("RecentRecordsSection", () => {
     );
 
     expect(accountDetails).toContain("RecentRecordsSection");
+    expect(accountDetails).toContain("isArchived={isArchived}");
     expect(certificateDetails).toContain("RecentRecordsSection");
+    expect(certificateDetails).toContain("isArchived={isArchived}");
+  });
+
+  it("hides archived empty states via shared visibility helper", () => {
+    const source = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/accounts/recent-records-section.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(source).toContain("shouldShowRecentRecordsSection");
+    expect(source).toContain("return null");
   });
 });
 

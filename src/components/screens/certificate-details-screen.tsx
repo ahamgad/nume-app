@@ -306,6 +306,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
 
         <RecentRecordsSection
           records={records}
+          isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
           recordAmount={(record) =>

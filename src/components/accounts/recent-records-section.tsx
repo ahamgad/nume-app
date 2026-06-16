@@ -3,11 +3,13 @@
 import type { ReactNode } from "react";
 
 import { RecordRow } from "@/components/patterns";
+import { shouldShowRecentRecordsSection } from "@/lib/finance/recent-records-display";
 import type { FinanceRecord } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
 
 interface RecentRecordsSectionProps {
   records: FinanceRecord[];
+  isArchived?: boolean;
   formatLocale: string;
   recordLabel: (record: FinanceRecord) => string;
   recordAmount: (record: FinanceRecord) => string;
@@ -18,6 +20,7 @@ interface RecentRecordsSectionProps {
 
 export function RecentRecordsSection({
   records,
+  isArchived = false,
   formatLocale: _formatLocale,
   recordLabel,
   recordAmount,
@@ -26,6 +29,10 @@ export function RecentRecordsSection({
   onRecordClick,
 }: RecentRecordsSectionProps) {
   const t = useT();
+
+  if (!shouldShowRecentRecordsSection(isArchived, records.length)) {
+    return null;
+  }
 
   return (
     <section>

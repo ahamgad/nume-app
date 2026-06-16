@@ -236,6 +236,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
         <RecentRecordsSection
           records={records}
+          isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
           recordAmount={(record) =>
