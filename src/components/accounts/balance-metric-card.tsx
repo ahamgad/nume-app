@@ -3,6 +3,7 @@
 import { Pencil } from "lucide-react";
 
 import { MetricHero, WidgetCard } from "@/components/patterns";
+import { IconButton } from "@/components/ui/icon-button";
 import { validateAccountBalanceField } from "@/lib/field-editor/field-validators";
 import { supportsQuickBalanceEdit } from "@/lib/finance/account-form";
 import type { Account } from "@/lib/finance/types";
@@ -67,14 +68,14 @@ export function BalanceMetricCard({
         meta={meta}
         amountAction={
           canEdit ? (
-            <button
+            <IconButton
               type="button"
-              onClick={handleEditBalance}
-              className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              size="sm"
               aria-label={label}
+              onClick={handleEditBalance}
             >
-              <Pencil className="size-4" />
-            </button>
+              <Pencil />
+            </IconButton>
           ) : undefined
         }
       />

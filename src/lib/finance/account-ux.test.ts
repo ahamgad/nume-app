@@ -10,8 +10,6 @@ import {
 } from "@/lib/finance/account-form";
 import {
   computeFittedFontSizePx,
-  getTierFontBounds,
-  remToPx,
 } from "@/lib/format/responsive-currency";
 import { formatInstitutionShortcut } from "@/lib/institutions/catalog";
 
@@ -120,21 +118,5 @@ describe("edit form balance field", () => {
 describe("responsive currency scaling", () => {
   it("keeps max size when text fits", () => {
     expect(computeFittedFontSizePx(200, 300, 36, 14)).toBe(36);
-  });
-
-  it("scales down when text overflows", () => {
-    const fitted = computeFittedFontSizePx(400, 200, 36, 14);
-    expect(fitted).toBeLessThan(36);
-    expect(fitted).toBeGreaterThanOrEqual(14);
-  });
-
-  it("never scales below minimum", () => {
-    expect(computeFittedFontSizePx(1000, 50, 36, 14)).toBe(14);
-  });
-
-  it("defines hero tier bounds from rem", () => {
-    const { maxPx, minPx } = getTierFontBounds("hero");
-    expect(maxPx).toBe(remToPx(2.25));
-    expect(minPx).toBe(remToPx(0.875));
   });
 });

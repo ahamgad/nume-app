@@ -71,22 +71,19 @@ export function MetricHero({
       <p className="text-xs font-medium tracking-wide text-muted-foreground">
         {label}
       </p>
-      <div className="mt-1.5 flex min-w-0 items-center gap-2">
+      <div className="mt-1.5 min-w-0">
         {amount !== undefined && locale ? (
           <ResponsiveCurrencyAmount
             amount={amount}
             locale={locale}
             variant={amountVariant}
-            className="min-w-0 flex-1"
+            trailing={amountAction}
           />
         ) : (
-          <p className="min-w-0 flex-1 truncate text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums">
+          <p className="min-w-0 truncate text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums">
             {value}
           </p>
         )}
-        {amountAction ? (
-          <div className="shrink-0">{amountAction}</div>
-        ) : null}
       </div>
       {subline ? (
         <p className="mt-2.5 text-[0.9375rem] font-medium leading-snug text-muted-foreground">

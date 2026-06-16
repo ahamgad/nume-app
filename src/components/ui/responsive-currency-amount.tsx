@@ -1,10 +1,18 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import { formatCurrency } from "@/lib/format/currency";
 import {
-  computeFittedFontSizePx,
+  CURRENCY_AMOUNT_TRAILING_GAP_PX,
+  fitFontSizeToWidth,
+  getAvailableAmountWidth,
   getTierFontBounds,
   type ResponsiveCurrencyVariant,
 } from "@/lib/format/responsive-currency";
@@ -15,6 +23,8 @@ interface ResponsiveCurrencyAmountProps {
   locale: string;
   variant?: ResponsiveCurrencyVariant;
   className?: string;
+  /** Trailing action rendered beside the amount (e.g. edit button). */
+  trailing?: ReactNode;
 }
 
 export function ResponsiveCurrencyAmount({
@@ -22,47 +32,74 @@ export function ResponsiveCurrencyAmount({
   locale,
   variant = "hero",
   className,
+  trailing,
 }: ResponsiveCurrencyAmountProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const trailingRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [fontSizePx, setFontSizePx] = useState<number | null>(null);
   const formatted = formatCurrency(amount, locale);
   const { maxPx, minPx } = getTierFontBounds(variant);
+  const hasTrailing = trailing != null;
 
   useLayoutEffect(() => {
-    const container = containerRef.current;
+    const row = rowRef.current;
     const text = textRef.current;
-    if (!container || !text) return;
+    if (!row || !text) return;
 
     function fit() {
-      text!.style.fontSize = `${maxPx}px`;
-      const textWidth = text!.scrollWidth;
-      const containerWidth = container!.clientWidth;
-      const nextSize = computeFittedFontSizePx(
-        textWidth,
-        containerWidth,
+      const trailingWidth = trailingRef.current?.offsetWidth ?? 0;
+      const available = getAvailableAmountWidth(
+        row!.clientWidth,
+        trailingWidth,
+        hasTrailing,
+      );
+
+      const nextSize = fitFontSizeToWidth(
+        (size) => {
+          text!.style.fontSize = `${size}px`;
+          return text!.scrollWidth;
+        },
+        available,
         maxPx,
         minPx,
       );
+
       setFontSizePx(nextSize);
     }
 
     fit();
 
     const observer = new ResizeObserver(fit);
-    observer.observe(container);
+    observer.observe(row);
+    if (trailingRef.current) {
+      observer.observe(trailingRef.current);
+    }
     return () => observer.disconnect();
-  }, [formatted, maxPx, minPx]);
+  }, [formatted, hasTrailing, maxPx, minPx]);
 
   return (
-    <div ref={containerRef} className={cn("min-w-0 w-full overflow-hidden", className)}>
+    <div
+      ref={rowRef}
+      className={cn("flex min-w-0 w-full items-center", className)}
+      style={
+        hasTrailing
+          ? ({ gap: `${CURRENCY_AMOUNT_TRAILING_GAP_PX}px` } as CSSProperties)
+          : undefined
+      }
+    >
       <span
         ref={textRef}
-        className="block whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none"
+        className="inline-block min-w-0 max-w-full whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none"
         style={{ fontSize: fontSizePx ?? maxPx }}
       >
         {formatted}
       </span>
+      {hasTrailing ? (
+        <div ref={trailingRef} className="shrink-0">
+          {trailing}
+        </div>
+      ) : null}
     </div>
   );
 }

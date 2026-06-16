@@ -16,7 +16,6 @@ import {
   WidgetCard,
 } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -109,36 +108,6 @@ export function DashboardScreen() {
             </>
           )}
         </WidgetCard>
-
-        {isFinanceReady &&
-        certificateInsights.nextInterestDate &&
-        certificateInsights.upcomingInterestAmount !== null ? (
-          <WidgetCard>
-            <h2 className="text-start text-lg font-semibold">
-              {t("dashboard.certificates.upcomingInterest.title")}
-            </h2>
-            <div className="mt-3 space-y-1">
-              <ResponsiveCurrencyAmount
-                amount={certificateInsights.upcomingInterestAmount}
-                locale={formatLocale}
-                variant="large"
-              />
-              <p className="text-[0.9375rem] text-muted-foreground">
-                {t("dashboard.certificates.upcomingInterest.date", {
-                  date: formatDisplayDate(
-                    certificateInsights.nextInterestDate,
-                    formatLocale,
-                  ),
-                })}
-              </p>
-              {certificateInsights.upcomingInterestAutoRenewal ? (
-                <span className="inline-block rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-                  {t("dashboard.certificates.autoRenewalIndicator")}
-                </span>
-              ) : null}
-            </div>
-          </WidgetCard>
-        ) : null}
 
         {isFinanceReady && certificateInsights.maturingSoon.length > 0 ? (
           <WidgetCard>
