@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   getScreenBodyScrollPadding,
   STACK_SCREEN_BOTTOM_PADDING,
+  SYSTEM_MESSAGE_GAP_PX,
+  SYSTEM_MESSAGE_TOP_OFFSET,
   TAB_BAR_SCROLL_PADDING,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
@@ -36,6 +38,15 @@ describe("screen body scroll padding", () => {
       }),
     ).toBe(STACK_SCREEN_BOTTOM_PADDING);
     expect(STACK_SCREEN_BOTTOM_PADDING).toContain("3.5rem");
+  });
+});
+
+describe("system message spacing", () => {
+  it("positions surfaces 4px below the fixed header", () => {
+    expect(SYSTEM_MESSAGE_GAP_PX).toBe("4px");
+    expect(SYSTEM_MESSAGE_TOP_OFFSET).toBe(
+      "calc(calc(3.5rem + env(safe-area-inset-top)) + 4px)",
+    );
   });
 });
 

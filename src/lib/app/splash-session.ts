@@ -1,11 +1,11 @@
 /** Minimum branded splash duration (ms) before exit when init is ready. */
-export const SPLASH_MIN_DURATION_MS = 800;
+export const SPLASH_MIN_DURATION_MS = 1300;
+
+/** Splash exit dissolve animation (ms). */
+export const SPLASH_EXIT_ANIMATION_MS = 280;
 
 /** Reduced-motion splash minimum (ms). */
-export const SPLASH_REDUCED_MOTION_MS = 400;
-
-/** Legacy animation reference — orbit CSS still targets ~1.2s visual, exit is gated separately. */
-export const SPLASH_ANIMATION_MS = 1200;
+export const SPLASH_REDUCED_MOTION_MS = 600;
 
 /** Set when splash finishes for the current browser session. */
 export const SPLASH_COMPLETE_KEY = "nume-splash-complete";

@@ -30,9 +30,18 @@ export const STICKY_FOOTER_TAB_BAR_PADDING =
 /** Matches in-flow ScreenHeader inner bar (`h-14`). */
 export const SCREEN_HEADER_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Full ScreenHeader zone including safe area. */
+/** Full ScreenHeader zone including safe area (bottom edge of fixed header). */
 export const SCREEN_HEADER_ZONE_TOP =
   "calc(3.5rem + env(safe-area-inset-top))";
+
+/** Shared top offset for toasts, banners, and global system messages — 4px below header. */
+export const SYSTEM_MESSAGE_GAP_PX = "4px";
+
+export const SYSTEM_MESSAGE_TOP_OFFSET = `calc(${SCREEN_HEADER_ZONE_TOP} + ${SYSTEM_MESSAGE_GAP_PX})`;
+
+/** Tailwind arbitrary value class for fixed system-message surfaces. */
+export const SYSTEM_MESSAGE_TOP_CLASS =
+  "top-[calc(3.5rem+env(safe-area-inset-top)+4px)]";
 
 /**
  * Diagnostic: compensates for fixed ScreenHeader (h-14 + safe area + ScreenBody pt-4).

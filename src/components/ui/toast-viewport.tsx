@@ -3,6 +3,7 @@
 import { WifiOff, X } from "lucide-react";
 
 import type { ToastTone } from "@/providers/toast-provider";
+import { SYSTEM_MESSAGE_TOP_CLASS } from "@/lib/layout/screen-spacing";
 import { useToast } from "@/providers/toast-provider";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
@@ -10,11 +11,28 @@ import { cn } from "@/lib/utils";
 function toastSurfaceClass(tone: ToastTone): string {
   switch (tone) {
     case "warning":
-      return "border border-amber-500/25 bg-amber-500/12 text-foreground";
+      return "border-amber-600/30 bg-card text-card-foreground shadow-md dark:border-amber-400/35";
     case "success":
-      return "border border-emerald-500/25 bg-emerald-500/12 text-foreground";
+      return "border-emerald-600/30 bg-card text-card-foreground shadow-md dark:border-emerald-400/35";
     default:
-      return "bg-foreground text-background";
+      return "border-border bg-card text-card-foreground shadow-md";
+  }
+}
+
+function toastDescriptionClass(tone: ToastTone): string {
+  return tone === "default"
+    ? "text-muted-foreground"
+    : "text-muted-foreground";
+}
+
+function toastIconClass(tone: ToastTone): string {
+  switch (tone) {
+    case "warning":
+      return "text-amber-700 dark:text-amber-300";
+    case "success":
+      return "text-emerald-700 dark:text-emerald-300";
+    default:
+      return "text-foreground";
   }
 }
 
@@ -28,26 +46,36 @@ export function ToastViewport() {
     <div
       className={cn(
         "pointer-events-none fixed inset-x-0 z-50 flex flex-col gap-2 px-4",
-        "top-[calc(3.75rem+env(safe-area-inset-top))]",
+        SYSTEM_MESSAGE_TOP_CLASS,
       )}
     >
       {toasts.map((toast) => (
         <div
           key={toast.id}
           className={cn(
-            "pointer-events-auto flex min-h-11 items-start justify-between gap-3 rounded-lg px-4 py-3 text-sm shadow-sm animate-in fade-in slide-in-from-top-2 duration-200",
+            "pointer-events-auto flex min-h-11 items-start justify-between gap-3 rounded-lg px-4 py-3 text-sm animate-in fade-in slide-in-from-top-2 duration-200",
             toastSurfaceClass(toast.tone),
           )}
           role="status"
         >
           <div className="flex min-w-0 items-start gap-3">
             {toast.icon === "wifi-off" ? (
-              <WifiOff className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-300" />
+              <WifiOff
+                className={cn(
+                  "mt-0.5 size-4 shrink-0",
+                  toastIconClass(toast.tone),
+                )}
+              />
             ) : null}
             <div className="min-w-0">
               <p className="font-medium">{toast.message}</p>
               {toast.description ? (
-                <p className="mt-0.5 text-[0.8125rem] leading-snug text-muted-foreground">
+                <p
+                  className={cn(
+                    "mt-0.5 text-[0.8125rem] leading-snug",
+                    toastDescriptionClass(toast.tone),
+                  )}
+                >
                   {toast.description}
                 </p>
               ) : null}

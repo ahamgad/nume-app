@@ -199,53 +199,60 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .animate-nume-splash-logo-arrival {
-    animation: nume-splash-logo-arrival 250ms ease-out forwards;
+  .nume-splash-n-stroke-path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: nume-splash-n-draw 480ms cubic-bezier(0.45, 0.05, 0.2, 1) forwards;
+  }
+
+  .nume-splash-n-stroke {
+    opacity: 1;
+    animation: nume-splash-n-fade 320ms ease-out 400ms forwards;
+  }
+
+  .nume-splash-logo-full {
     opacity: 0;
+    transform: scale(0.97);
+    animation: nume-splash-logo-reveal 380ms cubic-bezier(0.25, 0.1, 0.2, 1) 420ms
+      forwards;
   }
 
-  .nume-splash-orbit {
-    color: var(--foreground);
+  .nume-splash-wordmark {
     opacity: 0;
-    transform: rotate(-130deg);
-    animation:
-      nume-splash-orbit-travel 700ms cubic-bezier(0.45, 0.05, 0.2, 1) 250ms
-        forwards,
-      nume-splash-orbit-fade-out 250ms ease-out 950ms forwards;
+    animation: nume-splash-wordmark-reveal 320ms ease-out 700ms forwards;
   }
 
-  .nume-splash-orbit-track {
-    opacity: 0.1;
-  }
-
-  .nume-splash-orbit-arc {
-    stroke-dasharray: 56 44;
-    stroke-dashoffset: 0;
-    opacity: 0.42;
-  }
-
-  html.dark .nume-splash-orbit-arc {
-    opacity: 0.55;
-  }
-
-  .animate-nume-splash-wordmark {
-    animation: nume-splash-wordmark 250ms ease-out 180ms forwards;
-    opacity: 0;
+  .nume-splash-stage-exiting {
+    animation: nume-splash-dissolve 280ms ease-in forwards;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-nume-splash-logo-arrival,
-    .animate-nume-splash-wordmark {
-      animation: nume-splash-fade-in 350ms ease-out forwards;
+    .nume-splash-n-stroke-path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+
+    .nume-splash-n-stroke {
+      animation: none;
+      opacity: 0;
+    }
+
+    .nume-splash-logo-full {
+      animation: nume-splash-fade-in 420ms ease-out forwards;
       transform: none;
     }
 
-    .animate-nume-splash-wordmark {
-      animation-delay: 120ms;
+    .nume-splash-wordmark {
+      animation: nume-splash-fade-in 320ms ease-out 180ms forwards;
     }
 
-    .nume-splash-orbit {
-      display: none;
+    .nume-splash-stage-exiting {
+      animation: nume-splash-dissolve 220ms ease-in forwards;
     }
   }
 
@@ -268,10 +275,22 @@
   }
 }
 
-@keyframes nume-splash-logo-arrival {
+@keyframes nume-splash-n-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nume-splash-n-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nume-splash-logo-reveal {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
@@ -279,35 +298,23 @@
   }
 }
 
-@keyframes nume-splash-orbit-travel {
+@keyframes nume-splash-wordmark-reveal {
   from {
     opacity: 0;
-    transform: rotate(-130deg);
-  }
-  12% {
-    opacity: 1;
   }
   to {
     opacity: 1;
-    transform: rotate(90deg);
   }
 }
 
-@keyframes nume-splash-orbit-fade-out {
+@keyframes nume-splash-dissolve {
   from {
     opacity: 1;
+    transform: scale(1);
   }
   to {
     opacity: 0;
-  }
-}
-
-@keyframes nume-splash-wordmark {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+    transform: scale(0.98);
   }
 }
 
@@ -356,35 +363,5 @@
   to {
     stroke-dashoffset: -28;
     transform: rotate(210deg);
-  }
-}
-
-.nume-splash-stroke-path {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-}
-
-.nume-splash-stroke-path-a {
-  animation: nume-splash-stroke-draw 280ms ease-out forwards;
-}
-
-.nume-splash-stroke-path-b {
-  animation: nume-splash-stroke-draw 280ms ease-out 120ms forwards;
-}
-
-.nume-splash-stroke-path-c {
-  animation: nume-splash-stroke-draw 220ms ease-out 260ms forwards;
-}
-
-@keyframes nume-splash-stroke-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nume-splash-stroke-path {
-    animation: none;
-    stroke-dashoffset: 0;
   }
 }
