@@ -10,6 +10,7 @@ export class ScheduleValidationError extends Error {
 }
 
 const PERIODIC_FREQUENCIES: PayoutFrequency[] = [
+  "daily",
   "monthly",
   "quarterly",
   "semi_annual",

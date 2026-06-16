@@ -6,6 +6,7 @@ import {
   generateScheduleEntries,
   mergeScheduleRegeneration,
 } from "@/lib/certificates/schedule-generator";
+import { hasDuplicateScheduleDates } from "@/lib/certificates/schedule-validation";
 import type { CertificateScheduleEntry } from "@/lib/certificates/types";
 
 const baseInput = {
@@ -24,6 +25,44 @@ describe("schedule-generator", () => {
     expect(entries[0]?.dueDate).toBe("2026-02-15");
     expect(entries.at(-1)?.dueDate).toBe("2027-01-15");
     expect(entries[0]?.interestAmount).toBe(1000);
+  });
+
+  it("generates daily schedule entries from day after purchase through maturity", () => {
+    const entries = generateScheduleEntries({
+      ...baseInput,
+      payoutFrequency: "daily",
+    });
+    expect(entries.length).toBe(365);
+    expect(entries[0]?.dueDate).toBe("2026-01-16");
+    expect(entries.at(-1)?.dueDate).toBe("2027-01-15");
+    expect(entries[0]?.interestAmount).toBe(32.88);
+    expect(hasDuplicateScheduleDates(entries)).toBe(false);
+  });
+
+  it("finds multiple due daily entries for catch-up processing", () => {
+    const entries = generateScheduleEntries({
+      ...baseInput,
+      payoutFrequency: "daily",
+    });
+    const schedules: CertificateScheduleEntry[] = entries.slice(0, 5).map(
+      (entry, index) => ({
+        id: String(index + 1),
+        certificateId: "c1",
+        userId: "u1",
+        dueDate: entry.dueDate,
+        interestAmount: entry.interestAmount,
+        status: "pending",
+        processedAt: null,
+        interestRecordId: null,
+        transferFailed: false,
+        transferRecordId: null,
+        createdAt: "",
+        updatedAt: "",
+      }),
+    );
+
+    expect(findDueScheduleEntries(schedules, "2026-01-20")).toHaveLength(5);
+    expect(deriveNextInterestDate(schedules, "2026-01-17")).toBe("2026-01-17");
   });
 
   it("generates a single at-maturity entry", () => {

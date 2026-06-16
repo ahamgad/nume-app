@@ -513,10 +513,6 @@ export const ar = {
       interestDestination: {
         label: "وجهة العائد",
         description: "إلى أي حساب تريد استلام عائد الشهادة؟",
-        placeholder: "اختر حسابًا",
-        searchPlaceholder: "ابحث في الحسابات",
-        noResults: "لا توجد حسابات مطابقة",
-        notSelected: "غير محدد",
       },
       autoApplyInterest: {
         label: "تحويل العائد تلقائيًا",
@@ -531,6 +527,7 @@ export const ar = {
       },
     },
     payoutFrequency: {
+      daily: "يومي",
       instantly: "فورًا",
       monthly: "شهري",
       quarterly: "ربع سنوي",

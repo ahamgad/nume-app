@@ -7,6 +7,7 @@ import { AccountPicker } from "@/components/ui/account-picker";
 import { DateField } from "@/components/ui/date-field";
 import { Label } from "@/components/ui/label";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import type { RecordFormValues } from "@/lib/finance/record-form";
 import { validateRecordAmountField } from "@/lib/finance/record-form";
 import type { Account, RecordType } from "@/lib/finance/types";
@@ -26,6 +27,8 @@ interface RecordFormFieldsProps {
   disabled?: boolean;
   account?: Account;
   accounts: Account[];
+  /** When set, the source account is fixed (account-details transfer flow). */
+  fixedSourceAccountId?: string | null;
   onChange: (patch: Partial<RecordFormValues>) => void;
   onClearError: (field: string) => void;
 }
@@ -70,12 +73,15 @@ export function RecordFormFields({
   disabled = false,
   account,
   accounts,
+  fixedSourceAccountId = null,
   onChange,
   onClearError,
 }: RecordFormFieldsProps) {
   const t = useT();
   const formatLocale = useFormatLocale();
   const parsedAmount = parseAmount(values.amount);
+
+  const sourceAccountId = fixedSourceAccountId ?? values.fromAccountId;
 
   const fromAccounts = useMemo(
     () =>
@@ -87,10 +93,10 @@ export function RecordFormFields({
 
   const toAccounts = useMemo(
     () =>
-      filterTransferAccounts(accounts, {
-        excludeAccountIds: values.fromAccountId ? [values.fromAccountId] : [],
+      filterInterestDestinationAccounts(accounts, t, {
+        excludeAccountIds: sourceAccountId ? [sourceAccountId] : [],
       }),
-    [accounts, values.fromAccountId],
+    [accounts, sourceAccountId, t],
   );
 
   const preview = useMemo(() => {
@@ -179,26 +185,40 @@ export function RecordFormFields({
 
       {type === "transfer" ? (
         <>
-          <AccountPicker
-            id="transfer-from-account"
-            label={t("records.fields.transfer.fromAccount")}
-            placeholder={t("records.fields.transfer.fromPlaceholder")}
-            value={values.fromAccountId}
-            accounts={fromAccounts}
-            disabled={disabled}
-            onChange={(fromAccountId) => {
-              onChange({ fromAccountId });
-              onClearError("fromAccountId");
-            }}
-          />
-          {errors.fromAccountId ? (
-            <p className="-mt-3 text-sm text-destructive">{errors.fromAccountId}</p>
+          {!fixedSourceAccountId ? (
+            <>
+              <AccountPicker
+                id="transfer-from-account"
+                label={t("records.fields.transfer.fromAccount")}
+                placeholder={t("records.fields.transfer.fromPlaceholder")}
+                value={values.fromAccountId}
+                accounts={fromAccounts}
+                disabled={disabled}
+                onChange={(fromAccountId) => {
+                  onChange({ fromAccountId });
+                  onClearError("fromAccountId");
+                }}
+              />
+              {errors.fromAccountId ? (
+                <p className="-mt-3 text-sm text-destructive">
+                  {errors.fromAccountId}
+                </p>
+              ) : null}
+            </>
           ) : null}
 
           <AccountPicker
             id="transfer-to-account"
             label={t("records.fields.transfer.toAccount")}
-            placeholder={t("records.fields.transfer.toPlaceholder")}
+            placeholder={t(
+              "accounts.fields.interestDestinationAccount.placeholder",
+            )}
+            searchPlaceholder={t(
+              "accounts.fields.interestDestinationAccount.searchPlaceholder",
+            )}
+            noResultsMessage={t(
+              "accounts.fields.interestDestinationAccount.noResults",
+            )}
             value={values.toAccountId}
             accounts={toAccounts}
             disabled={disabled}

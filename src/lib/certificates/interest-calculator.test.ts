@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   calculateAtMaturityInterest,
+  calculateDailyPeriodInterest,
   calculatePeriodInterest,
   calculateScheduleEntryInterest,
 } from "@/lib/certificates/interest-calculator";
@@ -24,7 +25,14 @@ describe("interest-calculator", () => {
       calculateScheduleEntryInterest(100_000, 12, "monthly", 12),
     ).toBe(1000);
     expect(
+      calculateScheduleEntryInterest(100_000, 12, "daily", 12),
+    ).toBe(32.88);
+    expect(
       calculateScheduleEntryInterest(100_000, 12, "at_maturity", 12),
     ).toBe(12_000);
+  });
+
+  it("calculates daily period interest using 365-day divisor", () => {
+    expect(calculateDailyPeriodInterest(365_000, 10)).toBe(100);
   });
 });

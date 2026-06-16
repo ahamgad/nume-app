@@ -229,3 +229,32 @@ All items below are **approved** for Certificates v1 implementation.
 7. i18n keys in `en.ts` / `ar.ts`
 
 **Status:** Domain and product decisions approved and documented. Ready for Phase 3.1b. No migrations, services, UI, or code changes until implementation begins.
+
+---
+
+## Phase 3.1.1 — Business Days Engine (Future Work)
+
+**Status:** Not implemented. Documented during Phase 3.1 daily certificate payout work.
+
+### Current assumptions (Phase 3.1 daily)
+
+* Daily certificate interest uses a **365-day calendar-year divisor**: `(Principal × Annual Rate) ÷ 36500` per payout day, aligned with savings daily posting math but applied to certificate principal only.
+* Schedule entries are generated for **every calendar day** from `purchase_date + 1 day` through `maturity_date` inclusive.
+* Catch-up processing reuses the existing schedule-entry model: all pending entries with `due_date ≤ as_of_date` are processed in order; idempotency is enforced by schedule status (`pending` → `processed`) and `schedule_entry_id` on interest records.
+* **Weekends and Egyptian public holidays are not excluded** in Phase 3.1.
+
+### Recommended scope for Phase 3.1.1
+
+| Area | Recommendation |
+|------|----------------|
+| Shared engine | Extract a reusable business-day calculator consumed by certificates, savings, and future products |
+| Weekends | Skip Friday/Saturday or Saturday/Sunday per Egyptian market convention (confirm with PO) |
+| Public holidays | Maintain an Egyptian holiday calendar with optional automatic sync from an official or curated source |
+| Catch-up | When a payout day is skipped (weekend/holiday), roll forward to the next business day without duplicate accrual |
+| Schedule materialization | For daily certificates, consider lazy/on-demand entry generation for long terms instead of persisting every calendar day upfront |
+
+### Open product questions
+
+1. Should daily interest **accrue** on non-business days but **pay** on the next business day, or should accrual also pause?
+2. Should savings daily posting adopt the same business-day rules for consistency?
+3. Is 365-day simple interest still correct when business-day exclusion is introduced, or should accrual use actual days in term?

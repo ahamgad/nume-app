@@ -34,6 +34,7 @@ import type { TranslationKey } from "@/lib/i18n";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 const PAYOUT_FREQUENCIES: PayoutFrequency[] = [
+  "daily",
   "monthly",
   "quarterly",
   "semi_annual",

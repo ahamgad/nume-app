@@ -63,6 +63,22 @@ describe("maturity and processor logic", () => {
     expect(planned.map((entry) => entry.id)).toEqual(["due"]);
   });
 
+  it("plans all overdue daily entries for catch-up processing", () => {
+    const entries = [
+      scheduleEntry({ id: "d1", dueDate: "2026-01-02", status: "pending" }),
+      scheduleEntry({ id: "d2", dueDate: "2026-01-03", status: "pending" }),
+      scheduleEntry({ id: "d3", dueDate: "2026-01-04", status: "pending" }),
+      scheduleEntry({ id: "future", dueDate: "2026-01-10", status: "pending" }),
+    ];
+
+    const planned = planInterestProcessing(
+      certificate({ payoutFrequency: "daily" }),
+      entries,
+      "2026-01-05",
+    );
+    expect(planned.map((entry) => entry.id)).toEqual(["d1", "d2", "d3"]);
+  });
+
   it("evaluates maturity when all entries processed and maturity passed", () => {
     const entries = [
       scheduleEntry({ status: "processed", interestAmount: 1000 }),

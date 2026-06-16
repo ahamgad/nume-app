@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Account } from "@/lib/finance/types";
 import {
+  filterDestinationAccounts,
   filterInterestDestinationAccounts,
   isInterestDestinationInstitution,
 } from "@/lib/finance/interest-destination-accounts";
@@ -46,5 +47,12 @@ describe("interest destination account filtering", () => {
       "1",
       "2",
     ]);
+  });
+
+  it("exposes filterDestinationAccounts alias", () => {
+    const accounts = [
+      account({ id: "1", type: "current_account", institution: "CIB" }),
+    ];
+    expect(filterDestinationAccounts(accounts, t).map((a) => a.id)).toEqual(["1"]);
   });
 });

@@ -18,6 +18,13 @@ function formatIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+/** Calendar-day addition in UTC. */
+export function addCalendarDays(isoDate: string, days: number): string {
+  const date = parseIsoDate(isoDate);
+  date.setUTCDate(date.getUTCDate() + days);
+  return formatIsoDate(date);
+}
+
 /** Calendar-month addition with end-of-month clamping (e.g. Jan 31 + 1 → Feb 28/29). */
 export function addCalendarMonths(isoDate: string, months: number): string {
   const date = parseIsoDate(isoDate);
@@ -74,6 +81,10 @@ export function calculatePayoutAmount(
     case "instantly":
     case "at_maturity":
       return expectedProfit;
+    case "daily":
+      return (
+        principalAmount * (annualInterestRate / 100) * (1 / 365)
+      );
     case "monthly":
       return expectedProfit / termMonths;
     case "quarterly":
@@ -101,6 +112,8 @@ export function calculateCurrentValue(
 
 function frequencyStepMonths(frequency: PayoutFrequency): number | null {
   switch (frequency) {
+    case "daily":
+      return null;
     case "instantly":
       return null;
     case "monthly":
@@ -128,6 +141,30 @@ export function calculateNextPayoutDate(
 
   if (payoutFrequency === "at_maturity") {
     return maturityDate >= asOfDate ? maturityDate : null;
+  }
+
+  if (payoutFrequency === "daily") {
+    let candidate = addCalendarDays(purchaseDate, 1);
+    let guard = 0;
+    const maxIterations = Math.max(
+      1,
+      Math.ceil(
+        (parseIsoDate(maturityDate).getTime() -
+          parseIsoDate(purchaseDate).getTime()) /
+          MS_PER_DAY,
+      ),
+    );
+
+    while (candidate < asOfDate && guard < maxIterations) {
+      candidate = addCalendarDays(candidate, 1);
+      guard += 1;
+    }
+
+    if (guard >= maxIterations || candidate > maturityDate) {
+      return null;
+    }
+
+    return candidate;
   }
 
   const stepMonths = frequencyStepMonths(payoutFrequency);

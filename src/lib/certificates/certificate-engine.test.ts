@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  calculateNextPayoutDate,
+  calculatePayoutAmount,
   formatCertificateRemainingLabel,
   calculateRemainingDays,
 } from "@/lib/certificates/certificate-engine";
@@ -63,5 +65,33 @@ describe("schema-support", () => {
 describe("calculateRemainingDays", () => {
   it("never returns negative remaining days", () => {
     expect(calculateRemainingDays("2025-01-01", "2026-01-01")).toBe(0);
+  });
+});
+
+describe("daily payout frequency", () => {
+  it("calculates per-day payout amount from annual rate", () => {
+    expect(calculatePayoutAmount(100_000, 12, 12, "daily")).toBeCloseTo(32.88, 2);
+  });
+
+  it("returns the first daily payout on the day after purchase", () => {
+    expect(
+      calculateNextPayoutDate(
+        "2026-01-15",
+        "2027-01-15",
+        "daily",
+        "2026-01-15",
+      ),
+    ).toBe("2026-01-16");
+  });
+
+  it("advances daily payouts until on or after as-of date", () => {
+    expect(
+      calculateNextPayoutDate(
+        "2026-01-15",
+        "2027-01-15",
+        "daily",
+        "2026-01-20",
+      ),
+    ).toBe("2026-01-20");
   });
 });

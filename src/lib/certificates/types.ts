@@ -1,4 +1,5 @@
 export type PayoutFrequency =
+  | "daily"
   | "instantly"
   | "monthly"
   | "quarterly"

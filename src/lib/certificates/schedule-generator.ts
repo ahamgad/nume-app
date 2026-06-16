@@ -1,4 +1,4 @@
-import { addCalendarMonths } from "@/lib/certificates/certificate-engine";
+import { addCalendarDays, addCalendarMonths } from "@/lib/certificates/certificate-engine";
 import {
   calculateScheduleEntryInterest,
   roundCurrency,
@@ -10,8 +10,18 @@ import type {
 import type { CertificateScheduleEntry, PayoutFrequency } from "@/lib/certificates/types";
 import { validateGeneratedSchedule } from "@/lib/certificates/schedule-validation";
 
+const MS_PER_DAY = 86_400_000;
+
+function daysBetweenInclusive(startIso: string, endIso: string): number {
+  const startMs = Date.parse(`${startIso}T00:00:00Z`);
+  const endMs = Date.parse(`${endIso}T00:00:00Z`);
+  return Math.max(1, Math.ceil((endMs - startMs) / MS_PER_DAY));
+}
+
 function frequencyStepMonths(frequency: PayoutFrequency): number | null {
   switch (frequency) {
+    case "daily":
+      return null;
     case "monthly":
       return 1;
     case "quarterly":
@@ -52,6 +62,33 @@ export function generateScheduleEntries(
     );
     if (amount <= 0) return [];
     return [{ dueDate: maturityDate, interestAmount: amount }];
+  }
+
+  if (payoutFrequency === "daily") {
+    const perPeriodAmount = calculateScheduleEntryInterest(
+      input.principalAmount,
+      input.annualInterestRate,
+      payoutFrequency,
+      termMonths,
+    );
+
+    if (perPeriodAmount <= 0) return [];
+
+    const entries: GeneratedScheduleEntry[] = [];
+    let candidate = addCalendarDays(purchaseDate, 1);
+    const maxIterations = daysBetweenInclusive(purchaseDate, maturityDate);
+    let guard = 0;
+
+    while (candidate <= maturityDate && guard < maxIterations) {
+      entries.push({
+        dueDate: candidate,
+        interestAmount: perPeriodAmount,
+      });
+      candidate = addCalendarDays(candidate, 1);
+      guard += 1;
+    }
+
+    return entries;
   }
 
   const stepMonths = frequencyStepMonths(payoutFrequency);

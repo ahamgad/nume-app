@@ -33,3 +33,6 @@ export function filterInterestDestinationAccounts(
     isInterestDestinationInstitution(account.institution, t),
   );
 }
+
+/** @deprecated Alias — same eligibility as interest destination pickers. */
+export const filterDestinationAccounts = filterInterestDestinationAccounts;

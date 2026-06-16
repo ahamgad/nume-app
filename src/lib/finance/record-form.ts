@@ -56,7 +56,9 @@ export function validateRecordForm(
       errors.fromAccountId = t("records.validation.fromAccountRequired");
     }
     if (!values.toAccountId) {
-      errors.toAccountId = t("records.validation.toAccountRequired");
+      errors.toAccountId = t(
+        "accounts.validation.interestDestinationAccountRequired",
+      );
     }
     if (
       values.fromAccountId &&

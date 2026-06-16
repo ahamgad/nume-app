@@ -10,6 +10,7 @@ export type { CertificateScheduleEntry, CertificateScheduleStatus, RenewalType }
 
 /** Supported schedule frequencies (excludes instantly — handled separately). */
 export const SCHEDULE_PAYOUT_FREQUENCIES: PayoutFrequency[] = [
+  "daily",
   "monthly",
   "quarterly",
   "semi_annual",

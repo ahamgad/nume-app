@@ -514,10 +514,6 @@ export const en = {
       interestDestination: {
         label: "Interest destination",
         description: "Where should certificate interest be paid?",
-        placeholder: "Select account",
-        searchPlaceholder: "Search accounts",
-        noResults: "No matching accounts",
-        notSelected: "Not selected",
       },
       autoApplyInterest: {
         label: "Automatic transfer interest",
@@ -532,6 +528,7 @@ export const en = {
       },
     },
     payoutFrequency: {
+      daily: "Daily",
       instantly: "Instantly",
       monthly: "Monthly",
       quarterly: "Quarterly",

@@ -1,8 +1,22 @@
 import type { PayoutFrequency } from "@/lib/certificates/types";
 
+/**
+ * Simple interest for one daily schedule period.
+ * Formula: (Principal × Annual Rate) ÷ 36500
+ */
+export function calculateDailyPeriodInterest(
+  principalAmount: number,
+  annualInterestRate: number,
+): number {
+  if (principalAmount <= 0 || annualInterestRate <= 0) return 0;
+  return roundCurrency((principalAmount * annualInterestRate) / 36500);
+}
+
 /** Period length in months for simple-interest formula. */
 export function periodLengthMonths(frequency: PayoutFrequency): number | null {
   switch (frequency) {
+    case "daily":
+      return null;
     case "monthly":
       return 1;
     case "quarterly":
@@ -54,6 +68,10 @@ export function calculateScheduleEntryInterest(
       annualInterestRate,
       termMonths,
     );
+  }
+
+  if (payoutFrequency === "daily") {
+    return calculateDailyPeriodInterest(principalAmount, annualInterestRate);
   }
 
   const periodMonths = periodLengthMonths(payoutFrequency);

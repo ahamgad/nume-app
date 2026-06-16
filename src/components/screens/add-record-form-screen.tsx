@@ -11,6 +11,7 @@ import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { parseAmount } from "@/lib/format/currency";
 import { todayIsoDate } from "@/lib/format/date";
+import { canSendTransfers } from "@/lib/finance/account-capabilities";
 import { useFinance } from "@/lib/finance/store";
 import {
   validateRecordForm,
@@ -37,6 +38,9 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
 
   const account = getAccount(accountId);
 
+  const fixedSourceAccountId =
+    type === "transfer" && account && canSendTransfers(account) ? accountId : null;
+
   const [values, setValues] = useState<RecordFormValues>(() => ({
     amount: "",
     description: "",
@@ -55,13 +59,10 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     (type === "transfer" &&
       (values.fromAccountId !== accountId || values.toAccountId !== null));
 
-  const fromAccount = useMemo(
-    () =>
-      values.fromAccountId
-        ? accounts.find((item) => item.id === values.fromAccountId)
-        : undefined,
-    [accounts, values.fromAccountId],
-  );
+  const fromAccount = useMemo(() => {
+    const id = fixedSourceAccountId ?? values.fromAccountId;
+    return id ? accounts.find((item) => item.id === id) : undefined;
+  }, [accounts, fixedSourceAccountId, values.fromAccountId]);
 
   const parsedAmount = parseAmount(values.amount);
   const showInsufficientTransferBalance =
@@ -92,9 +93,10 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     setSubmitting(true);
     try {
       if (type === "transfer") {
-        if (!values.fromAccountId || !values.toAccountId) return;
+        const fromAccountId = fixedSourceAccountId ?? values.fromAccountId;
+        if (!fromAccountId || !values.toAccountId) return;
         await createTransfer({
-          fromAccountId: values.fromAccountId,
+          fromAccountId,
           toAccountId: values.toAccountId,
           amount,
           description: values.description.trim() || null,
@@ -149,7 +151,9 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
         : (`records.add.${type}.title` as TranslationKey);
 
   const canSubmit =
-    type === "transfer" ? Boolean(values.fromAccountId && values.toAccountId) : Boolean(account);
+    type === "transfer"
+      ? Boolean((fixedSourceAccountId ?? values.fromAccountId) && values.toAccountId)
+      : Boolean(account);
 
   return (
     <>
@@ -169,6 +173,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           disabled={submitting}
           account={account}
           accounts={accounts}
+          fixedSourceAccountId={fixedSourceAccountId}
           onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
           onClearError={clearFieldError}
         />
