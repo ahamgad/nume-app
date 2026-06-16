@@ -27,6 +27,13 @@ export const STICKY_FOOTER_BOTTOM_PADDING =
 export const STICKY_FOOTER_TAB_BAR_PADDING =
   "pb-[calc(9rem+env(safe-area-inset-bottom))]";
 
+/** Matches in-flow ScreenHeader inner bar (`h-14`). */
+export const SCREEN_HEADER_BAR_HEIGHT_CLASS = "3.5rem";
+
+/** Full ScreenHeader zone including safe area. */
+export const SCREEN_HEADER_ZONE_TOP =
+  "calc(3.5rem + env(safe-area-inset-top))";
+
 /**
  * Diagnostic: compensates for fixed ScreenHeader (h-14 + safe area + ScreenBody pt-4).
  */

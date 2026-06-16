@@ -1,16 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef } from "react";
 
+import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
 import { KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER } from "@/lib/layout/keyboard-snap-investigation";
 import {
   getScreenBodyScrollPadding,
   getScreenBodyTopPadding,
+  SCREEN_HEADER_ZONE_TOP,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
 import { cn } from "@/lib/utils";
@@ -136,6 +138,7 @@ export function ScreenBody({
   const topPadding = getScreenBodyTopPadding(
     KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER,
   );
+  const hasFixedHeader = KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER;
 
   const scrollContainerClassName = cn(
     "flex-1 min-h-0 overflow-x-hidden px-4",
@@ -177,14 +180,18 @@ export function ScreenBody({
         <div
           aria-live="polite"
           aria-busy={isRefreshing}
-          className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-center"
-          style={{ height: offset, opacity: indicatorOpacity }}
+          className="pointer-events-none absolute inset-x-0 z-20 flex items-end justify-center"
+          style={{
+            top: hasFixedHeader ? SCREEN_HEADER_ZONE_TOP : 0,
+            height: hasFixedHeader
+              ? `max(${offset}px, 2.75rem)`
+              : offset,
+            paddingBottom: hasFixedHeader ? "0.375rem" : 0,
+          }}
         >
-          <Loader2
-            className={cn(
-              "size-8 text-muted-foreground",
-              isRefreshing && "animate-spin",
-            )}
+          <PullToRefreshIndicator
+            isRefreshing={isRefreshing}
+            opacity={indicatorOpacity}
           />
         </div>
       ) : null}

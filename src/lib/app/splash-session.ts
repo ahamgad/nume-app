@@ -7,23 +7,14 @@ export const SPLASH_ANIMATION_MAX_MS = 1400;
 /** Reduced-motion splash duration (ms). */
 export const SPLASH_REDUCED_MOTION_MS = 400;
 
-/** Show splash again after this much inactivity (ms). */
-export const INACTIVITY_SPLASH_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000;
-
-/** Set when splash finishes or is skipped for the current browser session. */
+/** Set when splash finishes for the current browser session. */
 export const SPLASH_COMPLETE_KEY = "nume-splash-complete";
 
-/** Last successful app launch (localStorage, survives cold starts). */
-export const LAST_OPENED_AT_KEY = "nume-last-opened-at";
-
-export function shouldShowSplashOnColdStart(
-  lastOpenedAtMs: number | null,
-  nowMs: number,
-): boolean {
-  if (lastOpenedAtMs === null) return true;
-  if (!Number.isFinite(lastOpenedAtMs)) return true;
-  return nowMs - lastOpenedAtMs >= INACTIVITY_SPLASH_THRESHOLD_MS;
-}
+/**
+ * Set when the app enters the background. Consumed on the next load to
+ * distinguish background resume (skip splash) from cold start (show splash).
+ */
+export const BG_RESUME_ELIGIBLE_KEY = "nume-bg-resume-eligible";
 
 export function getSplashAnimationDurationMs(
   prefersReducedMotion = false,
@@ -31,36 +22,59 @@ export function getSplashAnimationDurationMs(
   return prefersReducedMotion ? SPLASH_REDUCED_MOTION_MS : SPLASH_ANIMATION_MS;
 }
 
-export function markSplashComplete(now = Date.now()) {
-  window.sessionStorage.setItem(SPLASH_COMPLETE_KEY, "1");
-  recordLastOpenedAt(now);
+export function shouldSkipSplashOnLoad(options: {
+  pathname: string;
+  splashComplete: boolean;
+  bgResumeEligible: boolean;
+  wasDiscarded: boolean;
+}): boolean {
+  if (options.pathname === "/splash") return true;
+  if (options.wasDiscarded) return false;
+  return options.splashComplete && options.bgResumeEligible;
 }
 
-export function skipSplashForActiveSession(now = Date.now()) {
+export function markSplashComplete() {
   window.sessionStorage.setItem(SPLASH_COMPLETE_KEY, "1");
-  recordLastOpenedAt(now);
+  window.sessionStorage.removeItem(BG_RESUME_ELIGIBLE_KEY);
 }
 
 export function clearSplashComplete() {
   window.sessionStorage.removeItem(SPLASH_COMPLETE_KEY);
+  window.sessionStorage.removeItem(BG_RESUME_ELIGIBLE_KEY);
 }
 
 export function isSplashComplete(): boolean {
   return window.sessionStorage.getItem(SPLASH_COMPLETE_KEY) === "1";
 }
 
-export function readLastOpenedAtMs(): number | null {
-  const raw = window.localStorage.getItem(LAST_OPENED_AT_KEY);
-  if (!raw) return null;
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-export function recordLastOpenedAt(now = Date.now()) {
-  window.localStorage.setItem(LAST_OPENED_AT_KEY, String(now));
-}
-
-/** Inline bootstrap script — runs before first paint on cold loads. */
+/** Inline bootstrap + lifecycle listeners — runs before first paint. */
 export function getSplashBootstrapScript(): string {
-  return `(function(){try{var p=location.pathname;if(p==="/splash")return;if(sessionStorage.getItem("${SPLASH_COMPLETE_KEY}")==="1")return;var last=localStorage.getItem("${LAST_OPENED_AT_KEY}");var now=Date.now();var threshold=${INACTIVITY_SPLASH_THRESHOLD_MS};if(last&&Number.isFinite(Number(last))&&(now-Number(last))<threshold){sessionStorage.setItem("${SPLASH_COMPLETE_KEY}","1");localStorage.setItem("${LAST_OPENED_AT_KEY}",String(now));return;}location.replace("/splash");}catch(e){}})();`;
+  return `(function(){try{
+var SPLASH="${SPLASH_COMPLETE_KEY}";
+var RESUME="${BG_RESUME_ELIGIBLE_KEY}";
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="hidden"){sessionStorage.setItem(RESUME,"1");}
+});
+window.addEventListener("pagehide",function(e){
+  if(!e.persisted){sessionStorage.removeItem(RESUME);}
+});
+var p=location.pathname;
+if(p==="/splash")return;
+var complete=sessionStorage.getItem(SPLASH)==="1";
+var resume=sessionStorage.getItem(RESUME)==="1";
+var discarded=typeof document!=="undefined"&&document.wasDiscarded===true;
+if(discarded){
+  sessionStorage.removeItem(SPLASH);
+  sessionStorage.removeItem(RESUME);
+  location.replace("/splash");
+  return;
+}
+if(complete&&resume){
+  sessionStorage.removeItem(RESUME);
+  return;
+}
+sessionStorage.removeItem(SPLASH);
+sessionStorage.removeItem(RESUME);
+location.replace("/splash");
+}catch(e){}})();`;
 }
