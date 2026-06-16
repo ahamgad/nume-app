@@ -1,11 +1,11 @@
-/** Branded splash animation target (ms). Ends earlier when init is slower. */
-export const SPLASH_ANIMATION_MS = 1200;
+/** Minimum branded splash duration (ms) before exit when init is ready. */
+export const SPLASH_MIN_DURATION_MS = 800;
 
-/** Branded splash animation upper bound (ms). */
-export const SPLASH_ANIMATION_MAX_MS = 1400;
-
-/** Reduced-motion splash duration (ms). */
+/** Reduced-motion splash minimum (ms). */
 export const SPLASH_REDUCED_MOTION_MS = 400;
+
+/** Legacy animation reference — orbit CSS still targets ~1.2s visual, exit is gated separately. */
+export const SPLASH_ANIMATION_MS = 1200;
 
 /** Set when splash finishes for the current browser session. */
 export const SPLASH_COMPLETE_KEY = "nume-splash-complete";
@@ -19,7 +19,25 @@ export const BG_RESUME_ELIGIBLE_KEY = "nume-bg-resume-eligible";
 export function getSplashAnimationDurationMs(
   prefersReducedMotion = false,
 ): number {
-  return prefersReducedMotion ? SPLASH_REDUCED_MOTION_MS : SPLASH_ANIMATION_MS;
+  return prefersReducedMotion ? SPLASH_REDUCED_MOTION_MS : SPLASH_MIN_DURATION_MS;
+}
+
+export function getSplashExitDelayMs(
+  elapsedMs: number,
+  prefersReducedMotion = false,
+): number {
+  const minimum = getSplashAnimationDurationMs(prefersReducedMotion);
+  return Math.max(0, minimum - elapsedMs);
+}
+
+export function isSplashInitializationReady(options: {
+  authLoading: boolean;
+  user: unknown;
+  isFinanceReady: boolean;
+}): boolean {
+  if (options.authLoading) return false;
+  if (options.user && !options.isFinanceReady) return false;
+  return true;
 }
 
 export function shouldSkipSplashOnLoad(options: {

@@ -1,6 +1,54 @@
 import { describe, expect, it } from "vitest";
 
-import { shouldSkipSplashOnLoad } from "@/lib/app/splash-session";
+import {
+  getSplashExitDelayMs,
+  isSplashInitializationReady,
+  shouldSkipSplashOnLoad,
+} from "@/lib/app/splash-session";
+
+describe("getSplashExitDelayMs", () => {
+  it("waits until the minimum splash duration has elapsed", () => {
+    expect(getSplashExitDelayMs(300)).toBe(500);
+    expect(getSplashExitDelayMs(900)).toBe(0);
+  });
+
+  it("uses a shorter minimum for reduced motion", () => {
+    expect(getSplashExitDelayMs(100, true)).toBe(300);
+  });
+});
+
+describe("isSplashInitializationReady", () => {
+  it("waits for auth and finance before exit", () => {
+    expect(
+      isSplashInitializationReady({
+        authLoading: true,
+        user: null,
+        isFinanceReady: false,
+      }),
+    ).toBe(false);
+    expect(
+      isSplashInitializationReady({
+        authLoading: false,
+        user: { id: "u1" },
+        isFinanceReady: false,
+      }),
+    ).toBe(false);
+    expect(
+      isSplashInitializationReady({
+        authLoading: false,
+        user: { id: "u1" },
+        isFinanceReady: true,
+      }),
+    ).toBe(true);
+    expect(
+      isSplashInitializationReady({
+        authLoading: false,
+        user: null,
+        isFinanceReady: false,
+      }),
+    ).toBe(true);
+  });
+});
 
 describe("shouldSkipSplashOnLoad", () => {
   it("always allows the splash route", () => {

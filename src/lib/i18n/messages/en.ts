@@ -10,6 +10,13 @@ export const en = {
     mainNavigation: "Main navigation",
     dismiss: "Dismiss",
   },
+  connectivity: {
+    offline: {
+      title: "You're offline",
+      description: "Some features may not be available.",
+    },
+    online: "You're back online.",
+  },
   auth: {
     fields: {
       email: "Email",

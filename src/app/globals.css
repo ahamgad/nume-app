@@ -358,3 +358,33 @@
     transform: rotate(210deg);
   }
 }
+
+.nume-splash-stroke-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.nume-splash-stroke-path-a {
+  animation: nume-splash-stroke-draw 280ms ease-out forwards;
+}
+
+.nume-splash-stroke-path-b {
+  animation: nume-splash-stroke-draw 280ms ease-out 120ms forwards;
+}
+
+.nume-splash-stroke-path-c {
+  animation: nume-splash-stroke-draw 220ms ease-out 260ms forwards;
+}
+
+@keyframes nume-splash-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nume-splash-stroke-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

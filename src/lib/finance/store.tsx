@@ -76,6 +76,7 @@ import type {
 import { createClient } from "@/lib/supabase/client";
 import { logSupabaseError } from "@/lib/supabase/errors";
 import { useAuth } from "@/providers/auth-provider";
+import { useConnectivity } from "@/providers/connectivity-provider";
 
 const FINANCE_QUERY_KEY = "finance";
 
@@ -213,6 +214,7 @@ async function loadFinanceData(userId: string): Promise<FinanceData> {
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { user, isLoading: authLoading } = useAuth();
+  const { isOnline } = useConnectivity();
   const queryClient = useQueryClient();
   const userId = user?.id;
   const processingCertificatesRef = useRef<Set<string>>(new Set());
@@ -229,6 +231,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     queryFn: () => loadFinanceData(userId!),
     enabled: Boolean(userId),
     placeholderData: (previous) => previous,
+    retry: isOnline ? 2 : false,
   });
 
   const accounts = useMemo(() => data?.accounts ?? [], [data?.accounts]);
@@ -566,8 +569,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [accounts, certificates],
   );
 
-  const isFinanceLoading = Boolean(userId) && financeLoading && !isFetched;
-  const isFinanceReady = !userId || isFetched;
+  const isFinanceLoading =
+    Boolean(userId) && financeLoading && !isFetched && isOnline;
+  const isFinanceReady = !userId || isFetched || (!isOnline && !authLoading);
   const isHydrated = !authLoading;
   const isLoading = authLoading || isFinanceLoading;
 

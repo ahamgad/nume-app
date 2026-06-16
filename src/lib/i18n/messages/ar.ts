@@ -12,6 +12,13 @@ export const ar = {
     mainNavigation: "التنقل الرئيسي",
     dismiss: "إغلاق",
   },
+  connectivity: {
+    offline: {
+      title: "أنت غير متصل بالإنترنت",
+      description: "قد لا تكون بعض المميزات غير متاحة.",
+    },
+    online: "تم استعادة الاتصال بالإنترنت.",
+  },
   auth: {
     fields: {
       email: "البريد الإلكتروني",

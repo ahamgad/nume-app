@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type TransitionEvent } from "react";
 
 import { useModalLayer } from "@/providers/modal-layer-provider";
+import { useConnectivity } from "@/providers/connectivity-provider";
 
 /** Visual offset required to trigger refresh after release. */
 const PULL_THRESHOLD = 56;
@@ -37,6 +38,7 @@ function isAtScrollTop(scrollContainer: HTMLElement): boolean {
 
 export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   const { isModalOpen } = useModalLayer();
+  const { isOnline, signalOffline } = useConnectivity();
   const [offset, setOffset] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -90,6 +92,14 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
   const runRefresh = useCallback(async () => {
     if (!onRefreshRef.current || isRefreshingRef.current) return;
 
+    if (!isOnline) {
+      isPullingRef.current = false;
+      startedAtTopRef.current = false;
+      resetPull();
+      signalOffline();
+      return;
+    }
+
     isRefreshingRef.current = true;
     isPullingRef.current = false;
     startedAtTopRef.current = false;
@@ -105,7 +115,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       setIsRefreshing(false);
       snapBack();
     }
-  }, [snapBack]);
+  }, [isOnline, resetPull, signalOffline, snapBack]);
 
   const handleTransitionEnd = useCallback(
     (event: TransitionEvent<HTMLDivElement>) => {
@@ -186,6 +196,11 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       startedAtTopRef.current = false;
 
       if (shouldRefresh) {
+        if (!isOnline) {
+          resetPull();
+          signalOffline();
+          return;
+        }
         void runRefresh();
         return;
       }
@@ -215,7 +230,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       element.removeEventListener("touchend", handleTouchEnd);
       element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [isModalOpen, onRefresh, runRefresh, resetPull, snapBack]);
+  }, [isModalOpen, isOnline, onRefresh, resetPull, runRefresh, signalOffline, snapBack]);
 
   const activeOffset = isModalOpen ? 0 : offset;
   const activeAnimating = isModalOpen ? false : isAnimating;
