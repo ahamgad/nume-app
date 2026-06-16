@@ -14,38 +14,9 @@ import type {
   UpdateCertificateInput,
 } from "@/lib/certificates/types";
 import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
-import { canReceiveTransfers } from "@/lib/finance/account-capabilities";
+import { assertDestinationAccount } from "@/lib/finance/interest-destination-accounts";
 import { patchAccount } from "@/lib/finance/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
-
-async function assertDestinationAccount(
-  supabase: SupabaseClient,
-  userId: string,
-  destinationAccountId: string | null | undefined,
-): Promise<void> {
-  if (!destinationAccountId) return;
-
-  const { data, error } = await supabase
-    .from("accounts")
-    .select("id, account_type, status")
-    .eq("id", destinationAccountId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error) throw error;
-  if (!data) {
-    throw new Error("Destination account not found");
-  }
-
-  if (
-    !canReceiveTransfers({
-      type: data.account_type,
-      status: data.status,
-    })
-  ) {
-    throw new Error("Destination account cannot receive transfers");
-  }
-}
 
 export async function getCertificates(
   supabase: SupabaseClient,

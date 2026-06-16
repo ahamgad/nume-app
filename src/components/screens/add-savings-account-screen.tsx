@@ -40,7 +40,7 @@ export function AddSavingsAccountScreen() {
   const [showDiscard, setShowDiscard] = useState(false);
 
   const transferAccounts = useMemo(
-    () => filterInterestDestinationAccounts(accounts, t),
+    () => filterInterestDestinationAccounts(accounts),
     [accounts, t],
   );
 

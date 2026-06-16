@@ -93,10 +93,10 @@ export function RecordFormFields({
 
   const toAccounts = useMemo(
     () =>
-      filterInterestDestinationAccounts(accounts, t, {
+      filterInterestDestinationAccounts(accounts, {
         excludeAccountIds: sourceAccountId ? [sourceAccountId] : [],
       }),
-    [accounts, sourceAccountId, t],
+    [accounts, sourceAccountId],
   );
 
   const preview = useMemo(() => {

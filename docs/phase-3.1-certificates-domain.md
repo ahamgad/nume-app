@@ -232,6 +232,43 @@ All items below are **approved** for Certificates v1 implementation.
 
 ---
 
+## Destination Account Rules (Phase 3.1 final)
+
+**Source of truth:** `src/lib/finance/interest-destination-accounts.ts` and `src/lib/finance/account-capabilities.ts`
+
+### Interest destinations (Savings, Certificates)
+
+Represents: *"Where should newly generated money go?"*
+
+| Eligible (active) | Excluded |
+|-------------------|----------|
+| Current Account | Certificate |
+| Savings Account | Gold |
+| Wallet | Stocks |
+| Cash | Loan |
+| | Credit Card |
+
+Institution catalog membership is **not** required. Cash and Wallet accounts appear regardless of institution.
+
+### Transfer destinations
+
+Represents: *"Where can I move my existing money?"*
+
+Same eligible/excluded matrix as interest destinations for Phase 3.1.
+
+**Future (not implemented):** When Loans and Credit Cards ship, transfer destinations should also support those types for repayment flows. Extend `TRANSFER_CAPABLE_ACCOUNT_TYPES` and shared destination helpers — do not scatter type lists in UI.
+
+### Enforcement layers
+
+| Layer | Mechanism |
+|-------|-----------|
+| Pickers | `filterDestinationAccounts()` |
+| Savings / Certificate services | `assertDestinationAccount()` |
+| Transfers | `canReceiveTransfers()` in `insertTransfer()` |
+| Interest processors | `canReceiveTransfers()` before balance update |
+
+---
+
 ## Phase 3.1.1 — Business Days Engine (Future Work)
 
 **Status:** Not implemented. Documented during Phase 3.1 daily certificate payout work.

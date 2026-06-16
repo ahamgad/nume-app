@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { canReceiveTransfers } from "@/lib/finance/account-capabilities";
+import { assertDestinationAccount } from "@/lib/finance/interest-destination-accounts";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 import { todayIsoDate } from "@/lib/format/date";
 import {
@@ -17,36 +17,6 @@ import type {
   SavingsAccount,
   UpdateSavingsAccountInput,
 } from "@/lib/savings/types";
-
-async function assertDestinationAccount(
-  supabase: SupabaseClient,
-  userId: string,
-  destinationAccountId: string | null | undefined,
-  excludeAccountId?: string,
-): Promise<void> {
-  if (!destinationAccountId) return;
-
-  const { data, error } = await supabase
-    .from("accounts")
-    .select("id, account_type, status")
-    .eq("id", destinationAccountId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error) throw error;
-  if (!data) throw new Error("Destination account not found");
-  if (excludeAccountId && data.id === excludeAccountId) {
-    throw new Error("Destination account cannot be the same savings account");
-  }
-  if (
-    !canReceiveTransfers({
-      type: data.account_type,
-      status: data.status,
-    })
-  ) {
-    throw new Error("Destination account cannot receive transfers");
-  }
-}
 
 async function replaceTiers(
   supabase: SupabaseClient,
@@ -223,7 +193,7 @@ export async function updateSavingsAccount(
       supabase,
       userId,
       destinationAccountId,
-      accountId,
+      { excludeAccountId: accountId },
     );
   }
 

@@ -57,7 +57,7 @@ function EditCertificateForm({
   const isDirty = isCertificateFormDirty(values, initialValues);
 
   const transferAccounts = useMemo(() => {
-    const eligible = filterInterestDestinationAccounts(accounts, t, {
+    const eligible = filterInterestDestinationAccounts(accounts, {
       excludeAccountIds: [accountId],
     });
     if (!values.destinationAccountId) return eligible;
@@ -68,7 +68,7 @@ function EditCertificateForm({
       return eligible;
     }
     return [...eligible, selected];
-  }, [accounts, accountId, values.destinationAccountId, t]);
+  }, [accounts, accountId, values.destinationAccountId]);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {

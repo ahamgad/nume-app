@@ -50,7 +50,13 @@ export function canSendTransfers(
   return account.status === "active" && isTransferCapableAccountType(account.type);
 }
 
-/** Whether an account can receive transfers and appear in destination pickers. */
+/**
+ * Whether an account can receive transfers and appear in destination pickers.
+ * Same rule set as interest destination accounts (Phase 3.1).
+ *
+ * Future: extend TRANSFER_CAPABLE_ACCOUNT_TYPES with loan and credit_card
+ * when repayment transfer flows ship.
+ */
 export function canReceiveTransfers(
   account: Pick<Account, "type" | "status">,
 ): boolean {

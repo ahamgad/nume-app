@@ -1,38 +1,70 @@
-import type { Account } from "@/lib/finance/types";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import {
-  matchInstitutionEntryGlobal,
-  type InstitutionCategory,
-} from "@/lib/institutions/catalog";
-import type { TranslationKey } from "@/lib/i18n";
+  canReceiveTransfers,
+  filterTransferAccounts,
+} from "@/lib/finance/account-capabilities";
+import type { Account } from "@/lib/finance/types";
 
-type InstitutionTranslator = (key: TranslationKey) => string;
+/**
+ * Destination eligibility (Phase 3.1 final rules).
+ *
+ * Interest and transfer destination pickers share the same active-account types:
+ * current_account, savings_account, wallet, cash.
+ *
+ * Wealth-only types (certificate, gold, stocks, loan, credit_card) are excluded.
+ * Institution catalog membership is not required.
+ *
+ * Future: loan and credit_card may become transfer destinations for repayments.
+ * See docs/phase-3.1-certificates-domain.md.
+ */
 
-const INTEREST_DESTINATION_INSTITUTION_CATEGORIES = new Set<InstitutionCategory>([
-  "bank",
-  "financial_service",
-]);
-
-export function isInterestDestinationInstitution(
-  institution: string | null,
-  t: InstitutionTranslator,
+/** Whether an account may receive interest or transfer inflows. */
+export function canBeDestinationAccount(
+  account: Pick<Account, "type" | "status">,
 ): boolean {
-  if (!institution?.trim()) return false;
-  const match = matchInstitutionEntryGlobal(institution.trim(), t);
-  if (!match) return false;
-  return INTEREST_DESTINATION_INSTITUTION_CATEGORIES.has(match.category);
+  return canReceiveTransfers(account);
 }
 
-/** Transfer-capable accounts at banks or financial-service institutions. */
-export function filterInterestDestinationAccounts(
+/** Active destination-eligible accounts for pickers. */
+export function filterDestinationAccounts(
   accounts: Account[],
-  t: InstitutionTranslator,
   options?: { excludeAccountIds?: string[] },
 ): Account[] {
-  return filterTransferAccounts(accounts, options).filter((account) =>
-    isInterestDestinationInstitution(account.institution, t),
-  );
+  return filterTransferAccounts(accounts, options);
 }
 
-/** @deprecated Alias — same eligibility as interest destination pickers. */
-export const filterDestinationAccounts = filterInterestDestinationAccounts;
+/** @deprecated Alias — use filterDestinationAccounts */
+export const filterInterestDestinationAccounts = filterDestinationAccounts;
+
+export async function assertDestinationAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  destinationAccountId: string | null | undefined,
+  options?: { excludeAccountId?: string },
+): Promise<void> {
+  if (!destinationAccountId) return;
+
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("id, account_type, status")
+    .eq("id", destinationAccountId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error("Destination account not found");
+
+  if (options?.excludeAccountId && data.id === options.excludeAccountId) {
+    throw new Error("Destination account cannot be the same account");
+  }
+
+  if (
+    !canBeDestinationAccount({
+      type: data.account_type,
+      status: data.status,
+    })
+  ) {
+    throw new Error("Destination account cannot receive transfers");
+  }
+}
