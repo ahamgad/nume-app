@@ -9,6 +9,8 @@ const TYPE_LABEL_KEYS: Partial<Record<AccountType, TranslationKey>> = {
   certificate: "accounts.types.certificate",
   gold: "accounts.types.gold",
   loan: "accounts.types.loan",
+  credit_card: "accounts.types.creditCard",
+  stocks: "accounts.types.stocks",
 };
 
 export function getAccountTypeLabelKey(type: AccountType): TranslationKey {

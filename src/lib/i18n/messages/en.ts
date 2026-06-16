@@ -184,9 +184,16 @@ export const en = {
     creating: "Creating…",
     sections: {
       money: "Money accounts",
+      savings: "Savings",
       certificates: "Certificates",
       basic: "Basic information",
       balance: "Balance",
+    },
+    typeGroups: {
+      money: "Money accounts",
+      savings: "Savings",
+      lending: "Lending",
+      investments: "Investments",
     },
     formSections: {
       accountDetails: "Account details",
@@ -200,7 +207,9 @@ export const en = {
       savingsAccount: "Savings account",
       certificate: "Certificate",
       gold: "Gold",
+      stocks: "Stocks",
       loan: "Loans",
+      creditCard: "Credit",
     },
     empty: {
       title: "Your accounts live here",
@@ -238,6 +247,7 @@ export const en = {
       certificateLead: "Track a fixed-term deposit with expected returns.",
       balanceHint: "Use the balance you see in your bank app today.",
       comingSoon: "Coming soon",
+      typeUnavailable: "This account type is not available yet.",
       firstAccount: {
         title: "Add your first account",
         lead: "Start with one account you use every day. You can add more later.",
@@ -343,6 +353,102 @@ export const en = {
       bokra: "Bokra",
       fawry: "Fawry",
       lucky: "Lucky",
+    },
+  },
+  savings: {
+    create: {
+      title: "Add savings account",
+      lead: "Track interest earned on your savings with configurable posting schedules.",
+      submit: "Create savings account",
+      creating: "Creating…",
+      success: "Savings account created",
+    },
+    edit: {
+      title: "Edit savings account",
+      submit: "Save changes",
+      saving: "Saving…",
+      success: "Savings account updated",
+    },
+    sections: {
+      interestModel: "Interest model",
+      posting: "Posting schedule",
+      destination: "Interest destination",
+    },
+    interestModel: {
+      fixed: "Fixed interest",
+      tiered: "Tiered interest",
+    },
+    postingFrequency: {
+      monthly: "Monthly",
+      quarterly: "Quarterly",
+      semi_annual: "Semi-annual",
+      annual: "Annual",
+    },
+    destination: {
+      sameAccount: "Same account",
+      anotherAccount: "Another account",
+    },
+    balanceMethodHint:
+      "Interest uses the minimum balance reached during each posting cycle.",
+    fields: {
+      currency: {
+        label: "Currency",
+      },
+      openingBalance: {
+        label: "Opening balance",
+      },
+      interestModel: {
+        label: "Interest model",
+      },
+      annualRate: {
+        label: "Annual interest rate",
+      },
+      tiers: {
+        label: "Interest tiers",
+        tierLabel: "Tier {index}",
+        minBalance: "Minimum balance",
+        maxBalance: "Maximum balance",
+        openEnded: "Open-ended",
+        add: "Add tier",
+        remove: "Remove tier",
+      },
+      postingFrequency: {
+        label: "Posting frequency",
+      },
+      postingDay: {
+        label: "Posting day",
+        lastOfMonth: "Last day of month",
+      },
+      cycleStartDate: {
+        label: "Interest cycle start date",
+        hint: "When interest tracking begins for this account.",
+      },
+      destination: {
+        label: "Interest destination",
+      },
+      destinationAccount: {
+        label: "Destination account",
+      },
+    },
+    details: {
+      interestModel: "Interest model",
+      annualRate: "Annual rate",
+      postingSchedule: "Posting schedule",
+      nextPosting: "Next posting",
+      cycleMinimum: "Cycle minimum balance",
+      destination: "Interest destination",
+    },
+    validation: {
+      rateRequired: "Enter a valid annual interest rate",
+      tiersRequired: "Add at least one interest tier",
+      tiersInvalid: "Fix tier amounts and rates",
+      tiersMustStartAtZero: "The first tier must start at 0",
+      tiersOpenEndedOnlyLast: "Only the last tier can be open-ended",
+      tiersInvalidRange: "Each tier needs a valid balance range",
+      tiersGap: "Tiers must connect without gaps or overlaps",
+      postingDayInvalid: "Choose a posting day between 1 and 28, or last day of month",
+      cycleStartDateRequired: "Choose when the interest cycle starts",
+      destinationRequired: "Select a destination account",
     },
   },
   certificates: {

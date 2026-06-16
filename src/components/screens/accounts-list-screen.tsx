@@ -4,6 +4,8 @@ import { Landmark, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
+
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
@@ -93,6 +95,7 @@ export function AccountsListScreen() {
   const router = useRouter();
   const { accounts, isFinanceReady, refresh } = useFinance();
   const [filter, setFilter] = useState<AccountsFilter>("active");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const filterOptions = useMemo(
     (): ScrollChipOption<AccountsFilter>[] => [
@@ -112,23 +115,30 @@ export function AccountsListScreen() {
     [accounts, filter],
   );
 
-  const { moneyAccounts, certificateAccounts } = useMemo(() => {
+  const { moneyAccounts, savingsAccounts, certificateAccounts } = useMemo(() => {
     const money: Account[] = [];
+    const savings: Account[] = [];
     const certificates: Account[] = [];
     for (const account of filteredAccounts) {
       if (account.type === "certificate") {
         certificates.push(account);
+      } else if (account.type === "savings_account") {
+        savings.push(account);
       } else {
         money.push(account);
       }
     }
-    return { moneyAccounts: money, certificateAccounts: certificates };
+    return {
+      moneyAccounts: money,
+      savingsAccounts: savings,
+      certificateAccounts: certificates,
+    };
   }, [filteredAccounts]);
 
   const addAccountAction = (
     <AddAccountHeaderAction
       label={t("accounts.addAccount")}
-      onClick={() => router.push("/accounts/new")}
+      onClick={() => setPickerOpen(true)}
     />
   );
 
@@ -194,6 +204,13 @@ export function AccountsListScreen() {
               t={t}
             />
             <AccountSection
+              title={t("accounts.sections.savings")}
+              accounts={savingsAccounts}
+              formatLocale={formatLocale}
+              onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
+              t={t}
+            />
+            <AccountSection
               title={t("accounts.sections.certificates")}
               accounts={certificateAccounts}
               formatLocale={formatLocale}
@@ -203,6 +220,10 @@ export function AccountsListScreen() {
           </div>
         )}
       </ScreenBody>
+      <AccountTypePickerSheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+      />
     </>
   );
 }

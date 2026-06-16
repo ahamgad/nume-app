@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { canReceiveTransfers, canSendTransfers } from "@/lib/finance/account-capabilities";
 import { mapAccount, mapRecord, type DbAccount, type DbRecord } from "@/lib/finance/mappers";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
+import { updateSavingsCycleMinimum } from "@/lib/savings/service";
 import type {
   Account,
   CreateAccountInput,
@@ -215,6 +216,13 @@ export async function insertRecordWithBalanceUpdate(
 
   if (accountError) throw accountError;
 
+  await updateSavingsCycleMinimum(
+    supabase,
+    userId,
+    input.accountId,
+    nextBalance,
+  );
+
   return {
     record: mapRecord(recordRow as DbRecord),
     nextBalance,
@@ -268,6 +276,13 @@ export async function insertTransfer(
 
   if (fromBalanceError) throw fromBalanceError;
 
+  await updateSavingsCycleMinimum(
+    supabase,
+    userId,
+    input.fromAccountId,
+    fromNextBalance,
+  );
+
   const { data: toRecordRow, error: toRecordError } = await supabase
     .from("records")
     .insert({
@@ -292,6 +307,13 @@ export async function insertTransfer(
     .eq("user_id", userId);
 
   if (toBalanceError) throw toBalanceError;
+
+  await updateSavingsCycleMinimum(
+    supabase,
+    userId,
+    input.toAccountId,
+    toNextBalance,
+  );
 
   return {
     fromRecord: mapRecord(fromRecordRow as DbRecord),
@@ -353,6 +375,78 @@ export async function insertInterestRecord(
     .eq("user_id", userId);
 
   if (accountError) throw accountError;
+
+  await updateSavingsCycleMinimum(
+    supabase,
+    userId,
+    input.accountId,
+    nextBalance,
+  );
+
+  return {
+    record: mapRecord(recordRow as DbRecord),
+    nextBalance,
+  };
+}
+
+export interface InsertSavingsInterestRecordInput {
+  accountId: string;
+  amount: number;
+  date: string;
+  description?: string | null;
+  savingsAccountId: string;
+  updateBalance: boolean;
+  currentBalance?: number;
+}
+
+export async function insertSavingsInterestRecord(
+  supabase: SupabaseClient,
+  userId: string,
+  input: InsertSavingsInterestRecordInput,
+): Promise<{ record: FinanceRecord; nextBalance?: number }> {
+  if (input.amount <= 0) {
+    throw new Error("Interest amount must be greater than zero");
+  }
+
+  const description = input.description?.trim() || "Interest Credit";
+
+  const { data: recordRow, error: recordError } = await supabase
+    .from("records")
+    .insert({
+      user_id: userId,
+      account_id: input.accountId,
+      record_type: "interest",
+      amount: input.amount,
+      description,
+      record_date: input.date,
+      savings_account_id: input.savingsAccountId,
+    })
+    .select("*")
+    .single();
+
+  if (recordError) throw recordError;
+
+  if (!input.updateBalance) {
+    return { record: mapRecord(recordRow as DbRecord) };
+  }
+
+  const currentBalance = input.currentBalance ?? 0;
+  const nextBalance = currentBalance + input.amount;
+
+  const { error: accountError } = await supabase
+    .from("accounts")
+    .update({ current_balance: nextBalance })
+    .eq("id", input.accountId)
+    .eq("user_id", userId);
+
+  if (accountError) throw accountError;
+
+  await updateSavingsCycleMinimum(
+    supabase,
+    userId,
+    input.accountId,
+    nextBalance,
+  );
 
   return {
     record: mapRecord(recordRow as DbRecord),

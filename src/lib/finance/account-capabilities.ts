@@ -15,6 +15,7 @@ export const TRANSFER_CAPABLE_ACCOUNT_TYPES = new Set<AccountType>([
   "current_account",
   "cash",
   "wallet",
+  "savings_account",
 ]);
 
 /** @deprecated Alias — settlement pickers use the same eligibility as transfers. */
@@ -27,7 +28,6 @@ export const WEALTH_ONLY_ACCOUNT_TYPES = new Set<AccountType>([
   "loan",
   "credit_card",
   "stocks",
-  "savings_account",
 ]);
 
 export function isTransferCapableAccountType(type: AccountType): boolean {

@@ -185,9 +185,16 @@ export const ar = {
     creating: "جارٍ الإنشاء…",
     sections: {
       money: "حسابات النقد",
+      savings: "التوفير",
       certificates: "الشهادات",
       basic: "المعلومات الأساسية",
       balance: "الرصيد",
+    },
+    typeGroups: {
+      money: "حسابات النقد",
+      savings: "التوفير",
+      lending: "الإقراض",
+      investments: "الاستثمارات",
     },
     formSections: {
       accountDetails: "تفاصيل الحساب",
@@ -201,7 +208,9 @@ export const ar = {
       savingsAccount: "حساب توفير",
       certificate: "شهادة",
       gold: "ذهب",
+      stocks: "أسهم",
       loan: "قروض",
+      creditCard: "ائتمان",
     },
     empty: {
       title: "حساباتك هنا",
@@ -238,6 +247,7 @@ export const ar = {
       certificateLead: "تتبّع وديعة لأجل بعائد متوقّع.",
       balanceHint: "استخدم الرصيد الظاهر في تطبيق البنك اليوم.",
       comingSoon: "قريبًا",
+      typeUnavailable: "نوع الحساب هذا غير متاح بعد.",
       firstAccount: {
         title: "أضف حسابك الأول",
         lead: "ابدأ بحساب واحد تستخدمه يوميًا. يمكنك إضافة المزيد لاحقًا.",
@@ -343,6 +353,102 @@ export const ar = {
       bokra: "Bokra",
       fawry: "Fawry",
       lucky: "Lucky",
+    },
+  },
+  savings: {
+    create: {
+      title: "إضافة حساب توفير",
+      lead: "تتبع العائد على مدخراتك مع جداول ترحيل قابلة للتخصيص.",
+      submit: "إنشاء حساب التوفير",
+      creating: "جارٍ الإنشاء…",
+      success: "تم إنشاء حساب التوفير",
+    },
+    edit: {
+      title: "تعديل حساب التوفير",
+      submit: "حفظ التغييرات",
+      saving: "جارٍ الحفظ…",
+      success: "تم تحديث حساب التوفير",
+    },
+    sections: {
+      interestModel: "نموذج العائد",
+      posting: "جدول الترحيل",
+      destination: "وجهة العائد",
+    },
+    interestModel: {
+      fixed: "عائد ثابت",
+      tiered: "عائد متدرج",
+    },
+    postingFrequency: {
+      monthly: "شهري",
+      quarterly: "ربع سنوي",
+      semi_annual: "نصف سنوي",
+      annual: "سنوي",
+    },
+    destination: {
+      sameAccount: "نفس الحساب",
+      anotherAccount: "حساب آخر",
+    },
+    balanceMethodHint:
+      "يُحسب العائد على أدنى رصيد وصل إليه الحساب خلال كل دورة ترحيل.",
+    fields: {
+      currency: {
+        label: "العملة",
+      },
+      openingBalance: {
+        label: "الرصيد الافتتاحي",
+      },
+      interestModel: {
+        label: "نموذج العائد",
+      },
+      annualRate: {
+        label: "معدل العائد السنوي",
+      },
+      tiers: {
+        label: "شرائح العائد",
+        tierLabel: "الشريحة {index}",
+        minBalance: "الحد الأدنى للرصيد",
+        maxBalance: "الحد الأقصى للرصيد",
+        openEnded: "مفتوح",
+        add: "إضافة شريحة",
+        remove: "إزالة الشريحة",
+      },
+      postingFrequency: {
+        label: "تكرار الترحيل",
+      },
+      postingDay: {
+        label: "يوم الترحيل",
+        lastOfMonth: "آخر يوم في الشهر",
+      },
+      cycleStartDate: {
+        label: "تاريخ بداية دورة العائد",
+        hint: "متى يبدأ تتبع العائد لهذا الحساب.",
+      },
+      destination: {
+        label: "وجهة العائد",
+      },
+      destinationAccount: {
+        label: "حساب الوجهة",
+      },
+    },
+    details: {
+      interestModel: "نموذج العائد",
+      annualRate: "المعدل السنوي",
+      postingSchedule: "جدول الترحيل",
+      nextPosting: "الترحيل التالي",
+      cycleMinimum: "أدنى رصيد في الدورة",
+      destination: "وجهة العائد",
+    },
+    validation: {
+      rateRequired: "أدخل معدل عائد سنوي صالحًا",
+      tiersRequired: "أضف شريحة عائد واحدة على الأقل",
+      tiersInvalid: "صحّح مبالغ ومعدلات الشرائح",
+      tiersMustStartAtZero: "يجب أن تبدأ الشريحة الأولى من 0",
+      tiersOpenEndedOnlyLast: "الشريحة الأخيرة فقط يمكن أن تكون مفتوحة",
+      tiersInvalidRange: "كل شريحة تحتاج نطاق رصيد صالحًا",
+      tiersGap: "يجب أن تتصل الشرائح دون فجوات أو تداخل",
+      postingDayInvalid: "اختر يوم ترحيل بين 1 و 28، أو آخر يوم في الشهر",
+      cycleStartDateRequired: "اختر تاريخ بداية دورة العائد",
+      destinationRequired: "اختر حساب الوجهة",
     },
   },
   certificates: {

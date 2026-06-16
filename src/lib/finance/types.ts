@@ -47,6 +47,7 @@ export interface FinanceRecord {
   date: string;
   certificateId: string | null;
   scheduleEntryId: string | null;
+  savingsAccountId: string | null;
   createdAt: string;
 }
 

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { EditAccountScreen } from "@/components/screens/edit-account-screen";
 import { EditCertificateScreen } from "@/components/screens/edit-certificate-screen";
+import { EditSavingsAccountScreen } from "@/components/screens/edit-savings-account-screen";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFinance } from "@/lib/finance/store";
@@ -49,6 +50,10 @@ export function EditAccountRouterScreen({ accountId }: EditAccountRouterScreenPr
 
   if (account.type === "certificate") {
     return <EditCertificateScreen accountId={accountId} />;
+  }
+
+  if (account.type === "savings_account") {
+    return <EditSavingsAccountScreen accountId={accountId} />;
   }
 
   return <EditAccountScreen accountId={accountId} />;

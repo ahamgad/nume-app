@@ -1,0 +1,156 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+
+import { SavingsFormFields } from "@/components/savings/savings-form-fields";
+import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StickyFooter } from "@/components/patterns";
+import { Button } from "@/components/ui/button";
+import { DiscardDialog } from "@/components/ui/discard-dialog";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import {
+  DEFAULT_SAVINGS_FORM_VALUES,
+  resolveSavingsFormForSubmit,
+  validateSavingsForm,
+  type SavingsFormValues,
+} from "@/lib/savings/form";
+import { useFinance } from "@/lib/finance/store";
+import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useT, useLocale } from "@/providers/i18n-provider";
+import { useToast } from "@/providers/toast-provider";
+import { cn } from "@/lib/utils";
+
+export function AddSavingsAccountScreen() {
+  const t = useT();
+  const locale = useLocale();
+  const amountInputLocale = getAmountInputLocale(locale);
+  const router = useRouter();
+  const { accounts, createSavingsAccount } = useFinance();
+  const { showToast } = useToast();
+
+  const [values, setValues] = useState<SavingsFormValues>(
+    DEFAULT_SAVINGS_FORM_VALUES,
+  );
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showDiscard, setShowDiscard] = useState(false);
+
+  const transferAccounts = useMemo(
+    () => filterTransferAccounts(accounts),
+    [accounts],
+  );
+
+  const isDirty = JSON.stringify(values) !== JSON.stringify(DEFAULT_SAVINGS_FORM_VALUES);
+
+  function clearFieldError(field: string) {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  async function handleSubmit() {
+    const nextErrors = validateSavingsForm(values, t, "create");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    const payload = resolveSavingsFormForSubmit(values, "create");
+    if (payload.openingBalance === undefined) return;
+
+    setSubmitting(true);
+    try {
+      const savings = await createSavingsAccount({
+        name: payload.name,
+        institution: payload.institution,
+        openingBalance: payload.openingBalance,
+        interestModel: payload.interestModel,
+        annualInterestRate: payload.annualInterestRate,
+        tiers: payload.tiers,
+        postingFrequency: payload.postingFrequency,
+        postingDay: payload.postingDay,
+        interestDestination: payload.interestDestination,
+        destinationAccountId: payload.destinationAccountId,
+        cycleStartDate: payload.cycleStartDate,
+      });
+      showToast(t("savings.create.success"));
+      router.replace(`/accounts/${savings.accountId}`);
+    } catch (error) {
+      logSupabaseError("createSavingsAccount", error);
+      setErrors({
+        form: getSupabaseErrorMessage(error) || t("common.retry"),
+      });
+      setSubmitting(false);
+    }
+  }
+
+  function handleBack() {
+    if (submitting) return;
+    if (isDirty) {
+      setShowDiscard(true);
+      return;
+    }
+    router.back();
+  }
+
+  const { confirmDiscardNavigation } = useDirtyFormNavigation();
+
+  return (
+    <>
+      <ScreenHeader
+        mode="stack"
+        title={t("savings.create.title")}
+        onBack={handleBack}
+      />
+      <ScreenBody withTabBar={false} withStickyFooter>
+        <div
+          className={cn(
+            "space-y-6 pt-2",
+            submitting && "pointer-events-none opacity-60",
+          )}
+        >
+          <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
+            {t("savings.create.lead")}
+          </p>
+
+          <SavingsFormFields
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            transferAccounts={transferAccounts}
+            disabled={submitting}
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
+
+          {errors.form ? (
+            <p className="text-sm text-destructive">{errors.form}</p>
+          ) : null}
+        </div>
+      </ScreenBody>
+
+      <StickyFooter>
+        <Button
+          className="h-12 w-full text-base"
+          disabled={submitting}
+          onClick={handleSubmit}
+        >
+          {submitting ? t("savings.create.creating") : t("savings.create.submit")}
+        </Button>
+      </StickyFooter>
+
+      <DiscardDialog
+        open={showDiscard}
+        onConfirm={() => {
+          setShowDiscard(false);
+          confirmDiscardNavigation(() => router.back());
+        }}
+        onCancel={() => setShowDiscard(false)}
+      />
+    </>
+  );
+}

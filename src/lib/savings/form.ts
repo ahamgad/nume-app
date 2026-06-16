@@ -1,0 +1,179 @@
+import {
+  parsePostingDayFromForm,
+  postingDayToFormValue,
+  POSTING_DAY_LAST_OF_MONTH,
+} from "@/lib/savings/posting-schedule";
+import type { SavingsAccount } from "@/lib/savings/types";
+import type { TierFormRow } from "@/lib/savings/tier-validation";
+import {
+  parseTierRows,
+  validateTierStructure,
+} from "@/lib/savings/tier-validation";
+import { parseAmount } from "@/lib/format/currency";
+import type { TranslationKey } from "@/lib/i18n";
+import { todayIsoDate } from "@/lib/format/date";
+
+export type SavingsInterestModelForm = "fixed" | "tiered";
+
+export type SavingsPostingFrequencyForm =
+  | "monthly"
+  | "quarterly"
+  | "semi_annual"
+  | "annual";
+
+export type SavingsInterestDestinationForm = "same_account" | "another_account";
+
+export interface SavingsFormValues {
+  name: string;
+  institution: string;
+  balance: string;
+  interestModel: SavingsInterestModelForm;
+  annualInterestRate: string;
+  tiers: TierFormRow[];
+  postingFrequency: SavingsPostingFrequencyForm;
+  postingDay: string;
+  cycleStartDate: string;
+  interestDestination: SavingsInterestDestinationForm;
+  destinationAccountId: string;
+}
+
+export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
+  name: "",
+  institution: "",
+  balance: "",
+  interestModel: "fixed",
+  annualInterestRate: "",
+  tiers: [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
+  postingFrequency: "monthly",
+  postingDay: "1",
+  cycleStartDate: todayIsoDate(),
+  interestDestination: "same_account",
+  destinationAccountId: "",
+};
+
+export function savingsFormValuesFromAccount(
+  account: { name: string; institution: string | null },
+  savings: SavingsAccount,
+): SavingsFormValues {
+  return {
+    name: account.name,
+    institution: account.institution ?? "",
+    balance: "",
+    interestModel: savings.interestModel,
+    annualInterestRate:
+      savings.annualInterestRate === null
+        ? ""
+        : String(savings.annualInterestRate),
+    tiers:
+      savings.tiers.length > 0
+        ? savings.tiers.map((tier) => ({
+            minBalance: String(tier.minBalance),
+            maxBalance:
+              tier.maxBalance === null ? "" : String(tier.maxBalance),
+            annualInterestRate: String(tier.annualInterestRate),
+          }))
+        : [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
+    postingFrequency: savings.postingFrequency,
+    postingDay: postingDayToFormValue(savings.postingDay),
+    cycleStartDate: savings.cycleStartDate,
+    interestDestination: savings.interestDestination,
+    destinationAccountId: savings.destinationAccountId ?? "",
+  };
+}
+
+export function isSavingsFormDirty(
+  values: SavingsFormValues,
+  initial: SavingsFormValues,
+): boolean {
+  return JSON.stringify(values) !== JSON.stringify(initial);
+}
+
+export function validateSavingsForm(
+  values: SavingsFormValues,
+  t: (key: TranslationKey) => string,
+  mode: "create" | "edit" = "create",
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.name.trim()) {
+    errors.name = t("accounts.validation.nameRequired");
+  }
+
+  if (mode === "create") {
+    const parsedBalance = parseAmount(values.balance);
+    if (parsedBalance === null) {
+      errors.balance = t("accounts.validation.balanceRequired");
+    } else if (parsedBalance < 0) {
+      errors.balance = t("accounts.validation.balanceNegative");
+    }
+  }
+
+  if (values.interestModel === "fixed") {
+    const rate = parseAmount(values.annualInterestRate);
+    if (rate === null || rate < 0) {
+      errors.annualInterestRate = t("savings.validation.rateRequired");
+    }
+  } else {
+    const parsedTiers = parseTierRows(values.tiers);
+    if (!parsedTiers) {
+      errors.tiers = t("savings.validation.tiersInvalid");
+    } else {
+      Object.assign(errors, validateTierStructure(parsedTiers, t));
+    }
+  }
+
+  const postingDay = parsePostingDayFromForm(values.postingDay);
+  if (postingDay === null) {
+    errors.postingDay = t("savings.validation.postingDayInvalid");
+  }
+
+  if (!values.cycleStartDate.trim()) {
+    errors.cycleStartDate = t("savings.validation.cycleStartDateRequired");
+  }
+
+  if (
+    values.interestDestination === "another_account" &&
+    !values.destinationAccountId.trim()
+  ) {
+    errors.destinationAccountId = t("savings.validation.destinationRequired");
+  }
+
+  return errors;
+}
+
+export function resolveSavingsFormForSubmit(
+  values: SavingsFormValues,
+  mode: "create" | "edit",
+) {
+  const parsedTiers =
+    values.interestModel === "tiered" ? parseTierRows(values.tiers) : null;
+
+  const parsedPostingDay = parsePostingDayFromForm(values.postingDay);
+
+  return {
+    name: values.name.trim(),
+    institution: values.institution.trim() || null,
+    openingBalance:
+      mode === "create" ? (parseAmount(values.balance) ?? 0) : undefined,
+    interestModel: values.interestModel,
+    annualInterestRate:
+      values.interestModel === "fixed"
+        ? parseAmount(values.annualInterestRate)
+        : null,
+    tiers:
+      parsedTiers?.map((tier, index) => ({
+        minBalance: tier.minBalance,
+        maxBalance: tier.maxBalance,
+        annualInterestRate: tier.annualInterestRate,
+        sortOrder: index,
+      })) ?? [],
+    postingFrequency: values.postingFrequency,
+    postingDay: parsedPostingDay ?? POSTING_DAY_LAST_OF_MONTH,
+    interestDestination: values.interestDestination,
+    destinationAccountId:
+      values.interestDestination === "another_account"
+        ? values.destinationAccountId
+        : null,
+    cycleStartDate: values.cycleStartDate.trim() || todayIsoDate(),
+  };
+}
