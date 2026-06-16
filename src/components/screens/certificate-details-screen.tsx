@@ -298,7 +298,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               value={t(payoutFrequencyKey)}
             />
             <DetailRow
-              label={t("certificates.details.interestPayout.destination")}
+              label={t("accounts.fields.interestDestination.label")}
               value={destinationDisplay}
             />
           </div>

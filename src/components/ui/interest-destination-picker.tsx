@@ -53,14 +53,16 @@ export function InterestDestinationPicker({
     [accounts, searchQuery, showSearch, t],
   );
 
+  const notSelectedLabel = t(
+    "accounts.fields.interestDestinationAccount.notSelected",
+  );
+
   const showClearOption = useMemo(() => {
     if (!showSearch) return true;
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
-    return t("certificates.fields.interestDestination.notSelected")
-      .toLowerCase()
-      .includes(query);
-  }, [searchQuery, showSearch, t]);
+    return notSelectedLabel.toLowerCase().includes(query);
+  }, [notSelectedLabel, searchQuery, showSearch]);
 
   const displayLabel = selectedAccount
     ? formatAccountDestinationDisplay(selectedAccount, t)
@@ -76,9 +78,13 @@ export function InterestDestinationPicker({
     closeSheet();
   }
 
-  const label = t("certificates.fields.interestDestination.label");
-  const placeholder = t("certificates.fields.interestDestination.placeholder");
-  const description = t("certificates.fields.interestDestination.description");
+  const label = t("accounts.fields.interestDestinationAccount.label");
+  const placeholder = t(
+    "accounts.fields.interestDestinationAccount.placeholder",
+  );
+  const description = t(
+    "accounts.fields.interestDestinationAccount.description",
+  );
 
   return (
     <div className="space-y-2">
@@ -114,7 +120,7 @@ export function InterestDestinationPicker({
                 value: searchQuery,
                 onChange: setSearchQuery,
                 placeholder: t(
-                  "certificates.fields.interestDestination.searchPlaceholder",
+                  "accounts.fields.interestDestinationAccount.searchPlaceholder",
                 ),
               }
             : undefined
@@ -122,7 +128,7 @@ export function InterestDestinationPicker({
       >
         {filteredAccounts.length === 0 && !showClearOption ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">
-              {t("certificates.fields.interestDestination.noResults")}
+              {t("accounts.fields.interestDestinationAccount.noResults")}
             </p>
           ) : (
             <div role="listbox" aria-label={label}>
@@ -139,7 +145,7 @@ export function InterestDestinationPicker({
                       : "hover:bg-muted/60",
                   )}
                 >
-                  {t("certificates.fields.interestDestination.notSelected")}
+                  {notSelectedLabel}
                 </button>
               ) : null}
 

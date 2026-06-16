@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import {
   isSavingsFormDirty,
   resolveSavingsFormForSubmit,
@@ -97,7 +97,7 @@ function EditSavingsAccountForm({
   const isDirty = isSavingsFormDirty(values, initialValues);
 
   const transferAccounts = useMemo(() => {
-    const eligible = filterTransferAccounts(accounts, {
+    const eligible = filterInterestDestinationAccounts(accounts, t, {
       excludeAccountIds: [accountId],
     });
     if (!values.destinationAccountId) return eligible;
@@ -108,7 +108,7 @@ function EditSavingsAccountForm({
       return eligible;
     }
     return [...eligible, selected];
-  }, [accounts, accountId, values.destinationAccountId]);
+  }, [accounts, accountId, values.destinationAccountId, t]);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {

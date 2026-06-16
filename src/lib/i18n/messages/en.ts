@@ -275,9 +275,17 @@ export const en = {
       annualRate: {
         label: "Annual rate",
       },
-      destinationAccount: {
-        label: "Destination account",
-        placeholder: "Select account",
+      interestDestination: {
+        label: "Interest destination",
+      },
+      interestDestinationAccount: {
+        label: "Interest destination account",
+        placeholder: "Select destination account",
+        description:
+          "Interest will be transferred to this account on each payout date.",
+        notSelected: "No account selected",
+        searchPlaceholder: "Search accounts",
+        noResults: "No matching accounts",
       },
       settings: {
         title: "Account settings",
@@ -325,6 +333,7 @@ export const en = {
       balanceInvalid: "Enter a valid amount",
       balanceNegative: "Balance cannot be negative",
       institutionRequired: "Institution is required",
+      interestDestinationAccountRequired: "Select a destination account",
     },
   },
   institutions: {
@@ -436,7 +445,7 @@ export const en = {
         label: "Interest destination",
       },
       destinationAccount: {
-        label: "Destination account",
+        label: "Interest destination account",
       },
     },
     details: {

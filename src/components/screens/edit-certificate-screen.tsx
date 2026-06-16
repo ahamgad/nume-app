@@ -17,7 +17,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
@@ -57,7 +57,7 @@ function EditCertificateForm({
   const isDirty = isCertificateFormDirty(values, initialValues);
 
   const transferAccounts = useMemo(() => {
-    const eligible = filterTransferAccounts(accounts, {
+    const eligible = filterInterestDestinationAccounts(accounts, t, {
       excludeAccountIds: [accountId],
     });
     if (!values.destinationAccountId) return eligible;
@@ -68,7 +68,7 @@ function EditCertificateForm({
       return eligible;
     }
     return [...eligible, selected];
-  }, [accounts, accountId, values.destinationAccountId]);
+  }, [accounts, accountId, values.destinationAccountId, t]);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {

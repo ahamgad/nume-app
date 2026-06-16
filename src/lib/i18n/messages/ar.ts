@@ -275,9 +275,16 @@ export const ar = {
       annualRate: {
         label: "المعدل السنوي",
       },
-      destinationAccount: {
-        label: "حساب الوجهة",
-        placeholder: "اختر حسابًا",
+      interestDestination: {
+        label: "وجهة العائد",
+      },
+      interestDestinationAccount: {
+        label: "حساب وجهة العائد",
+        placeholder: "اختر حساب الوجهة",
+        description: "سيُحوَّل العائد إلى هذا الحساب في كل تاريخ ترحيل.",
+        notSelected: "لم يُحدد حساب",
+        searchPlaceholder: "ابحث في الحسابات",
+        noResults: "لا توجد حسابات مطابقة",
       },
       settings: {
         title: "إعدادات الحساب",
@@ -325,6 +332,7 @@ export const ar = {
       balanceInvalid: "أدخل مبلغًا صالحًا",
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
       institutionRequired: "المؤسسة مطلوبة",
+      interestDestinationAccountRequired: "اختر حساب الوجهة",
     },
   },
   institutions: {
@@ -436,7 +444,7 @@ export const ar = {
         label: "وجهة العائد",
       },
       destinationAccount: {
-        label: "حساب الوجهة",
+        label: "حساب وجهة العائد",
       },
     },
     details: {

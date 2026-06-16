@@ -338,11 +338,11 @@ export function SavingsFormFields({
 
       <FormSection title={t("savings.sections.destination")} separator>
         <div className="space-y-2">
-          <Label>{t("savings.fields.destination.label")}</Label>
+          <Label>{t("accounts.fields.interestDestination.label")}</Label>
           <ScrollChipSelect
             value={values.interestDestination}
             options={destinationOptions}
-            ariaLabel={t("savings.fields.destination.label")}
+            ariaLabel={t("accounts.fields.interestDestination.label")}
             onChange={(interestDestination) => {
               onChange({
                 interestDestination,
@@ -360,8 +360,19 @@ export function SavingsFormFields({
           <>
             <AccountPicker
               id="savings-destination"
-              label={t("accounts.fields.destinationAccount.label")}
-              placeholder={t("accounts.fields.destinationAccount.placeholder")}
+              label={t("accounts.fields.interestDestinationAccount.label")}
+              placeholder={t(
+                "accounts.fields.interestDestinationAccount.placeholder",
+              )}
+              description={t(
+                "accounts.fields.interestDestinationAccount.description",
+              )}
+              searchPlaceholder={t(
+                "accounts.fields.interestDestinationAccount.searchPlaceholder",
+              )}
+              noResultsMessage={t(
+                "accounts.fields.interestDestinationAccount.noResults",
+              )}
               value={values.destinationAccountId || null}
               accounts={transferAccounts}
               disabled={disabled}

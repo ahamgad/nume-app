@@ -128,7 +128,9 @@ export function validateSavingsForm(
     values.interestDestination === "another_account" &&
     !values.destinationAccountId.trim()
   ) {
-    errors.destinationAccountId = t("savings.validation.destinationRequired");
+    errors.destinationAccountId = t(
+      "accounts.validation.interestDestinationAccountRequired",
+    );
   }
 
   return errors;

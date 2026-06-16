@@ -107,7 +107,7 @@ export function validateCertificateForm(
 
   if (values.autoApplyInterest && !values.destinationAccountId) {
     errors.destinationAccountId = t(
-      "certificates.validation.interestDestinationRequired",
+      "accounts.validation.interestDestinationAccountRequired",
     );
   }
 

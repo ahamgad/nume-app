@@ -8,7 +8,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import {
   DEFAULT_SAVINGS_FORM_VALUES,
@@ -40,8 +40,8 @@ export function AddSavingsAccountScreen() {
   const [showDiscard, setShowDiscard] = useState(false);
 
   const transferAccounts = useMemo(
-    () => filterTransferAccounts(accounts),
-    [accounts],
+    () => filterInterestDestinationAccounts(accounts, t),
+    [accounts, t],
   );
 
   const isDirty = JSON.stringify(values) !== JSON.stringify(DEFAULT_SAVINGS_FORM_VALUES);

@@ -261,14 +261,26 @@ export function CertificateFormFields({
 
         <AccountPicker
           id="certificate-interest-destination"
-          label={t("certificates.fields.interestDestination.label")}
-          description={t("certificates.fields.interestDestination.description")}
-          placeholder={t("certificates.fields.interestDestination.placeholder")}
+          label={t("accounts.fields.interestDestinationAccount.label")}
+          description={t(
+            "accounts.fields.interestDestinationAccount.description",
+          )}
+          placeholder={t(
+            "accounts.fields.interestDestinationAccount.placeholder",
+          )}
+          searchPlaceholder={t(
+            "accounts.fields.interestDestinationAccount.searchPlaceholder",
+          )}
+          noResultsMessage={t(
+            "accounts.fields.interestDestinationAccount.noResults",
+          )}
           value={values.destinationAccountId}
           accounts={transferAccounts}
           disabled={disabled || !values.autoApplyInterest}
           allowClear
-          clearLabel={t("certificates.fields.interestDestination.notSelected")}
+          clearLabel={t(
+            "accounts.fields.interestDestinationAccount.notSelected",
+          )}
           onChange={(destinationAccountId) => {
             onChange({ destinationAccountId });
             onClearError("destinationAccountId");

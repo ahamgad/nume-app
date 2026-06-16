@@ -14,7 +14,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
@@ -41,8 +41,8 @@ export function AddCertificateAccountScreen() {
   const [showDiscard, setShowDiscard] = useState(false);
 
   const transferAccounts = useMemo(
-    () => filterTransferAccounts(accounts),
-    [accounts],
+    () => filterInterestDestinationAccounts(accounts, t),
+    [accounts, t],
   );
 
   const isDirty =

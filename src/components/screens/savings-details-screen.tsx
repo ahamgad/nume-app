@@ -228,7 +228,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
               }
             />
             <DetailRow
-              label={t("savings.details.destination")}
+              label={t("accounts.fields.interestDestination.label")}
               value={destinationLabel}
             />
           </div>

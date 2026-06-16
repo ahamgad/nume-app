@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getScreenBodyScrollPadding, TAB_BAR_SCROLL_PADDING } from "@/lib/layout/screen-spacing";
+import {
+  getScreenBodyScrollPadding,
+  STACK_SCREEN_BOTTOM_PADDING,
+  TAB_BAR_SCROLL_PADDING,
+} from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
 import { supportsQuickBalanceEdit } from "@/lib/finance/account-form";
 
@@ -14,22 +18,24 @@ describe("tab bar visibility", () => {
 });
 
 describe("screen body scroll padding", () => {
-  it("reserves tab bar height on tab-root screens", () => {
+  it("reserves double tab bar height on tab-root screens", () => {
     expect(
       getScreenBodyScrollPadding({
         tabBarVisible: true,
         withStickyFooter: false,
       }),
     ).toBe(TAB_BAR_SCROLL_PADDING);
+    expect(TAB_BAR_SCROLL_PADDING).toContain("7rem");
   });
 
-  it("uses the same inset on stack screens for consistent bottom breathing room", () => {
+  it("uses a single tab-bar-height inset on stack screens", () => {
     expect(
       getScreenBodyScrollPadding({
         tabBarVisible: false,
         withStickyFooter: false,
       }),
-    ).toBe(TAB_BAR_SCROLL_PADDING);
+    ).toBe(STACK_SCREEN_BOTTOM_PADDING);
+    expect(STACK_SCREEN_BOTTOM_PADDING).toContain("3.5rem");
   });
 });
 

@@ -1,23 +1,23 @@
 /**
  * Shared screen layout spacing (NUME v1).
  *
- * All scrollable in-app screens use the same bottom inset so content never
- * feels flush with the bottom edge. Tab-root screens reserve this space for
- * the fixed tab bar; stack screens use the same inset for perceived consistency.
+ * Tab-root screens reserve double the tab bar height so content never feels
+ * attached to the fixed tab bar. Stack screens use a single tab-bar-height inset.
  */
 
 /** Matches TabBar `h-14` (3.5rem). */
 export const TAB_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Standard scroll padding — tab bar height + safe area. */
+/** Tab-root scroll padding — tab bar height + equal breathing room + safe area. */
 export const TAB_BAR_SCROLL_PADDING =
-  "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";
+  "pb-[calc(7rem+env(safe-area-inset-bottom))]";
 
 /** @deprecated Use {@link TAB_BAR_SCROLL_PADDING}. */
 export const TAB_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;
 
-/** Stack/detail screens use the same inset for consistent bottom breathing room. */
-export const STACK_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;
+/** Stack/detail screens — single tab-bar-height inset + safe area. */
+export const STACK_SCREEN_BOTTOM_PADDING =
+  "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";
 
 /** Bottom inset when a sticky footer action bar is present (no tab bar). */
 export const STICKY_FOOTER_BOTTOM_PADDING =

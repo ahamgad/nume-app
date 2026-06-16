@@ -27,6 +27,9 @@ interface AccountPickerProps {
   disabled?: boolean;
   allowClear?: boolean;
   clearLabel?: string;
+  sheetTitle?: string;
+  searchPlaceholder?: string;
+  noResultsMessage?: string;
   onChange: (accountId: string | null) => void;
 }
 
@@ -40,6 +43,9 @@ export function AccountPicker({
   disabled = false,
   allowClear = false,
   clearLabel,
+  sheetTitle,
+  searchPlaceholder,
+  noResultsMessage,
   onChange,
 }: AccountPickerProps) {
   const t = useT();
@@ -88,6 +94,12 @@ export function AccountPicker({
     closeSheet();
   }
 
+  const resolvedSheetTitle = sheetTitle ?? label;
+  const resolvedSearchPlaceholder =
+    searchPlaceholder ?? t("records.fields.transfer.searchPlaceholder");
+  const resolvedNoResults =
+    noResultsMessage ?? t("records.fields.transfer.noResults");
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
@@ -116,24 +128,24 @@ export function AccountPicker({
       <PickerBottomSheet
         open={open}
         onClose={closeSheet}
-        title={label}
+        title={resolvedSheetTitle}
         titleId={`${id ?? "account"}-picker-title`}
         search={
           showSearch
             ? {
                 value: searchQuery,
                 onChange: setSearchQuery,
-                placeholder: t("records.fields.transfer.searchPlaceholder"),
+                placeholder: resolvedSearchPlaceholder,
               }
             : undefined
         }
       >
         {filteredAccounts.length === 0 && !showClearOption ? (
           <p className="px-2 py-6 text-center text-sm text-muted-foreground">
-            {t("records.fields.transfer.noResults")}
+            {resolvedNoResults}
           </p>
         ) : (
-          <div role="listbox" aria-label={label}>
+          <div role="listbox" aria-label={resolvedSheetTitle}>
             {showClearOption ? (
               <button
                 type="button"
