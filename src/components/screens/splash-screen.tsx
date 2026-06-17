@@ -16,16 +16,14 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
 
-/** Opening pair — top corners draw inward; upper half of the N (y ≈ 25→50). */
-const NUME_N_STROKE_LEFT = "M32.2 25 L39.29 25 M32.2 25 L24.17 50";
-const NUME_N_STROKE_RIGHT = "M46.37 25 L39.29 25 M46.37 25 L38.33 50";
+/** Left leg — bottom-left to top-left (first-letter N inner edge). */
+const NUME_N_STROKE_LEFT = "M16.13 75 L32.2 25";
 
-/** Ending pair — bottom corners draw inward; lower half of the N (y ≈ 50→75). */
-const NUME_N_STROKE_END_LEFT = "M16.13 75 L23.21 75 M16.13 75 L24.17 50";
-const NUME_N_STROKE_END_RIGHT = "M30.29 75 L23.21 75 M30.29 75 L38.33 50";
-
-/** Center diagonal — N backbone from bottom-left to top-right. */
+/** N diagonal — bottom-left to top-right. */
 const NUME_N_STROKE_DIAGONAL = "M16.13 75 L46.37 25";
+
+/** Right leg — top-right to bottom-right (first-letter N inner edge). */
+const NUME_N_STROKE_RIGHT = "M46.37 25 L30.29 75";
 
 function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
   return (
@@ -47,22 +45,12 @@ function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
             className="nume-splash-n-stroke-path"
           />
           <path
-            d={NUME_N_STROKE_RIGHT}
-            pathLength="100"
-            className="nume-splash-n-stroke-path"
-          />
-          <path
-            d={NUME_N_STROKE_END_LEFT}
-            pathLength="100"
-            className="nume-splash-n-stroke-path"
-          />
-          <path
             d={NUME_N_STROKE_DIAGONAL}
             pathLength="100"
             className="nume-splash-n-stroke-path"
           />
           <path
-            d={NUME_N_STROKE_END_RIGHT}
+            d={NUME_N_STROKE_RIGHT}
             pathLength="100"
             className="nume-splash-n-stroke-path"
           />
