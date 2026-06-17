@@ -8,8 +8,8 @@ import {
 
 describe("getSplashExitDelayMs", () => {
   it("waits until the minimum splash duration has elapsed", () => {
-    expect(getSplashExitDelayMs(300)).toBe(1000);
-    expect(getSplashExitDelayMs(1400)).toBe(0);
+    expect(getSplashExitDelayMs(300)).toBe(700);
+    expect(getSplashExitDelayMs(1100)).toBe(0);
   });
 
   it("uses a shorter minimum for reduced motion", () => {

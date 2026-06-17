@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -63,7 +64,7 @@ function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
 
       <p
         aria-hidden
-        className="nume-splash-wordmark mt-2.5 text-xl font-semibold tracking-[0.24em] text-foreground"
+        className="nume-splash-wordmark mt-1 text-xl font-semibold tracking-[0.24em] text-foreground"
       >
         NUME
       </p>
@@ -72,6 +73,7 @@ function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
 }
 
 export function SplashScreen() {
+  const router = useRouter();
   const { isLoading: authLoading, user } = useAuth();
   const { isFinanceReady } = useFinance();
   const startedAtRef = useRef(0);
@@ -119,11 +121,11 @@ export function SplashScreen() {
       if (navigatedRef.current) return;
       navigatedRef.current = true;
       markSplashComplete();
-      window.location.replace("/");
+      router.replace("/");
     }, SPLASH_EXIT_ANIMATION_MS);
 
     return () => window.clearTimeout(timer);
-  }, [isExiting]);
+  }, [isExiting, router]);
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center bg-background px-6">

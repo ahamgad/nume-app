@@ -39,6 +39,12 @@ export const SYSTEM_MESSAGE_GAP_PX = "4px";
 
 export const SYSTEM_MESSAGE_TOP_OFFSET = `calc(${SCREEN_HEADER_ZONE_TOP} + ${SYSTEM_MESSAGE_GAP_PX})`;
 
+/** Horizontal inset for edge-to-edge system message bars (4px each side). */
+export const SYSTEM_MESSAGE_HORIZONTAL_INSET_PX = "4px";
+
+/** Tailwind class — full width minus 4px left/right. */
+export const SYSTEM_MESSAGE_INSET_X_CLASS = "inset-x-1";
+
 /** Tailwind arbitrary value class for fixed system-message surfaces. */
 export const SYSTEM_MESSAGE_TOP_CLASS =
   "top-[calc(3.5rem+env(safe-area-inset-top)+4px)]";

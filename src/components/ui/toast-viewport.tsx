@@ -3,7 +3,10 @@
 import { WifiOff, X } from "lucide-react";
 
 import type { ToastTone } from "@/providers/toast-provider";
-import { SYSTEM_MESSAGE_TOP_CLASS } from "@/lib/layout/screen-spacing";
+import {
+  SYSTEM_MESSAGE_INSET_X_CLASS,
+  SYSTEM_MESSAGE_TOP_CLASS,
+} from "@/lib/layout/screen-spacing";
 import { useToast } from "@/providers/toast-provider";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
@@ -11,11 +14,11 @@ import { cn } from "@/lib/utils";
 function toastSurfaceClass(tone: ToastTone): string {
   switch (tone) {
     case "warning":
-      return "border-amber-600/30 bg-card text-card-foreground shadow-md dark:border-amber-400/35";
+      return "border-y border-amber-600/30 border-x-0 bg-card text-card-foreground dark:border-amber-400/35";
     case "success":
-      return "border-emerald-600/30 bg-card text-card-foreground shadow-md dark:border-emerald-400/35";
+      return "border-y border-emerald-600/30 border-x-0 bg-card text-card-foreground dark:border-emerald-400/35";
     default:
-      return "border-border bg-card text-card-foreground shadow-md";
+      return "border-y border-border border-x-0 bg-card text-card-foreground";
   }
 }
 
@@ -45,7 +48,8 @@ export function ToastViewport() {
   return (
     <div
       className={cn(
-        "pointer-events-none fixed inset-x-0 z-50 flex flex-col gap-2 px-4",
+        "pointer-events-none fixed z-50 flex flex-col gap-1",
+        SYSTEM_MESSAGE_INSET_X_CLASS,
         SYSTEM_MESSAGE_TOP_CLASS,
       )}
     >
@@ -53,7 +57,7 @@ export function ToastViewport() {
         <div
           key={toast.id}
           className={cn(
-            "pointer-events-auto flex min-h-11 items-start justify-between gap-3 rounded-lg px-4 py-3 text-sm animate-in fade-in slide-in-from-top-2 duration-200",
+            "pointer-events-auto flex min-h-11 w-full items-start justify-between gap-3 rounded-none px-4 py-3 text-sm animate-in fade-in slide-in-from-top-2 duration-200",
             toastSurfaceClass(toast.tone),
           )}
           role="status"
@@ -85,7 +89,7 @@ export function ToastViewport() {
             <button
               type="button"
               onClick={() => dismissToast(toast.id)}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-md opacity-80 transition-opacity hover:opacity-100"
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-none opacity-80 transition-opacity hover:opacity-100"
               aria-label={t("a11y.dismiss")}
             >
               <X className="size-4" />

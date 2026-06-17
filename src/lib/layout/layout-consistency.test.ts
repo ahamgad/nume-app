@@ -4,6 +4,8 @@ import {
   getScreenBodyScrollPadding,
   STACK_SCREEN_BOTTOM_PADDING,
   SYSTEM_MESSAGE_GAP_PX,
+  SYSTEM_MESSAGE_HORIZONTAL_INSET_PX,
+  SYSTEM_MESSAGE_INSET_X_CLASS,
   SYSTEM_MESSAGE_TOP_OFFSET,
   TAB_BAR_SCROLL_PADDING,
 } from "@/lib/layout/screen-spacing";
@@ -47,6 +49,11 @@ describe("system message spacing", () => {
     expect(SYSTEM_MESSAGE_TOP_OFFSET).toBe(
       "calc(calc(3.5rem + env(safe-area-inset-top)) + 4px)",
     );
+  });
+
+  it("insets edge-to-edge system messages 4px from each screen edge", () => {
+    expect(SYSTEM_MESSAGE_HORIZONTAL_INSET_PX).toBe("4px");
+    expect(SYSTEM_MESSAGE_INSET_X_CLASS).toBe("inset-x-1");
   });
 });
 

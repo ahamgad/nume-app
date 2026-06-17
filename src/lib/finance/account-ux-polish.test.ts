@@ -62,7 +62,8 @@ describe("splash screen spacing", () => {
       "utf8",
     );
 
-    expect(source).toContain("mt-2.5");
+    expect(source).toContain("mt-1");
+    expect(source).not.toContain("mt-2.5");
     expect(source).not.toContain("mt-4 text-xl font-semibold tracking-[0.24em]");
   });
 });

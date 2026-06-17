@@ -1,5 +1,5 @@
 /** Minimum branded splash duration (ms) before exit when init is ready. */
-export const SPLASH_MIN_DURATION_MS = 1300;
+export const SPLASH_MIN_DURATION_MS = 1000;
 
 /** Splash exit dissolve animation (ms). */
 export const SPLASH_EXIT_ANIMATION_MS = 280;
