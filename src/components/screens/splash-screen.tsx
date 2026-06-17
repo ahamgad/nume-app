@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
 
-/** Left-letter N stroke traced from the NUME flatten mark. */
-const NUME_N_STROKE_PATH =
-  "M16.13 75 L32.2 25 L46.37 25 L30.29 75";
+/** N stroke paths — left and right legs draw inward and meet at the top center. */
+const NUME_N_STROKE_LEFT = "M16.13 75 L32.2 25 L39.29 25";
+const NUME_N_STROKE_RIGHT = "M30.29 75 L46.37 25 L39.29 25";
 
 function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
   return (
@@ -35,7 +35,12 @@ function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
           className="nume-splash-n-stroke pointer-events-none absolute inset-0 size-full text-foreground"
         >
           <path
-            d={NUME_N_STROKE_PATH}
+            d={NUME_N_STROKE_LEFT}
+            pathLength="100"
+            className="nume-splash-n-stroke-path"
+          />
+          <path
+            d={NUME_N_STROKE_RIGHT}
             pathLength="100"
             className="nume-splash-n-stroke-path"
           />

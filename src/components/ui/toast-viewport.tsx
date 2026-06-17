@@ -14,11 +14,11 @@ import { cn } from "@/lib/utils";
 function toastSurfaceClass(tone: ToastTone): string {
   switch (tone) {
     case "warning":
-      return "border-y border-amber-600/30 border-x-0 bg-card text-card-foreground dark:border-amber-400/35";
+      return "border border-amber-700/50 bg-card text-card-foreground dark:border-amber-300/60";
     case "success":
-      return "border-y border-emerald-600/30 border-x-0 bg-card text-card-foreground dark:border-emerald-400/35";
+      return "border border-emerald-700/50 bg-card text-card-foreground dark:border-emerald-300/60";
     default:
-      return "border-y border-border border-x-0 bg-card text-card-foreground";
+      return "border border-border bg-card text-card-foreground";
   }
 }
 
