@@ -24,6 +24,9 @@ const NUME_N_STROKE_RIGHT = "M46.37 25 L39.29 25 M46.37 25 L38.33 50";
 const NUME_N_STROKE_END_LEFT = "M16.13 75 L23.21 75 M16.13 75 L24.17 50";
 const NUME_N_STROKE_END_RIGHT = "M30.29 75 L23.21 75 M30.29 75 L38.33 50";
 
+/** Center diagonal — N backbone from bottom-left to top-right. */
+const NUME_N_STROKE_DIAGONAL = "M16.13 75 L46.37 25";
+
 function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
   return (
     <div
@@ -50,6 +53,11 @@ function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
           />
           <path
             d={NUME_N_STROKE_END_LEFT}
+            pathLength="100"
+            className="nume-splash-n-stroke-path"
+          />
+          <path
+            d={NUME_N_STROKE_DIAGONAL}
             pathLength="100"
             className="nume-splash-n-stroke-path"
           />
