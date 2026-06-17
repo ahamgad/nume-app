@@ -16,13 +16,13 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
 
-/** N stroke paths — bottom legs draw inward and meet at the top center. */
-const NUME_N_STROKE_LEFT = "M16.13 75 L32.2 25 L39.29 25";
-const NUME_N_STROKE_RIGHT = "M30.29 75 L46.37 25 M46.37 25 L39.29 25";
+/** Opening pair — top corners draw inward; upper half of the N (y ≈ 25→50). */
+const NUME_N_STROKE_LEFT = "M32.2 25 L39.29 25 M32.2 25 L24.17 50";
+const NUME_N_STROKE_RIGHT = "M46.37 25 L39.29 25 M46.37 25 L38.33 50";
 
-/** Mirrored pair — top legs draw inward and meet at the bottom center. */
-const NUME_N_STROKE_END_LEFT = "M32.2 25 L16.13 75 L23.21 75";
-const NUME_N_STROKE_END_RIGHT = "M46.37 25 L30.29 75 M30.29 75 L23.21 75";
+/** Ending pair — bottom corners draw inward; lower half of the N (y ≈ 50→75). */
+const NUME_N_STROKE_END_LEFT = "M16.13 75 L23.21 75 M16.13 75 L24.17 50";
+const NUME_N_STROKE_END_RIGHT = "M30.29 75 L23.21 75 M30.29 75 L38.33 50";
 
 function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
   return (
