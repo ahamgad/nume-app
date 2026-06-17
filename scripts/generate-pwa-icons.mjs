@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  * Generates crisp PWA icon PNGs from the approved SVG source.
- * Source of truth: docs/brand-flatten-background.svg
+ * Source of truth: public/brand-flatten-background.svg
  */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = process.cwd();
-const SVG_SOURCE = path.join(ROOT, "docs/brand-flatten-background.svg");
+const SVG_SOURCE = path.join(ROOT, "public/brand-flatten-background.svg");
 const OUT_DIR = path.join(ROOT, "public/icons");
 
 /** Render SVG at 3× target size, then downscale for sharper edges. */
@@ -51,12 +51,17 @@ async function main() {
     await renderIcon(size, name);
   }
 
-  // Convenience copy for manifest maskable reference
+  await copyFile(
+    path.join(OUT_DIR, "favicon-32.png"),
+    path.join(ROOT, "public/favicon.ico"),
+  );
+  console.log("✓ favicon.ico (from favicon-32.png)");
+
   await writeFile(
     path.join(OUT_DIR, "README.md"),
     `# PWA Icons
 
-Generated from \`docs/brand-flatten-background.svg\`.
+Generated from \`public/brand-flatten-background.svg\`.
 
 Regenerate: \`npm run icons:generate\`
 

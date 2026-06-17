@@ -1,6 +1,6 @@
 # PWA Icons
 
-Generated from `docs/brand-flatten-background.svg`.
+Generated from `public/brand-flatten-background.svg`.
 
 Regenerate: `npm run icons:generate`
 
