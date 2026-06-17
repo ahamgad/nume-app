@@ -211,11 +211,13 @@
   }
 
   .nume-splash-n-stroke {
+    z-index: 1;
     opacity: 1;
     animation: nume-splash-n-fade 280ms ease-out 340ms forwards;
   }
 
   .nume-splash-logo-full {
+    z-index: 0;
     opacity: 0;
     transform: scale(0.97);
     animation: nume-splash-logo-reveal 320ms cubic-bezier(0.25, 0.1, 0.2, 1) 360ms
