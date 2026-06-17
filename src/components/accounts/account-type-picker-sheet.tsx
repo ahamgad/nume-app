@@ -27,7 +27,6 @@ export function AccountTypePickerSheet({
 
   function handleSelect(type: string, enabled: boolean) {
     if (!enabled) return;
-    onClose();
     router.push(getAccountTypeCreatePath(type as Parameters<typeof getAccountTypeCreatePath>[0]));
   }
 
