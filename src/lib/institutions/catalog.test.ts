@@ -13,14 +13,22 @@ const t = vi.fn((key: string) => {
     "institutions.banks.cib": "Commercial International Bank",
     "institutions.banks.banqueMisr": "Banque Misr",
     "institutions.banks.nbe": "National Bank of Egypt",
+    "institutions.banks.qnbAlahli": "QNB Al Ahli",
   };
   return labels[key] ?? key;
 });
 
 describe("formatInstitutionEntityLabel", () => {
-  it("returns catalog shortcuts instead of full names", () => {
+  it("returns catalog short names for known institutions", () => {
     expect(formatInstitutionEntityLabel("CIB", t)).toBe("CIB");
+    expect(formatInstitutionEntityLabel("NBE", t)).toBe("NBE");
+  });
+
+  it("resolves legacy full names to short names", () => {
     expect(formatInstitutionEntityLabel("National Bank of Egypt", t)).toBe("NBE");
+    expect(formatInstitutionEntityLabel("Commercial International Bank", t)).toBe(
+      "CIB",
+    );
   });
 
   it("returns custom values unchanged", () => {
@@ -53,13 +61,18 @@ describe("getAllowedCategories", () => {
 });
 
 describe("institutionMatchesSearch", () => {
-  it("matches full names during search even when display uses shortcuts", () => {
+  it("matches full names during search", () => {
     expect(
       institutionMatchesSearch("CIB", "commercial international", t),
     ).toBe(true);
   });
 
-  it("matches shortcuts", () => {
+  it("matches legacy stored values", () => {
+    expect(institutionMatchesSearch("QNB", "qnb alahli", t)).toBe(true);
+  });
+
+  it("matches short names and legacy full names", () => {
+    expect(institutionMatchesSearch("NBE", "national bank", t)).toBe(true);
     expect(institutionMatchesSearch("National Bank of Egypt", "nbe", t)).toBe(
       true,
     );

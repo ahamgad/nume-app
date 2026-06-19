@@ -1,7 +1,19 @@
 import type { AccountType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
+import {
+  INSTITUTION_REGISTRY,
+  INSTITUTION_REGISTRY_BANKS,
+  INSTITUTION_REGISTRY_FINANCIAL_SERVICES,
+} from "@/lib/institutions/registry";
+import { institutionRegistryLabelKey } from "@/lib/institutions/registry-labels";
+import type { InstitutionCategory } from "@/lib/institutions/registry-types";
 
-export type InstitutionCategory = "bank" | "financial_service";
+export type { InstitutionCategory } from "@/lib/institutions/registry-types";
+export {
+  INSTITUTION_REGISTRY,
+  INSTITUTION_REGISTRY_BANKS,
+  INSTITUTION_REGISTRY_FINANCIAL_SERVICES,
+} from "@/lib/institutions/registry";
 
 export type InstitutionPickerContext = Extract<
   AccountType,
@@ -11,11 +23,13 @@ export type InstitutionPickerContext = Extract<
 export interface InstitutionCatalogEntry {
   id: string;
   category: InstitutionCategory;
-  /** Display shortcut shown in triggers and list prefixes (e.g. CIB, NBE). */
+  /** Display name shown in triggers and list primary line. */
   shortcut: string;
-  /** Stored on `accounts.institution` — canonical English string for catalog picks. */
+  /** Stored on `accounts.institution` — canonical short name for catalog picks. */
   storageValue: string;
-  /** Localized full institution name. */
+  /** English full name; localized via {@link labelKey} in the picker. */
+  fullName: string;
+  /** Localized full institution name (picker line 2). */
   labelKey: TranslationKey;
   /** Legacy / alternate spellings for prefilling existing data. */
   matchValues?: string[];
@@ -23,153 +37,28 @@ export interface InstitutionCatalogEntry {
 
 export const OTHER_INSTITUTION_ID = "__other__";
 
-export const INSTITUTION_BANKS: InstitutionCatalogEntry[] = [
-  {
-    id: "nbe",
-    category: "bank",
-    shortcut: "NBE",
-    storageValue: "National Bank of Egypt",
-    labelKey: "institutions.banks.nbe",
-    matchValues: ["NBE", "البنك الأهلي المصري"],
-  },
-  {
-    id: "banque_misr",
-    category: "bank",
-    shortcut: "Banque Misr",
-    storageValue: "Banque Misr",
-    labelKey: "institutions.banks.banqueMisr",
-    matchValues: ["بنك مصر", "BM"],
-  },
-  {
-    id: "cib",
-    category: "bank",
-    shortcut: "CIB",
-    storageValue: "CIB",
-    labelKey: "institutions.banks.cib",
-  },
-  {
-    id: "qnb",
-    category: "bank",
-    shortcut: "QNB",
-    storageValue: "QNB",
-    labelKey: "institutions.banks.qnb",
-  },
-  {
-    id: "hsbc",
-    category: "bank",
-    shortcut: "HSBC",
-    storageValue: "HSBC",
-    labelKey: "institutions.banks.hsbc",
-    matchValues: ["HSBC Egypt"],
-  },
-  {
-    id: "alexbank",
-    category: "bank",
-    shortcut: "AlexBank",
-    storageValue: "AlexBank",
-    labelKey: "institutions.banks.alexBank",
-  },
-  {
-    id: "fab",
-    category: "bank",
-    shortcut: "FAB",
-    storageValue: "FAB",
-    labelKey: "institutions.banks.fab",
-  },
-  {
-    id: "adib",
-    category: "bank",
-    shortcut: "ADIB",
-    storageValue: "ADIB",
-    labelKey: "institutions.banks.adib",
-  },
-  {
-    id: "aaib",
-    category: "bank",
-    shortcut: "AAIB",
-    storageValue: "Arab African International Bank",
-    labelKey: "institutions.banks.aaib",
-    matchValues: ["AAIB", "البنك العربي الأفريقي الدولي"],
-  },
-];
+function registryEntryToCatalog(
+  entry: (typeof INSTITUTION_REGISTRY)[number],
+): InstitutionCatalogEntry {
+  return {
+    id: entry.id,
+    category: entry.category,
+    shortcut: entry.shortName,
+    storageValue: entry.shortName,
+    fullName: entry.fullName,
+    labelKey: institutionRegistryLabelKey(entry),
+    matchValues: entry.matchValues ? [...entry.matchValues] : undefined,
+  };
+}
 
-export const INSTITUTION_FINANCIAL_SERVICES: InstitutionCatalogEntry[] = [
-  {
-    id: "thndr",
-    category: "financial_service",
-    shortcut: "Thndr",
-    storageValue: "Thndr",
-    labelKey: "institutions.financialServices.thndr",
-  },
-  {
-    id: "klivvr",
-    category: "financial_service",
-    shortcut: "Klivvr",
-    storageValue: "Klivvr",
-    labelKey: "institutions.financialServices.klivvr",
-  },
-  {
-    id: "souhoula",
-    category: "financial_service",
-    shortcut: "Souhoula",
-    storageValue: "Souhoula",
-    labelKey: "institutions.financialServices.souhoula",
-  },
-  {
-    id: "valu",
-    category: "financial_service",
-    shortcut: "ValU",
-    storageValue: "ValU",
-    labelKey: "institutions.financialServices.valu",
-  },
-  {
-    id: "contact",
-    category: "financial_service",
-    shortcut: "Contact",
-    storageValue: "Contact",
-    labelKey: "institutions.financialServices.contact",
-  },
-  {
-    id: "mnt_halan",
-    category: "financial_service",
-    shortcut: "MNT-Halan",
-    storageValue: "MNT-Halan",
-    labelKey: "institutions.financialServices.mntHalan",
-  },
-  {
-    id: "telda",
-    category: "financial_service",
-    shortcut: "Telda",
-    storageValue: "Telda",
-    labelKey: "institutions.financialServices.telda",
-  },
-  {
-    id: "bokra",
-    category: "financial_service",
-    shortcut: "Bokra",
-    storageValue: "Bokra",
-    labelKey: "institutions.financialServices.bokra",
-  },
-  {
-    id: "fawry",
-    category: "financial_service",
-    shortcut: "Fawry",
-    storageValue: "Fawry",
-    labelKey: "institutions.financialServices.fawry",
-  },
-  {
-    id: "lucky",
-    category: "financial_service",
-    shortcut: "Lucky",
-    storageValue: "Lucky",
-    labelKey: "institutions.financialServices.lucky",
-  },
-];
+export const INSTITUTION_BANKS: InstitutionCatalogEntry[] =
+  INSTITUTION_REGISTRY_BANKS.map(registryEntryToCatalog);
 
-export const ALL_INSTITUTIONS: InstitutionCatalogEntry[] = [
-  ...INSTITUTION_BANKS,
-  ...INSTITUTION_FINANCIAL_SERVICES,
-];
+export const INSTITUTION_FINANCIAL_SERVICES: InstitutionCatalogEntry[] =
+  INSTITUTION_REGISTRY_FINANCIAL_SERVICES.map(registryEntryToCatalog);
+
+export const ALL_INSTITUTIONS: InstitutionCatalogEntry[] =
+  INSTITUTION_REGISTRY.map(registryEntryToCatalog);
 
 export function getAllowedCategories(
   context: InstitutionPickerContext,
@@ -225,6 +114,7 @@ export function matchInstitutionEntry(
   for (const entry of entries) {
     if (entry.storageValue.toLowerCase() === normalized) return entry;
     if (entry.shortcut.toLowerCase() === normalized) return entry;
+    if (entry.fullName.toLowerCase() === normalized) return entry;
     if (t(entry.labelKey).trim().toLowerCase() === normalized) return entry;
     for (const alias of entry.matchValues ?? []) {
       if (alias.trim().toLowerCase() === normalized) return entry;
@@ -263,6 +153,7 @@ export function filterInstitutions(
     if (label.includes(normalized)) return true;
     if (entry.shortcut.toLowerCase().includes(normalized)) return true;
     if (entry.storageValue.toLowerCase().includes(normalized)) return true;
+    if (entry.fullName.toLowerCase().includes(normalized)) return true;
     return (entry.matchValues ?? []).some((alias) =>
       alias.toLowerCase().includes(normalized),
     );
@@ -327,6 +218,7 @@ export function institutionMatchesSearch(
 
   if (match.shortcut.toLowerCase().includes(normalized)) return true;
   if (match.storageValue.toLowerCase().includes(normalized)) return true;
+  if (match.fullName.toLowerCase().includes(normalized)) return true;
   if (t(match.labelKey).toLowerCase().includes(normalized)) return true;
 
   return (match.matchValues ?? []).some((alias) =>
