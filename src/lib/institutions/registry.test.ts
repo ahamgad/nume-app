@@ -43,11 +43,16 @@ describe("institution registry", () => {
     const cib = INSTITUTION_REGISTRY.find((entry) => entry.id === "cib");
     const nbe = INSTITUTION_REGISTRY.find((entry) => entry.id === "nbe");
     const aaib = INSTITUTION_REGISTRY.find((entry) => entry.id === "aaib");
+    const banqueMisr = INSTITUTION_REGISTRY.find(
+      (entry) => entry.id === "banque_misr",
+    );
     expect(cib?.shortName).toBe("CIB");
     expect(cib?.fullName).toBe("Commercial International Bank");
     expect(nbe?.shortName).toBe("NBE");
     expect(nbe?.fullName).toBe("National Bank of Egypt");
     expect(aaib?.shortName).toBe("AAIB");
     expect(aaib?.fullName).toBe("Arab African International Bank");
+    expect(banqueMisr?.shortName).toBe("Banque Misr");
+    expect(banqueMisr?.fullName).toBe("Banque Misr");
   });
 });

@@ -29,7 +29,9 @@ Each entry has:
 npm run logos:collect
 ```
 
-Downloads official SVGs (primarily from Wikimedia Commons files sourced from institution websites), normalizes them to a square 100×100 viewBox with padding, and writes assets to `public/institutions/`.
+Downloads official SVGs (Wikimedia Commons, institution websites, and verified CDN assets), normalizes them to a square 100×100 viewBox with padding, writes assets to `public/institutions/`, and regenerates `logo-registry.ts`.
+
+The collector uses `curl` as a fallback when a host returns malformed HTTP responses to Node `fetch`.
 
 ## Fallback strategy (future UI)
 
@@ -48,24 +50,26 @@ Helper: `getInstitutionFallbackInitial()` in `src/lib/institutions/logo-fallback
 
 Custom “Other” institutions always use fallback avatars.
 
-## Coverage (2026-06-19)
+## Coverage (2026-06-19, second pass)
 
 | Status | Count |
 |--------|-------|
 | Total institutions | 57 |
-| Available logos | 17 |
-| Fallback | 40 |
+| Available logos | 38 |
+| Fallback | 19 |
+
+The 40+ logo target was not reached while keeping the SVG-only policy and official-source quality bar. Remaining high-priority institutions (Emirates NBD, InstaPay, Fawry, Telda, Thndr, valU, and several regional banks) publish PNG or raster-only brand assets.
 
 ### Available
 
-**Banks (14):** cib, nbe, banque_misr, banque_du_caire, qnb_alahli, hsbc, alexbank, credit_agricole, fab, adcb, arab_bank, nbk, al_baraka, suez_canal
+**Banks (23):** cib, nbe, banque_misr, banque_du_caire, qnb_alahli, hsbc, alexbank, credit_agricole, aaib, fab, adcb, arab_bank, nbk, adib, faisal_islamic, al_baraka, attijariwafa, suez_canal, kfh, abk, mashreq, bank_abc, united_bank
 
-**Financial services (3):** vodafone_cash, orange_cash, etisalat_cash
+**Financial services (15):** vodafone_cash, orange_cash, etisalat_cash, we_pay, opay, tabby, tamara, meeza, contact, aman, klivvr, paymob, money_fellows, mnt_halan, shahry
 
 ### Fallback
 
-**Banks (18):** aaib, saib, egbank, adib, faisal_islamic, mid_bank, emirates_nbd, hdb, edbe, united_bank, attijariwafa, kfh, abk, mashreq, bank_abc, aib, abe, bank_nxt
+**Banks (9):** saib, egbank, emirates_nbd, hdb, edbe, aib, abe, bank_nxt, mid_bank
 
-**Financial services (22):** we_pay, instapay, fawry, valu, aman, contact, money_fellows, telda, khazna, lucky, sympl, souhoola, paymob, meeza, opay, shahry, tabby, tamara, thndr, klivvr, bokra, mnt_halan
+**Financial services (10):** instapay, fawry, valu, telda, khazna, lucky, sympl, souhoola, thndr, bokra
 
 Fallback institutions lack acceptable official SVG sources in this pass. They can be added later without breaking registry consumers.

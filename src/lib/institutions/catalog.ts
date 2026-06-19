@@ -37,6 +37,23 @@ export interface InstitutionCatalogEntry {
 
 export const OTHER_INSTITUTION_ID = "__other__";
 
+/** Locale-aware ascending sort by consumer-facing short name. */
+export function compareInstitutionsByShortName(
+  a: Pick<InstitutionCatalogEntry, "shortcut">,
+  b: Pick<InstitutionCatalogEntry, "shortcut">,
+): number {
+  return a.shortcut.localeCompare(b.shortcut, undefined, {
+    sensitivity: "base",
+    numeric: true,
+  });
+}
+
+function sortByShortName(
+  entries: InstitutionCatalogEntry[],
+): InstitutionCatalogEntry[] {
+  return [...entries].sort(compareInstitutionsByShortName);
+}
+
 function registryEntryToCatalog(
   entry: (typeof INSTITUTION_REGISTRY)[number],
 ): InstitutionCatalogEntry {
@@ -51,14 +68,16 @@ function registryEntryToCatalog(
   };
 }
 
-export const INSTITUTION_BANKS: InstitutionCatalogEntry[] =
-  INSTITUTION_REGISTRY_BANKS.map(registryEntryToCatalog);
+export const INSTITUTION_BANKS: InstitutionCatalogEntry[] = sortByShortName(
+  INSTITUTION_REGISTRY_BANKS.map(registryEntryToCatalog),
+);
 
 export const INSTITUTION_FINANCIAL_SERVICES: InstitutionCatalogEntry[] =
-  INSTITUTION_REGISTRY_FINANCIAL_SERVICES.map(registryEntryToCatalog);
+  sortByShortName(INSTITUTION_REGISTRY_FINANCIAL_SERVICES.map(registryEntryToCatalog));
 
-export const ALL_INSTITUTIONS: InstitutionCatalogEntry[] =
-  INSTITUTION_REGISTRY.map(registryEntryToCatalog);
+export const ALL_INSTITUTIONS: InstitutionCatalogEntry[] = sortByShortName(
+  INSTITUTION_REGISTRY.map(registryEntryToCatalog),
+);
 
 export function getAllowedCategories(
   context: InstitutionPickerContext,

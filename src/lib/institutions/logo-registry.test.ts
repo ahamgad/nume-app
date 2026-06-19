@@ -35,8 +35,8 @@ describe("institution logo registry", () => {
       (entry) => entry.status === "fallback",
     );
 
-    expect(available).toHaveLength(17);
-    expect(fallback).toHaveLength(40);
+    expect(available).toHaveLength(38);
+    expect(fallback).toHaveLength(19);
     expect(available.length + fallback.length).toBe(57);
   });
 

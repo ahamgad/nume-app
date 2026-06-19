@@ -281,9 +281,7 @@ function InstitutionSection({
             )}
           >
             <span className="text-[0.9375rem] font-medium">{shortcut}</span>
-            {fullName !== shortcut ? (
-              <span className="text-sm text-muted-foreground">{fullName}</span>
-            ) : null}
+            <span className="text-sm text-muted-foreground">{fullName}</span>
           </button>
         );
         })}

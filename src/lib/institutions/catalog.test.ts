@@ -5,6 +5,9 @@ import {
   formatInstitutionEntityLabel,
   formatInstitutionShortcut,
   getAllowedCategories,
+  compareInstitutionsByShortName,
+  INSTITUTION_BANKS,
+  INSTITUTION_FINANCIAL_SERVICES,
   institutionMatchesSearch,
 } from "@/lib/institutions/catalog";
 
@@ -76,5 +79,31 @@ describe("institutionMatchesSearch", () => {
     expect(institutionMatchesSearch("National Bank of Egypt", "nbe", t)).toBe(
       true,
     );
+  });
+});
+
+describe("institution catalog ordering", () => {
+  it("sorts banks alphabetically by short name", () => {
+    const names = INSTITUTION_BANKS.map((entry) => entry.shortcut);
+    const sorted = [...names].sort((a, b) =>
+      compareInstitutionsByShortName(
+        { shortcut: a },
+        { shortcut: b },
+      ),
+    );
+    expect(names).toEqual(sorted);
+    expect(names[0]).toBe("AAIB");
+  });
+
+  it("sorts financial services alphabetically by short name", () => {
+    const names = INSTITUTION_FINANCIAL_SERVICES.map((entry) => entry.shortcut);
+    const sorted = [...names].sort((a, b) =>
+      compareInstitutionsByShortName(
+        { shortcut: a },
+        { shortcut: b },
+      ),
+    );
+    expect(names).toEqual(sorted);
+    expect(names[0]).toBe("Aman");
   });
 });
