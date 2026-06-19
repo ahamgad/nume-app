@@ -131,6 +131,7 @@ function EditSavingsAccountForm({
       await updateSavingsAccount(savingsId, {
         name: payload.name,
         institution: payload.institution,
+        accountNumberLast4: payload.accountNumberLast4,
         interestModel: payload.interestModel,
         annualInterestRate: payload.annualInterestRate,
         tiers: payload.tiers,

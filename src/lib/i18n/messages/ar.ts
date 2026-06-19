@@ -279,6 +279,22 @@ export const ar = {
       balance: {
         label: "الرصيد الحالي",
       },
+      accountNumber: {
+        label: "رقم الحساب",
+        placeholder: "أدخل آخر 4 أرقام من رقم حسابك",
+      },
+      certificateNumber: {
+        label: "رقم الشهادة",
+        placeholder: "أدخل آخر 4 أرقام من رقم شهادتك",
+      },
+      loanNumber: {
+        label: "رقم القرض",
+        placeholder: "أدخل آخر 4 أرقام من رقم قرضك",
+      },
+      cardNumber: {
+        label: "رقم البطاقة",
+        placeholder: "أدخل آخر 4 أرقام من رقم بطاقتك",
+      },
       annualRate: {
         label: "المعدل السنوي",
       },
@@ -339,6 +355,7 @@ export const ar = {
       balanceInvalid: "أدخل مبلغًا صالحًا",
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
       institutionRequired: "المؤسسة مطلوبة",
+      identifierLast4Invalid: "أدخل 4 أرقام بالضبط",
       interestDestinationAccountRequired: "اختر حساب الوجهة",
     },
   },

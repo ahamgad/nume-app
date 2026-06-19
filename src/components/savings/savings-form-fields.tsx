@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
 import { ToggleSettingRow } from "@/components/patterns";
@@ -146,6 +147,17 @@ export function SavingsFormFields({
           value={values.institution}
           disabled={disabled}
           onChange={(institution) => onChange({ institution })}
+        />
+
+        <AccountIdentifierField
+          id="savings-account-number"
+          labelKey="accounts.fields.accountNumber.label"
+          placeholderKey="accounts.fields.accountNumber.placeholder"
+          value={values.accountNumber}
+          disabled={disabled}
+          error={errors.accountNumber}
+          onChange={(accountNumber) => onChange({ accountNumber })}
+          onClearError={() => onClearError("accountNumber")}
         />
 
         {mode === "create" ? (

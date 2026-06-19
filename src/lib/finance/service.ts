@@ -66,6 +66,7 @@ export async function insertAccount(
       account_type: input.type ?? "current_account",
       name: input.name.trim(),
       institution: input.institution?.trim() || null,
+      account_number_last4: input.accountNumberLast4 ?? null,
       current_balance: input.currentBalance,
       include_in_net_worth: input.includeInNetWorth ?? true,
       include_in_emergency_fund: input.includeInEmergencyFund ?? false,
@@ -94,6 +95,7 @@ export async function patchAccount(
       Account,
       | "name"
       | "institution"
+      | "accountNumberLast4"
       | "includeInNetWorth"
       | "includeInEmergencyFund"
       | "currentBalance"
@@ -103,6 +105,9 @@ export async function patchAccount(
   const payload: Record<string, unknown> = {};
   if (patch.name !== undefined) payload.name = patch.name;
   if (patch.institution !== undefined) payload.institution = patch.institution;
+  if (patch.accountNumberLast4 !== undefined) {
+    payload.account_number_last4 = patch.accountNumberLast4;
+  }
   if (patch.includeInNetWorth !== undefined) {
     payload.include_in_net_worth = patch.includeInNetWorth;
   }

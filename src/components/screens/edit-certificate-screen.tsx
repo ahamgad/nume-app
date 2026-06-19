@@ -9,6 +9,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import {
   certificateFormValuesFromCertificate,
@@ -101,6 +102,7 @@ function EditCertificateForm({
       await updateCertificate(certificateId, {
         name: values.name.trim(),
         institution: values.institution.trim() || null,
+        certificateNumberLast4: parseOptionalIdentifierLast4(values.certificateNumber),
         principalAmount,
         annualInterestRate,
         purchaseDate: values.purchaseDate,

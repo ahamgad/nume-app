@@ -4,6 +4,7 @@ import type { TranslationKey } from "@/lib/i18n";
 import {
   validateAccountBalanceField,
   validateAccountNameField,
+  validateIdentifierLast4Field,
 } from "@/lib/field-editor/field-validators";
 
 export type { MoneyAccountFormValues };
@@ -12,6 +13,7 @@ export function moneyAccountFormValuesFromAccount(
   account: {
     name: string;
     institution: string | null;
+    accountNumberLast4?: string | null;
     currentBalance: number;
   },
   _accountType: AccountType,
@@ -19,6 +21,7 @@ export function moneyAccountFormValuesFromAccount(
   return {
     name: account.name,
     institution: account.institution ?? "",
+    accountNumber: account.accountNumberLast4 ?? "",
     balance: "",
   };
 }
@@ -30,7 +33,8 @@ export function isMoneyAccountFormDirty(
 ): boolean {
   return (
     values.name.trim() !== initial.name.trim() ||
-    values.institution.trim() !== initial.institution.trim()
+    values.institution.trim() !== initial.institution.trim() ||
+    values.accountNumber.trim() !== initial.accountNumber.trim()
   );
 }
 
@@ -47,6 +51,12 @@ export function validateMoneyAccountForm(
   if (accountType !== "cash" && !values.institution.trim()) {
     errors.institution = t("accounts.validation.institutionRequired");
   }
+
+  const identifierError =
+    accountType === "current_account"
+      ? validateIdentifierLast4Field(values.accountNumber, t)
+      : undefined;
+  if (identifierError) errors.accountNumber = identifierError;
 
   if (mode === "create") {
     const balanceError = validateAccountBalanceField(values.balance, t);

@@ -6,6 +6,7 @@ export interface DbAccount {
   account_type: AccountType;
   name: string;
   institution: string | null;
+  account_number_last4: string | null;
   current_balance: number;
   include_in_net_worth: boolean;
   include_in_emergency_fund: boolean;
@@ -34,6 +35,7 @@ export function mapAccount(row: DbAccount): Account {
     type: row.account_type,
     name: row.name,
     institution: row.institution,
+    accountNumberLast4: row.account_number_last4,
     currentBalance: Number(row.current_balance),
     includeInNetWorth: row.include_in_net_worth,
     includeInEmergencyFund: row.include_in_emergency_fund,

@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
@@ -22,6 +23,7 @@ export { showsBalanceField, showsInstitutionField } from "@/lib/finance/account-
 export interface MoneyAccountFormValues {
   name: string;
   institution: string;
+  accountNumber: string;
   balance: string;
 }
 
@@ -86,6 +88,19 @@ export function MoneyAccountFormFields({
             onSave={(institution) => onChange({ institution })}
           />
         )
+      ) : null}
+
+      {accountType === "current_account" ? (
+        <AccountIdentifierField
+          id="account-number-last4"
+          labelKey="accounts.fields.accountNumber.label"
+          placeholderKey="accounts.fields.accountNumber.placeholder"
+          value={values.accountNumber}
+          disabled={disabled}
+          error={errors.accountNumber}
+          onChange={(accountNumber) => onChange({ accountNumber })}
+          onClearError={() => onClearError("accountNumber")}
+        />
       ) : null}
 
       {showBalance ? (

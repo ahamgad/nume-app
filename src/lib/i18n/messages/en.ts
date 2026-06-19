@@ -279,6 +279,22 @@ export const en = {
       balance: {
         label: "Current balance",
       },
+      accountNumber: {
+        label: "Account Number",
+        placeholder: "Enter the last 4 digits of your account number",
+      },
+      certificateNumber: {
+        label: "Certificate Number",
+        placeholder: "Enter the last 4 digits of your certificate number",
+      },
+      loanNumber: {
+        label: "Loan Number",
+        placeholder: "Enter the last 4 digits of your loan number",
+      },
+      cardNumber: {
+        label: "Card Number",
+        placeholder: "Enter the last 4 digits of your card number",
+      },
       annualRate: {
         label: "Annual rate",
       },
@@ -340,6 +356,7 @@ export const en = {
       balanceInvalid: "Enter a valid amount",
       balanceNegative: "Balance cannot be negative",
       institutionRequired: "Institution is required",
+      identifierLast4Invalid: "Enter exactly 4 digits",
       interestDestinationAccountRequired: "Select a destination account",
     },
   },

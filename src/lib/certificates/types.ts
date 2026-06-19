@@ -58,6 +58,7 @@ export interface Certificate {
   renewalProcessedAt: string | null;
   excludeWeekends: boolean;
   excludeEgyptianHolidays: boolean;
+  certificateNumberLast4: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -84,6 +85,7 @@ export interface CreateCertificateInput {
   destinationAccountId?: string | null;
   autoApply?: boolean;
   renewalType?: RenewalType;
+  certificateNumberLast4?: string | null;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
 }
@@ -101,6 +103,7 @@ export interface UpdateCertificateInput {
   destinationAccountId?: string | null;
   autoApply?: boolean;
   renewalType?: RenewalType;
+  certificateNumberLast4?: string | null;
   status?: CertificateStatus;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;

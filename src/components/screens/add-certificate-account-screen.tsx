@@ -15,6 +15,8 @@ import {
   type CertificateFormValues,
 } from "@/lib/certificates/form";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
@@ -23,7 +25,6 @@ import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
-import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 
 export function AddCertificateAccountScreen() {
   const t = useT();
@@ -84,6 +85,7 @@ export function AddCertificateAccountScreen() {
       const certificate = await createCertificate({
         name: values.name.trim(),
         institution: values.institution.trim() || null,
+        certificateNumberLast4: parseOptionalIdentifierLast4(values.certificateNumber),
         principalAmount,
         annualInterestRate,
         purchaseDate: values.purchaseDate,

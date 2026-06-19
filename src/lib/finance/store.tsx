@@ -43,6 +43,24 @@ import {
   createSavingsAccount as createSavingsAccountService,
   updateSavingsAccount as updateSavingsAccountService,
 } from "@/lib/savings/service";
+import {
+  getCreditCardsSafe,
+  getLoansSafe,
+} from "@/lib/lending/load-lending";
+import {
+  createCreditCard as createCreditCardService,
+  createLoan as createLoanService,
+  updateCreditCard as updateCreditCardService,
+  updateLoan as updateLoanService,
+} from "@/lib/lending/service";
+import type {
+  CreateCreditCardInput,
+  CreateLoanInput,
+  CreditCard,
+  Loan,
+  UpdateCreditCardInput,
+  UpdateLoanInput,
+} from "@/lib/lending/types";
 import type { ProcessCertificateInterestResult } from "@/lib/certificates/recurring/types";
 import type {
   CreateSavingsAccountInput,
@@ -86,6 +104,8 @@ interface FinanceData {
   certificates: Certificate[];
   certificateSchedules: CertificateScheduleEntry[];
   savingsAccounts: SavingsAccount[];
+  loans: Loan[];
+  creditCards: CreditCard[];
 }
 
 interface FinanceContextValue {
@@ -94,6 +114,8 @@ interface FinanceContextValue {
   certificates: Certificate[];
   certificateSchedules: CertificateScheduleEntry[];
   savingsAccounts: SavingsAccount[];
+  loans: Loan[];
+  creditCards: CreditCard[];
   certificateInsights: CertificateInsights;
   isLoading: boolean;
   isHydrated: boolean;
@@ -105,6 +127,8 @@ interface FinanceContextValue {
   createAccount: (input: CreateAccountInput) => Promise<Account>;
   createCertificate: (input: CreateCertificateInput) => Promise<Certificate>;
   createSavingsAccount: (input: CreateSavingsAccountInput) => Promise<SavingsAccount>;
+  createLoan: (input: CreateLoanInput) => Promise<Loan>;
+  createCreditCard: (input: CreateCreditCardInput) => Promise<CreditCard>;
   updateCertificate: (
     certificateId: string,
     input: UpdateCertificateInput,
@@ -113,6 +137,14 @@ interface FinanceContextValue {
     savingsAccountId: string,
     input: UpdateSavingsAccountInput,
   ) => Promise<SavingsAccount>;
+  updateLoan: (
+    accountId: string,
+    input: UpdateLoanInput,
+  ) => Promise<Loan>;
+  updateCreditCard: (
+    accountId: string,
+    input: UpdateCreditCardInput,
+  ) => Promise<CreditCard>;
   archiveCertificate: (certificateId: string) => Promise<void>;
   processCertificateInterest: (
     certificateId: string,
@@ -125,6 +157,8 @@ interface FinanceContextValue {
   getAccount: (id: string) => Account | undefined;
   getCertificateByAccountId: (accountId: string) => Certificate | undefined;
   getSavingsByAccountId: (accountId: string) => SavingsAccount | undefined;
+  getLoanByAccountId: (accountId: string) => Loan | undefined;
+  getCreditCardByAccountId: (accountId: string) => CreditCard | undefined;
   getAccountRecords: (accountId: string) => FinanceRecord[];
   createRecord: (input: CreateRecordInput) => Promise<FinanceRecord>;
   createTransfer: (input: CreateTransferInput) => Promise<void>;
@@ -146,6 +180,8 @@ async function fetchFinanceSnapshot(
   let certificates: Certificate[] = [];
   let certificateSchedules: CertificateScheduleEntry[] = [];
   let savingsAccounts: SavingsAccount[] = [];
+  let loans: Loan[] = [];
+  let creditCards: CreditCard[] = [];
 
   try {
     certificates = await getCertificatesSafe(supabase, userId);
@@ -160,6 +196,13 @@ async function fetchFinanceSnapshot(
     logSupabaseError("fetchFinanceSnapshot:savings", error);
   }
 
+  try {
+    loans = await getLoansSafe(supabase, userId);
+    creditCards = await getCreditCardsSafe(supabase, userId);
+  } catch (error) {
+    logSupabaseError("fetchFinanceSnapshot:lending", error);
+  }
+
   const activeAccountIds = new Set(accounts.map((account) => account.id));
   certificates = certificates.filter((certificate) =>
     activeAccountIds.has(certificate.accountId),
@@ -167,8 +210,18 @@ async function fetchFinanceSnapshot(
   savingsAccounts = savingsAccounts.filter((savings) =>
     activeAccountIds.has(savings.accountId),
   );
+  loans = loans.filter((loan) => activeAccountIds.has(loan.accountId));
+  creditCards = creditCards.filter((card) => activeAccountIds.has(card.accountId));
 
-  return { accounts, records, certificates, certificateSchedules, savingsAccounts };
+  return {
+    accounts,
+    records,
+    certificates,
+    certificateSchedules,
+    savingsAccounts,
+    loans,
+    creditCards,
+  };
 }
 
 async function loadFinanceData(userId: string): Promise<FinanceData> {
@@ -248,6 +301,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     () => data?.savingsAccounts ?? [],
     [data?.savingsAccounts],
   );
+  const loans = useMemo(() => data?.loans ?? [], [data?.loans]);
+  const creditCards = useMemo(() => data?.creditCards ?? [], [data?.creditCards]);
 
   const certificateAccountNameKey = useMemo(
     () => buildCertificateAccountNameKey(accounts),
@@ -300,6 +355,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           certificates: current?.certificates ?? [],
           certificateSchedules: current?.certificateSchedules ?? [],
           savingsAccounts: current?.savingsAccounts ?? [],
+          loans: current?.loans ?? [],
+          creditCards: current?.creditCards ?? [],
         }),
       );
       return account;
@@ -314,6 +371,28 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       const savings = await createSavingsAccountService(supabase, userId, input);
       await invalidate();
       return savings;
+    },
+    [userId, invalidate],
+  );
+
+  const createLoan = useCallback(
+    async (input: CreateLoanInput): Promise<Loan> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const loan = await createLoanService(supabase, userId, input);
+      await invalidate();
+      return loan;
+    },
+    [userId, invalidate],
+  );
+
+  const createCreditCard = useCallback(
+    async (input: CreateCreditCardInput): Promise<CreditCard> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const card = await createCreditCardService(supabase, userId, input);
+      await invalidate();
+      return card;
     },
     [userId, invalidate],
   );
@@ -391,6 +470,33 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         supabase,
         userId,
         savingsAccountId,
+        input,
+      );
+      await invalidate();
+      return updated;
+    },
+    [userId, invalidate],
+  );
+
+  const updateLoan = useCallback(
+    async (accountId: string, input: UpdateLoanInput): Promise<Loan> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const updated = await updateLoanService(supabase, userId, accountId, input);
+      await invalidate();
+      return updated;
+    },
+    [userId, invalidate],
+  );
+
+  const updateCreditCard = useCallback(
+    async (accountId: string, input: UpdateCreditCardInput): Promise<CreditCard> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const updated = await updateCreditCardService(
+        supabase,
+        userId,
+        accountId,
         input,
       );
       await invalidate();
@@ -499,6 +605,17 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [savingsAccounts],
   );
 
+  const getLoanByAccountId = useCallback(
+    (accountId: string) => loans.find((loan) => loan.accountId === accountId),
+    [loans],
+  );
+
+  const getCreditCardByAccountId = useCallback(
+    (accountId: string) =>
+      creditCards.find((card) => card.accountId === accountId),
+    [creditCards],
+  );
+
   const getAccountRecords = useCallback(
     (accountId: string) =>
       records
@@ -582,6 +699,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       certificates,
       certificateSchedules,
       savingsAccounts,
+      loans,
+      creditCards,
       certificateInsights,
       isLoading,
       isHydrated,
@@ -593,8 +712,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       createAccount,
       createCertificate,
       createSavingsAccount,
+      createLoan,
+      createCreditCard,
       updateCertificate,
       updateSavingsAccount,
+      updateLoan,
+      updateCreditCard,
       archiveCertificate,
       processCertificateInterest,
       getCertificateSchedules,
@@ -605,6 +728,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccount,
       getCertificateByAccountId,
       getSavingsByAccountId,
+      getLoanByAccountId,
+      getCreditCardByAccountId,
       getAccountRecords,
       createRecord,
       createTransfer,
@@ -617,6 +742,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       certificates,
       certificateSchedules,
       savingsAccounts,
+      loans,
+      creditCards,
       certificateInsights,
       isLoading,
       isHydrated,
@@ -628,8 +755,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       createAccount,
       createCertificate,
       createSavingsAccount,
+      createLoan,
+      createCreditCard,
       updateCertificate,
       updateSavingsAccount,
+      updateLoan,
+      updateCreditCard,
       archiveCertificate,
       processCertificateInterest,
       getCertificateSchedules,
@@ -640,6 +771,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       getAccount,
       getCertificateByAccountId,
       getSavingsByAccountId,
+      getLoanByAccountId,
+      getCreditCardByAccountId,
       getAccountRecords,
       createRecord,
       createTransfer,

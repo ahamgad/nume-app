@@ -5,6 +5,7 @@ export type AccountUpdatableFields = Partial<
     Account,
     | "name"
     | "institution"
+    | "accountNumberLast4"
     | "includeInNetWorth"
     | "includeInEmergencyFund"
     | "currentBalance"

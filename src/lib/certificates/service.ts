@@ -122,6 +122,7 @@ export async function createCertificate(
     destination_account_id: input.destinationAccountId ?? null,
     auto_apply: input.autoApply ?? false,
     status: "active",
+    certificate_number_last4: input.certificateNumberLast4 ?? null,
   };
 
   if (renewalTypeSupported) {
@@ -232,6 +233,9 @@ export async function updateCertificate(
   }
   if (input.status !== undefined) {
     certificatePayload.status = input.status;
+  }
+  if (input.certificateNumberLast4 !== undefined) {
+    certificatePayload.certificate_number_last4 = input.certificateNumberLast4;
   }
 
   let updatedCertificate = existing;

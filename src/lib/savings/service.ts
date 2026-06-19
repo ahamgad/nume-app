@@ -127,6 +127,7 @@ export async function createSavingsAccount(
       account_type: "savings_account",
       name: input.name.trim(),
       institution: input.institution?.trim() || null,
+      account_number_last4: input.accountNumberLast4 ?? null,
       current_balance: input.openingBalance,
       include_in_net_worth: input.includeInNetWorth ?? true,
       include_in_emergency_fund: input.includeInEmergencyFund ?? false,
@@ -200,11 +201,14 @@ export async function updateSavingsAccount(
   const existing = await getSavingsByAccountId(supabase, userId, accountId);
   if (!existing) throw new Error("Savings account not found");
 
-  if (input.name !== undefined || input.institution !== undefined) {
+  if (input.name !== undefined || input.institution !== undefined || input.accountNumberLast4 !== undefined) {
     const accountPatch: Record<string, unknown> = {};
     if (input.name !== undefined) accountPatch.name = input.name.trim();
     if (input.institution !== undefined) {
       accountPatch.institution = input.institution?.trim() || null;
+    }
+    if (input.accountNumberLast4 !== undefined) {
+      accountPatch.account_number_last4 = input.accountNumberLast4;
     }
     const { error } = await supabase
       .from("accounts")

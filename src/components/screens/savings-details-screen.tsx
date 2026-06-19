@@ -210,6 +210,12 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             {t("savings.details.summary")}
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
+            {account.accountNumberLast4 ? (
+              <DetailRow
+                label={t("accounts.fields.accountNumber.label")}
+                value={account.accountNumberLast4}
+              />
+            ) : null}
             <DetailRow
               label={t("savings.details.interestModel")}
               value={t(

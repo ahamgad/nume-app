@@ -13,6 +13,7 @@ function account(overrides: Partial<Account> = {}): Account {
     name: "Main",
     type: "current_account",
     institution: null,
+    accountNumberLast4: null,
     currentBalance: 1000,
     includeInNetWorth: true,
     includeInEmergencyFund: false,

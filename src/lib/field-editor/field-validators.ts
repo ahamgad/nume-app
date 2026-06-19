@@ -55,3 +55,14 @@ export function validateCertificateCustomTermField(
   }
   if (years > 50) return t("certificates.validation.termYearsMax");
 }
+
+export function validateIdentifierLast4Field(
+  value: string | undefined | null,
+  t: Translator,
+): string | undefined {
+  const trimmed = (value ?? "").trim();
+  if (!trimmed) return undefined;
+  if (!/^\d{4}$/.test(trimmed)) {
+    return t("accounts.validation.identifierLast4Invalid");
+  }
+}

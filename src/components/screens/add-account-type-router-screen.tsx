@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { AddCertificateAccountScreen } from "@/components/screens/add-certificate-account-screen";
+import { AddLendingAccountScreen } from "@/components/screens/add-lending-account-screen";
 import { AddMoneyAccountScreen } from "@/components/screens/add-money-account-screen";
 import { AddSavingsAccountScreen } from "@/components/screens/add-savings-account-screen";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { parseCreatableAccountType } from "@/lib/finance/account-type-catalog";
 import {
   isCertificateAccountType,
+  isLendingAccountType,
   isMoneyAccountType,
 } from "@/lib/finance/add-account-types";
 import { useT } from "@/providers/i18n-provider";
@@ -55,6 +57,10 @@ export function AddAccountTypeRouterScreen({ type }: AddAccountTypeRouterScreenP
 
   if (accountType === "savings_account") {
     return <AddSavingsAccountScreen />;
+  }
+
+  if (isLendingAccountType(accountType)) {
+    return <AddLendingAccountScreen accountType={accountType} />;
   }
 
   return null;

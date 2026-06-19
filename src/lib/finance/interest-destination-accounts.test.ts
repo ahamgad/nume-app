@@ -13,6 +13,7 @@ function account(partial: Partial<Account> & Pick<Account, "id">): Account {
     name: "Test",
     type: "current_account",
     institution: null,
+    accountNumberLast4: null,
     currentBalance: 0,
     includeInNetWorth: true,
     includeInEmergencyFund: false,

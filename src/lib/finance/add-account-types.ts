@@ -35,6 +35,12 @@ export function isSavingsAccountType(type: AccountType): boolean {
   return type === "savings_account";
 }
 
+export function isLendingAccountType(
+  type: AccountType,
+): type is "loan" | "credit_card" {
+  return type === "loan" || type === "credit_card";
+}
+
 export function isEnabledOnboardingAccountType(type: AccountType): boolean {
   return ONBOARDING_ACCOUNT_TYPES.some(
     (option) => option.type === type && option.enabled,

@@ -55,6 +55,7 @@ export interface CreateSavingsAccountInput {
   destinationAccountId?: string | null;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
+  accountNumberLast4?: string | null;
 }
 
 export interface UpdateSavingsAccountInput {
@@ -69,6 +70,7 @@ export interface UpdateSavingsAccountInput {
   excludeEgyptianHolidays?: boolean;
   interestDestination?: SavingsInterestDestination;
   destinationAccountId?: string | null;
+  accountNumberLast4?: string | null;
 }
 
 export interface ProcessSavingsInterestResult {

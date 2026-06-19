@@ -55,6 +55,8 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const {
     getAccount,
     getAccountRecords,
+    getLoanByAccountId,
+    getCreditCardByAccountId,
     updateAccount,
     archiveAccount,
     restoreAccount,
@@ -67,7 +69,27 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
+  const loan = getLoanByAccountId(accountId);
+  const creditCard = getCreditCardByAccountId(accountId);
   const isArchived = account?.status === "archived";
+
+  const identifierLabel =
+    account?.type === "current_account"
+      ? t("accounts.fields.accountNumber.label")
+      : account?.type === "loan"
+        ? t("accounts.fields.loanNumber.label")
+        : account?.type === "credit_card"
+          ? t("accounts.fields.cardNumber.label")
+          : null;
+
+  const identifierValue =
+    account?.type === "current_account"
+      ? account.accountNumberLast4
+      : account?.type === "loan"
+        ? loan?.loanNumberLast4
+        : account?.type === "credit_card"
+          ? creditCard?.cardNumberLast4
+          : null;
 
   async function handleArchiveConfirm() {
     if (!account) return;
@@ -173,6 +195,12 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               {isArchived ? t("accounts.status.archived") : t("common.active")}
             </span>
           </div>
+          {identifierLabel && identifierValue ? (
+            <div className="mt-3">
+              <p className="text-xs text-muted-foreground">{identifierLabel}</p>
+              <p className="text-sm font-medium tabular-nums">{identifierValue}</p>
+            </div>
+          ) : null}
         </div>
 
         <BalanceMetricCard

@@ -1,3 +1,4 @@
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import {
   parsePostingDayFromForm,
@@ -11,6 +12,7 @@ import {
   validateTierStructure,
 } from "@/lib/savings/tier-validation";
 import { parseAmount } from "@/lib/format/currency";
+import { validateIdentifierLast4Field } from "@/lib/field-editor/field-validators";
 import type { TranslationKey } from "@/lib/i18n";
 
 export type SavingsInterestModelForm = "fixed" | "tiered";
@@ -27,6 +29,7 @@ export type SavingsInterestDestinationForm = "same_account" | "another_account";
 export interface SavingsFormValues {
   name: string;
   institution: string;
+  accountNumber: string;
   balance: string;
   interestModel: SavingsInterestModelForm;
   annualInterestRate: string;
@@ -42,6 +45,7 @@ export interface SavingsFormValues {
 export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
   name: "",
   institution: "",
+  accountNumber: "",
   balance: "",
   interestModel: "fixed",
   annualInterestRate: "",
@@ -55,12 +59,13 @@ export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
 };
 
 export function savingsFormValuesFromAccount(
-  account: { name: string; institution: string | null },
+  account: { name: string; institution: string | null; accountNumberLast4?: string | null },
   savings: SavingsAccount,
 ): SavingsFormValues {
   return {
     name: account.name,
     institution: account.institution ?? "",
+    accountNumber: account.accountNumberLast4 ?? "",
     balance: "",
     interestModel: savings.interestModel,
     annualInterestRate:
@@ -102,6 +107,9 @@ export function validateSavingsForm(
   if (!values.name.trim()) {
     errors.name = t("accounts.validation.nameRequired");
   }
+
+  const identifierError = validateIdentifierLast4Field(values.accountNumber, t);
+  if (identifierError) errors.accountNumber = identifierError;
 
   if (mode === "create") {
     const parsedBalance = parseAmount(values.balance);
@@ -155,6 +163,7 @@ export function resolveSavingsFormForSubmit(
   return {
     name: values.name.trim(),
     institution: values.institution.trim() || null,
+    accountNumberLast4: parseOptionalIdentifierLast4(values.accountNumber),
     openingBalance:
       mode === "create" ? (parseAmount(values.balance) ?? 0) : undefined,
     interestModel: values.interestModel,

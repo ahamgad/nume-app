@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import {
   isMoneyAccountFormDirty,
   moneyAccountFormValuesFromAccount,
@@ -73,6 +74,12 @@ function EditAccountForm({
         institution:
           accountType === "cash" ? null : values.institution.trim() || null,
       };
+
+      if (accountType === "current_account") {
+        patch.accountNumberLast4 = parseOptionalIdentifierLast4(
+          values.accountNumber,
+        );
+      }
 
       await updateAccount(accountId, patch);
       showToast(t("accounts.edit.success"));

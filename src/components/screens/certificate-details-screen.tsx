@@ -264,6 +264,12 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             {t("certificates.details.summary")}
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
+            {certificate.certificateNumberLast4 ? (
+              <DetailRow
+                label={t("accounts.fields.certificateNumber.label")}
+                value={certificate.certificateNumberLast4}
+              />
+            ) : null}
             <DetailRow
               label={t("accounts.fields.annualRate.label")}
               value={`${certificate.annualInterestRate}%`}

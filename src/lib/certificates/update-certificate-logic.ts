@@ -13,6 +13,7 @@ const CERTIFICATE_ROW_FIELDS: Array<keyof UpdateCertificateInput> = [
   "destinationAccountId",
   "autoApply",
   "renewalType",
+  "certificateNumberLast4",
   "status",
 ];
 

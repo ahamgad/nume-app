@@ -44,6 +44,7 @@ export interface DbCertificate {
   renewal_processed_at: string | null;
   exclude_weekends: boolean;
   exclude_egyptian_holidays: boolean;
+  certificate_number_last4: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +72,7 @@ export function mapCertificate(row: DbCertificate): Certificate {
     renewalProcessedAt: row.renewal_processed_at,
     excludeWeekends: row.exclude_weekends,
     excludeEgyptianHolidays: row.exclude_egyptian_holidays,
+    certificateNumberLast4: row.certificate_number_last4,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

@@ -30,6 +30,7 @@ export interface Account {
   type: AccountType;
   name: string;
   institution: string | null;
+  accountNumberLast4: string | null;
   currentBalance: number;
   includeInNetWorth: boolean;
   includeInEmergencyFund: boolean;
@@ -55,6 +56,7 @@ export interface CreateAccountInput {
   type?: MoneyAccountType;
   name: string;
   institution?: string | null;
+  accountNumberLast4?: string | null;
   currentBalance: number;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;

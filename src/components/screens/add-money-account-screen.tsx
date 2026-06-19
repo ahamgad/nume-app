@@ -12,6 +12,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import type { MoneyAccountType } from "@/lib/finance/types";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 const EMPTY_VALUES: MoneyAccountFormValues = {
   name: "",
   institution: "",
+  accountNumber: "",
   balance: "",
 };
 
@@ -52,6 +54,7 @@ export function AddMoneyAccountScreen({
   const isDirty =
     values.name.trim().length > 0 ||
     values.institution.trim().length > 0 ||
+    values.accountNumber.trim().length > 0 ||
     values.balance.trim().length > 0;
 
   function clearFieldError(field: string) {
@@ -90,6 +93,10 @@ export function AddMoneyAccountScreen({
         name: values.name,
         institution:
           accountType === "cash" ? null : values.institution.trim() || null,
+        accountNumberLast4:
+          accountType === "current_account"
+            ? parseOptionalIdentifierLast4(values.accountNumber)
+            : null,
         currentBalance: parsedBalance,
       });
       showToast(t("common.accountCreated"));

@@ -1,4 +1,5 @@
 import type { PayoutFrequency, RenewalType } from "@/lib/certificates/types";
+import { validateIdentifierLast4Field } from "@/lib/field-editor/field-validators";
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import type { TranslationKey } from "@/lib/i18n";
 import { parseAmount } from "@/lib/format/currency";
@@ -13,6 +14,7 @@ export type CertificateTermPreset =
 export interface CertificateFormValues {
   name: string;
   institution: string;
+  certificateNumber: string;
   principalAmount: string;
   annualInterestRate: string;
   purchaseDate: string;
@@ -29,6 +31,7 @@ export interface CertificateFormValues {
 export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   name: "",
   institution: "",
+  certificateNumber: "",
   principalAmount: "",
   annualInterestRate: "",
   purchaseDate: todayIsoDate(),
@@ -68,6 +71,9 @@ export function validateCertificateForm(
   if (!values.name.trim()) {
     errors.name = t("certificates.validation.nameRequired");
   }
+
+  const identifierError = validateIdentifierLast4Field(values.certificateNumber, t);
+  if (identifierError) errors.certificateNumber = identifierError;
 
   const principal = parseAmount(values.principalAmount);
   if (principal === null) {
@@ -130,6 +136,7 @@ export function certificateFormValuesFromCertificate(
     destinationAccountId: string | null;
     autoApply: boolean;
     renewalType: RenewalType;
+    certificateNumberLast4: string | null;
   },
   account: { name: string; institution: string | null },
 ): CertificateFormValues {
@@ -142,6 +149,7 @@ export function certificateFormValuesFromCertificate(
   return {
     name: account.name,
     institution: account.institution ?? "",
+    certificateNumber: certificate.certificateNumberLast4 ?? "",
     principalAmount: String(certificate.principalAmount),
     annualInterestRate: String(certificate.annualInterestRate),
     purchaseDate: certificate.purchaseDate,
@@ -166,6 +174,7 @@ export function isCertificateFormDirty(
   return (
     values.name.trim() !== initial.name.trim() ||
     values.institution.trim() !== initial.institution.trim() ||
+    values.certificateNumber.trim() !== initial.certificateNumber.trim() ||
     values.principalAmount !== initial.principalAmount ||
     values.annualInterestRate !== initial.annualInterestRate ||
     values.purchaseDate !== initial.purchaseDate ||

@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { DateField } from "@/components/ui/date-field";
 import { EditableField } from "@/components/field-editor";
 import { FormSection } from "@/components/forms/form-section";
@@ -116,6 +117,17 @@ export function CertificateFormFields({
           value={values.institution}
           disabled={disabled}
           onChange={(institution) => onChange({ institution })}
+        />
+
+        <AccountIdentifierField
+          id="certificate-number"
+          labelKey="accounts.fields.certificateNumber.label"
+          placeholderKey="accounts.fields.certificateNumber.placeholder"
+          value={values.certificateNumber}
+          disabled={disabled}
+          error={errors.certificateNumber}
+          onChange={(certificateNumber) => onChange({ certificateNumber })}
+          onClearError={() => onClearError("certificateNumber")}
         />
 
         <EditableField

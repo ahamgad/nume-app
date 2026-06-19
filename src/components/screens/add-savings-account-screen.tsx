@@ -68,6 +68,7 @@ export function AddSavingsAccountScreen() {
       const savings = await createSavingsAccount({
         name: payload.name,
         institution: payload.institution,
+        accountNumberLast4: payload.accountNumberLast4,
         openingBalance: payload.openingBalance,
         interestModel: payload.interestModel,
         annualInterestRate: payload.annualInterestRate,
