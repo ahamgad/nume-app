@@ -188,6 +188,10 @@ export const ar = {
   accounts: {
     title: "الحسابات",
     addAccount: "إضافة حساب",
+    headerActions: {
+      addAccount: "إضافة حساب",
+      addRecord: "إضافة سجل",
+    },
     createAccount: "إنشاء حساب",
     creating: "جارٍ الإنشاء…",
     sections: {

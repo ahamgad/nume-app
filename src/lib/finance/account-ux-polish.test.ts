@@ -19,7 +19,7 @@ describe("RecentRecordsSection", () => {
     expect(source).not.toContain('"accounts.details.records.empty"');
   });
 
-  it("is used on account and certificate detail screens", () => {
+  it("is used on account detail screens but not certificates", () => {
     const accountDetails = fs.readFileSync(
       path.join(
         process.cwd(),
@@ -37,8 +37,7 @@ describe("RecentRecordsSection", () => {
 
     expect(accountDetails).toContain("RecentRecordsSection");
     expect(accountDetails).toContain("isArchived={isArchived}");
-    expect(certificateDetails).toContain("RecentRecordsSection");
-    expect(certificateDetails).toContain("isArchived={isArchived}");
+    expect(certificateDetails).not.toContain("RecentRecordsSection");
   });
 
   it("hides archived empty states via shared visibility helper", () => {

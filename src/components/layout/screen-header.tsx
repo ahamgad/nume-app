@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef } from "react";
 
@@ -35,6 +35,27 @@ export const SCREEN_HEADER_ICON_CLASS = "size-6";
 
 /** Trailing header action icons (e.g. Plus). */
 export const SCREEN_HEADER_ACTION_ICON_CLASS = "size-5";
+
+/** Trailing header text action with leading plus icon. */
+export function ScreenHeaderActionButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-11 max-w-[7.5rem] items-center justify-end gap-1 rounded-md px-1 text-sm font-medium text-foreground sm:max-w-none"
+      aria-label={label}
+    >
+      <Plus className={cn(SCREEN_HEADER_ACTION_ICON_CLASS, "shrink-0")} />
+      <span className="truncate">{label}</span>
+    </button>
+  );
+}
 
 /** Stack/tab header titles. */
 export const SCREEN_HEADER_TITLE_CLASS =
@@ -76,7 +97,7 @@ export function ScreenHeader({
         )}
         <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
         {rightAction ? (
-          <div className="flex size-11 shrink-0 items-center justify-center">
+          <div className="flex min-h-11 shrink-0 items-center justify-end">
             {rightAction}
           </div>
         ) : (

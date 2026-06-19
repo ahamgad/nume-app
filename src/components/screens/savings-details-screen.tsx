@@ -4,7 +4,6 @@ import {
   ArrowDownLeft,
   ArrowLeftRight,
   ArrowUpRight,
-  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -13,7 +12,7 @@ import { AccountHeaderMetadata } from "@/components/accounts/account-header-meta
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
-import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
+import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
@@ -166,14 +165,10 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         onBack={() => router.push("/accounts")}
         rightAction={
           !isArchived ? (
-            <button
-              type="button"
+            <ScreenHeaderActionButton
+              label={t("accounts.headerActions.addRecord")}
               onClick={() => router.push(`/accounts/${account.id}/records/new`)}
-              className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
-              aria-label={t("accounts.details.addRecord")}
-            >
-              <Plus className={SCREEN_HEADER_ACTION_ICON_CLASS} />
-            </button>
+            />
           ) : undefined
         }
       />

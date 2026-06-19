@@ -1,16 +1,10 @@
 "use client";
 
-import {
-  ArrowDownLeft,
-  ArrowLeftRight,
-  ArrowUpRight,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
-import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -24,10 +18,9 @@ import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator"
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromCertificate } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
+import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { FinanceRecord } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -46,19 +39,6 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function recordIcon(type: FinanceRecord["type"]) {
-  if (type === "income" || type === "interest") {
-    return <ArrowDownLeft className="size-4" />;
-  }
-  if (type === "expense") return <ArrowUpRight className="size-4" />;
-  return <ArrowLeftRight className="size-4" />;
-}
-
-function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
-  if (record.description) return record.description;
-  return t(`records.types.${record.type}`);
-}
-
 export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreenProps) {
   const t = useT();
   const formatLocale = useFormatLocale();
@@ -68,7 +48,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     getAccount,
     getCertificateByAccountId,
     getCertificateSchedules,
-    getAccountRecords,
     updateAccount,
     archiveCertificate,
     processCertificateInterest,
@@ -85,7 +64,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const account = getAccount(accountId);
   const certificate = getCertificateByAccountId(accountId);
   const schedules = certificate ? getCertificateSchedules(certificate.id) : [];
-  const records = getAccountRecords(accountId).slice(0, 5);
 
   const metrics = useMemo(() => {
     if (!certificate) return null;
@@ -200,14 +178,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     t,
   );
 
-  const supplementaryChips: TranslationKey[] = [];
-  if (certificate.autoApply) {
-    supplementaryChips.push("certificates.details.autoApplyActive");
-  }
-  if (certificate.renewalType !== "none") {
-    supplementaryChips.push("dashboard.certificates.autoRenewalIndicator");
-  }
-
   return (
     <>
       <ScreenHeader
@@ -220,7 +190,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromCertificate(certificate.status)}
-          supplementaryChips={supplementaryChips}
         />
 
         <WidgetCard>
@@ -300,20 +269,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             />
           </div>
         </section>
-
-        <RecentRecordsSection
-          records={records}
-          isArchived={isArchived}
-          formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) =>
-            formatSignedCurrency(record.amount, record.type, formatLocale)
-          }
-          recordMeta={(record) =>
-            formatDisplayDate(record.date, formatLocale)
-          }
-          recordIcon={(record) => recordIcon(record.type)}
-        />
 
         {!isArchived ? (
           <section>

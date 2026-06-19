@@ -187,6 +187,10 @@ export const en = {
   accounts: {
     title: "Accounts",
     addAccount: "Add account",
+    headerActions: {
+      addAccount: "Add Account",
+      addRecord: "Add Record",
+    },
     createAccount: "Create account",
     creating: "Creating…",
     sections: {

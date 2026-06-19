@@ -1,12 +1,12 @@
 "use client";
 
-import { Landmark, Plus } from "lucide-react";
+import { Landmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 
-import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
+import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Button } from "@/components/ui/button";
@@ -23,25 +23,6 @@ import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 type AccountsFilter = "active" | "archived";
-
-function AddAccountHeaderAction({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
-      aria-label={label}
-    >
-      <Plus className={SCREEN_HEADER_ACTION_ICON_CLASS} />
-    </button>
-  );
-}
 
 function AccountSection({
   title,
@@ -136,8 +117,8 @@ export function AccountsListScreen() {
   }, [filteredAccounts]);
 
   const addAccountAction = (
-    <AddAccountHeaderAction
-      label={t("accounts.addAccount")}
+    <ScreenHeaderActionButton
+      label={t("accounts.headerActions.addAccount")}
       onClick={() => setPickerOpen(true)}
     />
   );
