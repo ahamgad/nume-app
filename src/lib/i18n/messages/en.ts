@@ -188,8 +188,8 @@ export const en = {
     title: "Accounts",
     addAccount: "Add account",
     headerActions: {
-      addAccount: "Add Account",
-      addRecord: "Add Record",
+      addAccount: "Add account",
+      addRecord: "Add record",
     },
     createAccount: "Create account",
     creating: "Creating…",
@@ -219,8 +219,8 @@ export const en = {
       certificate: "Certificate",
       gold: "Gold",
       stocks: "Stocks",
-      loan: "Loans",
-      creditCard: "Credit",
+      loan: "Loan",
+      creditCard: "Credit card",
     },
     empty: {
       title: "Your accounts live here",
@@ -284,19 +284,19 @@ export const en = {
         label: "Current balance",
       },
       accountNumber: {
-        label: "Account Number",
+        label: "Account number",
         placeholder: "Enter the last 4 digits",
       },
       certificateNumber: {
-        label: "Certificate Number",
+        label: "Certificate number",
         placeholder: "Enter the last 4 digits",
       },
       loanNumber: {
-        label: "Loan Number",
+        label: "Loan number",
         placeholder: "Enter the last 4 digits",
       },
       cardNumber: {
-        label: "Card Number",
+        label: "Card number",
         placeholder: "Enter the last 4 digits",
       },
       annualRate: {

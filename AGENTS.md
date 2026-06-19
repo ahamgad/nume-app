@@ -18,5 +18,7 @@ Quick reference:
 
 Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard ownership.
 
+Read **`docs/CONTENT.md`** for English sentence-case and copy conventions.
+
 Do not create custom sheet implementations. Do not inline keyboard editing on form screens.
 <!-- END:foundation-rules -->
