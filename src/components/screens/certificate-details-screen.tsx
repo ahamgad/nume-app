@@ -8,21 +8,21 @@ import {
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
+import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
-import { AccountTypeBadge } from "@/components/ui/account-type-icon";
-import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
+import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { countDueEntries } from "@/lib/certificates/certificate-insights";
 import {
   computeCertificateMetrics,
   formatCertificateRemainingLabel,
 } from "@/lib/certificates/certificate-engine";
 import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
-import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
+import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { getAccountHeaderStatusFromCertificate } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
@@ -194,6 +194,20 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     certificate.id,
   );
 
+  const institutionSubtitle = formatAccountInstitutionSubtitle(
+    account.institution,
+    certificate.certificateNumberLast4,
+    t,
+  );
+
+  const supplementaryChips: TranslationKey[] = [];
+  if (certificate.autoApply) {
+    supplementaryChips.push("certificates.details.autoApplyActive");
+  }
+  if (certificate.renewalType !== "none") {
+    supplementaryChips.push("dashboard.certificates.autoRenewalIndicator");
+  }
+
   return (
     <>
       <ScreenHeader
@@ -202,29 +216,12 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         onBack={() => router.push("/accounts")}
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <div>
-          {account.institution ? (
-            <p className="text-[0.8125rem] text-muted-foreground">
-              {formatInstitutionEntityLabel(account.institution, t)}
-            </p>
-          ) : null}
-          <div className="mt-1 flex flex-wrap gap-2">
-            <AccountTypeBadge type={account.type} />
-            <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {t(statusKey)}
-            </span>
-            {certificate.autoApply ? (
-              <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-                {t("certificates.details.autoApplyActive")}
-              </span>
-            ) : null}
-            {certificate.renewalType !== "none" ? (
-              <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-                {t("dashboard.certificates.autoRenewalIndicator")}
-              </span>
-            ) : null}
-          </div>
-        </div>
+        <AccountHeaderMetadata
+          institutionSubtitle={institutionSubtitle}
+          accountType={account.type}
+          status={getAccountHeaderStatusFromCertificate(certificate.status)}
+          supplementaryChips={supplementaryChips}
+        />
 
         <WidgetCard>
           <MetricHero
@@ -264,12 +261,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             {t("certificates.details.summary")}
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
-            {certificate.certificateNumberLast4 ? (
-              <DetailRow
-                label={t("accounts.fields.certificateNumber.label")}
-                value={certificate.certificateNumberLast4}
-              />
-            ) : null}
             <DetailRow
               label={t("accounts.fields.annualRate.label")}
               value={`${certificate.annualInterestRate}%`}

@@ -9,16 +9,16 @@ import {
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
 import { ToggleSettingRow } from "@/components/patterns";
-import { AccountTypeBadge } from "@/components/ui/account-type-icon";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
-import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -152,6 +152,12 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     );
   }
 
+  const institutionSubtitle = formatAccountInstitutionSubtitle(
+    account.institution,
+    account.accountNumberLast4,
+    t,
+  );
+
   return (
     <>
       <ScreenHeader
@@ -172,16 +178,11 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <div>
-          {account.institution ? (
-            <p className="text-[0.8125rem] text-muted-foreground">
-              {formatInstitutionEntityLabel(account.institution, t)}
-            </p>
-          ) : null}
-          <div className="mt-1">
-            <AccountTypeBadge type={account.type} />
-          </div>
-        </div>
+        <AccountHeaderMetadata
+          institutionSubtitle={institutionSubtitle}
+          accountType={account.type}
+          status={getAccountHeaderStatusFromAccount(account)}
+        />
 
         <BalanceMetricCard
           account={account}
@@ -210,12 +211,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             {t("savings.details.summary")}
           </h2>
           <div className="divide-y divide-border rounded-lg border border-border px-4">
-            {account.accountNumberLast4 ? (
-              <DetailRow
-                label={t("accounts.fields.accountNumber.label")}
-                value={account.accountNumberLast4}
-              />
-            ) : null}
             <DetailRow
               label={t("savings.details.interestModel")}
               value={t(

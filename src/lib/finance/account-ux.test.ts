@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { formatAccountListSubtitle } from "@/lib/finance/account-display";
+import { formatAccountInstitutionSubtitle, formatAccountListSubtitle } from "@/lib/finance/account-display";
 import {
   isMoneyAccountFormDirty,
   moneyAccountFormValuesFromAccount,
@@ -50,6 +50,22 @@ describe("formatAccountListSubtitle", () => {
         t,
       ),
     ).toBe("Lucky · Wallet");
+  });
+});
+
+describe("formatAccountInstitutionSubtitle", () => {
+  it("appends identifier to institution when both exist", () => {
+    expect(
+      formatAccountInstitutionSubtitle("CIB", "1234", t),
+    ).toBe("CIB · 1234");
+  });
+
+  it("shows institution only when identifier is missing", () => {
+    expect(formatAccountInstitutionSubtitle("CIB", null, t)).toBe("CIB");
+  });
+
+  it("returns null when institution is missing", () => {
+    expect(formatAccountInstitutionSubtitle(null, "1234", t)).toBeNull();
   });
 });
 

@@ -11,6 +11,7 @@ import { useState } from "react";
 
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
+import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
@@ -18,10 +19,10 @@ import { ScreenBody, ScreenHeader, SCREEN_HEADER_ACTION_ICON_CLASS } from "@/com
 import {
   ToggleSettingRow,
 } from "@/components/patterns";
-import { AccountTypeBadge } from "@/components/ui/account-type-icon";
-import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { Button } from "@/components/ui/button";
-import { formatInstitutionEntityLabel } from "@/lib/institutions/catalog";
+import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
+import { formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -73,23 +74,19 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const creditCard = getCreditCardByAccountId(accountId);
   const isArchived = account?.status === "archived";
 
-  const identifierLabel =
-    account?.type === "current_account"
-      ? t("accounts.fields.accountNumber.label")
-      : account?.type === "loan"
-        ? t("accounts.fields.loanNumber.label")
-        : account?.type === "credit_card"
-          ? t("accounts.fields.cardNumber.label")
-          : null;
-
-  const identifierValue =
-    account?.type === "current_account"
-      ? account.accountNumberLast4
-      : account?.type === "loan"
-        ? loan?.loanNumberLast4
-        : account?.type === "credit_card"
-          ? creditCard?.cardNumberLast4
-          : null;
+  const institutionSubtitle = account
+    ? formatAccountInstitutionSubtitle(
+        account.institution,
+        account.type === "current_account"
+          ? account.accountNumberLast4
+          : account.type === "loan"
+            ? (loan?.loanNumberLast4 ?? null)
+            : account.type === "credit_card"
+              ? (creditCard?.cardNumberLast4 ?? null)
+              : null,
+        t,
+      )
+    : null;
 
   async function handleArchiveConfirm() {
     if (!account) return;
@@ -183,25 +180,11 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6">
-        <div>
-          {account.institution ? (
-            <p className="text-[0.8125rem] text-muted-foreground">
-              {formatInstitutionEntityLabel(account.institution, t)}
-            </p>
-          ) : null}
-          <div className="mt-1 flex flex-wrap gap-2">
-            <AccountTypeBadge type={account.type} />
-            <span className="rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {isArchived ? t("accounts.status.archived") : t("common.active")}
-            </span>
-          </div>
-          {identifierLabel && identifierValue ? (
-            <div className="mt-3">
-              <p className="text-xs text-muted-foreground">{identifierLabel}</p>
-              <p className="text-sm font-medium tabular-nums">{identifierValue}</p>
-            </div>
-          ) : null}
-        </div>
+        <AccountHeaderMetadata
+          institutionSubtitle={institutionSubtitle}
+          accountType={account.type}
+          status={getAccountHeaderStatusFromAccount(account)}
+        />
 
         <BalanceMetricCard
           account={account}

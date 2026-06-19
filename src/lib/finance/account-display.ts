@@ -8,6 +8,26 @@ import type { TranslationKey } from "@/lib/i18n";
 
 type AccountLabelTranslator = (key: TranslationKey, params?: Record<string, string>) => string;
 
+const INSTITUTION_IDENTIFIER_SEPARATOR = " · ";
+
+/** Institution subtitle on account details headers, optionally with last-4 identifier. */
+export function formatAccountInstitutionSubtitle(
+  institution: string | null | undefined,
+  identifierLast4: string | null | undefined,
+  t: AccountLabelTranslator,
+): string | null {
+  const institutionLabel = institution?.trim()
+    ? formatInstitutionEntityLabel(institution, t)
+    : null;
+  const identifier = identifierLast4?.trim() || null;
+
+  if (institutionLabel && identifier) {
+    return `${institutionLabel}${INSTITUTION_IDENTIFIER_SEPARATOR}${identifier}`;
+  }
+  if (institutionLabel) return institutionLabel;
+  return null;
+}
+
 /** Secondary line for accounts list rows (Active and Archived). */
 export function formatAccountListSubtitle(
   account: Pick<Account, "type" | "institution">,

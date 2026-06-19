@@ -281,19 +281,19 @@ export const ar = {
       },
       accountNumber: {
         label: "رقم الحساب",
-        placeholder: "أدخل آخر 4 أرقام من رقم حسابك",
+        placeholder: "أدخل آخر 4 أرقام",
       },
       certificateNumber: {
         label: "رقم الشهادة",
-        placeholder: "أدخل آخر 4 أرقام من رقم شهادتك",
+        placeholder: "أدخل آخر 4 أرقام",
       },
       loanNumber: {
         label: "رقم القرض",
-        placeholder: "أدخل آخر 4 أرقام من رقم قرضك",
+        placeholder: "أدخل آخر 4 أرقام",
       },
       cardNumber: {
         label: "رقم البطاقة",
-        placeholder: "أدخل آخر 4 أرقام من رقم بطاقتك",
+        placeholder: "أدخل آخر 4 أرقام",
       },
       annualRate: {
         label: "المعدل السنوي",

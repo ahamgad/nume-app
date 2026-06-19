@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { MetadataChip } from "@/components/accounts/metadata-chip";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import type { AccountType } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
@@ -48,14 +49,9 @@ interface AccountTypeBadgeProps {
 export function AccountTypeBadge({ type, className }: AccountTypeBadgeProps) {
   const t = useT();
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-sm bg-muted px-2 py-1 text-xs text-muted-foreground",
-        className,
-      )}
-    >
+    <MetadataChip className={className}>
       <AccountTypeIcon type={type} className="size-3" />
       {t(getAccountTypeLabelKey(type))}
-    </span>
+    </MetadataChip>
   );
 }

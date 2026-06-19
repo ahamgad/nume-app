@@ -281,19 +281,19 @@ export const en = {
       },
       accountNumber: {
         label: "Account Number",
-        placeholder: "Enter the last 4 digits of your account number",
+        placeholder: "Enter the last 4 digits",
       },
       certificateNumber: {
         label: "Certificate Number",
-        placeholder: "Enter the last 4 digits of your certificate number",
+        placeholder: "Enter the last 4 digits",
       },
       loanNumber: {
         label: "Loan Number",
-        placeholder: "Enter the last 4 digits of your loan number",
+        placeholder: "Enter the last 4 digits",
       },
       cardNumber: {
         label: "Card Number",
-        placeholder: "Enter the last 4 digits of your card number",
+        placeholder: "Enter the last 4 digits",
       },
       annualRate: {
         label: "Annual rate",
