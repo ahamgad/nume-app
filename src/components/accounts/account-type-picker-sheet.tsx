@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { prepareAccountsEphemeralUiForNavigation } from "@/lib/accounts/accounts-ephemeral-ui";
-import { markAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import {
   ACCOUNT_TYPE_GROUPS,
   getAccountTypeCreatePath,
@@ -32,7 +31,6 @@ export function AccountTypePickerSheet({
     const path = getAccountTypeCreatePath(
       type as Parameters<typeof getAccountTypeCreatePath>[0],
     );
-    markAccountTypePickerDismissed();
     prepareAccountsEphemeralUiForNavigation(onClose);
     router.push(path);
   }

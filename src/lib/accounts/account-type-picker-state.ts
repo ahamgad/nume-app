@@ -5,13 +5,17 @@ function getSessionStorage() {
   return globalThis.sessionStorage;
 }
 
+/** Marks picker as dismissed for one-shot bfcache/snapshot cleanup on return. */
 export function markAccountTypePickerDismissed() {
   getSessionStorage()?.setItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY, "1");
 }
 
-/** True while returning from a picker-driven create flow — suppresses sheet flash on bfcache restore. */
 export function shouldSuppressAccountTypePicker(): boolean {
   return getSessionStorage()?.getItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY) === "1";
+}
+
+export function clearAccountTypePickerDismissed() {
+  getSessionStorage()?.removeItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY);
 }
 
 export function consumeAccountTypePickerDismissed(): boolean {

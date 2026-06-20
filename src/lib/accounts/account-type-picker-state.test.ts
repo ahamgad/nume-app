@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
 
 import {
+  clearAccountTypePickerDismissed,
   consumeAccountTypePickerDismissed,
   markAccountTypePickerDismissed,
   shouldSuppressAccountTypePicker,
@@ -30,5 +31,11 @@ describe("account type picker state", () => {
     expect(consumeAccountTypePickerDismissed()).toBe(true);
     expect(shouldSuppressAccountTypePicker()).toBe(false);
     expect(consumeAccountTypePickerDismissed()).toBe(false);
+  });
+
+  it("clears dismissed flag without requiring consumption", () => {
+    markAccountTypePickerDismissed();
+    clearAccountTypePickerDismissed();
+    expect(shouldSuppressAccountTypePicker()).toBe(false);
   });
 });

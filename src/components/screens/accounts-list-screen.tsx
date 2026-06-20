@@ -23,7 +23,7 @@ import {
   resolveAccountsListFilter,
   type AccountsListFilter,
 } from "@/lib/accounts/accounts-list-filter";
-import { shouldSuppressAccountTypePicker } from "@/lib/accounts/account-type-picker-state";
+import { clearAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -79,11 +79,20 @@ export function AccountsListScreen() {
     setPickerOpen(false);
   }, []);
 
+  const openPicker = useCallback(() => {
+    clearAccountTypePickerDismissed();
+    setPickerOpen(true);
+  }, []);
+
   const filter = resolveAccountsListFilter(searchParams);
 
   useEffect(() => {
     persistAccountsListFilter(filter);
   }, [filter]);
+
+  useEffect(() => {
+    clearAccountTypePickerDismissed();
+  }, []);
 
   useAccountsEphemeralUiLifecycle(closePicker);
 
@@ -136,7 +145,7 @@ export function AccountsListScreen() {
   const addAccountAction = (
     <ScreenHeaderActionButton
       label={t("accounts.headerActions.addAccount")}
-      onClick={() => setPickerOpen(true)}
+      onClick={openPicker}
     />
   );
 
@@ -218,8 +227,8 @@ export function AccountsListScreen() {
         )}
       </ScreenBody>
       <AccountTypePickerSheet
-        open={pickerOpen && !shouldSuppressAccountTypePicker()}
-        onClose={() => setPickerOpen(false)}
+        open={pickerOpen}
+        onClose={closePicker}
       />
     </>
   );

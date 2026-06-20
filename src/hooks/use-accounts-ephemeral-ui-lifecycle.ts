@@ -3,10 +3,7 @@
 import { useEffect } from "react";
 
 import { restoreAccountsEphemeralUi } from "@/lib/accounts/accounts-ephemeral-ui";
-import {
-  consumeAccountTypePickerDismissed,
-  shouldSuppressAccountTypePicker,
-} from "@/lib/accounts/account-type-picker-state";
+import { consumeAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 
 /** Ensures picker/modal ephemeral state is cleared on pagehide and bfcache restore. */
 export function useAccountsEphemeralUiLifecycle(closePicker: () => void) {
@@ -16,9 +13,7 @@ export function useAccountsEphemeralUiLifecycle(closePicker: () => void) {
     }
 
     function handlePageShow(event: PageTransitionEvent) {
-      const fromHistorySnapshot =
-        event.persisted || shouldSuppressAccountTypePicker();
-      if (!fromHistorySnapshot) return;
+      if (!event.persisted) return;
       restoreAccountsEphemeralUi(closePicker);
       consumeAccountTypePickerDismissed();
     }
