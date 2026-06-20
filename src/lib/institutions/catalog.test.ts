@@ -17,7 +17,7 @@ const t = vi.fn((key: string) => {
     "institutions.banks.cib": "Commercial International Bank",
     "institutions.banks.banqueMisr": "Banque Misr",
     "institutions.banks.nbe": "National Bank of Egypt",
-    "institutions.banks.qnbAlahli": "QNB Al Ahli",
+    "institutions.banks.qnbAlahli": "Qatar National Bank",
   };
   return labels[key] ?? key;
 });
@@ -36,8 +36,11 @@ describe("formatInstitutionEntityLabel", () => {
     expect(formatInstitutionEntityLabel("Etisalat Cash", t)).toBe("e& money");
     expect(formatInstitutionEntityLabel("Shahry", t)).toBe("TRU");
     expect(formatInstitutionEntityLabel("MNT-Halan", t)).toBe("Halan");
-    expect(formatInstitutionEntityLabel("FAB", t)).toBe("FABMISR");
-    expect(formatInstitutionEntityLabel("KFH", t)).toBe("KFH Egypt");
+    expect(formatInstitutionEntityLabel("FAB", t)).toBe("FAB");
+    expect(formatInstitutionEntityLabel("KFH", t)).toBe("KFH");
+    expect(formatInstitutionEntityLabel("FABMISR", t)).toBe("FAB");
+    expect(formatInstitutionEntityLabel("QNB Alahli", t)).toBe("QNB");
+    expect(formatInstitutionEntityLabel("KFH Egypt", t)).toBe("KFH");
   });
 
   it("returns custom values unchanged", () => {
