@@ -358,9 +358,9 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     matchValues: ["Shahry", "TRU Finance", "Tru Finance", "Tru"],
   },
   {
-    id: "tabby",
-    shortName: "Tabby",
-    fullName: "Tabby",
+    id: "seven",
+    shortName: "Seven",
+    fullName: "Seven",
     category: "financial_service",
   },
   {

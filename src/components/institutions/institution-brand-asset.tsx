@@ -38,7 +38,8 @@ export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
   const assetPath = getInstitutionBrandAssetPath(institutionId);
   const initial = getInstitutionFallbackInitial(fallbackLabel);
   const isCached = assetPath ? isBrandAssetLoaded(assetPath) : false;
-  const useEagerLoad = size >= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE;
+  const useEagerLoad =
+    isCached || size >= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE;
   const imgRef = useRef<HTMLImageElement>(null);
 
   useLayoutEffect(() => {
@@ -66,7 +67,7 @@ export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
           width={size}
           height={size}
           loading={useEagerLoad ? "eager" : "lazy"}
-          decoding="async"
+          decoding={isCached ? "sync" : "async"}
           fetchPriority={useEagerLoad ? "high" : "auto"}
           onLoad={(event) => {
             markBrandAssetLoaded(assetPath);

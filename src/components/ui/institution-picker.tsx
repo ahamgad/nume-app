@@ -1,12 +1,14 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { preloadBrandAssets } from "@/lib/institutions/brand-asset-cache";
+import { getInstitutionBrandAssetPath } from "@/lib/institutions/brand-assets-registry";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterInstitutions,
@@ -57,6 +59,13 @@ export function InstitutionPicker({
     () => getInstitutionsForContext(accountType),
     [accountType],
   );
+
+  useEffect(() => {
+    const assetPaths = entries
+      .map((entry) => getInstitutionBrandAssetPath(entry.id))
+      .filter((path): path is string => path !== null);
+    preloadBrandAssets(assetPaths);
+  }, [entries]);
 
   const bankEntries = useMemo(
     () => entries.filter((entry) => entry.category === "bank"),

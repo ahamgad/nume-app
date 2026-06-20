@@ -433,7 +433,7 @@ export const en = {
       meeza: "Meeza",
       opay: "OPay",
       shahry: "TRU",
-      tabby: "Tabby",
+      seven: "Seven",
       tamara: "Tamara",
       thndr: "Thndr",
       klivvr: "Klivvr",

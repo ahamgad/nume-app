@@ -21,6 +21,36 @@ export function markBrandAssetLoaded(assetPath: string) {
   listeners.forEach((listener) => listener());
 }
 
+const preloadingBrandAssetPaths = new Set<string>();
+
+/** Warm the browser image cache for paths not yet loaded this session. */
+export function preloadBrandAsset(assetPath: string) {
+  if (
+    typeof window === "undefined" ||
+    loadedBrandAssetPaths.has(assetPath) ||
+    preloadingBrandAssetPaths.has(assetPath)
+  ) {
+    return;
+  }
+
+  preloadingBrandAssetPaths.add(assetPath);
+  const img = new Image();
+  img.onload = () => {
+    preloadingBrandAssetPaths.delete(assetPath);
+    markBrandAssetLoaded(assetPath);
+  };
+  img.onerror = () => {
+    preloadingBrandAssetPaths.delete(assetPath);
+  };
+  img.src = assetPath;
+}
+
+export function preloadBrandAssets(assetPaths: readonly string[]) {
+  for (const assetPath of assetPaths) {
+    preloadBrandAsset(assetPath);
+  }
+}
+
 export function getLoadedBrandAssetPaths(): readonly string[] {
   return loadedBrandAssetPathsSnapshot;
 }

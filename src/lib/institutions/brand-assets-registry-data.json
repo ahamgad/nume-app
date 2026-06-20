@@ -175,8 +175,8 @@
       "institutionId": "contact",
       "status": "available",
       "tier": "B",
-      "assetPath": "/institutions/contact.svg",
-      "assetFormat": "svg",
+      "assetPath": "/institutions/contact.png",
+      "assetFormat": "png",
       "isOfficial": true,
       "lastUpdated": "2026-06-20",
       "source": "https://contact.eg/"
@@ -185,8 +185,8 @@
       "institutionId": "credit_agricole",
       "status": "available",
       "tier": "C",
-      "assetPath": "/institutions/credit_agricole.svg",
-      "assetFormat": "svg",
+      "assetPath": "/institutions/credit_agricole.png",
+      "assetFormat": "png",
       "isOfficial": true,
       "lastUpdated": "2026-06-20",
       "source": "https://www.credit-agricole.com.eg/"
@@ -225,8 +225,8 @@
       "institutionId": "etisalat_cash",
       "status": "available",
       "tier": "B",
-      "assetPath": "/institutions/etisalat_cash.svg",
-      "assetFormat": "svg",
+      "assetPath": "/institutions/etisalat_cash.png",
+      "assetFormat": "png",
       "isOfficial": true,
       "lastUpdated": "2026-06-20",
       "source": "https://www.etisalat.ae/"
@@ -345,8 +345,8 @@
       "institutionId": "meeza",
       "status": "available",
       "tier": "C",
-      "assetPath": "/institutions/meeza.svg",
-      "assetFormat": "svg",
+      "assetPath": "/institutions/meeza.png",
+      "assetFormat": "png",
       "isOfficial": true,
       "lastUpdated": "2026-06-20",
       "source": "https://www.egyptianpayments.com/"
@@ -411,8 +411,8 @@
       "institutionId": "orange_cash",
       "status": "available",
       "tier": "B",
-      "assetPath": "/institutions/orange_cash.svg",
-      "assetFormat": "svg",
+      "assetPath": "/institutions/orange_cash.png",
+      "assetFormat": "png",
       "isOfficial": true,
       "lastUpdated": "2026-06-20",
       "source": "https://commons.wikimedia.org/wiki/File:Orange_logo.svg"
@@ -488,14 +488,14 @@
       "source": "https://apps.apple.com/eg/search?term=sympl%20%7C%20Save%20money.%20Pay%20later."
     },
     {
-      "institutionId": "tabby",
+      "institutionId": "seven",
       "status": "available",
       "tier": "A",
-      "assetPath": "/institutions/tabby.png",
+      "assetPath": "/institutions/seven.png",
       "assetFormat": "png",
       "isOfficial": true,
-      "lastUpdated": "2026-06-20",
-      "source": "https://apps.apple.com/eg/search?term=Tabby%3A%20Pay%20over%20time"
+      "lastUpdated": "2026-06-21",
+      "source": "https://apps.apple.com/eg/search?term=Seven"
     },
     {
       "institutionId": "tamara",

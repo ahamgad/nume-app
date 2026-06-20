@@ -58,7 +58,7 @@ describe("institution brand assets registry", () => {
 
     expect(new Set(paths).size).toBe(paths.length);
     expect(getInstitutionBrandAssetPath("cib")).toMatch(/\/institutions\/cib\.png$/);
-    expect(getInstitutionBrandAssetPath("contact")).toMatch(/\/institutions\/contact\.svg$/);
+    expect(getInstitutionBrandAssetPath("contact")).toMatch(/\/institutions\/contact\.png$/);
     expect(getInstitutionBrandAssetPath("mid_bank")).toBeNull();
     expect(getInstitutionBrandAssetPath("we_pay")).toBeNull();
     expect(getInstitutionBrandAssetPath("tamara")).toBeNull();
