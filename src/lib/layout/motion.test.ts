@@ -6,9 +6,8 @@ import {
   NUME_MOTION_EASE,
   NUME_MOTION_EASE_CLASS,
   NUME_OVERLAY_ENTER_CLASS,
+  NUME_SCREEN_ENTER_CLASS,
   numeMotionSafeScreenEnterClass,
-  numeScreenEnterClass,
-  shouldUseStackScreenTransition,
 } from "@/lib/layout/motion";
 
 describe("NUME motion tokens", () => {
@@ -26,32 +25,12 @@ describe("NUME motion tokens", () => {
     expect(NUME_BOTTOM_SHEET_ENTER_CLASS).toContain("slide-in-from-bottom-4");
     expect(NUME_BOTTOM_SHEET_ENTER_CLASS).toContain(NUME_MOTION_EASE_CLASS);
 
-    expect(numeScreenEnterClass(true)).toContain("slide-in-from-left-full");
-    expect(numeScreenEnterClass(false)).toContain("slide-in-from-right-full");
-    expect(numeScreenEnterClass(true)).toContain(NUME_MOTION_EASE_CLASS);
+    expect(NUME_SCREEN_ENTER_CLASS).toContain("fade-in-0");
+    expect(NUME_SCREEN_ENTER_CLASS).not.toContain("slide-in-from");
+    expect(NUME_SCREEN_ENTER_CLASS).toContain(NUME_MOTION_EASE_CLASS);
 
-    expect(numeMotionSafeScreenEnterClass(true)).toContain(
-      "slide-in-from-left-full",
-    );
+    expect(numeMotionSafeScreenEnterClass()).toContain("fade-in-0");
+    expect(numeMotionSafeScreenEnterClass()).not.toContain("slide-in-from");
     expect(NUME_MODAL_OVERLAY_ENTER_CLASS).toContain("fixed inset-0 z-50");
-  });
-
-  it("animates stack navigation but not tab-root switches", () => {
-    expect(
-      shouldUseStackScreenTransition("/accounts", "/accounts/abc", "forward"),
-    ).toBe(true);
-    expect(
-      shouldUseStackScreenTransition("/accounts/abc", "/accounts", "back"),
-    ).toBe(true);
-    expect(
-      shouldUseStackScreenTransition("/accounts", "/goals", "forward"),
-    ).toBe(false);
-    expect(shouldUseStackScreenTransition("/", "/more", "forward")).toBe(false);
-    expect(
-      shouldUseStackScreenTransition("/accounts/abc", "/goals", "forward"),
-    ).toBe(false);
-    expect(
-      shouldUseStackScreenTransition("/more/language", "/more", "back"),
-    ).toBe(true);
   });
 });
