@@ -161,7 +161,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     <>
       <ScreenHeader
         mode="stack"
-        title={account.name}
+        title={t("accounts.details.title")}
         onBack={() => router.push("/accounts")}
         rightAction={
           !isArchived ? (
@@ -174,6 +174,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
         <AccountHeaderMetadata
+          accountName={account.name}
           institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}

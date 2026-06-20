@@ -329,6 +329,7 @@ export const en = {
       },
     },
     details: {
+      title: "Account details",
       settingsTitle: "Settings",
       currentBalance: "Current balance",
       records: {

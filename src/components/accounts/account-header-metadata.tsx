@@ -74,6 +74,8 @@ export function SupplementaryMetadataChip({
 }
 
 export interface AccountHeaderMetadataProps {
+  /** Account display name — primary line in the header content block. */
+  accountName: string;
   /** Stored institution value — used for brand asset lookup. */
   institution?: string | null;
   institutionSubtitle?: string | null;
@@ -83,8 +85,9 @@ export interface AccountHeaderMetadataProps {
   className?: string;
 }
 
-/** Unified institution subtitle + metadata chips row for account details headers. */
+/** Institution + account name block and metadata chips for account details headers. */
 export function AccountHeaderMetadata({
+  accountName,
   institution,
   institutionSubtitle,
   accountType,
@@ -94,23 +97,30 @@ export function AccountHeaderMetadata({
 }: AccountHeaderMetadataProps) {
   const t = useT();
   const brandAsset = resolveInstitutionBrandAssetProps(institution, t);
+  const showInstitutionRow = Boolean(institutionSubtitle?.trim() && brandAsset);
 
   return (
-    <div className={cn("space-y-1", className)}>
-      {institutionSubtitle ? (
-        <div className="flex min-w-0 items-center gap-2">
-          {brandAsset ? (
-            <InstitutionBrandAsset
-              institutionId={brandAsset.institutionId}
-              fallbackLabel={brandAsset.fallbackLabel}
-              size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
-            />
+    <div className={cn("space-y-3", className)}>
+      <div className="flex min-w-0 gap-3">
+        {showInstitutionRow && brandAsset ? (
+          <InstitutionBrandAsset
+            institutionId={brandAsset.institutionId}
+            fallbackLabel={brandAsset.fallbackLabel}
+            size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
+            className="self-center"
+          />
+        ) : null}
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+          {showInstitutionRow ? (
+            <p className="truncate text-[0.8125rem] leading-snug text-muted-foreground tabular-nums">
+              {institutionSubtitle}
+            </p>
           ) : null}
-          <p className="min-w-0 truncate text-[0.8125rem] text-muted-foreground tabular-nums">
-            {institutionSubtitle}
+          <p className="truncate text-[1.0625rem] font-semibold leading-snug">
+            {accountName}
           </p>
         </div>
-      ) : null}
+      </div>
       <div className="flex flex-wrap gap-2">
         <AccountTypeMetadataChip type={accountType} />
         {status ? <AccountStatusMetadataChip status={status} /> : null}

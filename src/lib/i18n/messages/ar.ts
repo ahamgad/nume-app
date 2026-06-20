@@ -328,6 +328,7 @@ export const ar = {
       },
     },
     details: {
+      title: "تفاصيل الحساب",
       settingsTitle: "الإعدادات",
       currentBalance: "الرصيد الحالي",
       records: {

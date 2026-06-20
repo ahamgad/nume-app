@@ -8,6 +8,9 @@ export const INSTITUTION_BRAND_ASSET_PICKER_SIZE = 32;
 /** Account header and list row size (28×28). */
 export const INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE = 28;
 
+/** Shared corner radius for brand asset containers. */
+export const INSTITUTION_BRAND_ASSET_BORDER_RADIUS_PX = 8;
+
 interface InstitutionBrandAssetProps {
   institutionId: string;
   /** Consumer-facing label for fallback initial derivation. */
@@ -29,7 +32,7 @@ export function InstitutionBrandAsset({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 overflow-hidden rounded-[10px] bg-muted",
+        "inline-flex shrink-0 overflow-hidden rounded-[8px] bg-muted",
         className,
       )}
       style={{ width: size, height: size }}
