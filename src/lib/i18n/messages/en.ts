@@ -213,9 +213,11 @@ export const en = {
     },
     types: {
       currentAccount: "Current account",
+      currentAccountCard: "Current",
       cash: "Cash",
       wallet: "Wallet",
       savingsAccount: "Savings account",
+      savingsAccountCard: "Savings",
       certificate: "Certificate",
       gold: "Gold",
       stocks: "Stocks",

@@ -214,9 +214,11 @@ export const ar = {
     },
     types: {
       currentAccount: "حساب جاري",
+      currentAccountCard: "جاري",
       cash: "نقد",
       wallet: "محفظة",
       savingsAccount: "حساب توفير",
+      savingsAccountCard: "توفير",
       certificate: "شهادة",
       gold: "ذهب",
       stocks: "أسهم",

@@ -2,7 +2,7 @@
 
 import {
   InstitutionBrandAsset,
-  INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE,
+  INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE,
 } from "@/components/institutions/institution-brand-asset";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { MetadataChip } from "@/components/accounts/metadata-chip";
@@ -106,7 +106,7 @@ export function AccountHeaderMetadata({
           <InstitutionBrandAsset
             institutionId={brandAsset.institutionId}
             fallbackLabel={brandAsset.fallbackLabel}
-            size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
+            size={INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE}
             className="self-center"
           />
         ) : null}

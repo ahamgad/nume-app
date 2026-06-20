@@ -5,8 +5,11 @@ import { cn } from "@/lib/utils";
 /** Default picker row size (32×32). */
 export const INSTITUTION_BRAND_ASSET_PICKER_SIZE = 32;
 
-/** Account header and list row size (28×28). */
-export const INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE = 28;
+/** Account list row size — spans two text rows. */
+export const INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE = 36;
+
+/** Account details header — matches combined institution + name row height. */
+export const INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE = 40;
 
 /** Shared corner radius for brand asset containers. */
 export const INSTITUTION_BRAND_ASSET_BORDER_RADIUS_PX = 8;
@@ -53,7 +56,11 @@ export function InstitutionBrandAsset({
         <span
           className={cn(
             "flex size-full items-center justify-center font-semibold text-muted-foreground",
-            size <= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE ? "text-xs" : "text-sm",
+            size <= INSTITUTION_BRAND_ASSET_PICKER_SIZE
+              ? "text-xs"
+              : size <= INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE
+                ? "text-sm"
+                : "text-base",
           )}
         >
           {initial}
