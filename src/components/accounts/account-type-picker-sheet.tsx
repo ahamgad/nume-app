@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import { prepareAccountsEphemeralUiForNavigation } from "@/lib/accounts/accounts-ephemeral-ui";
+import { markAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import {
   ACCOUNT_TYPE_GROUPS,
   getAccountTypeCreatePath,
 } from "@/lib/finance/account-type-catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
-import { markAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export function AccountTypePickerSheet({
       type as Parameters<typeof getAccountTypeCreatePath>[0],
     );
     markAccountTypePickerDismissed();
+    prepareAccountsEphemeralUiForNavigation(onClose);
     router.push(path);
   }
 

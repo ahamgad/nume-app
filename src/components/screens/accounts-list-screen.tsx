@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 import { AccountCardRow } from "@/components/accounts/account-card-row";
+import { useAccountsEphemeralUiLifecycle } from "@/hooks/use-accounts-ephemeral-ui-lifecycle";
 
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState } from "@/components/patterns";
@@ -22,7 +23,7 @@ import {
   resolveAccountsListFilter,
   type AccountsListFilter,
 } from "@/lib/accounts/accounts-list-filter";
-import { consumeAccountTypePickerDismissed, shouldSuppressAccountTypePicker } from "@/lib/accounts/account-type-picker-state";
+import { shouldSuppressAccountTypePicker } from "@/lib/accounts/account-type-picker-state";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -74,27 +75,17 @@ export function AccountsListScreen() {
   const { accounts, isFinanceReady, refresh } = useFinance();
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  const closePicker = useCallback(() => {
+    setPickerOpen(false);
+  }, []);
+
   const filter = resolveAccountsListFilter(searchParams);
 
   useEffect(() => {
     persistAccountsListFilter(filter);
   }, [filter]);
 
-  useEffect(() => {
-    function handlePageShow(event: PageTransitionEvent) {
-      if (!event.persisted) return;
-      if (consumeAccountTypePickerDismissed()) {
-        setPickerOpen(false);
-      }
-    }
-
-    window.addEventListener("pageshow", handlePageShow);
-    return () => window.removeEventListener("pageshow", handlePageShow);
-  }, []);
-
-  useEffect(() => {
-    consumeAccountTypePickerDismissed();
-  }, []);
+  useAccountsEphemeralUiLifecycle(closePicker);
 
   const setFilter = useCallback(
     (next: AccountsListFilter) => {
