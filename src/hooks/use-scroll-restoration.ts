@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { type RefObject, useLayoutEffect, useRef } from "react";
 
 import {
@@ -18,12 +18,14 @@ export function useScrollRestoration(
   scrollRef: RefObject<HTMLElement | null>,
 ) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const scrollKeyRef = useRef("");
 
-  const scrollKey =
-    typeof window === "undefined"
-      ? buildScrollRestorationKey(pathname)
-      : buildScrollRestorationKey(pathname, window.location.search);
+  const search = searchParams.toString();
+  const scrollKey = buildScrollRestorationKey(
+    pathname,
+    search ? `?${search}` : "",
+  );
 
   useLayoutEffect(() => {
     scrollKeyRef.current = scrollKey;
