@@ -9,8 +9,8 @@ import { useIsNavigationDirty } from "@/providers/navigation-guard-provider";
 const EDGE_SWIPE_WIDTH_PX = 24;
 
 /**
- * Blocks iOS interactive edge swipe on tab roots and dirty screens.
- * Clean stack screens keep native swipe-back.
+ * Blocks iOS interactive edge swipe on tab roots, dirty screens, and
+ * stack screens that require explicit back navigation (e.g. Appearance).
  */
 export function NavigationEdgeGuard() {
   const pathname = usePathname();

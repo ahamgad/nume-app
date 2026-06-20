@@ -14,7 +14,6 @@ import {
 
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import {
-  isSwipeBackExemptPath,
   shouldRestoreTabRootAfterPopState,
 } from "@/lib/navigation/back-navigation-policy";
 
@@ -124,7 +123,7 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
       const dirty = readIsDirty(registrationsRef.current);
       const destinationPathname = window.location.pathname;
 
-      if (dirty && !isSwipeBackExemptPath(pathname)) {
+      if (dirty) {
         window.history.forward();
         pendingNavigateRef.current = () => router.back();
         setShowDiscard(true);

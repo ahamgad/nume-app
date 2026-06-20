@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  isSwipeBackExemptPath,
+  isSwipeBackDisabledStackPath,
   shouldBlockNavigationEdgeSwipe,
   shouldRestoreTabRootAfterPopState,
 } from "@/lib/navigation/back-navigation-policy";
@@ -48,10 +48,11 @@ describe("shouldBlockNavigationEdgeSwipe", () => {
     );
   });
 
-  it("keeps native swipe on theme selection even when dirty", () => {
-    expect(isSwipeBackExemptPath("/more/appearance")).toBe(true);
-    expect(shouldBlockNavigationEdgeSwipe("/more/appearance", true)).toBe(
-      false,
+  it("blocks swipe on appearance even when not dirty", () => {
+    expect(isSwipeBackDisabledStackPath("/more/appearance")).toBe(true);
+    expect(shouldBlockNavigationEdgeSwipe("/more/appearance", false)).toBe(
+      true,
     );
+    expect(shouldBlockNavigationEdgeSwipe("/more/appearance", true)).toBe(true);
   });
 });

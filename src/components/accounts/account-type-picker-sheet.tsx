@@ -10,6 +10,7 @@ import {
   getAccountTypeCreatePath,
 } from "@/lib/finance/account-type-catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
+import { markAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
@@ -27,8 +28,12 @@ export function AccountTypePickerSheet({
 
   function handleSelect(type: string, enabled: boolean) {
     if (!enabled) return;
-    onClose();
-    router.push(getAccountTypeCreatePath(type as Parameters<typeof getAccountTypeCreatePath>[0]));
+    const path = getAccountTypeCreatePath(
+      type as Parameters<typeof getAccountTypeCreatePath>[0],
+    );
+    markAccountTypePickerDismissed();
+    router.push(path);
+    queueMicrotask(onClose);
   }
 
   return (
