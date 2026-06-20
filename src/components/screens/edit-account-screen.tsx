@@ -7,9 +7,8 @@ import { MoneyAccountFormFields } from "@/components/accounts/money-account-form
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import {
   isMoneyAccountFormDirty,
@@ -47,11 +46,9 @@ function EditAccountForm({
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [showDiscard, setShowDiscard] = useState(false);
-
   const isDirty = isMoneyAccountFormDirty(values, initialValues, accountType);
 
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
+  const { handleBack } = useNavigationGuard(isDirty);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -93,19 +90,6 @@ function EditAccountForm({
     }
   }
 
-  function handleBack() {
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
-  }
-
-  function handleDiscardConfirm() {
-    setShowDiscard(false);
-    confirmDiscardNavigation(() => router.back());
-  }
-
   return (
     <>
       <ScreenHeader
@@ -140,12 +124,6 @@ function EditAccountForm({
           {submitting ? t("accounts.edit.saving") : t("accounts.edit.submit")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={handleDiscardConfirm}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

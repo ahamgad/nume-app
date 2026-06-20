@@ -11,14 +11,13 @@ import {
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
 import type { LendingAccountType } from "@/lib/lending/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -114,7 +113,6 @@ function EditLendingAccountForm({
   const [values, setValues] = useState(initialValues);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showDiscard, setShowDiscard] = useState(false);
 
   const isDirty = useMemo(
     () =>
@@ -166,16 +164,12 @@ function EditLendingAccountForm({
     }
   }
 
+  const { handleBack: guardBack } = useNavigationGuard(isDirty);
+
   function handleBack() {
     if (submitting) return;
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
+    guardBack();
   }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   return (
     <>
@@ -208,14 +202,6 @@ function EditLendingAccountForm({
           {submitting ? t("accounts.edit.saving") : t("accounts.edit.submit")}
         </Button>
       </StickyFooter>
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          confirmDiscardNavigation(() => router.back());
-        }}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

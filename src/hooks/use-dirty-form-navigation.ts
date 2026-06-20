@@ -1,17 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
+export {
+  NavigationGuardProvider,
+  useNavigationGuard,
+} from "@/providers/navigation-guard-provider";
 
 /**
- * Dirty form navigation (NUME platform — frozen before Gold).
+ * Dirty form navigation — delegates to the global NavigationGuardProvider.
  *
- * Edge swipe is disabled globally via NavigationEdgeGuard. Dirty forms rely on
- * the header back button to open the discard sheet, then router.back() on confirm.
+ * Screens declare `isDirty`; back button, swipe-back, and hardware back are
+ * handled centrally with the standard discard confirmation sheet.
  */
-export function useDirtyFormNavigation() {
-  const confirmDiscardNavigation = useCallback((navigateBack: () => void) => {
-    navigateBack();
-  }, []);
-
-  return { confirmDiscardNavigation };
-}
+export { useNavigationGuard as useDirtyFormNavigation } from "@/providers/navigation-guard-provider";

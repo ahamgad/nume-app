@@ -7,7 +7,6 @@ import { CertificateFormFields } from "@/components/certificates/certificate-for
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import {
   DEFAULT_CERTIFICATE_FORM_VALUES,
   resolveTermMonths,
@@ -21,7 +20,7 @@ import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -39,7 +38,6 @@ export function AddCertificateAccountScreen() {
   );
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showDiscard, setShowDiscard] = useState(false);
 
   const transferAccounts = useMemo(
     () => filterInterestDestinationAccounts(accounts),
@@ -110,16 +108,12 @@ export function AddCertificateAccountScreen() {
     }
   }
 
+  const { handleBack: guardBack } = useNavigationGuard(isDirty);
+
   function handleBack() {
     if (submitting) return;
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
+    guardBack();
   }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   return (
     <>
@@ -166,15 +160,6 @@ export function AddCertificateAccountScreen() {
             : t("certificates.create.submit")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          confirmDiscardNavigation(() => router.back());
-        }}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

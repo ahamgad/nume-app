@@ -7,8 +7,7 @@ import { RecordFormFields } from "@/components/records/record-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { parseAmount } from "@/lib/format/currency";
 import { todayIsoDate } from "@/lib/format/date";
 import { canSendTransfers } from "@/lib/finance/account-capabilities";
@@ -50,7 +49,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
   }));
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showDiscard, setShowDiscard] = useState(false);
 
   const isDirty =
     values.amount.trim().length > 0 ||
@@ -128,20 +126,7 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     }
   }
 
-  function handleBack() {
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
-  }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
-
-  function handleDiscardConfirm() {
-    setShowDiscard(false);
-    confirmDiscardNavigation(() => router.back());
-  }
+  const { handleBack } = useNavigationGuard(isDirty);
 
   const titleKey: TranslationKey =
     type === "adjustment"
@@ -198,12 +183,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
           {submitting ? t("records.add.saving") : t("records.add.save")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={handleDiscardConfirm}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

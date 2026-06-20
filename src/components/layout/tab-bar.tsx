@@ -7,10 +7,10 @@ import {
   Menu,
   Target,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useT } from "@/providers/i18n-provider";
+import { isTabRootPath } from "@/lib/navigation/tab-roots";
 import { isStackScreen } from "@/lib/layout/tab-bar-visibility";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +29,7 @@ function isTabActive(pathname: string, href: string) {
 
 export function TabBar() {
   const pathname = usePathname();
+  const router = useRouter();
   const t = useT();
 
   if (isStackScreen(pathname)) return null;
@@ -42,9 +43,15 @@ export function TabBar() {
         {tabs.map(({ href, labelKey, icon: Icon }) => {
           const active = isTabActive(pathname, href);
           return (
-            <Link
+            <button
               key={href}
-              href={href}
+              type="button"
+              onClick={() => {
+                if (pathname === href || (href !== "/" && pathname === href)) {
+                  return;
+                }
+                router.replace(href);
+              }}
               className={cn(
                 "inline-flex min-h-11 flex-col items-center justify-center gap-1 px-1 py-1 text-[0.6875rem] font-medium transition-colors",
                 active
@@ -56,7 +63,7 @@ export function TabBar() {
               <span className="max-w-full truncate leading-none">
                 {t(labelKey)}
               </span>
-            </Link>
+            </button>
           );
         })}
       </div>
@@ -64,10 +71,4 @@ export function TabBar() {
   );
 }
 
-export function isTabRootPath(pathname: string) {
-  return tabs.some(
-    (tab) =>
-      tab.href === pathname ||
-      (tab.href !== "/" && pathname === tab.href),
-  );
-}
+export { isTabRootPath };

@@ -7,10 +7,9 @@ import { CertificateFormFields } from "@/components/certificates/certificate-for
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import {
   certificateFormValuesFromCertificate,
   isCertificateFormDirty,
@@ -53,9 +52,9 @@ function EditCertificateForm({
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [showDiscard, setShowDiscard] = useState(false);
 
   const isDirty = isCertificateFormDirty(values, initialValues);
+  const { handleBack } = useNavigationGuard(isDirty);
 
   const transferAccounts = useMemo(() => {
     const eligible = filterInterestDestinationAccounts(accounts, {
@@ -128,21 +127,6 @@ function EditCertificateForm({
     }
   }
 
-  function handleBack() {
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
-  }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
-
-  function handleDiscardConfirm() {
-    setShowDiscard(false);
-    confirmDiscardNavigation(() => router.back());
-  }
-
   return (
     <>
       <ScreenHeader
@@ -177,12 +161,6 @@ function EditCertificateForm({
           {submitting ? t("certificates.edit.saving") : t("certificates.edit.submit")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={handleDiscardConfirm}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

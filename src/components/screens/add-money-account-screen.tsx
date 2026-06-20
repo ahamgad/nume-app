@@ -10,7 +10,6 @@ import {
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import type { MoneyAccountType } from "@/lib/finance/types";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
@@ -18,7 +17,7 @@ import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
@@ -49,8 +48,6 @@ export function AddMoneyAccountScreen({
   const [values, setValues] = useState<MoneyAccountFormValues>(EMPTY_VALUES);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showDiscard, setShowDiscard] = useState(false);
-
   const isDirty =
     values.name.trim().length > 0 ||
     values.institution.trim().length > 0 ||
@@ -110,16 +107,12 @@ export function AddMoneyAccountScreen({
     }
   }
 
+  const { handleBack: guardBack } = useNavigationGuard(isDirty);
+
   function handleBack() {
     if (submitting) return;
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
+    guardBack();
   }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   return (
     <>
@@ -174,15 +167,6 @@ export function AddMoneyAccountScreen({
               : t("accounts.createAccount")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          confirmDiscardNavigation(() => router.back());
-        }}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }

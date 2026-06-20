@@ -10,6 +10,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { ConnectivityProvider } from "@/providers/connectivity-provider";
 import { I18nProvider } from "@/providers/i18n-provider";
 import { LocaleFontProvider } from "@/providers/locale-font-provider";
+import { NavigationGuardProvider } from "@/providers/navigation-guard-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { ModalLayerProvider } from "@/providers/modal-layer-provider";
 import { FieldEditorProvider } from "@/providers/field-editor-provider";
@@ -29,8 +30,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
                   <ModalLayerProvider>
                     <FieldEditorProvider>
                       <FinanceProvider>
-                        <NavigationEdgeGuard />
-                        <AppBootstrap>{children}</AppBootstrap>
+                        <NavigationGuardProvider>
+                          <NavigationEdgeGuard />
+                          <AppBootstrap>{children}</AppBootstrap>
+                        </NavigationGuardProvider>
                       </FinanceProvider>
                     </FieldEditorProvider>
                   </ModalLayerProvider>

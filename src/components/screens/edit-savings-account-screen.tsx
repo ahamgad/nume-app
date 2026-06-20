@@ -7,9 +7,8 @@ import { SavingsFormFields } from "@/components/savings/savings-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { DiscardDialog } from "@/components/ui/discard-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDirtyFormNavigation } from "@/hooks/use-dirty-form-navigation";
+import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import {
   isSavingsFormDirty,
@@ -92,9 +91,9 @@ function EditSavingsAccountForm({
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [showDiscard, setShowDiscard] = useState(false);
 
   const isDirty = isSavingsFormDirty(values, initialValues);
+  const { handleBack: guardBack } = useNavigationGuard(isDirty);
 
   const transferAccounts = useMemo(() => {
     const eligible = filterInterestDestinationAccounts(accounts, {
@@ -155,14 +154,8 @@ function EditSavingsAccountForm({
 
   function handleBack() {
     if (submitting) return;
-    if (isDirty) {
-      setShowDiscard(true);
-      return;
-    }
-    router.back();
+    guardBack();
   }
-
-  const { confirmDiscardNavigation } = useDirtyFormNavigation();
 
   return (
     <>
@@ -204,15 +197,6 @@ function EditSavingsAccountForm({
           {submitting ? t("savings.edit.saving") : t("savings.edit.submit")}
         </Button>
       </StickyFooter>
-
-      <DiscardDialog
-        open={showDiscard}
-        onConfirm={() => {
-          setShowDiscard(false);
-          confirmDiscardNavigation(() => router.back());
-        }}
-        onCancel={() => setShowDiscard(false)}
-      />
     </>
   );
 }
