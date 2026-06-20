@@ -19,7 +19,7 @@ import {
   ScrollChipSelect,
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
-import { formatAccountListSubtitle } from "@/lib/finance/account-display";
+import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { useFinance } from "@/lib/finance/store";
@@ -58,17 +58,18 @@ function AccountSection({
           return (
           <div key={account.id}>
             <ListRow
-              primary={account.name}
+              primary={t(getAccountTypeLabelKey(account.type))}
+              secondary={account.name}
               leading={
                 brandAsset ? (
                   <InstitutionBrandAsset
                     institutionId={brandAsset.institutionId}
                     fallbackLabel={brandAsset.fallbackLabel}
                     size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
+                    className="self-center"
                   />
                 ) : undefined
               }
-              secondary={formatAccountListSubtitle(account, t)}
               trailing={
                 <ResponsiveCurrencyAmount
                   amount={account.currentBalance}
