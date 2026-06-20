@@ -4,6 +4,7 @@ import { Landmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 import { AccountCardRow } from "@/components/accounts/account-card-row";
 
@@ -11,7 +12,6 @@ import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components
 import { EmptyState } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   ScrollChipSelect,
   type ScrollChipOption,
@@ -119,8 +119,7 @@ export function AccountsListScreen() {
       <>
         <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
         <ScreenBody withTabBar onRefresh={refresh}>
-          <Skeleton className="mx-auto mt-10 h-8 w-48 rounded-md" />
-          <Skeleton className="mx-auto mt-4 h-16 w-full max-w-sm rounded-md" />
+          <AccountsListSkeleton />
         </ScreenBody>
       </>
     );
