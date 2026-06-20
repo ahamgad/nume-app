@@ -8,6 +8,7 @@ import { type ReactNode, useCallback, useRef } from "react";
 import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
+import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER } from "@/lib/layout/keyboard-snap-investigation";
 import {
   getScreenBodyScrollPadding,
@@ -137,6 +138,7 @@ export function ScreenBody({
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
 
+  useScrollRestoration(scrollRef);
   useFocusScrollIntoView(scrollRef, !isModalOpen, withStickyFooter);
 
   const tabBarVisible = withTabBar ?? isTabBarVisible(pathname);

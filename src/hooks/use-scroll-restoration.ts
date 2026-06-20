@@ -1,0 +1,42 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { type RefObject, useLayoutEffect, useRef } from "react";
+
+import {
+  buildScrollRestorationKey,
+  getScrollPosition,
+  setScrollPosition,
+} from "@/lib/navigation/scroll-restoration";
+
+/**
+ * Saves and restores `[data-app-scroll]` position across route remounts.
+ * Attach to ScreenBody scroll containers so tab switches and back navigation
+ * preserve list context.
+ */
+export function useScrollRestoration(
+  scrollRef: RefObject<HTMLElement | null>,
+) {
+  const pathname = usePathname();
+  const scrollKeyRef = useRef("");
+
+  const scrollKey =
+    typeof window === "undefined"
+      ? buildScrollRestorationKey(pathname)
+      : buildScrollRestorationKey(pathname, window.location.search);
+
+  useLayoutEffect(() => {
+    scrollKeyRef.current = scrollKey;
+    const node = scrollRef.current;
+    if (!node) return;
+
+    const saved = getScrollPosition(scrollKey);
+    if (saved !== undefined) {
+      node.scrollTop = saved;
+    }
+
+    return () => {
+      setScrollPosition(scrollKeyRef.current, node.scrollTop);
+    };
+  }, [scrollKey, scrollRef]);
+}

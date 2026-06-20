@@ -33,7 +33,6 @@ export function AccountTypePickerSheet({
     );
     markAccountTypePickerDismissed();
     router.push(path);
-    queueMicrotask(onClose);
   }
 
   return (

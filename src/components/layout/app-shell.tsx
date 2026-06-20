@@ -2,6 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 
+import { InstitutionBrandAssetPool } from "@/components/institutions/institution-brand-asset-pool";
 import { TabBar } from "@/components/layout/tab-bar";
 import { ToastViewport } from "@/components/ui/toast-viewport";
 import { useDocumentScrollGuard } from "@/hooks/use-document-scroll-guard";
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {children}
       </div>
+      <InstitutionBrandAssetPool />
       <TabBar />
       <ToastViewport />
     </div>

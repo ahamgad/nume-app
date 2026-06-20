@@ -1,5 +1,9 @@
-import { memo } from "react";
+import { memo, useLayoutEffect, useRef } from "react";
 
+import {
+  isBrandAssetLoaded,
+  markBrandAssetLoaded,
+} from "@/lib/institutions/brand-asset-cache";
 import { getInstitutionBrandAssetPath } from "@/lib/institutions/brand-assets-registry";
 import { getInstitutionFallbackInitial } from "@/lib/institutions/logo-fallback";
 import { cn } from "@/lib/utils";
@@ -15,8 +19,6 @@ export const INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE = 40;
 
 /** Shared corner radius for brand asset containers. */
 export const INSTITUTION_BRAND_ASSET_BORDER_RADIUS_PX = 8;
-
-const loadedBrandAssetPaths = new Set<string>();
 
 interface InstitutionBrandAssetProps {
   institutionId: string;
@@ -35,8 +37,16 @@ export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
 }: InstitutionBrandAssetProps) {
   const assetPath = getInstitutionBrandAssetPath(institutionId);
   const initial = getInstitutionFallbackInitial(fallbackLabel);
-  const isCached = assetPath ? loadedBrandAssetPaths.has(assetPath) : false;
+  const isCached = assetPath ? isBrandAssetLoaded(assetPath) : false;
   const useEagerLoad = size >= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE;
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    const img = imgRef.current;
+    if (!img || !assetPath || !img.complete) return;
+    markBrandAssetLoaded(assetPath);
+    img.style.opacity = "1";
+  }, [assetPath]);
 
   return (
     <span
@@ -50,6 +60,7 @@ export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
       {assetPath ? (
         // eslint-disable-next-line @next/next/no-img-element -- small static registry assets; native img avoids list scroll overhead.
         <img
+          ref={imgRef}
           src={assetPath}
           alt=""
           width={size}
@@ -58,12 +69,12 @@ export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
           decoding="async"
           fetchPriority={useEagerLoad ? "high" : "auto"}
           onLoad={(event) => {
-            loadedBrandAssetPaths.add(assetPath);
+            markBrandAssetLoaded(assetPath);
             event.currentTarget.style.opacity = "1";
           }}
           className={cn(
-            "size-full object-cover object-center transition-opacity duration-150",
-            isCached ? "opacity-100" : "opacity-0",
+            "size-full object-cover object-center",
+            isCached ? "opacity-100" : "opacity-0 transition-opacity duration-150",
           )}
         />
       ) : (

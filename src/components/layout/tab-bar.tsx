@@ -61,7 +61,7 @@ export function TabBar() {
                 ) {
                   return;
                 }
-                router.replace(targetHref);
+                router.replace(targetHref, { scroll: false });
               }}
               className={cn(
                 "inline-flex min-h-11 flex-col items-center justify-center gap-1 px-1 py-1 text-[0.6875rem] font-medium transition-colors",
