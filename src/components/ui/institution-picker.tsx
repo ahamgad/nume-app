@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
@@ -274,14 +275,20 @@ function InstitutionSection({
             aria-selected={selectedId === entry.id}
             onClick={() => onSelect(entry)}
             className={cn(
-              "flex min-h-11 w-full flex-col justify-center rounded-md px-3 py-2 text-start transition-colors",
+              "flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-start transition-colors",
               selectedId === entry.id
                 ? "bg-muted"
                 : "hover:bg-muted/60",
             )}
           >
-            <span className="text-[0.9375rem] font-medium">{shortcut}</span>
-            <span className="text-sm text-muted-foreground">{fullName}</span>
+            <InstitutionBrandAsset
+              institutionId={entry.id}
+              fallbackLabel={shortcut}
+            />
+            <span className="flex min-w-0 flex-1 flex-col justify-center">
+              <span className="text-[0.9375rem] font-medium">{shortcut}</span>
+              <span className="text-sm text-muted-foreground">{fullName}</span>
+            </span>
           </button>
         );
         })}

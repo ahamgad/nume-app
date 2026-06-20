@@ -55,4 +55,44 @@ describe("institution registry", () => {
     expect(banqueMisr?.shortName).toBe("Banque Misr");
     expect(banqueMisr?.fullName).toBe("Banque Misr");
   });
+
+  it("uses current consumer-facing brand names", () => {
+    const byId = (id: string) =>
+      INSTITUTION_REGISTRY.find((entry) => entry.id === id);
+
+    expect(byId("fab")).toMatchObject({
+      shortName: "FABMISR",
+      fullName: "FABMISR",
+    });
+    expect(byId("kfh")).toMatchObject({
+      shortName: "KFH Egypt",
+      fullName: "KFH Egypt",
+    });
+    expect(byId("etisalat_cash")).toMatchObject({
+      shortName: "e& money",
+      fullName: "e& money",
+    });
+    expect(byId("mnt_halan")).toMatchObject({
+      shortName: "Halan",
+      fullName: "Halan",
+    });
+    expect(byId("shahry")).toMatchObject({
+      shortName: "TRU",
+      fullName: "TRU",
+    });
+  });
+
+  it("keeps legacy brand names in matchValues", () => {
+    const byId = (id: string) =>
+      INSTITUTION_REGISTRY.find((entry) => entry.id === id);
+
+    expect(byId("etisalat_cash")?.matchValues).toContain("Etisalat Cash");
+    expect(byId("kfh")?.matchValues).toContain("Ahli United Bank");
+    expect(byId("fab")?.matchValues).toContain("FAB");
+    expect(byId("shahry")?.matchValues).toContain("Shahry");
+    expect(byId("mnt_halan")?.matchValues).toContain("MNT-Halan");
+    expect(byId("saib")?.matchValues).toContain(
+      "Société Arabe Internationale de Banque",
+    );
+  });
 });

@@ -1,0 +1,563 @@
+{
+  "generatedAt": "2026-06-20",
+  "entries": [
+    {
+      "institutionId": "aaib",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/aaib.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=AAIB%20Mobile"
+    },
+    {
+      "institutionId": "abe",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/abe.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Agri-Wallet"
+    },
+    {
+      "institutionId": "abk",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/abk.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=ABK-Egypt"
+    },
+    {
+      "institutionId": "adcb",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/adcb.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=ADCB-Egypt%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "adib",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/adib.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=ADIB%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "aib",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/aib.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=AIB%20Mobile%20App"
+    },
+    {
+      "institutionId": "al_baraka",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/al_baraka.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=alBaraka%20Bank%20Mobile"
+    },
+    {
+      "institutionId": "alexbank",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/alexbank.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=ALEXBANK%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "aman",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/aman.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=AMAN%20-%20%D8%A3%D9%85%D9%80%D9%80%D8%A7%D9%86"
+    },
+    {
+      "institutionId": "arab_bank",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/arab_bank.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Arabi-Mobile"
+    },
+    {
+      "institutionId": "attijariwafa",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/attijariwafa.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Attijari%20Mobile%20Egypt"
+    },
+    {
+      "institutionId": "bank_abc",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/bank_abc.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=ABC%20Egypt%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "bank_nxt",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/bank_nxt.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Bank%20NXT%20Mobile"
+    },
+    {
+      "institutionId": "banque_du_caire",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/banque_du_caire.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=BDC%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "banque_misr",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/banque_misr.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=BM%20Online"
+    },
+    {
+      "institutionId": "bokra",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/bokra.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Bokra"
+    },
+    {
+      "institutionId": "cib",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/cib.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=CIB%20Mobile%20Banking%20App"
+    },
+    {
+      "institutionId": "contact",
+      "status": "available",
+      "tier": "B",
+      "assetPath": "/institutions/contact.svg",
+      "assetFormat": "svg",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://contact.eg/"
+    },
+    {
+      "institutionId": "credit_agricole",
+      "status": "available",
+      "tier": "C",
+      "assetPath": "/institutions/credit_agricole.svg",
+      "assetFormat": "svg",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://www.credit-agricole.com.eg/"
+    },
+    {
+      "institutionId": "edbe",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/edbe.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=EBank%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "egbank",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/egbank.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=EGBank%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "emirates_nbd",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/emirates_nbd.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Emirates%20NBD%20Egypt"
+    },
+    {
+      "institutionId": "etisalat_cash",
+      "status": "available",
+      "tier": "B",
+      "assetPath": "/institutions/etisalat_cash.svg",
+      "assetFormat": "svg",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://www.etisalat.ae/"
+    },
+    {
+      "institutionId": "fab",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/fab.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=FABMISR%20Mobile"
+    },
+    {
+      "institutionId": "faisal_islamic",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/faisal_islamic.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=FIBE%20ONLINE"
+    },
+    {
+      "institutionId": "fawry",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/fawry.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=myfawry"
+    },
+    {
+      "institutionId": "hdb",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/hdb.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=HDB%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "hsbc",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/hsbc.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=HSBC%20EG"
+    },
+    {
+      "institutionId": "instapay",
+      "status": "available",
+      "tier": "B",
+      "assetPath": "/institutions/instapay.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://www.instapay.eg/"
+    },
+    {
+      "institutionId": "kfh",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/kfh.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=KFH%20Egypt%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "khazna",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/khazna.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Khazna"
+    },
+    {
+      "institutionId": "klivvr",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/klivvr.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Klivvr"
+    },
+    {
+      "institutionId": "lucky",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/lucky.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Lucky%20App"
+    },
+    {
+      "institutionId": "mashreq",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/mashreq.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Mashreq%20Egypt"
+    },
+    {
+      "institutionId": "meeza",
+      "status": "available",
+      "tier": "C",
+      "assetPath": "/institutions/meeza.svg",
+      "assetFormat": "svg",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://www.egyptianpayments.com/"
+    },
+    {
+      "institutionId": "mid_bank",
+      "status": "fallback",
+      "tier": "D",
+      "assetPath": null
+    },
+    {
+      "institutionId": "mnt_halan",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/mnt_halan.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Halan%3A%20Lending%2C%20BNPL%2C%20Payments"
+    },
+    {
+      "institutionId": "money_fellows",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/money_fellows.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Money%20Fellows%3A%20Online%20Circles"
+    },
+    {
+      "institutionId": "nbe",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/nbe.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=NBE%20Mobile"
+    },
+    {
+      "institutionId": "nbk",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/nbk.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=NBK%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "opay",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/opay.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=OPay%20%7C%20Recharge%20and%20Pay%20Bills"
+    },
+    {
+      "institutionId": "orange_cash",
+      "status": "available",
+      "tier": "B",
+      "assetPath": "/institutions/orange_cash.svg",
+      "assetFormat": "svg",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://commons.wikimedia.org/wiki/File:Orange_logo.svg"
+    },
+    {
+      "institutionId": "paymob",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/paymob.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Paymob"
+    },
+    {
+      "institutionId": "qnb_alahli",
+      "status": "available",
+      "tier": "B",
+      "assetPath": "/institutions/qnb_alahli.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://www.qnb.com.eg/ (QNB arrow mark, cropped)"
+    },
+    {
+      "institutionId": "saib",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/saib.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=SAIB%20Mobile"
+    },
+    {
+      "institutionId": "shahry",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/shahry.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=TRU"
+    },
+    {
+      "institutionId": "souhoola",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/souhoola.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Souhoola%20-%20%D8%B3%D9%87%D9%88%D9%84%D8%A9"
+    },
+    {
+      "institutionId": "suez_canal",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/suez_canal.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=SCB%20Mobile%E2%80%8E"
+    },
+    {
+      "institutionId": "sympl",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/sympl.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=sympl%20%7C%20Save%20money.%20Pay%20later."
+    },
+    {
+      "institutionId": "tabby",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/tabby.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Tabby%3A%20Pay%20over%20time"
+    },
+    {
+      "institutionId": "tamara",
+      "status": "fallback",
+      "tier": "D",
+      "assetPath": null
+    },
+    {
+      "institutionId": "telda",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/telda.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Telda"
+    },
+    {
+      "institutionId": "thndr",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/thndr.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Thndr%3A%20Invest%20Your%20Money"
+    },
+    {
+      "institutionId": "united_bank",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/united_bank.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=UB%20Mobile%20Banking"
+    },
+    {
+      "institutionId": "valu",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/valu.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Valu"
+    },
+    {
+      "institutionId": "vodafone_cash",
+      "status": "available",
+      "tier": "A",
+      "assetPath": "/institutions/vodafone_cash.png",
+      "assetFormat": "png",
+      "isOfficial": true,
+      "lastUpdated": "2026-06-20",
+      "source": "https://apps.apple.com/eg/search?term=Ana%20Vodafone"
+    },
+    {
+      "institutionId": "we_pay",
+      "status": "fallback",
+      "tier": "D",
+      "assetPath": null
+    }
+  ]
+}

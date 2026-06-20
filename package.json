@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "icons:generate": "node scripts/generate-pwa-icons.mjs",
-    "logos:collect": "node scripts/collect-institution-logos.mjs && node scripts/generate-logo-registry.mjs"
+    "brand-assets:collect": "node scripts/collect-institution-brand-assets.mjs && node scripts/generate-brand-assets-registry.mjs",
+    "logos:collect": "npm run brand-assets:collect"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

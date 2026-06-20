@@ -50,6 +50,7 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     shortName: "AlexBank",
     fullName: "Bank of Alexandria",
     category: "bank",
+    matchValues: ["Alex Bank", "Bank of Alexandria Egypt"],
   },
   {
     id: "credit_agricole",
@@ -67,10 +68,16 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   },
   {
     id: "fab",
-    shortName: "FAB",
-    fullName: "First Abu Dhabi Bank – Misr",
+    shortName: "FABMISR",
+    fullName: "FABMISR",
     category: "bank",
-    matchValues: ["First Abu Dhabi Bank"],
+    matchValues: [
+      "FAB",
+      "FAB Misr",
+      "First Abu Dhabi Bank – Misr",
+      "First Abu Dhabi Bank Egypt",
+      "Bank Audi Egypt",
+    ],
   },
   {
     id: "adcb",
@@ -96,8 +103,9 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   {
     id: "saib",
     shortName: "SAIB",
-    fullName: "Société Arabe Internationale de Banque",
+    fullName: "SAIB Bank",
     category: "bank",
+    matchValues: ["saib", "Société Arabe Internationale de Banque"],
   },
   {
     id: "egbank",
@@ -155,8 +163,9 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   {
     id: "united_bank",
     shortName: "United Bank",
-    fullName: "The United Bank",
+    fullName: "United Bank",
     category: "bank",
+    matchValues: ["The United Bank"],
   },
   {
     id: "attijariwafa",
@@ -174,10 +183,16 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   },
   {
     id: "kfh",
-    shortName: "KFH",
-    fullName: "Kuwait Finance House Egypt",
+    shortName: "KFH Egypt",
+    fullName: "KFH Egypt",
     category: "bank",
-    matchValues: ["Ahli United Bank", "Kuwait Finance House"],
+    matchValues: [
+      "KFH",
+      "Kuwait Finance House Egypt",
+      "Ahli United Bank",
+      "Ahli United Bank Egypt",
+      "Kuwait Finance House",
+    ],
   },
   {
     id: "abk",
@@ -235,23 +250,24 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   },
   {
     id: "etisalat_cash",
-    shortName: "Etisalat Cash",
-    fullName: "Etisalat Cash",
+    shortName: "e& money",
+    fullName: "e& money",
     category: "financial_service",
+    matchValues: ["Etisalat Cash", "e& Money", "eand money", "e and money"],
   },
   {
     id: "we_pay",
     shortName: "WE Pay",
     fullName: "WE Pay",
     category: "financial_service",
-    matchValues: ["WE Pay Wallet"],
+    matchValues: ["WE Pay Wallet", "WE", "Telecom Egypt"],
   },
   {
     id: "instapay",
     shortName: "InstaPay",
     fullName: "InstaPay",
     category: "financial_service",
-    matchValues: ["Insta Pay"],
+    matchValues: ["Insta Pay", "InstaPay Egypt"],
   },
   {
     id: "fawry",
@@ -301,6 +317,7 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     shortName: "Lucky",
     fullName: "Lucky",
     category: "financial_service",
+    matchValues: ["Lucky ONE", "Lucky One", "Lucky App"],
   },
   {
     id: "sympl",
@@ -335,9 +352,10 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   },
   {
     id: "shahry",
-    shortName: "Shahry",
-    fullName: "Shahry",
+    shortName: "TRU",
+    fullName: "TRU",
     category: "financial_service",
+    matchValues: ["Shahry", "TRU Finance", "Tru Finance", "Tru"],
   },
   {
     id: "tabby",
@@ -372,10 +390,10 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
   },
   {
     id: "mnt_halan",
-    shortName: "MNT-Halan",
-    fullName: "MNT-Halan",
+    shortName: "Halan",
+    fullName: "Halan",
     category: "financial_service",
-    matchValues: ["Halan", "MNT Halan"],
+    matchValues: ["MNT-Halan", "MNT Halan"],
   },
 ] as const;
 

@@ -1,14 +1,12 @@
-export type InstitutionLogoStatus = "available" | "fallback";
+export type {
+  InstitutionBrandAssetEntry,
+  InstitutionBrandAssetFormat,
+  InstitutionBrandAssetStatus,
+  InstitutionBrandAssetTier,
+} from "@/lib/institutions/brand-assets-registry-types";
 
-/**
- * Institution logo record — maps registry IDs to static assets.
- * Optional metadata (isOfficial, lastUpdated) reserved for future use.
- */
-export interface InstitutionLogoEntry {
-  readonly institutionId: string;
-  readonly status: InstitutionLogoStatus;
-  /** Public path when status is `available`; null for fallback. */
-  readonly logoPath: string | null;
-  readonly isOfficial?: boolean;
-  readonly lastUpdated?: string;
-}
+/** @deprecated Use InstitutionBrandAssetEntry */
+export type { InstitutionBrandAssetEntry as InstitutionLogoEntry } from "@/lib/institutions/brand-assets-registry-types";
+
+/** @deprecated Use InstitutionBrandAssetStatus */
+export type { InstitutionBrandAssetStatus as InstitutionLogoStatus } from "@/lib/institutions/brand-assets-registry-types";
