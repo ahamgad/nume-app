@@ -8,6 +8,7 @@ import {
   CONFIRMATION_SHEET_PANEL_CLASS,
   BottomSheetDragHandle,
 } from "@/components/ui/bottom-sheet-chrome";
+import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { useT } from "@/providers/i18n-provider";
 import { useModalLayerLock } from "@/providers/modal-layer-provider";
 import { cn } from "@/lib/utils";
@@ -44,7 +45,7 @@ export function ConfirmationBottomSheet({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 animate-in fade-in-0 duration-200",
+        NUME_MODAL_OVERLAY_ENTER_CLASS,
         BOTTOM_SHEET_BACKDROP_CLASS,
         className,
       )}

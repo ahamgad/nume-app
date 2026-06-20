@@ -16,8 +16,7 @@ export const BOTTOM_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
 export const CONFIRMATION_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
 
 /** Opening animation aligned across sheet types. */
-export const BOTTOM_SHEET_ENTER_CLASS =
-  "animate-in fade-in-0 slide-in-from-bottom-4 duration-200 ease-out";
+export { NUME_BOTTOM_SHEET_ENTER_CLASS as BOTTOM_SHEET_ENTER_CLASS } from "@/lib/layout/motion";
 
 export function BottomSheetDragHandle({
   className,

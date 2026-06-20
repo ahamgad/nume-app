@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Tran
 
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useConnectivity } from "@/providers/connectivity-provider";
+import { NUME_MOTION_EASE } from "@/lib/layout/motion";
 
 /** Visual offset required to trigger refresh after release. */
 const PULL_THRESHOLD = 56;
@@ -246,7 +247,7 @@ export function usePullToRefresh(onRefresh?: () => Promise<void>) {
       ? {
           transform: `translate3d(0, ${activeOffset}px, 0)`,
           transition: activeAnimating
-            ? `transform ${SNAP_BACK_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+            ? `transform ${SNAP_BACK_MS}ms ${NUME_MOTION_EASE}`
             : undefined,
         }
       : {};

@@ -13,6 +13,7 @@ import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
 } from "@/components/ui/bottom-sheet-chrome";
+import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { IMMERSIVE_SHEET_HEIGHT } from "@/lib/layout/immersive-sheet";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
@@ -59,7 +60,7 @@ export function ImmersiveBottomSheet({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 animate-in fade-in-0 duration-200",
+        NUME_MODAL_OVERLAY_ENTER_CLASS,
         BOTTOM_SHEET_BACKDROP_CLASS,
       )}
     >

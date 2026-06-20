@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
+import { numeMotionSafeScreenEnterClass } from "@/lib/layout/motion";
 import { useLocale } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
@@ -47,8 +48,6 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
 
   const slideFromStart =
     (direction === "forward" && !isRtl) || (direction === "back" && isRtl);
-  const slideFromEnd =
-    (direction === "forward" && isRtl) || (direction === "back" && !isRtl);
 
   return (
     <div
@@ -56,9 +55,7 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
       data-layout-root="screen-transition"
       className={cn(
         "flex min-h-0 flex-1 flex-col overflow-hidden",
-        "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-200",
-        slideFromStart && "motion-safe:slide-in-from-left-3",
-        slideFromEnd && "motion-safe:slide-in-from-right-3",
+        numeMotionSafeScreenEnterClass(slideFromStart),
         "motion-reduce:animate-none",
       )}
     >
