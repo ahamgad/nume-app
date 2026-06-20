@@ -22,6 +22,20 @@ export function shouldRestoreTabRootAfterPopState(
   );
 }
 
+/**
+ * After a native back/swipe gesture, resync Next.js when the browser URL already
+ * moved but React Router still reflects the previous stack screen.
+ */
+export function shouldSyncRouterAfterCleanPopState(
+  reactPathname: string,
+  destinationPathname: string,
+): boolean {
+  return (
+    reactPathname !== destinationPathname &&
+    !shouldRestoreTabRootAfterPopState(reactPathname, destinationPathname)
+  );
+}
+
 /** Whether iOS edge swipe should be blocked for the current navigation context. */
 export function shouldBlockNavigationEdgeSwipe(
   pathname: string,

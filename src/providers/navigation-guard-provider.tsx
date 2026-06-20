@@ -15,6 +15,7 @@ import {
 import { DiscardDialog } from "@/components/ui/discard-dialog";
 import {
   shouldRestoreTabRootAfterPopState,
+  shouldSyncRouterAfterCleanPopState,
 } from "@/lib/navigation/back-navigation-policy";
 
 interface NavigationGuardRegistration {
@@ -106,6 +107,7 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      allowNavigationRef.current = true;
       router.back();
     },
     [router],
@@ -122,10 +124,15 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
 
       const dirty = readIsDirty(registrationsRef.current);
       const destinationPathname = window.location.pathname;
+      const destinationSearch = window.location.search;
+      const destination = `${destinationPathname}${destinationSearch}`;
 
       if (dirty) {
         window.history.forward();
-        pendingNavigateRef.current = () => router.back();
+        pendingNavigateRef.current = () => {
+          allowNavigationRef.current = true;
+          router.back();
+        };
         setShowDiscard(true);
         return;
       }
@@ -135,6 +142,17 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
       ) {
         allowNavigationRef.current = true;
         router.replace(pathname);
+        return;
+      }
+
+      if (
+        shouldSyncRouterAfterCleanPopState(
+          pathname,
+          destinationPathname,
+        )
+      ) {
+        allowNavigationRef.current = true;
+        router.replace(destination, { scroll: false });
       }
     }
 

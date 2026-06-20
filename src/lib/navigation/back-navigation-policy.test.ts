@@ -4,6 +4,7 @@ import {
   isSwipeBackDisabledStackPath,
   shouldBlockNavigationEdgeSwipe,
   shouldRestoreTabRootAfterPopState,
+  shouldSyncRouterAfterCleanPopState,
 } from "@/lib/navigation/back-navigation-policy";
 
 describe("shouldRestoreTabRootAfterPopState", () => {
@@ -54,5 +55,34 @@ describe("shouldBlockNavigationEdgeSwipe", () => {
       true,
     );
     expect(shouldBlockNavigationEdgeSwipe("/more/appearance", true)).toBe(true);
+  });
+});
+
+describe("shouldSyncRouterAfterCleanPopState", () => {
+  it("resyncs when native back leaves a stack screen", () => {
+    expect(
+      shouldSyncRouterAfterCleanPopState(
+        "/accounts/new/savings_account",
+        "/accounts",
+      ),
+    ).toBe(true);
+    expect(
+      shouldSyncRouterAfterCleanPopState(
+        "/accounts/abc/edit",
+        "/accounts/abc",
+      ),
+    ).toBe(true);
+  });
+
+  it("does not resync when React already matches the destination", () => {
+    expect(
+      shouldSyncRouterAfterCleanPopState("/accounts", "/accounts"),
+    ).toBe(false);
+  });
+
+  it("does not resync for tab-root cross-tab gestures", () => {
+    expect(
+      shouldSyncRouterAfterCleanPopState("/accounts", "/planning"),
+    ).toBe(false);
   });
 });

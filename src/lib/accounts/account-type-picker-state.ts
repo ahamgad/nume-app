@@ -9,6 +9,11 @@ export function markAccountTypePickerDismissed() {
   getSessionStorage()?.setItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY, "1");
 }
 
+/** True while returning from a picker-driven create flow — suppresses sheet flash on bfcache restore. */
+export function shouldSuppressAccountTypePicker(): boolean {
+  return getSessionStorage()?.getItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY) === "1";
+}
+
 export function consumeAccountTypePickerDismissed(): boolean {
   const storage = getSessionStorage();
   if (!storage || storage.getItem(ACCOUNT_TYPE_PICKER_DISMISSED_KEY) !== "1") {

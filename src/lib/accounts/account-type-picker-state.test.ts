@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach, vi } from "vitest";
 import {
   consumeAccountTypePickerDismissed,
   markAccountTypePickerDismissed,
+  shouldSuppressAccountTypePicker,
 } from "@/lib/accounts/account-type-picker-state";
 
 describe("account type picker state", () => {
@@ -25,7 +26,9 @@ describe("account type picker state", () => {
   it("marks dismissed once and consumes on read", () => {
     expect(consumeAccountTypePickerDismissed()).toBe(false);
     markAccountTypePickerDismissed();
+    expect(shouldSuppressAccountTypePicker()).toBe(true);
     expect(consumeAccountTypePickerDismissed()).toBe(true);
+    expect(shouldSuppressAccountTypePicker()).toBe(false);
     expect(consumeAccountTypePickerDismissed()).toBe(false);
   });
 });

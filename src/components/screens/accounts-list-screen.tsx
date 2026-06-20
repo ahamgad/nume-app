@@ -22,7 +22,7 @@ import {
   resolveAccountsListFilter,
   type AccountsListFilter,
 } from "@/lib/accounts/accounts-list-filter";
-import { consumeAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
+import { consumeAccountTypePickerDismissed, shouldSuppressAccountTypePicker } from "@/lib/accounts/account-type-picker-state";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -227,7 +227,7 @@ export function AccountsListScreen() {
         )}
       </ScreenBody>
       <AccountTypePickerSheet
-        open={pickerOpen}
+        open={pickerOpen && !shouldSuppressAccountTypePicker()}
         onClose={() => setPickerOpen(false)}
       />
     </>
