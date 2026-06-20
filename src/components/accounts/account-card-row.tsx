@@ -48,28 +48,28 @@ export function AccountCardRow({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex min-h-16 w-full gap-3 px-4 py-3 text-start transition-colors active:bg-muted",
+        "grid w-full min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[auto_auto] items-center gap-x-3 gap-y-0.5 px-4 py-3 text-start transition-colors active:bg-muted",
       )}
     >
-      <div className="flex shrink-0 self-center">{leading}</div>
-      <div className="grid min-w-0 flex-1 grid-cols-1 grid-rows-2 gap-0.5">
-        <p className="truncate text-[0.8125rem] leading-snug text-muted-foreground">
-          {typeLabel}
-        </p>
-        <p className="truncate text-[0.9375rem] font-semibold leading-snug">
-          {account.name}
-        </p>
+      <div className="col-start-1 row-span-2 self-center">{leading}</div>
+
+      <p className="col-start-2 row-start-1 min-w-0 truncate text-[0.8125rem] text-muted-foreground">
+        {typeLabel}
+      </p>
+
+      <div className="col-start-3 row-start-1 flex shrink-0 items-center gap-2">
+        <ResponsiveCurrencyAmount
+          amount={account.currentBalance}
+          locale={formatLocale}
+          variant="row"
+          className="w-auto shrink-0"
+        />
+        <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
       </div>
-      <div className="flex shrink-0 items-start gap-2">
-        <div className="min-w-0 max-w-[50%] pt-px text-end leading-snug">
-          <ResponsiveCurrencyAmount
-            amount={account.currentBalance}
-            locale={formatLocale}
-            variant="row"
-          />
-        </div>
-        <ChevronRight className="mt-0.5 size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
-      </div>
+
+      <p className="col-start-2 row-start-2 min-w-0 truncate text-[0.9375rem] font-medium">
+        {account.name}
+      </p>
     </button>
   );
-}
+};
