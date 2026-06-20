@@ -1,8 +1,8 @@
 "use client";
 
 import { Landmark } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
@@ -16,11 +16,15 @@ import {
   ScrollChipSelect,
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
+import {
+  accountsListHref,
+  persistAccountsListFilter,
+  resolveAccountsListFilter,
+  type AccountsListFilter,
+} from "@/lib/accounts/accounts-list-filter";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
-
-type AccountsFilter = "active" | "archived";
 
 function AccountSection({
   title,
@@ -65,12 +69,26 @@ export function AccountsListScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { accounts, isFinanceReady, refresh } = useFinance();
-  const [filter, setFilter] = useState<AccountsFilter>("active");
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  const filter = resolveAccountsListFilter(searchParams);
+
+  useEffect(() => {
+    persistAccountsListFilter(filter);
+  }, [filter]);
+
+  const setFilter = useCallback(
+    (next: AccountsListFilter) => {
+      persistAccountsListFilter(next);
+      router.replace(accountsListHref(next), { scroll: false });
+    },
+    [router],
+  );
+
   const filterOptions = useMemo(
-    (): ScrollChipOption<AccountsFilter>[] => [
+    (): ScrollChipOption<AccountsListFilter>[] => [
       { value: "active", label: t("accounts.filters.active") },
       { value: "archived", label: t("accounts.filters.archived") },
     ],

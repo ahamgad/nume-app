@@ -13,7 +13,10 @@ import {
 } from "react";
 
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { shouldRestoreTabRootAfterPopState } from "@/lib/navigation/back-navigation-policy";
+import {
+  isSwipeBackExemptPath,
+  shouldRestoreTabRootAfterPopState,
+} from "@/lib/navigation/back-navigation-policy";
 
 interface NavigationGuardRegistration {
   isDirty: boolean;
@@ -121,7 +124,7 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
       const dirty = readIsDirty(registrationsRef.current);
       const destinationPathname = window.location.pathname;
 
-      if (dirty) {
+      if (dirty && !isSwipeBackExemptPath(pathname)) {
         window.history.forward();
         pendingNavigateRef.current = () => router.back();
         setShowDiscard(true);

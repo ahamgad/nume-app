@@ -68,7 +68,7 @@ export function EditLendingAccountScreen({ accountId }: EditLendingAccountScreen
         <ScreenHeader
           mode="stack"
           title={t("accounts.details.notFound")}
-          onBack={() => router.push("/accounts")}
+          onBack={() => router.back()}
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">

@@ -20,6 +20,7 @@ import {
 } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
+import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -93,7 +94,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
     try {
       await archiveAccount(account.id);
       showToast(t("accounts.details.archiveSuccess"));
-      router.replace("/accounts");
+      router.replace(accountsListHref(getPersistedAccountsListFilter()));
     } catch (error) {
       logSupabaseError("archiveAccount", error);
       showToast(getSupabaseErrorMessage(error) || t("common.retry"));
@@ -134,7 +135,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         <ScreenHeader
           mode="stack"
           title={t("accounts.details.notFound")}
-          onBack={() => router.push("/accounts")}
+          onBack={() => router.back()}
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">
@@ -142,7 +143,9 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           </p>
           <Button
             className="mt-4 h-11"
-            onClick={() => router.push("/accounts")}
+            onClick={() =>
+              router.push(accountsListHref(getPersistedAccountsListFilter()))
+            }
           >
             {t("accounts.title")}
           </Button>
@@ -164,7 +167,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       <ScreenHeader
         mode="stack"
         title={t("accounts.details.title")}
-        onBack={() => router.push("/accounts")}
+        onBack={() => router.back()}
         rightAction={
           !isArchived ? (
             <ScreenHeaderActionButton

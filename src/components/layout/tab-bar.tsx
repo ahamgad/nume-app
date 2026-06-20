@@ -9,9 +9,13 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
+import {
+  accountsListHref,
+  getPersistedAccountsListFilter,
+} from "@/lib/accounts/accounts-list-filter";
 import { useT } from "@/providers/i18n-provider";
-import { isTabRootPath } from "@/lib/navigation/tab-roots";
 import { isStackScreen } from "@/lib/layout/tab-bar-visibility";
+import { isTabRootPath } from "@/lib/navigation/tab-roots";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -47,10 +51,17 @@ export function TabBar() {
               key={href}
               type="button"
               onClick={() => {
-                if (pathname === href || (href !== "/" && pathname === href)) {
+                const targetHref =
+                  href === "/accounts"
+                    ? accountsListHref(getPersistedAccountsListFilter())
+                    : href;
+                if (
+                  pathname === targetHref ||
+                  (href !== "/" && pathname === href)
+                ) {
                   return;
                 }
-                router.replace(href);
+                router.replace(targetHref);
               }}
               className={cn(
                 "inline-flex min-h-11 flex-col items-center justify-center gap-1 px-1 py-1 text-[0.6875rem] font-medium transition-colors",

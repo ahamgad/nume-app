@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { getInstitutionBrandAssetPath } from "@/lib/institutions/brand-assets-registry";
 import { getInstitutionFallbackInitial } from "@/lib/institutions/logo-fallback";
 import { cn } from "@/lib/utils";
@@ -14,6 +16,8 @@ export const INSTITUTION_BRAND_ASSET_DETAILS_HEADER_SIZE = 40;
 /** Shared corner radius for brand asset containers. */
 export const INSTITUTION_BRAND_ASSET_BORDER_RADIUS_PX = 8;
 
+const loadedBrandAssetPaths = new Set<string>();
+
 interface InstitutionBrandAssetProps {
   institutionId: string;
   /** Consumer-facing label for fallback initial derivation. */
@@ -23,7 +27,7 @@ interface InstitutionBrandAssetProps {
   className?: string;
 }
 
-export function InstitutionBrandAsset({
+export const InstitutionBrandAsset = memo(function InstitutionBrandAsset({
   institutionId,
   fallbackLabel,
   size = INSTITUTION_BRAND_ASSET_PICKER_SIZE,
@@ -31,6 +35,8 @@ export function InstitutionBrandAsset({
 }: InstitutionBrandAssetProps) {
   const assetPath = getInstitutionBrandAssetPath(institutionId);
   const initial = getInstitutionFallbackInitial(fallbackLabel);
+  const isCached = assetPath ? loadedBrandAssetPaths.has(assetPath) : false;
+  const useEagerLoad = size >= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE;
 
   return (
     <span
@@ -48,9 +54,17 @@ export function InstitutionBrandAsset({
           alt=""
           width={size}
           height={size}
-          loading="lazy"
+          loading={useEagerLoad ? "eager" : "lazy"}
           decoding="async"
-          className="size-full object-cover object-center"
+          fetchPriority={useEagerLoad ? "high" : "auto"}
+          onLoad={(event) => {
+            loadedBrandAssetPaths.add(assetPath);
+            event.currentTarget.style.opacity = "1";
+          }}
+          className={cn(
+            "size-full object-cover object-center transition-opacity duration-150",
+            isCached ? "opacity-100" : "opacity-0",
+          )}
         />
       ) : (
         <span
@@ -68,4 +82,4 @@ export function InstitutionBrandAsset({
       )}
     </span>
   );
-}
+});

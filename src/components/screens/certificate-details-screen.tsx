@@ -9,6 +9,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
+import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { countDueEntries } from "@/lib/certificates/certificate-insights";
 import {
   computeCertificateMetrics,
@@ -107,7 +108,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     try {
       await archiveCertificate(certificate.id);
       showToast(t("certificates.details.archiveSuccess"));
-      router.replace("/accounts");
+      router.replace(accountsListHref(getPersistedAccountsListFilter()));
     } catch (error) {
       logSupabaseError("archiveCertificate", error);
       showToast(getSupabaseErrorMessage(error) || t("common.retry"));
@@ -134,7 +135,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         <ScreenHeader
           mode="stack"
           title={t("certificates.details.notFound")}
-          onBack={() => router.push("/accounts")}
+          onBack={() => router.back()}
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">
@@ -142,7 +143,9 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           </p>
           <Button
             className="mt-4 h-11"
-            onClick={() => router.push("/accounts")}
+            onClick={() =>
+              router.push(accountsListHref(getPersistedAccountsListFilter()))
+            }
           >
             {t("accounts.title")}
           </Button>
@@ -183,7 +186,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
       <ScreenHeader
         mode="stack"
         title={t("accounts.details.title")}
-        onBack={() => router.push("/accounts")}
+        onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
         <AccountHeaderMetadata

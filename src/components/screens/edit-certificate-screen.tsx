@@ -195,7 +195,7 @@ export function EditCertificateScreen({ accountId }: EditCertificateScreenProps)
         <ScreenHeader
           mode="stack"
           title={t("certificates.details.notFound")}
-          onBack={() => router.push("/accounts")}
+          onBack={() => router.back()}
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">

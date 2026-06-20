@@ -8,6 +8,7 @@ import { AddMoneyAccountScreen } from "@/components/screens/add-money-account-sc
 import { AddSavingsAccountScreen } from "@/components/screens/add-savings-account-screen";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Button } from "@/components/ui/button";
+import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { parseCreatableAccountType } from "@/lib/finance/account-type-catalog";
 import {
   isCertificateAccountType,
@@ -31,14 +32,16 @@ export function AddAccountTypeRouterScreen({ type }: AddAccountTypeRouterScreenP
         <ScreenHeader
           mode="stack"
           title={t("accounts.add.title")}
-          onBack={() => router.push("/accounts")}
+          onBack={() => router.back()}
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">{t("accounts.add.typeUnavailable")}</p>
           <Button
             className="mt-4 h-11"
             variant="outline"
-            onClick={() => router.push("/accounts")}
+            onClick={() =>
+              router.push(accountsListHref(getPersistedAccountsListFilter()))
+            }
           >
             {t("accounts.title")}
           </Button>
