@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  IS_SWIPE_BACK_ENABLED,
   isSwipeBackDisabledStackPath,
   shouldBlockNavigationEdgeSwipe,
   shouldRestoreTabRootAfterPopState,
@@ -42,10 +43,11 @@ describe("shouldBlockNavigationEdgeSwipe", () => {
     );
   });
 
-  it("allows clean stack screens", () => {
-    expect(shouldBlockNavigationEdgeSwipe("/accounts/abc", false)).toBe(false);
+  it("blocks clean stack screens when swipe is disabled", () => {
+    expect(IS_SWIPE_BACK_ENABLED).toBe(false);
+    expect(shouldBlockNavigationEdgeSwipe("/accounts/abc", false)).toBe(true);
     expect(shouldBlockNavigationEdgeSwipe("/accounts/abc/edit", false)).toBe(
-      false,
+      true,
     );
   });
 

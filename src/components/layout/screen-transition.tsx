@@ -13,7 +13,6 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const stackRef = useRef<string[]>([]);
   const pendingDirectionRef = useRef<ScreenDirection | null>(null);
   const [direction, setDirection] = useState<ScreenDirection>("forward");
 
@@ -27,27 +26,21 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const stack = stackRef.current;
     let nextDirection: ScreenDirection = "forward";
 
     if (pendingDirectionRef.current) {
       nextDirection = pendingDirectionRef.current;
       pendingDirectionRef.current = null;
-    } else {
-      const existingIndex = stack.lastIndexOf(pathname);
-      if (existingIndex >= 0 && existingIndex < stack.length - 1) {
-        nextDirection = "back";
-        stackRef.current = stack.slice(0, existingIndex + 1);
-      } else if (stack[stack.length - 1] !== pathname) {
-        stackRef.current = [...stack, pathname];
-      }
     }
 
     setDirection(nextDirection);
   }, [pathname]);
 
-  const slideFromStart =
-    (direction === "forward" && !isRtl) || (direction === "back" && isRtl);
+  // NUME stack navigation direction:
+  // - Forward (parent → child): enter from end (right in LTR, left in RTL)
+  // - Back (child → parent): enter from start (left in LTR, right in RTL)
+  const enterFromStart =
+    (direction === "back" && !isRtl) || (direction === "forward" && isRtl);
 
   return (
     <div
@@ -55,7 +48,7 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
       data-layout-root="screen-transition"
       className={cn(
         "flex min-h-0 flex-1 flex-col overflow-hidden",
-        numeMotionSafeScreenEnterClass(slideFromStart),
+        numeMotionSafeScreenEnterClass(enterFromStart),
         "motion-reduce:animate-none",
       )}
     >

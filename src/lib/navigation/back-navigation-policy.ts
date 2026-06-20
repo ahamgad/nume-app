@@ -1,6 +1,12 @@
 import { isTabRootPath } from "@/lib/navigation/tab-roots";
 
 /**
+ * Product toggle: temporarily disable interactive edge swipe-back globally.
+ * Keep navigation guards and programmatic/browser back working normally.
+ */
+export const IS_SWIPE_BACK_ENABLED = false;
+
+/**
  * Stack screens where interactive swipe-back is disabled.
  * Theme applies immediately — explicit header back only.
  */
@@ -41,6 +47,7 @@ export function shouldBlockNavigationEdgeSwipe(
   pathname: string,
   isNavigationDirty: boolean,
 ): boolean {
+  if (!IS_SWIPE_BACK_ENABLED) return true;
   return (
     isTabRootPath(pathname) ||
     isNavigationDirty ||

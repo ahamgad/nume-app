@@ -13,10 +13,6 @@ import {
 } from "react";
 
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import {
-  shouldRestoreTabRootAfterPopState,
-  shouldSyncRouterAfterCleanPopState,
-} from "@/lib/navigation/back-navigation-policy";
 
 interface NavigationGuardRegistration {
   isDirty: boolean;
@@ -123,9 +119,6 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
       }
 
       const dirty = readIsDirty(registrationsRef.current);
-      const destinationPathname = window.location.pathname;
-      const destinationSearch = window.location.search;
-      const destination = `${destinationPathname}${destinationSearch}`;
 
       if (dirty) {
         window.history.forward();
@@ -135,24 +128,6 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
         };
         setShowDiscard(true);
         return;
-      }
-
-      if (
-        shouldRestoreTabRootAfterPopState(pathname, destinationPathname)
-      ) {
-        allowNavigationRef.current = true;
-        router.replace(pathname);
-        return;
-      }
-
-      if (
-        shouldSyncRouterAfterCleanPopState(
-          pathname,
-          destinationPathname,
-        )
-      ) {
-        allowNavigationRef.current = true;
-        router.replace(destination, { scroll: false });
       }
     }
 

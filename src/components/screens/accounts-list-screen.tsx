@@ -7,7 +7,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 import { AccountCardRow } from "@/components/accounts/account-card-row";
-import { useAccountsEphemeralUiLifecycle } from "@/hooks/use-accounts-ephemeral-ui-lifecycle";
 
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState } from "@/components/patterns";
@@ -23,7 +22,6 @@ import {
   resolveAccountsListFilter,
   type AccountsListFilter,
 } from "@/lib/accounts/accounts-list-filter";
-import { clearAccountTypePickerDismissed } from "@/lib/accounts/account-type-picker-state";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
@@ -79,22 +77,11 @@ export function AccountsListScreen() {
     setPickerOpen(false);
   }, []);
 
-  const openPicker = useCallback(() => {
-    clearAccountTypePickerDismissed();
-    setPickerOpen(true);
-  }, []);
-
   const filter = resolveAccountsListFilter(searchParams);
 
   useEffect(() => {
     persistAccountsListFilter(filter);
   }, [filter]);
-
-  useEffect(() => {
-    clearAccountTypePickerDismissed();
-  }, []);
-
-  useAccountsEphemeralUiLifecycle(closePicker);
 
   const setFilter = useCallback(
     (next: AccountsListFilter) => {
@@ -145,7 +132,7 @@ export function AccountsListScreen() {
   const addAccountAction = (
     <ScreenHeaderActionButton
       label={t("accounts.headerActions.addAccount")}
-      onClick={openPicker}
+      onClick={() => setPickerOpen(true)}
     />
   );
 
