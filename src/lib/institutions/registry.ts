@@ -363,12 +363,6 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     fullName: "Seven",
     category: "financial_service",
   },
-  {
-    id: "tamara",
-    shortName: "Tamara",
-    fullName: "Tamara",
-    category: "financial_service",
-  },
   // Additional Egyptian fintech (legacy account data)
   {
     id: "thndr",

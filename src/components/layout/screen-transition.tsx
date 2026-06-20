@@ -3,18 +3,22 @@
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { numeMotionSafeScreenEnterClass } from "@/lib/layout/motion";
+import {
+  numeMotionSafeScreenEnterClass,
+  shouldUseStackScreenTransition,
+  type StackNavigationDirection,
+} from "@/lib/layout/motion";
 import { useLocale } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
-
-type ScreenDirection = "forward" | "back";
 
 export function ScreenTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const pendingDirectionRef = useRef<ScreenDirection | null>(null);
-  const [direction, setDirection] = useState<ScreenDirection>("forward");
+  const pendingDirectionRef = useRef<StackNavigationDirection | null>(null);
+  const previousPathnameRef = useRef<string | null>(null);
+  const [direction, setDirection] = useState<StackNavigationDirection>("forward");
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
     function handlePopState() {
@@ -26,14 +30,21 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    let nextDirection: ScreenDirection = "forward";
+    let nextDirection: StackNavigationDirection = "forward";
 
     if (pendingDirectionRef.current) {
       nextDirection = pendingDirectionRef.current;
       pendingDirectionRef.current = null;
     }
 
+    const fromPathname = previousPathnameRef.current;
     setDirection(nextDirection);
+    setShouldAnimate(
+      fromPathname === null
+        ? false
+        : shouldUseStackScreenTransition(fromPathname, pathname, nextDirection),
+    );
+    previousPathnameRef.current = pathname;
   }, [pathname]);
 
   // NUME stack navigation direction:
@@ -48,7 +59,7 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
       data-layout-root="screen-transition"
       className={cn(
         "flex min-h-0 flex-1 flex-col overflow-hidden",
-        numeMotionSafeScreenEnterClass(enterFromStart),
+        shouldAnimate && numeMotionSafeScreenEnterClass(enterFromStart),
         "motion-reduce:animate-none",
       )}
     >

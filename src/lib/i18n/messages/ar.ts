@@ -433,7 +433,6 @@ export const ar = {
       opay: "OPay",
       shahry: "TRU",
       seven: "Seven",
-      tamara: "Tamara",
       thndr: "Thndr",
       klivvr: "Klivvr",
       bokra: "Bokra",

@@ -24,7 +24,7 @@ describe("institution brand assets registry", () => {
     expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(
       INSTITUTION_REGISTRY.length,
     );
-    expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(57);
+    expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(56);
 
     for (const entry of INSTITUTION_REGISTRY) {
       expect(getInstitutionBrandAssetEntry(entry.id)).toBeDefined();
@@ -42,13 +42,13 @@ describe("institution brand assets registry", () => {
     const tierB = available.filter((entry) => entry.tier === "B");
     const tierC = available.filter((entry) => entry.tier === "C");
 
-    expect(available).toHaveLength(54);
-    expect(tierA).toHaveLength(47);
+    expect(available).toHaveLength(56);
+    expect(tierA).toHaveLength(49);
     expect(tierB).toHaveLength(5);
     expect(tierC).toHaveLength(2);
-    expect(fallback).toHaveLength(3);
+    expect(fallback).toHaveLength(0);
     expect(tierA.length + tierB.length + tierC.length).toBe(available.length);
-    expect(available.length + fallback.length).toBe(57);
+    expect(available.length + fallback.length).toBe(56);
   });
 
   it("maps available assets to unique public paths", () => {
@@ -59,9 +59,12 @@ describe("institution brand assets registry", () => {
     expect(new Set(paths).size).toBe(paths.length);
     expect(getInstitutionBrandAssetPath("cib")).toMatch(/\/institutions\/cib\.png$/);
     expect(getInstitutionBrandAssetPath("contact")).toMatch(/\/institutions\/contact\.png$/);
-    expect(getInstitutionBrandAssetPath("mid_bank")).toBeNull();
-    expect(getInstitutionBrandAssetPath("we_pay")).toBeNull();
-    expect(getInstitutionBrandAssetPath("tamara")).toBeNull();
+    expect(getInstitutionBrandAssetPath("mid_bank")).toMatch(
+      /\/institutions\/mid_bank\.png$/,
+    );
+    expect(getInstitutionBrandAssetPath("we_pay")).toMatch(
+      /\/institutions\/we_cash\.png$/,
+    );
   });
 
   it("aligns bank and financial service coverage with institution registry", () => {
@@ -75,6 +78,6 @@ describe("institution brand assets registry", () => {
     );
 
     expect(bankAssets).toHaveLength(32);
-    expect(fsAssets).toHaveLength(25);
+    expect(fsAssets).toHaveLength(24);
   });
 });

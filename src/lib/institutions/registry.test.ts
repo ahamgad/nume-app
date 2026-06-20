@@ -20,8 +20,8 @@ describe("institution registry", () => {
 
   it("has expected category counts", () => {
     expect(INSTITUTION_REGISTRY_BANKS).toHaveLength(32);
-    expect(INSTITUTION_REGISTRY_FINANCIAL_SERVICES).toHaveLength(25);
-    expect(INSTITUTION_REGISTRY).toHaveLength(57);
+    expect(INSTITUTION_REGISTRY_FINANCIAL_SERVICES).toHaveLength(24);
+    expect(INSTITUTION_REGISTRY).toHaveLength(56);
   });
 
   it("derives catalog entries from registry without data loss", () => {

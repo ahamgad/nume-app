@@ -8,6 +8,7 @@ import {
   NUME_OVERLAY_ENTER_CLASS,
   numeMotionSafeScreenEnterClass,
   numeScreenEnterClass,
+  shouldUseStackScreenTransition,
 } from "@/lib/layout/motion";
 
 describe("NUME motion tokens", () => {
@@ -33,5 +34,24 @@ describe("NUME motion tokens", () => {
       "slide-in-from-left-full",
     );
     expect(NUME_MODAL_OVERLAY_ENTER_CLASS).toContain("fixed inset-0 z-50");
+  });
+
+  it("animates stack navigation but not tab-root switches", () => {
+    expect(
+      shouldUseStackScreenTransition("/accounts", "/accounts/abc", "forward"),
+    ).toBe(true);
+    expect(
+      shouldUseStackScreenTransition("/accounts/abc", "/accounts", "back"),
+    ).toBe(true);
+    expect(
+      shouldUseStackScreenTransition("/accounts", "/goals", "forward"),
+    ).toBe(false);
+    expect(shouldUseStackScreenTransition("/", "/more", "forward")).toBe(false);
+    expect(
+      shouldUseStackScreenTransition("/accounts/abc", "/goals", "forward"),
+    ).toBe(false);
+    expect(
+      shouldUseStackScreenTransition("/more/language", "/more", "back"),
+    ).toBe(true);
   });
 });

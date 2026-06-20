@@ -354,9 +354,13 @@ export const INSTITUTION_BRAND_ASSET_REGISTRY: readonly InstitutionBrandAssetEnt
   },
   {
     institutionId: "mid_bank",
-    status: "fallback",
-    tier: "D",
-    assetPath: null,
+    status: "available",
+    tier: "A",
+    assetPath: "/institutions/mid_bank.png",
+    assetFormat: "png",
+    isOfficial: true,
+    lastUpdated: "2026-06-21",
+    source: "https://apps.apple.com/eg/search?term=MIDBank",
   },
   {
     institutionId: "mnt_halan",
@@ -499,12 +503,6 @@ export const INSTITUTION_BRAND_ASSET_REGISTRY: readonly InstitutionBrandAssetEnt
     source: "https://apps.apple.com/eg/search?term=Seven",
   },
   {
-    institutionId: "tamara",
-    status: "fallback",
-    tier: "D",
-    assetPath: null,
-  },
-  {
     institutionId: "telda",
     status: "available",
     tier: "A",
@@ -556,9 +554,13 @@ export const INSTITUTION_BRAND_ASSET_REGISTRY: readonly InstitutionBrandAssetEnt
   },
   {
     institutionId: "we_pay",
-    status: "fallback",
-    tier: "D",
-    assetPath: null,
+    status: "available",
+    tier: "A",
+    assetPath: "/institutions/we_cash.png",
+    assetFormat: "png",
+    isOfficial: true,
+    lastUpdated: "2026-06-21",
+    source: "https://apps.apple.com/eg/search?term=WE%20Pay",
   },
 ] as const;
 

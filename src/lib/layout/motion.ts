@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { isTabRootPath } from "@/lib/navigation/tab-roots";
 
 /**
  * Splash-aligned deceleration curve — smooth arrival with no overshoot.
@@ -45,6 +46,35 @@ export function numeScreenEnterClass(fromStart: boolean) {
     NUME_MOTION_EASE_CLASS,
     numeScreenEnterSlideClass(fromStart),
   );
+}
+
+export type StackNavigationDirection = "forward" | "back";
+
+/**
+ * LinkedIn-style navigation logic: tab roots switch instantly; stack routes
+ * animate forward from the trailing edge and back from the leading edge.
+ */
+export function shouldUseStackScreenTransition(
+  fromPathname: string,
+  toPathname: string,
+  direction: StackNavigationDirection,
+): boolean {
+  if (fromPathname === toPathname) return false;
+
+  // Tab bar peers — no horizontal slide.
+  if (
+    isTabRootPath(fromPathname) &&
+    isTabRootPath(toPathname)
+  ) {
+    return false;
+  }
+
+  // Tab bar jump to a root from a stack screen — instant cut.
+  if (isTabRootPath(toPathname) && direction === "forward") {
+    return false;
+  }
+
+  return true;
 }
 
 /** ScreenTransition wrapper — respects prefers-reduced-motion. */
