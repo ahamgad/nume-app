@@ -6,9 +6,12 @@ import { useMemo, useState } from "react";
 
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 
+import {
+  InstitutionBrandAsset,
+  INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE,
+} from "@/components/institutions/institution-brand-asset";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState, ListRow } from "@/components/patterns";
-import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +20,7 @@ import {
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
 import { formatAccountListSubtitle } from "@/lib/finance/account-display";
+import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
@@ -45,11 +49,25 @@ function AccountSection({
         {title}
       </p>
       <Card className="overflow-hidden shadow-none">
-        {accounts.map((account, index) => (
+        {accounts.map((account, index) => {
+          const brandAsset = resolveInstitutionBrandAssetProps(
+            account.institution,
+            t,
+          );
+
+          return (
           <div key={account.id}>
             <ListRow
               primary={account.name}
-              leading={<AccountTypeIcon type={account.type} />}
+              leading={
+                brandAsset ? (
+                  <InstitutionBrandAsset
+                    institutionId={brandAsset.institutionId}
+                    fallbackLabel={brandAsset.fallbackLabel}
+                    size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
+                  />
+                ) : undefined
+              }
               secondary={formatAccountListSubtitle(account, t)}
               trailing={
                 <ResponsiveCurrencyAmount
@@ -64,7 +82,8 @@ function AccountSection({
               <div className="mx-4 border-b border-border" />
             ) : null}
           </div>
-        ))}
+        );
+        })}
       </Card>
     </section>
   );

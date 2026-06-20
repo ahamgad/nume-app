@@ -9,6 +9,7 @@ import {
   INSTITUTION_BANKS,
   INSTITUTION_FINANCIAL_SERVICES,
   institutionMatchesSearch,
+  resolveInstitutionBrandAssetProps,
 } from "@/lib/institutions/catalog";
 
 const t = vi.fn((key: string) => {
@@ -110,5 +111,26 @@ describe("institution catalog ordering", () => {
     );
     expect(names).toEqual(sorted);
     expect(names[0]).toBe("Aman");
+  });
+});
+
+describe("resolveInstitutionBrandAssetProps", () => {
+  it("returns registry id and shortcut for catalog institutions", () => {
+    expect(resolveInstitutionBrandAssetProps("CIB", t)).toEqual({
+      institutionId: "cib",
+      fallbackLabel: "CIB",
+    });
+  });
+
+  it("returns null when institution is empty", () => {
+    expect(resolveInstitutionBrandAssetProps("", t)).toBeNull();
+    expect(resolveInstitutionBrandAssetProps(null, t)).toBeNull();
+  });
+
+  it("uses custom label for unknown institutions", () => {
+    expect(resolveInstitutionBrandAssetProps("My Local Bank", t)).toEqual({
+      institutionId: "My Local Bank",
+      fallbackLabel: "My Local Bank",
+    });
   });
 });

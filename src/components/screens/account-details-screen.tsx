@@ -176,6 +176,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       />
       <ScreenBody withTabBar={false} className="space-y-6">
         <AccountHeaderMetadata
+          institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}

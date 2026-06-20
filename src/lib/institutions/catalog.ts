@@ -253,6 +253,21 @@ export function formatInstitutionDisplay(
   return formatInstitutionEntityLabel(value, t);
 }
 
+/** Props for {@link InstitutionBrandAsset} from a stored institution value. */
+export function resolveInstitutionBrandAssetProps(
+  institution: string | null | undefined,
+  t: InstitutionTranslator,
+): { institutionId: string; fallbackLabel: string } | null {
+  const trimmed = institution?.trim();
+  if (!trimmed) return null;
+
+  const match = matchInstitutionEntryGlobal(trimmed, t);
+  return {
+    institutionId: match?.id ?? trimmed,
+    fallbackLabel: match?.shortcut ?? formatInstitutionEntityLabel(trimmed, t),
+  };
+}
+
 /** @deprecated Use getInstitutionTriggerLabel or formatInstitutionDisplay. */
 export function getInstitutionDisplayLabel(
   value: string,

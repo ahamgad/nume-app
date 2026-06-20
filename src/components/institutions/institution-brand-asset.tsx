@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 /** Default picker row size (32×32). */
 export const INSTITUTION_BRAND_ASSET_PICKER_SIZE = 32;
 
+/** Account header and list row size (28×28). */
+export const INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE = 28;
+
 interface InstitutionBrandAssetProps {
   institutionId: string;
   /** Consumer-facing label for fallback initial derivation. */
@@ -44,7 +47,12 @@ export function InstitutionBrandAsset({
           className="size-full object-cover object-center"
         />
       ) : (
-        <span className="flex size-full items-center justify-center text-sm font-semibold text-muted-foreground">
+        <span
+          className={cn(
+            "flex size-full items-center justify-center font-semibold text-muted-foreground",
+            size <= INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE ? "text-xs" : "text-sm",
+          )}
+        >
           {initial}
         </span>
       )}

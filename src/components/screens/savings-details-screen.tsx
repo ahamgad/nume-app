@@ -174,6 +174,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
         <AccountHeaderMetadata
+          institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}

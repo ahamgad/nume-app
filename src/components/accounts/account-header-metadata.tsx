@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  InstitutionBrandAsset,
+  INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE,
+} from "@/components/institutions/institution-brand-asset";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { MetadataChip } from "@/components/accounts/metadata-chip";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
@@ -8,6 +12,7 @@ import {
   getAccountHeaderStatusTone,
   type AccountDetailHeaderStatus,
 } from "@/lib/finance/account-header-status";
+import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import type { AccountType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
@@ -69,6 +74,8 @@ export function SupplementaryMetadataChip({
 }
 
 export interface AccountHeaderMetadataProps {
+  /** Stored institution value — used for brand asset lookup. */
+  institution?: string | null;
   institutionSubtitle?: string | null;
   accountType: AccountType;
   status?: AccountDetailHeaderStatus | null;
@@ -78,18 +85,31 @@ export interface AccountHeaderMetadataProps {
 
 /** Unified institution subtitle + metadata chips row for account details headers. */
 export function AccountHeaderMetadata({
+  institution,
   institutionSubtitle,
   accountType,
   status,
   supplementaryChips = [],
   className,
 }: AccountHeaderMetadataProps) {
+  const t = useT();
+  const brandAsset = resolveInstitutionBrandAssetProps(institution, t);
+
   return (
     <div className={cn("space-y-1", className)}>
       {institutionSubtitle ? (
-        <p className="text-[0.8125rem] text-muted-foreground tabular-nums">
-          {institutionSubtitle}
-        </p>
+        <div className="flex min-w-0 items-center gap-2">
+          {brandAsset ? (
+            <InstitutionBrandAsset
+              institutionId={brandAsset.institutionId}
+              fallbackLabel={brandAsset.fallbackLabel}
+              size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
+            />
+          ) : null}
+          <p className="min-w-0 truncate text-[0.8125rem] text-muted-foreground tabular-nums">
+            {institutionSubtitle}
+          </p>
+        </div>
       ) : null}
       <div className="flex flex-wrap gap-2">
         <AccountTypeMetadataChip type={accountType} />
