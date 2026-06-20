@@ -13,7 +13,7 @@ import {
 } from "react";
 
 import { DiscardDialog } from "@/components/ui/discard-dialog";
-import { isTabRootPath } from "@/lib/navigation/tab-roots";
+import { shouldRestoreTabRootAfterPopState } from "@/lib/navigation/back-navigation-policy";
 
 interface NavigationGuardRegistration {
   isDirty: boolean;
@@ -23,6 +23,7 @@ interface NavigationGuardContextValue {
   register: (registration: NavigationGuardRegistration) => () => void;
   notifyDirtyChange: () => void;
   requestBack: (navigateBack?: () => void) => void;
+  isNavigationDirty: boolean;
 }
 
 const NavigationGuardContext = createContext<NavigationGuardContextValue | null>(
@@ -41,38 +42,44 @@ function readIsDirty(registrations: Set<NavigationGuardRegistration>) {
   return Array.from(registrations).some((registration) => registration.isDirty);
 }
 
+export function useIsNavigationDirty() {
+  const context = useContext(NavigationGuardContext);
+  return context?.isNavigationDirty ?? false;
+}
+
 export function NavigationGuardProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [showDiscard, setShowDiscard] = useState(false);
-  const [guardRevision, setGuardRevision] = useState(0);
+  const [isNavigationDirty, setIsNavigationDirty] = useState(false);
   const registrationsRef = useRef<Set<NavigationGuardRegistration>>(new Set());
   const pendingNavigateRef = useRef<(() => void) | null>(null);
   const allowNavigationRef = useRef(false);
-  const historyTrapActiveRef = useRef(false);
+
+  const syncDirtyState = useCallback(() => {
+    setIsNavigationDirty(readIsDirty(registrationsRef.current));
+  }, []);
 
   const notifyDirtyChange = useCallback(() => {
-    setGuardRevision((revision) => revision + 1);
-  }, []);
+    syncDirtyState();
+  }, [syncDirtyState]);
 
-  const register = useCallback((registration: NavigationGuardRegistration) => {
-    registrationsRef.current.add(registration);
-    return () => {
-      registrationsRef.current.delete(registration);
-      setGuardRevision((revision) => revision + 1);
-    };
-  }, []);
+  const register = useCallback(
+    (registration: NavigationGuardRegistration) => {
+      registrationsRef.current.add(registration);
+      syncDirtyState();
+      return () => {
+        registrationsRef.current.delete(registration);
+        syncDirtyState();
+      };
+    },
+    [syncDirtyState],
+  );
 
   const navigateAway = useCallback(() => {
     const pending = pendingNavigateRef.current;
     pendingNavigateRef.current = null;
     allowNavigationRef.current = true;
-
-    if (historyTrapActiveRef.current) {
-      historyTrapActiveRef.current = false;
-      window.history.go(-2);
-      return;
-    }
 
     if (pending) {
       pending();
@@ -105,11 +112,6 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    function pushHistoryTrap() {
-      window.history.pushState({ numeNavigationGuard: true }, "", window.location.href);
-      historyTrapActiveRef.current = true;
-    }
-
     function handlePopState() {
       if (allowNavigationRef.current) {
         allowNavigationRef.current = false;
@@ -117,30 +119,28 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
       }
 
       const dirty = readIsDirty(registrationsRef.current);
+      const destinationPathname = window.location.pathname;
 
-      if (isTabRootPath(pathname)) {
-        pushHistoryTrap();
+      if (dirty) {
+        window.history.forward();
+        pendingNavigateRef.current = () => router.back();
+        setShowDiscard(true);
         return;
       }
 
-      if (dirty) {
-        pendingNavigateRef.current = null;
-        setShowDiscard(true);
-        pushHistoryTrap();
+      if (
+        shouldRestoreTabRootAfterPopState(pathname, destinationPathname)
+      ) {
+        allowNavigationRef.current = true;
+        router.replace(pathname);
       }
-    }
-
-    const dirty = readIsDirty(registrationsRef.current);
-
-    if (isTabRootPath(pathname) || dirty) {
-      pushHistoryTrap();
     }
 
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [pathname, guardRevision, router]);
+  }, [pathname, isNavigationDirty, router]);
 
   const handleDiscardConfirm = useCallback(() => {
     setShowDiscard(false);
@@ -153,8 +153,13 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ register, notifyDirtyChange, requestBack }),
-    [register, notifyDirtyChange, requestBack],
+    () => ({
+      register,
+      notifyDirtyChange,
+      requestBack,
+      isNavigationDirty,
+    }),
+    [register, notifyDirtyChange, requestBack, isNavigationDirty],
   );
 
   return (

@@ -15,8 +15,3 @@ export function isTabRootPath(pathname: string): boolean {
       href === pathname || (href !== "/" && pathname === href),
   );
 }
-
-/** Whether iOS edge swipe should be blocked (tab roots only). */
-export function shouldBlockNavigationEdgeSwipe(pathname: string): boolean {
-  return isTabRootPath(pathname);
-}

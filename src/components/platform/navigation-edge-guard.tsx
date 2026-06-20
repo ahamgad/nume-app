@@ -3,17 +3,22 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-import { shouldBlockNavigationEdgeSwipe } from "@/lib/navigation/tab-roots";
+import { shouldBlockNavigationEdgeSwipe } from "@/lib/navigation/back-navigation-policy";
+import { useIsNavigationDirty } from "@/providers/navigation-guard-provider";
 
 const EDGE_SWIPE_WIDTH_PX = 24;
 
 /**
- * Blocks iOS interactive edge swipe on tab-root screens only.
- * Stack screens keep native swipe-back; dirty forms are handled by NavigationGuardProvider.
+ * Blocks iOS interactive edge swipe on tab roots and dirty screens.
+ * Clean stack screens keep native swipe-back.
  */
 export function NavigationEdgeGuard() {
   const pathname = usePathname();
-  const blockEdgeSwipe = shouldBlockNavigationEdgeSwipe(pathname);
+  const isNavigationDirty = useIsNavigationDirty();
+  const blockEdgeSwipe = shouldBlockNavigationEdgeSwipe(
+    pathname,
+    isNavigationDirty,
+  );
 
   useEffect(() => {
     if (!blockEdgeSwipe) return;
