@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { EditableField } from "@/components/field-editor";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
+import { AccountPicker } from "@/components/ui/account-picker";
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-field";
 import { Label } from "@/components/ui/label";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { validateRecordAmountField } from "@/lib/finance/record-form";
 import {
   formatAmountInput,
@@ -46,14 +47,24 @@ export function AddCreditCardPaymentScreen({
   const account = getAccount(accountId);
   const creditCard = getCreditCardByAccountId(accountId);
 
-  const linkedAccountLabel = useMemo(() => {
-    if (!creditCard?.paymentSourceAccountId) return null;
-    const source = accounts.find(
-      (item) => item.id === creditCard.paymentSourceAccountId,
-    );
-    return source ? formatAccountDestinationDisplay(source, t) : null;
-  }, [creditCard, accounts, t]);
+  const paymentSourceAccounts = useMemo(
+    () =>
+      filterTransferAccounts(accounts, {
+        excludeAccountIds: [accountId],
+      }),
+    [accounts, accountId],
+  );
 
+  const linkedDefaultId = creditCard?.paymentSourceAccountId ?? null;
+
+  const [selectedSourceOverride, setSelectedSourceOverride] = useState<
+    string | null | undefined
+  >(undefined);
+
+  const paymentSourceAccountId =
+    selectedSourceOverride !== undefined
+      ? selectedSourceOverride
+      : linkedDefaultId;
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(todayIsoDate());
@@ -61,6 +72,7 @@ export function AddCreditCardPaymentScreen({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isDirty =
+    selectedSourceOverride !== undefined ||
     amount.trim().length > 0 ||
     description.trim().length > 0 ||
     date !== todayIsoDate();
@@ -71,14 +83,16 @@ export function AddCreditCardPaymentScreen({
     const nextErrors: Record<string, string> = {};
     const amountError = validateRecordAmountField("expense", amount, t);
     if (amountError) nextErrors.amount = amountError;
-    if (!creditCard?.paymentSourceAccountId) {
-      nextErrors.form = t("creditCards.validation.linkedAccountRequired");
+    if (!paymentSourceAccountId) {
+      nextErrors.paymentSourceAccountId = t(
+        "records.validation.fromAccountRequired",
+      );
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     const parsedAmount = parseAmount(amount);
-    if (parsedAmount === null || !creditCard?.paymentSourceAccountId) return;
+    if (parsedAmount === null || !paymentSourceAccountId) return;
 
     setSubmitting(true);
     try {
@@ -86,7 +100,7 @@ export function AddCreditCardPaymentScreen({
         amount: parsedAmount,
         description: description.trim() || null,
         date,
-        paymentSourceAccountId: creditCard.paymentSourceAccountId,
+        paymentSourceAccountId,
       });
       showToast(t("creditCards.payment.success"));
       router.replace(`/accounts/${accountId}`);
@@ -131,20 +145,32 @@ export function AddCreditCardPaymentScreen({
       />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
         <p className="text-[0.8125rem] text-muted-foreground">{account.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {t("creditCards.payment.description")}
-        </p>
 
-        <div className="space-y-1">
-          <Label>{t("creditCards.details.linkedAccount")}</Label>
-          {linkedAccountLabel ? (
-            <p className="text-[0.9375rem] font-medium">{linkedAccountLabel}</p>
-          ) : (
-            <p className="text-sm text-destructive">
-              {t("creditCards.validation.linkedAccountRequired")}
-            </p>
-          )}
-        </div>
+        <AccountPicker
+          id="cc-payment-source-account"
+          label={t("records.fields.transfer.fromAccount")}
+          placeholder={t("records.fields.transfer.fromPlaceholder")}
+          value={paymentSourceAccountId}
+          accounts={paymentSourceAccounts}
+          disabled={submitting}
+          sheetTitle={t("records.fields.transfer.fromAccount")}
+          searchPlaceholder={t("records.fields.transfer.searchPlaceholder")}
+          noResultsMessage={t("records.fields.transfer.noResults")}
+          onChange={(next) => {
+            setSelectedSourceOverride(next);
+            setErrors((prev) => {
+              if (!prev.paymentSourceAccountId) return prev;
+              const updated = { ...prev };
+              delete updated.paymentSourceAccountId;
+              return updated;
+            });
+          }}
+        />
+        {errors.paymentSourceAccountId ? (
+          <p className="-mt-3 text-sm text-destructive">
+            {errors.paymentSourceAccountId}
+          </p>
+        ) : null}
 
         <EditableField
           id="cc-payment-amount"
@@ -153,7 +179,7 @@ export function AddCreditCardPaymentScreen({
           inputMode="decimal"
           value={amount}
           placeholder={t("common.currency.zeroPlaceholder")}
-          disabled={submitting || !linkedAccountLabel}
+          disabled={submitting}
           error={errors.amount}
           prefixLabel={t("common.currency.code")}
           sanitizeInput={sanitizeAmountInput}
@@ -190,7 +216,7 @@ export function AddCreditCardPaymentScreen({
       <StickyFooter>
         <Button
           className="h-12 w-full"
-          disabled={submitting || !linkedAccountLabel}
+          disabled={submitting || !paymentSourceAccountId}
           onClick={() => void handleSubmit()}
         >
           {submitting ? t("creditCards.payment.saving") : t("creditCards.payment.submit")}

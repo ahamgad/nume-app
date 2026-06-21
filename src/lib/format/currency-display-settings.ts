@@ -1,5 +1,5 @@
-/** Product currency symbol (future settings may override). */
-export const CURRENCY_SYMBOL = "E£";
+/** Product currency code (future settings may override). */
+export const CURRENCY_CODE = "EGP";
 
 /**
  * When false, decimal portion is omitted from display.

@@ -1,22 +1,27 @@
 import {
   formatCurrency as formatCurrencyDisplay,
+  formatMetricCurrency as formatMetricCurrencyDisplay,
   formatSignedCurrency as formatSignedCurrencyDisplay,
   getCurrencyDisplayParts,
   toDisplayCurrencyAmount,
   CURRENCY_DECIMAL_SCALE,
 } from "@/lib/format/currency-display";
-import { CURRENCY_SYMBOL } from "@/lib/format/currency-display-settings";
+import { CURRENCY_CODE } from "@/lib/format/currency-display-settings";
 import type { RecordType } from "@/lib/finance/types";
 import { normalizeNumericInput } from "@/lib/format/numerals";
 
 export {
   CURRENCY_DECIMAL_SCALE,
-  CURRENCY_SYMBOL,
+  CURRENCY_CODE,
   getCurrencyDisplayParts,
   toDisplayCurrencyAmount,
+  formatMetricCurrencyDisplay as formatMetricCurrency,
 };
-export type { CurrencyDisplayParts } from "@/lib/format/currency-display";
-export type { FormatCurrencyOptions } from "@/lib/format/currency-display";
+export type {
+  CurrencyDisplayParts,
+  CurrencySignMode,
+  FormatCurrencyOptions,
+} from "@/lib/format/currency-display";
 
 export function formatCurrency(
   amount: number,

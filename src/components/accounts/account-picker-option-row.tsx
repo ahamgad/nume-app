@@ -36,7 +36,6 @@ export function AccountPickerOptionRow({
         account={account}
         formatLocale={formatLocale}
         t={t}
-        showInstitutionName
       />
     </button>
   );

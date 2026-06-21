@@ -10,6 +10,7 @@ import {
 
 import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { getCurrencyDisplayParts } from "@/lib/format/currency";
+import type { CurrencySignMode } from "@/lib/format/currency-display";
 import {
   CURRENCY_AMOUNT_TRAILING_GAP_PX,
   fitFontSizeToWidth,
@@ -24,6 +25,7 @@ interface ResponsiveCurrencyAmountProps {
   locale: string;
   variant?: ResponsiveCurrencyVariant;
   className?: string;
+  signMode?: CurrencySignMode;
   /** Trailing action rendered beside the amount (e.g. edit button). */
   trailing?: ReactNode;
 }
@@ -33,13 +35,14 @@ export function ResponsiveCurrencyAmount({
   locale,
   variant = "hero",
   className,
+  signMode = "unsigned",
   trailing,
 }: ResponsiveCurrencyAmountProps) {
   const rowRef = useRef<HTMLDivElement>(null);
   const trailingRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [fontSizePx, setFontSizePx] = useState<number | null>(null);
-  const parts = getCurrencyDisplayParts(amount, locale);
+  const parts = getCurrencyDisplayParts(amount, locale, { signMode });
   const { maxPx, minPx } = getTierFontBounds(variant);
   const hasTrailing = trailing != null;
 
@@ -89,11 +92,12 @@ export function ResponsiveCurrencyAmount({
           : undefined
       }
     >
-      <span ref={textRef} className="inline-block min-w-0 max-w-full">
+      <span ref={textRef} className="inline-block min-w-0">
         <CurrencyAmount
           amount={amount}
           locale={locale}
           variant={variant}
+          signMode={signMode}
           className="font-semibold"
           style={{ fontSize: fontSizePx ?? maxPx }}
         />

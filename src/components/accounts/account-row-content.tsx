@@ -25,8 +25,6 @@ interface AccountRowContentProps {
   formatLocale: string;
   t: (key: TranslationKey) => string;
   trailing?: ReactNode;
-  /** Show institution name as a subtitle (pickers). */
-  showInstitutionName?: boolean;
 }
 
 export function AccountRowContent({
@@ -34,7 +32,6 @@ export function AccountRowContent({
   formatLocale,
   t,
   trailing,
-  showInstitutionName = false,
 }: AccountRowContentProps) {
   const displayBalance = getAccountDisplayBalance(account);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
@@ -43,6 +40,9 @@ export function AccountRowContent({
   const institutionLabel = account.institution?.trim()
     ? formatInstitutionEntityLabel(account.institution, t)
     : null;
+  const metaLabel = institutionLabel
+    ? `${institutionLabel} · ${typeLabel}`
+    : typeLabel;
 
   const leading = brandAsset ? (
     <InstitutionBrandAsset
@@ -64,14 +64,14 @@ export function AccountRowContent({
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-3">
           <p className="min-w-0 flex-1 truncate text-[0.8125rem] text-muted-foreground">
-            {typeLabel}
+            {metaLabel}
           </p>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex min-w-0 max-w-[50%] shrink items-center gap-2">
             <ResponsiveCurrencyAmount
               amount={displayBalance}
               locale={formatLocale}
               variant="row"
-              className={cn("w-auto shrink-0", balanceToneClassName)}
+              className={cn("min-w-0 shrink", balanceToneClassName)}
             />
             {trailing}
           </div>
@@ -79,11 +79,6 @@ export function AccountRowContent({
         <p className="min-w-0 truncate text-[0.9375rem] font-medium">
           {account.name}
         </p>
-        {showInstitutionName && institutionLabel ? (
-          <p className="min-w-0 truncate text-[0.8125rem] text-muted-foreground">
-            {institutionLabel}
-          </p>
-        ) : null}
       </div>
     </>
   );

@@ -93,6 +93,8 @@ interface MetricHeroProps {
   amountAction?: ReactNode;
   subline?: string;
   meta?: string;
+  /** Dashboard/widget metrics show explicit +/- prefixes. */
+  signedAmount?: boolean;
 }
 
 export function MetricHero({
@@ -105,6 +107,7 @@ export function MetricHero({
   amountAction,
   subline,
   meta,
+  signedAmount = false,
 }: MetricHeroProps) {
   return (
     <div className="w-full min-w-0 text-start">
@@ -118,6 +121,7 @@ export function MetricHero({
             locale={locale}
             variant={amountVariant}
             className={amountClassName}
+            signMode={signedAmount ? "signed" : "unsigned"}
             trailing={amountAction}
           />
         ) : (

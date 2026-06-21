@@ -107,9 +107,6 @@ export function AddCreditCardPurchaseScreen({
       />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
         <p className="text-[0.8125rem] text-muted-foreground">{account.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {t("creditCards.purchase.description")}
-        </p>
 
         <EditableField
           id="cc-purchase-amount"

@@ -6,6 +6,7 @@ import {
   CURRENCY_DECIMAL_SCALE,
   getCurrencyDisplayParts,
 } from "@/lib/format/currency";
+import type { CurrencySignMode } from "@/lib/format/currency-display";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +17,9 @@ interface CurrencyAmountProps {
   locale: string;
   variant?: CurrencyAmountVariant;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   showDecimals?: boolean;
+  signMode?: CurrencySignMode;
 }
 
 const STATIC_VARIANT_CLASS: Partial<Record<CurrencyAmountVariant, string>> = {
@@ -33,20 +35,28 @@ export function CurrencyAmount({
   className,
   style,
   showDecimals,
+  signMode = "unsigned",
 }: CurrencyAmountProps) {
-  const parts = getCurrencyDisplayParts(amount, locale, { showDecimals });
+  const parts = getCurrencyDisplayParts(amount, locale, { showDecimals, signMode });
   const staticClass = STATIC_VARIANT_CLASS[variant];
 
   return (
     <span
       className={cn(
-        "inline-flex min-w-0 max-w-full items-baseline whitespace-nowrap tabular-nums tracking-tight leading-none",
+        "inline-flex max-w-full items-baseline whitespace-nowrap tabular-nums tracking-tight leading-none",
         staticClass,
         className,
       )}
       style={style}
     >
-      <span className="min-w-0 truncate">{parts.integerText}</span>
+      {parts.signPrefix ? (
+        <span className="shrink-0">{parts.signPrefix}</span>
+      ) : null}
+      <span className="shrink-0">{parts.code}</span>
+      <span className="mx-1 shrink-0" aria-hidden="true">
+        {" "}
+      </span>
+      <span className="shrink-0">{parts.integerText}</span>
       {parts.hasDecimals ? (
         <span
           className="shrink-0"
@@ -55,7 +65,6 @@ export function CurrencyAmount({
           {parts.decimalText}
         </span>
       ) : null}
-      <span className="ms-1 shrink-0">{parts.symbol}</span>
     </span>
   );
 }
