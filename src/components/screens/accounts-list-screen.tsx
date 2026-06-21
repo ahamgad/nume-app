@@ -109,15 +109,19 @@ export function AccountsListScreen() {
     [accounts, filter],
   );
 
-  const { moneyAccounts, savingsAccounts, certificateAccounts } = useMemo(() => {
+  const { moneyAccounts, savingsAccounts, certificateAccounts, liabilityAccounts } =
+    useMemo(() => {
     const money: Account[] = [];
     const savings: Account[] = [];
     const certificates: Account[] = [];
+    const liabilities: Account[] = [];
     for (const account of filteredAccounts) {
       if (account.type === "certificate") {
         certificates.push(account);
       } else if (account.type === "savings_account") {
         savings.push(account);
+      } else if (account.type === "credit_card" || account.type === "loan") {
+        liabilities.push(account);
       } else {
         money.push(account);
       }
@@ -126,6 +130,7 @@ export function AccountsListScreen() {
       moneyAccounts: money,
       savingsAccounts: savings,
       certificateAccounts: certificates,
+      liabilityAccounts: liabilities,
     };
   }, [filteredAccounts]);
 
@@ -206,6 +211,13 @@ export function AccountsListScreen() {
             <AccountSection
               title={t("accounts.sections.certificates")}
               accounts={certificateAccounts}
+              formatLocale={formatLocale}
+              onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
+              t={t}
+            />
+            <AccountSection
+              title={t("accounts.sections.liabilities")}
+              accounts={liabilityAccounts}
               formatLocale={formatLocale}
               onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
               t={t}

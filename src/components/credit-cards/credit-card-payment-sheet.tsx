@@ -1,15 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { EditableField } from "@/components/field-editor";
 import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
-import { PaymentSourcePicker } from "@/components/ui/payment-source-picker";
 import { DateField } from "@/components/ui/date-field";
 import { Label } from "@/components/ui/label";
 import { validateRecordAmountField } from "@/lib/finance/record-form";
-import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
-import type { Account } from "@/lib/finance/types";
 import {
   formatAmountInput,
   parseAmount,
@@ -22,12 +19,9 @@ import { useT, useLocale } from "@/providers/i18n-provider";
 interface CreditCardPaymentSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  accounts: Account[];
-  creditCardAccountId: string;
-  initialPaymentSourceAccountId: string | null;
+  linkedAccountLabel: string | null;
   onSubmit: (input: {
     amount: number;
-    paymentSourceAccountId: string;
     description: string | null;
     date: string;
   }) => Promise<void>;
@@ -36,9 +30,7 @@ interface CreditCardPaymentSheetProps {
 export function CreditCardPaymentSheet({
   open,
   onOpenChange,
-  accounts,
-  creditCardAccountId,
-  initialPaymentSourceAccountId,
+  linkedAccountLabel,
   onSubmit,
 }: CreditCardPaymentSheetProps) {
   const t = useT();
@@ -47,19 +39,8 @@ export function CreditCardPaymentSheet({
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(todayIsoDate());
-  const [paymentSourceAccountId, setPaymentSourceAccountId] = useState<
-    string | null
-  >(initialPaymentSourceAccountId);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const paymentSourceAccounts = useMemo(
-    () =>
-      filterTransferAccounts(accounts, {
-        excludeAccountIds: [creditCardAccountId],
-      }),
-    [accounts, creditCardAccountId],
-  );
 
   if (!open) return null;
 
@@ -67,7 +48,6 @@ export function CreditCardPaymentSheet({
     setAmount("");
     setDescription("");
     setDate(todayIsoDate());
-    setPaymentSourceAccountId(initialPaymentSourceAccountId);
     setErrors({});
     setSubmitting(false);
   }
@@ -81,22 +61,19 @@ export function CreditCardPaymentSheet({
     const nextErrors: Record<string, string> = {};
     const amountError = validateRecordAmountField("expense", amount, t);
     if (amountError) nextErrors.amount = amountError;
-    if (!paymentSourceAccountId) {
-      nextErrors.paymentSourceAccountId = t(
-        "creditCards.validation.paymentSourceRequired",
-      );
+    if (!linkedAccountLabel) {
+      nextErrors.form = t("creditCards.validation.linkedAccountRequired");
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     const parsedAmount = parseAmount(amount);
-    if (parsedAmount === null || !paymentSourceAccountId) return;
+    if (parsedAmount === null) return;
 
     setSubmitting(true);
     try {
       await onSubmit({
         amount: parsedAmount,
-        paymentSourceAccountId,
         description: description.trim() || null,
         date,
       });
@@ -111,7 +88,7 @@ export function CreditCardPaymentSheet({
       title={t("creditCards.payment.title")}
       onDismiss={dismiss}
       onConfirm={() => void handleSubmit()}
-      confirmDisabled={submitting}
+      confirmDisabled={submitting || !linkedAccountLabel}
       confirmLabel={
         submitting ? t("creditCards.payment.saving") : t("creditCards.payment.submit")
       }
@@ -122,28 +99,19 @@ export function CreditCardPaymentSheet({
           {t("creditCards.payment.description")}
         </p>
 
-        {!initialPaymentSourceAccountId ? (
-          <p className="text-sm text-muted-foreground">
-            {t("creditCards.payment.selectSourcePrompt")}
+        {linkedAccountLabel ? (
+          <div className="space-y-1">
+            <Label>{t("creditCards.fields.linkedAccount.label")}</Label>
+            <p className="text-[0.9375rem] font-medium">{linkedAccountLabel}</p>
+          </div>
+        ) : (
+          <p className="text-sm text-destructive">
+            {t("creditCards.validation.linkedAccountRequired")}
           </p>
-        ) : null}
+        )}
 
-        <PaymentSourcePicker
-          id="cc-payment-source"
-          value={paymentSourceAccountId}
-          accounts={paymentSourceAccounts}
-          onChange={(next) => {
-            setPaymentSourceAccountId(next);
-            setErrors((prev) => {
-              if (!prev.paymentSourceAccountId) return prev;
-              const updated = { ...prev };
-              delete updated.paymentSourceAccountId;
-              return updated;
-            });
-          }}
-        />
-        {errors.paymentSourceAccountId ? (
-          <p className="text-sm text-destructive">{errors.paymentSourceAccountId}</p>
+        {errors.form ? (
+          <p className="text-sm text-destructive">{errors.form}</p>
         ) : null}
 
         <EditableField

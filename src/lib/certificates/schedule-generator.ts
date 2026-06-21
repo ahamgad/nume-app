@@ -1,4 +1,3 @@
-import { addCalendarDays, addCalendarMonths } from "@/lib/certificates/certificate-engine";
 import {
   iterateEligibleDailyPayoutDates,
 } from "@/lib/business-days/calendar";
@@ -12,6 +11,11 @@ import type {
   ScheduleGenerationInput,
 } from "@/lib/certificates/recurring/types";
 import type { CertificateScheduleEntry, PayoutFrequency } from "@/lib/certificates/types";
+import type { SavingsPostingFrequency } from "@/lib/savings/types";
+import {
+  calculateInitialNextPostingDate,
+  calculateNextPostingDateAfter,
+} from "@/lib/savings/posting-schedule";
 import { validateGeneratedSchedule } from "@/lib/certificates/schedule-validation";
 
 const MS_PER_DAY = 86_400_000;
@@ -40,11 +44,31 @@ function frequencyStepMonths(frequency: PayoutFrequency): number | null {
   }
 }
 
+function certificateFrequencyToSavings(
+  frequency: PayoutFrequency,
+): SavingsPostingFrequency | null {
+  switch (frequency) {
+    case "daily":
+      return "daily";
+    case "monthly":
+      return "monthly";
+    case "quarterly":
+      return "quarterly";
+    case "semi_annual":
+      return "semi_annual";
+    case "annual":
+      return "annual";
+    default:
+      return null;
+  }
+}
+
 /** Build the full projected schedule for a certificate configuration. */
 export function generateScheduleEntries(
   input: ScheduleGenerationInput,
 ): GeneratedScheduleEntry[] {
-  const { payoutFrequency, purchaseDate, maturityDate, termMonths } = input;
+  const { payoutFrequency, purchaseDate, maturityDate, termMonths, payoutDay } =
+    input;
 
   if (payoutFrequency === "instantly") {
     const amount = calculateScheduleEntryInterest(
@@ -111,8 +135,22 @@ export function generateScheduleEntries(
 
   if (perPeriodAmount <= 0) return [];
 
+  const savingsFrequency = certificateFrequencyToSavings(payoutFrequency);
+  if (!savingsFrequency) return [];
+
   const entries: GeneratedScheduleEntry[] = [];
-  let candidate = addCalendarMonths(purchaseDate, stepMonths);
+  let candidate = calculateInitialNextPostingDate(
+    purchaseDate,
+    savingsFrequency,
+    payoutDay,
+  );
+  if (candidate === purchaseDate) {
+    candidate = calculateNextPostingDateAfter(
+      candidate,
+      savingsFrequency,
+      payoutDay,
+    );
+  }
   let guard = 0;
   const maxIterations = 600;
 
@@ -121,7 +159,11 @@ export function generateScheduleEntries(
       dueDate: candidate,
       interestAmount: perPeriodAmount,
     });
-    candidate = addCalendarMonths(candidate, stepMonths);
+    candidate = calculateNextPostingDateAfter(
+      candidate,
+      savingsFrequency,
+      payoutDay,
+    );
     guard += 1;
   }
 
@@ -213,6 +255,7 @@ export function certificateInputFromCertificate(
     termMonths: number;
     maturityDate: string;
     payoutFrequency: PayoutFrequency;
+    payoutDay: number;
     excludeWeekends: boolean;
     excludeEgyptianHolidays: boolean;
   },
@@ -225,6 +268,7 @@ export function certificateInputFromCertificate(
     termMonths: certificate.termMonths,
     maturityDate: certificate.maturityDate,
     payoutFrequency: certificate.payoutFrequency,
+    payoutDay: certificate.payoutDay,
     excludeWeekends: certificate.excludeWeekends,
     excludeEgyptianHolidays: certificate.excludeEgyptianHolidays,
     observedHolidayDates,

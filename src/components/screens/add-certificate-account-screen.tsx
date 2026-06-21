@@ -17,6 +17,7 @@ import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destin
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseAmount } from "@/lib/format/currency";
+import { parsePostingDayFromForm } from "@/lib/savings/posting-schedule";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
@@ -70,10 +71,12 @@ export function AddCertificateAccountScreen() {
     const principalAmount = parseAmount(values.principalAmount);
     const annualInterestRate = parseAmount(values.annualInterestRate);
     const termMonths = resolveTermMonths(values);
+    const payoutDay = parsePostingDayFromForm(values.payoutDay);
     if (
       principalAmount === null ||
       annualInterestRate === null ||
-      termMonths === null
+      termMonths === null ||
+      payoutDay === null
     ) {
       return;
     }
@@ -89,6 +92,7 @@ export function AddCertificateAccountScreen() {
         purchaseDate: values.purchaseDate,
         termMonths,
         payoutFrequency: values.payoutFrequency,
+        payoutDay,
         excludeWeekends: values.excludeWeekends,
         excludeEgyptianHolidays: values.excludeEgyptianHolidays,
         destinationAccountId: values.autoApplyInterest

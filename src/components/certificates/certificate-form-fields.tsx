@@ -20,6 +20,7 @@ import {
 } from "@/lib/certificates/form";
 import type { PayoutFrequency } from "@/lib/certificates/types";
 import type { Account } from "@/lib/finance/types";
+import { POSTING_DAY_FORM_LAST } from "@/lib/savings/posting-schedule";
 import {
   formatAmountInput,
   sanitizeAmountInput,
@@ -93,6 +94,22 @@ export function CertificateFormFields({
       label: t(`certificates.payoutFrequency.${frequency}` as TranslationKey),
     }),
   );
+
+  const payoutDayOptions: ScrollChipOption<string>[] = [
+    ...Array.from({ length: 28 }, (_, index) => ({
+      value: String(index + 1),
+      label: String(index + 1),
+    })),
+    {
+      value: POSTING_DAY_FORM_LAST,
+      label: t("savings.fields.postingDay.lastOfMonth"),
+    },
+  ];
+
+  const showsPayoutDay =
+    values.payoutFrequency !== "daily" &&
+    values.payoutFrequency !== "at_maturity" &&
+    values.payoutFrequency !== "instantly";
 
   return (
     <div className="space-y-6">
@@ -251,6 +268,24 @@ export function CertificateFormFields({
             onChange={(payoutFrequency) => onChange({ payoutFrequency })}
           />
         </div>
+
+        {showsPayoutDay ? (
+          <div className="space-y-2">
+            <Label>{t("savings.fields.postingDay.label")}</Label>
+            <ScrollChipSelect
+              value={values.payoutDay}
+              options={payoutDayOptions}
+              ariaLabel={t("savings.fields.postingDay.label")}
+              onChange={(payoutDay) => {
+                onChange({ payoutDay });
+                onClearError("payoutDay");
+              }}
+            />
+            {errors.payoutDay ? (
+              <p className="text-sm text-destructive">{errors.payoutDay}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         {values.payoutFrequency === "daily" ? (
           <div className="rounded-lg border border-border px-4">

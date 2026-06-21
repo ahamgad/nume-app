@@ -124,6 +124,8 @@ interface ScreenBodyProps {
   /** When omitted, inferred from the current route (tab bar visible or not). */
   withTabBar?: boolean;
   withStickyFooter?: boolean;
+  /** When true, always opens at the top instead of restoring scroll position. */
+  resetScrollOnMount?: boolean;
   onRefresh?: () => Promise<void>;
 }
 
@@ -132,13 +134,14 @@ export function ScreenBody({
   className,
   withTabBar,
   withStickyFooter = false,
+  resetScrollOnMount = false,
   onRefresh,
 }: ScreenBodyProps) {
   const pathname = usePathname();
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
 
-  useScrollRestoration(scrollRef);
+  useScrollRestoration(scrollRef, { resetOnMount: resetScrollOnMount });
   useFocusScrollIntoView(scrollRef, !isModalOpen, withStickyFooter);
 
   const tabBarVisible = withTabBar ?? isTabBarVisible(pathname);

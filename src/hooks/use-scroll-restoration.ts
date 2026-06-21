@@ -5,9 +5,14 @@ import { type RefObject, useLayoutEffect, useRef } from "react";
 
 import {
   buildScrollRestorationKey,
+  clearScrollPosition,
   getScrollPosition,
   setScrollPosition,
 } from "@/lib/navigation/scroll-restoration";
+
+interface UseScrollRestorationOptions {
+  resetOnMount?: boolean;
+}
 
 /**
  * Saves and restores `[data-app-scroll]` position across route remounts.
@@ -16,6 +21,7 @@ import {
  */
 export function useScrollRestoration(
   scrollRef: RefObject<HTMLElement | null>,
+  options?: UseScrollRestorationOptions,
 ) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,6 +38,12 @@ export function useScrollRestoration(
     const node = scrollRef.current;
     if (!node) return;
 
+    if (options?.resetOnMount) {
+      clearScrollPosition(scrollKey);
+      node.scrollTop = 0;
+      return;
+    }
+
     const saved = getScrollPosition(scrollKey);
     if (saved !== undefined) {
       node.scrollTop = saved;
@@ -40,5 +52,5 @@ export function useScrollRestoration(
     return () => {
       setScrollPosition(scrollKeyRef.current, node.scrollTop);
     };
-  }, [scrollKey, scrollRef]);
+  }, [scrollKey, scrollRef, options?.resetOnMount]);
 }

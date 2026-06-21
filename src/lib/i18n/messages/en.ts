@@ -197,6 +197,7 @@ export const en = {
       money: "Money accounts",
       savings: "Savings",
       certificates: "Certificates",
+      liabilities: "Liabilities",
       basic: "Basic information",
       balance: "Balance",
     },
@@ -730,41 +731,31 @@ export const en = {
       success: "Credit card updated",
     },
     formSections: {
-      statementCycle: "Statement cycle",
-      paymentSource: "Payment source",
+      statement: "Statement",
     },
     fields: {
       outstandingBalance: {
-        label: "Amount owed",
-        hint: "Enter the outstanding balance on this card today.",
+        label: "Outstanding balance",
       },
       creditLimit: {
         label: "Credit limit",
-        placeholder: "Optional",
-        hint: "Optional. Used to calculate utilization.",
       },
-      statementCloseDay: {
-        label: "Statement close day",
+      statementDueDay: {
+        label: "Statement due date",
       },
-      paymentDueDay: {
-        label: "Payment due day",
-      },
-      paymentSource: {
-        label: "Payment source account",
-        placeholder: "Select payment source",
-        description: "Optional. Used when you make a payment from this card.",
-        hint: "You can link a payment source now or when you make your first payment.",
+      linkedAccount: {
+        label: "Account",
+        placeholder: "Select account",
+        description:
+          "The existing account this credit card is tied to.",
         searchPlaceholder: "Search accounts",
         noResults: "No matching accounts",
-        notSelected: "No account selected",
       },
     },
     details: {
       title: "Credit card",
       outstandingBalance: "Outstanding balance",
       utilization: "{value}% utilization",
-      paymentSource: "Payment source",
-      paymentSourceNotSet: "Not set",
     },
     actions: {
       addPurchase: "Add purchase",
@@ -788,9 +779,10 @@ export const en = {
       success: "Payment recorded",
     },
     validation: {
+      creditLimitRequired: "Enter a valid credit limit",
       creditLimitInvalid: "Enter a valid credit limit",
-      statementDayInvalid: "Choose a day between 1 and 28",
-      paymentSourceRequired: "Select a payment source account",
+      statementDayInvalid: "Choose a day between 1 and 28, or last day of month",
+      linkedAccountRequired: "Select the account this card is tied to",
     },
   },
   records: {

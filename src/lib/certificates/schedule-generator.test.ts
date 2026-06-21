@@ -18,6 +18,9 @@ const baseInput = {
   termMonths: 12,
   maturityDate: "2027-01-15",
   payoutFrequency: "monthly" as const,
+  payoutDay: 15,
+  excludeWeekends: true,
+  excludeEgyptianHolidays: true,
 };
 
 describe("schedule-generator", () => {

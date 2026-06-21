@@ -25,9 +25,9 @@ import type { Account, FinanceRecord } from "@/lib/finance/types";
 import { updateSavingsCycleMinimum } from "@/lib/savings/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 
-function validateStatementDay(day: number, field: string): void {
-  if (!Number.isInteger(day) || day < 1 || day > 28) {
-    throw new Error(`${field} must be between 1 and 28`);
+function validatePaymentDueDay(day: number, field: string): void {
+  if (!Number.isInteger(day) || day < 0 || day > 28) {
+    throw new Error(`${field} must be between 1 and 28, or last day of month`);
   }
 }
 
@@ -61,10 +61,17 @@ export async function createCreditCard(
   if (authError) throw new Error(getSupabaseErrorMessage(authError));
   if (!user || user.id !== userId) throw new Error("Not authenticated");
 
-  const statementCloseDay = input.statementCloseDay ?? 1;
   const paymentDueDay = input.paymentDueDay ?? 15;
-  validateStatementDay(statementCloseDay, "Statement close day");
-  validateStatementDay(paymentDueDay, "Payment due day");
+  validatePaymentDueDay(paymentDueDay, "Statement due day");
+
+  const linkedAccount = await loadAccount(
+    supabase,
+    userId,
+    input.linkedAccountId,
+  );
+  if (!canSendTransfers(linkedAccount)) {
+    throw new Error("Linked account cannot be used for credit card payments");
+  }
 
   const { data: accountRow, error: accountError } = await supabase
     .from("accounts")
@@ -72,10 +79,10 @@ export async function createCreditCard(
       user_id: user.id,
       account_type: "credit_card",
       name: input.name.trim(),
-      institution: input.institution?.trim() || null,
+      institution: linkedAccount.institution,
       current_balance: toStoredCreditCardBalance(input.outstandingBalance),
-      include_in_net_worth: input.includeInNetWorth ?? true,
-      include_in_emergency_fund: input.includeInEmergencyFund ?? false,
+      include_in_net_worth: true,
+      include_in_emergency_fund: false,
       status: "active",
     })
     .select("id")
@@ -89,9 +96,9 @@ export async function createCreditCard(
       user_id: user.id,
       account_id: accountRow.id,
       card_number_last4: input.cardNumberLast4 ?? null,
-      statement_close_day: statementCloseDay,
+      statement_close_day: 1,
       payment_due_day: paymentDueDay,
-      credit_limit: input.creditLimit ?? null,
+      credit_limit: input.creditLimit,
     })
     .select("*")
     .single();
@@ -105,19 +112,15 @@ export async function createCreditCard(
     throw new Error(getSupabaseErrorMessage(error));
   }
 
-  let paymentSourceAccountId: string | null = null;
-  if (input.paymentSourceAccountId) {
-    await setRelationship(
-      supabase,
-      userId,
-      accountRow.id,
-      input.paymentSourceAccountId,
-      "credit_card_payment_source",
-    );
-    paymentSourceAccountId = input.paymentSourceAccountId;
-  }
+  await setRelationship(
+    supabase,
+    userId,
+    accountRow.id,
+    input.linkedAccountId,
+    "credit_card_payment_source",
+  );
 
-  return mapCreditCard(data as DbCreditCard, paymentSourceAccountId);
+  return mapCreditCard(data as DbCreditCard, input.linkedAccountId);
 }
 
 export async function updateCreditCard(
@@ -131,12 +134,17 @@ export async function updateCreditCard(
 
   const accountPatch: Parameters<typeof patchAccount>[3] = {};
   if (input.name !== undefined) accountPatch.name = input.name;
-  if (input.institution !== undefined) accountPatch.institution = input.institution;
-  if (input.includeInNetWorth !== undefined) {
-    accountPatch.includeInNetWorth = input.includeInNetWorth;
-  }
-  if (input.includeInEmergencyFund !== undefined) {
-    accountPatch.includeInEmergencyFund = input.includeInEmergencyFund;
+
+  if (input.linkedAccountId) {
+    const linkedAccount = await loadAccount(
+      supabase,
+      userId,
+      input.linkedAccountId,
+    );
+    if (!canSendTransfers(linkedAccount)) {
+      throw new Error("Linked account cannot be used for credit card payments");
+    }
+    accountPatch.institution = linkedAccount.institution;
   }
 
   if (Object.keys(accountPatch).length > 0) {
@@ -147,12 +155,8 @@ export async function updateCreditCard(
   if (input.cardNumberLast4 !== undefined) {
     cardPatch.card_number_last4 = input.cardNumberLast4;
   }
-  if (input.statementCloseDay !== undefined) {
-    validateStatementDay(input.statementCloseDay, "Statement close day");
-    cardPatch.statement_close_day = input.statementCloseDay;
-  }
   if (input.paymentDueDay !== undefined) {
-    validateStatementDay(input.paymentDueDay, "Payment due day");
+    validatePaymentDueDay(input.paymentDueDay, "Statement due day");
     cardPatch.payment_due_day = input.paymentDueDay;
   }
   if (input.creditLimit !== undefined) {
@@ -176,7 +180,7 @@ export async function updateCreditCard(
     );
   }
 
-  if (input.clearPaymentSource) {
+  if (input.clearLinkedAccount) {
     await removeRelationship(
       supabase,
       userId,
@@ -187,17 +191,17 @@ export async function updateCreditCard(
       ...updatedRow,
       paymentSourceAccountId: null,
     };
-  } else if (input.paymentSourceAccountId) {
+  } else if (input.linkedAccountId) {
     await setRelationship(
       supabase,
       userId,
       accountId,
-      input.paymentSourceAccountId,
+      input.linkedAccountId,
       "credit_card_payment_source",
     );
     updatedRow = {
       ...updatedRow,
-      paymentSourceAccountId: input.paymentSourceAccountId,
+      paymentSourceAccountId: input.linkedAccountId,
     };
   }
 

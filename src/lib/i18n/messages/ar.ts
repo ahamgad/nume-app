@@ -198,6 +198,7 @@ export const ar = {
       money: "حسابات النقد",
       savings: "التوفير",
       certificates: "الشهادات",
+      liabilities: "الالتزامات",
       basic: "المعلومات الأساسية",
       balance: "الرصيد",
     },
@@ -729,41 +730,30 @@ export const ar = {
       success: "تم تحديث بطاقة الائتمان",
     },
     formSections: {
-      statementCycle: "دورة الكشف",
-      paymentSource: "مصدر السداد",
+      statement: "الكشف",
     },
     fields: {
       outstandingBalance: {
-        label: "المبلغ المستحق",
-        hint: "أدخل الرصيد المستحق على البطاقة اليوم.",
+        label: "الرصيد المستحق",
       },
       creditLimit: {
         label: "حد الائتمان",
-        placeholder: "اختياري",
-        hint: "اختياري. يُستخدم لحساب نسبة الاستخدام.",
       },
-      statementCloseDay: {
-        label: "يوم إغلاق الكشف",
+      statementDueDay: {
+        label: "تاريخ استحقاق الكشف",
       },
-      paymentDueDay: {
-        label: "يوم استحقاق السداد",
-      },
-      paymentSource: {
-        label: "حساب مصدر السداد",
-        placeholder: "اختر مصدر السداد",
-        description: "اختياري. يُستخدم عند سداد البطاقة.",
-        hint: "يمكنك ربط مصدر السداد الآن أو عند أول عملية سداد.",
+      linkedAccount: {
+        label: "الحساب",
+        placeholder: "اختر حسابًا",
+        description: "الحساب الموجود المرتبط ببطاقة الائتمان.",
         searchPlaceholder: "ابحث في الحسابات",
         noResults: "لا توجد حسابات مطابقة",
-        notSelected: "لم يُحدد حساب",
       },
     },
     details: {
       title: "بطاقة ائتمان",
       outstandingBalance: "الرصيد المستحق",
       utilization: "نسبة الاستخدام {value}%",
-      paymentSource: "مصدر السداد",
-      paymentSourceNotSet: "غير محدد",
     },
     actions: {
       addPurchase: "إضافة مشترى",
@@ -787,9 +777,10 @@ export const ar = {
       success: "تم تسجيل السداد",
     },
     validation: {
+      creditLimitRequired: "أدخل حد ائتمان صالحًا",
       creditLimitInvalid: "أدخل حد ائتمان صالحًا",
-      statementDayInvalid: "اختر يومًا بين 1 و 28",
-      paymentSourceRequired: "اختر حساب مصدر السداد",
+      statementDayInvalid: "اختر يومًا بين 1 و 28 أو آخر يوم في الشهر",
+      linkedAccountRequired: "اختر الحساب المرتبط بالبطاقة",
     },
   },
   records: {

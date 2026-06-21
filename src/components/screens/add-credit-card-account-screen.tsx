@@ -9,8 +9,8 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import {
   EMPTY_CREDIT_CARD_FORM_VALUES,
-  parseCreditCardDay,
-  parseOptionalCreditLimit,
+  parseCreditCardStatementDueDay,
+  parseCreditLimit,
   validateCreditCardForm,
   type CreditCardFormValues,
 } from "@/lib/credit-cards/form";
@@ -40,7 +40,7 @@ export function AddCreditCardAccountScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const paymentSourceAccounts = useMemo(
+  const linkedAccounts = useMemo(
     () => filterTransferAccounts(accounts),
     [accounts],
   );
@@ -63,25 +63,26 @@ export function AddCreditCardAccountScreen() {
     if (Object.keys(nextErrors).length > 0) return;
 
     const outstandingBalance = parseAmount(values.outstandingBalance);
-    if (outstandingBalance === null) return;
-
-    const statementCloseDay = parseCreditCardDay(values.statementCloseDay);
-    const paymentDueDay = parseCreditCardDay(values.paymentDueDay);
-    if (statementCloseDay === null || paymentDueDay === null) return;
+    const creditLimit = parseCreditLimit(values.creditLimit);
+    const paymentDueDay = parseCreditCardStatementDueDay(values.statementDueDay);
+    if (
+      outstandingBalance === null ||
+      creditLimit === null ||
+      paymentDueDay === null ||
+      !values.linkedAccountId
+    ) {
+      return;
+    }
 
     setSubmitting(true);
     try {
       const card = await createCreditCard({
         name: values.name.trim(),
-        institution: values.institution.trim() || null,
+        linkedAccountId: values.linkedAccountId,
         outstandingBalance,
         cardNumberLast4: parseOptionalIdentifierLast4(values.identifier),
-        statementCloseDay,
         paymentDueDay,
-        creditLimit: parseOptionalCreditLimit(values.creditLimit),
-        paymentSourceAccountId: values.paymentSourceAccountId,
-        includeInNetWorth: values.includeInNetWorth,
-        includeInEmergencyFund: values.includeInEmergencyFund,
+        creditLimit,
       });
       showToast(t("creditCards.create.success"));
       router.replace(`/accounts/${card.accountId}`);
@@ -108,12 +109,12 @@ export function AddCreditCardAccountScreen() {
         title={getAddAccountScreenTitle("credit_card", t)}
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} className="pb-28">
+      <ScreenBody withTabBar={false} className="pb-28" resetScrollOnMount>
         <CreditCardFormFields
           values={values}
           errors={errors}
           amountInputLocale={amountInputLocale}
-          paymentSourceAccounts={paymentSourceAccounts}
+          linkedAccounts={linkedAccounts}
           disabled={submitting}
           mode="create"
           onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}

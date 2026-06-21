@@ -3,6 +3,7 @@
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { WidgetCard } from "@/components/patterns";
 import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
+import { getBalanceToneClassName } from "@/lib/finance/balance-display";
 import { formatRelativeTime } from "@/lib/format/date";
 import type { Account } from "@/lib/finance/types";
 import { useFormatLocale, useT } from "@/providers/i18n-provider";
@@ -33,7 +34,7 @@ export function LiabilityBalanceMetricCard({
           amount={outstanding}
           locale={formatLocale}
           variant="hero"
-          className="text-destructive"
+          className={getBalanceToneClassName(account)}
         />
       </div>
       {subline ? (

@@ -13,29 +13,22 @@ export interface CreditCard {
 
 export interface CreateCreditCardInput {
   name: string;
-  institution?: string | null;
+  /** Existing account this credit card is tied to (payment source). */
+  linkedAccountId: string;
   /** Amount owed as a positive number; stored internally as negative balance. */
   outstandingBalance: number;
   cardNumberLast4?: string | null;
-  statementCloseDay?: number;
   paymentDueDay?: number;
-  creditLimit?: number | null;
-  paymentSourceAccountId?: string | null;
-  includeInNetWorth?: boolean;
-  includeInEmergencyFund?: boolean;
+  creditLimit: number;
 }
 
 export interface UpdateCreditCardInput {
   name?: string;
-  institution?: string | null;
   cardNumberLast4?: string | null;
-  statementCloseDay?: number;
   paymentDueDay?: number;
   creditLimit?: number | null;
-  paymentSourceAccountId?: string | null;
-  clearPaymentSource?: boolean;
-  includeInNetWorth?: boolean;
-  includeInEmergencyFund?: boolean;
+  linkedAccountId?: string | null;
+  clearLinkedAccount?: boolean;
 }
 
 export interface AddCreditCardPurchaseInput {

@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   creditCardFormValuesFromAccount,
-  parseCreditCardDay,
-  parseOptionalCreditLimit,
+  parseCreditCardStatementDueDay,
+  parseCreditLimit,
   validateCreditCardForm,
   type CreditCardFormValues,
 } from "@/lib/credit-cards/form";
@@ -92,7 +92,7 @@ function EditCreditCardAccountForm({
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const paymentSourceAccounts = useMemo(
+  const linkedAccounts = useMemo(
     () => filterTransferAccounts(accounts, { excludeAccountIds: [accountId] }),
     [accounts, accountId],
   );
@@ -116,23 +116,20 @@ function EditCreditCardAccountForm({
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const statementCloseDay = parseCreditCardDay(values.statementCloseDay);
-    const paymentDueDay = parseCreditCardDay(values.paymentDueDay);
-    if (statementCloseDay === null || paymentDueDay === null) return;
+    const paymentDueDay = parseCreditCardStatementDueDay(values.statementDueDay);
+    const creditLimit = parseCreditLimit(values.creditLimit);
+    if (paymentDueDay === null || creditLimit === null || !values.linkedAccountId) {
+      return;
+    }
 
     setSubmitting(true);
     try {
       await updateCreditCard(accountId, {
         name: values.name.trim(),
-        institution: values.institution.trim() || null,
         cardNumberLast4: parseOptionalIdentifierLast4(values.identifier),
-        statementCloseDay,
         paymentDueDay,
-        creditLimit: parseOptionalCreditLimit(values.creditLimit),
-        paymentSourceAccountId: values.paymentSourceAccountId ?? undefined,
-        clearPaymentSource: values.paymentSourceAccountId === null,
-        includeInNetWorth: values.includeInNetWorth,
-        includeInEmergencyFund: values.includeInEmergencyFund,
+        creditLimit,
+        linkedAccountId: values.linkedAccountId,
       });
       showToast(t("creditCards.edit.success"));
       router.replace(`/accounts/${accountId}`);
@@ -159,12 +156,12 @@ function EditCreditCardAccountForm({
         title={t("creditCards.edit.title")}
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} className="pb-28">
+      <ScreenBody withTabBar={false} className="pb-28" resetScrollOnMount>
         <CreditCardFormFields
           values={values}
           errors={errors}
           amountInputLocale={amountInputLocale}
-          paymentSourceAccounts={paymentSourceAccounts}
+          linkedAccounts={linkedAccounts}
           disabled={submitting}
           mode="edit"
           onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}

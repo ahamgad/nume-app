@@ -3,9 +3,7 @@
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
-import { ToggleSettingRow } from "@/components/patterns";
-import { PaymentSourcePicker } from "@/components/ui/payment-source-picker";
-import { InstitutionPicker } from "@/components/ui/institution-picker";
+import { AccountPicker } from "@/components/ui/account-picker";
 import { Label } from "@/components/ui/label";
 import {
   ScrollChipSelect,
@@ -22,6 +20,7 @@ import {
   validateAccountNameField,
 } from "@/lib/field-editor/field-validators";
 import type { Account } from "@/lib/finance/types";
+import { POSTING_DAY_FORM_LAST } from "@/lib/savings/posting-schedule";
 import { useT } from "@/providers/i18n-provider";
 
 const STATEMENT_DAYS = Array.from({ length: 28 }, (_, index) => index + 1);
@@ -30,7 +29,7 @@ interface CreditCardFormFieldsProps {
   values: CreditCardFormValues;
   errors: Record<string, string>;
   amountInputLocale: string;
-  paymentSourceAccounts: Account[];
+  linkedAccounts: Account[];
   disabled?: boolean;
   mode?: "create" | "edit";
   onChange: (patch: Partial<CreditCardFormValues>) => void;
@@ -41,7 +40,7 @@ export function CreditCardFormFields({
   values,
   errors,
   amountInputLocale,
-  paymentSourceAccounts,
+  linkedAccounts,
   disabled = false,
   mode = "create",
   onChange,
@@ -49,13 +48,19 @@ export function CreditCardFormFields({
 }: CreditCardFormFieldsProps) {
   const t = useT();
 
-  const dayOptions: ScrollChipOption<string>[] = STATEMENT_DAYS.map((day) => ({
-    value: String(day),
-    label: String(day),
-  }));
+  const statementDueDayOptions: ScrollChipOption<string>[] = [
+    ...STATEMENT_DAYS.map((day) => ({
+      value: String(day),
+      label: String(day),
+    })),
+    {
+      value: POSTING_DAY_FORM_LAST,
+      label: t("savings.fields.postingDay.lastOfMonth"),
+    },
+  ];
 
   return (
-    <>
+    <div className="space-y-6">
       <FormSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="credit-card-name"
@@ -71,18 +76,23 @@ export function CreditCardFormFields({
           }}
         />
 
-        <InstitutionPicker
-          id="credit-card-institution"
-          accountType="credit_card"
-          value={values.institution}
+        <AccountPicker
+          id="credit-card-linked-account"
+          label={t("creditCards.fields.linkedAccount.label")}
+          placeholder={t("creditCards.fields.linkedAccount.placeholder")}
+          description={t("creditCards.fields.linkedAccount.description")}
+          searchPlaceholder={t("creditCards.fields.linkedAccount.searchPlaceholder")}
+          noResultsMessage={t("creditCards.fields.linkedAccount.noResults")}
+          value={values.linkedAccountId}
+          accounts={linkedAccounts}
           disabled={disabled}
-          onChange={(institution) => {
-            onChange({ institution });
-            onClearError("institution");
+          onChange={(linkedAccountId) => {
+            onChange({ linkedAccountId });
+            onClearError("linkedAccountId");
           }}
         />
-        {errors.institution ? (
-          <p className="text-sm text-destructive">{errors.institution}</p>
+        {errors.linkedAccountId ? (
+          <p className="-mt-3 text-sm text-destructive">{errors.linkedAccountId}</p>
         ) : null}
 
         <AccountIdentifierField
@@ -106,11 +116,6 @@ export function CreditCardFormFields({
             placeholder={t("common.currency.zeroPlaceholder")}
             disabled={disabled}
             error={errors.outstandingBalance}
-            hint={
-              errors.outstandingBalance
-                ? undefined
-                : t("creditCards.fields.outstandingBalance.hint")
-            }
             prefixLabel={t("common.currency.code")}
             sanitizeInput={sanitizeAmountInput}
             formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
@@ -129,10 +134,9 @@ export function CreditCardFormFields({
           mode="numeric"
           inputMode="decimal"
           value={values.creditLimit}
-          placeholder={t("creditCards.fields.creditLimit.placeholder")}
+          placeholder="0"
           disabled={disabled}
           error={errors.creditLimit}
-          hint={t("creditCards.fields.creditLimit.hint")}
           prefixLabel={t("common.currency.code")}
           sanitizeInput={sanitizeDecimalInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
@@ -143,76 +147,23 @@ export function CreditCardFormFields({
         />
       </FormSection>
 
-      <FormSection title={t("creditCards.formSections.statementCycle")}>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t("creditCards.fields.statementCloseDay.label")}</Label>
-            <ScrollChipSelect
-              value={values.statementCloseDay}
-              options={dayOptions}
-              ariaLabel={t("creditCards.fields.statementCloseDay.label")}
-              onChange={(statementCloseDay) => {
-                onChange({ statementCloseDay });
-                onClearError("statementCloseDay");
-              }}
-            />
-            {errors.statementCloseDay ? (
-              <p className="text-sm text-destructive">{errors.statementCloseDay}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t("creditCards.fields.paymentDueDay.label")}</Label>
-            <ScrollChipSelect
-              value={values.paymentDueDay}
-              options={dayOptions}
-              ariaLabel={t("creditCards.fields.paymentDueDay.label")}
-              onChange={(paymentDueDay) => {
-                onChange({ paymentDueDay });
-                onClearError("paymentDueDay");
-              }}
-            />
-            {errors.paymentDueDay ? (
-              <p className="text-sm text-destructive">{errors.paymentDueDay}</p>
-            ) : null}
-          </div>
+      <FormSection title={t("creditCards.formSections.statement")} separator>
+        <div className="space-y-2">
+          <Label>{t("creditCards.fields.statementDueDay.label")}</Label>
+          <ScrollChipSelect
+            value={values.statementDueDay}
+            options={statementDueDayOptions}
+            ariaLabel={t("creditCards.fields.statementDueDay.label")}
+            onChange={(statementDueDay) => {
+              onChange({ statementDueDay });
+              onClearError("statementDueDay");
+            }}
+          />
+          {errors.statementDueDay ? (
+            <p className="text-sm text-destructive">{errors.statementDueDay}</p>
+          ) : null}
         </div>
       </FormSection>
-
-      <FormSection title={t("creditCards.formSections.paymentSource")}>
-        <PaymentSourcePicker
-          id="credit-card-payment-source"
-          value={values.paymentSourceAccountId}
-          accounts={paymentSourceAccounts}
-          disabled={disabled}
-          onChange={(paymentSourceAccountId) => {
-            onChange({ paymentSourceAccountId });
-            onClearError("paymentSourceAccountId");
-          }}
-        />
-        <p className="text-sm text-muted-foreground">
-          {t("creditCards.fields.paymentSource.hint")}
-        </p>
-      </FormSection>
-
-      <FormSection title={t("accounts.fields.settings.title")}>
-        <ToggleSettingRow
-          label={t("accounts.settings.includeInNetWorth.label")}
-          description={t("accounts.settings.includeInNetWorth.description")}
-          checked={values.includeInNetWorth}
-          disabled={disabled}
-          onCheckedChange={(includeInNetWorth) => onChange({ includeInNetWorth })}
-        />
-        <ToggleSettingRow
-          label={t("accounts.settings.includeInEmergencyFund.label")}
-          description={t("accounts.settings.includeInEmergencyFund.description")}
-          checked={values.includeInEmergencyFund}
-          disabled={disabled}
-          onCheckedChange={(includeInEmergencyFund) =>
-            onChange({ includeInEmergencyFund })
-          }
-        />
-      </FormSection>
-    </>
+    </div>
   );
 }

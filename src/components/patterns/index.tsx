@@ -51,6 +51,7 @@ interface MetricHeroProps {
   amount?: number;
   locale?: string;
   amountVariant?: ResponsiveCurrencyVariant;
+  amountClassName?: string;
   amountAction?: ReactNode;
   subline?: string;
   meta?: string;
@@ -62,6 +63,7 @@ export function MetricHero({
   amount,
   locale,
   amountVariant = "hero",
+  amountClassName,
   amountAction,
   subline,
   meta,
@@ -77,6 +79,7 @@ export function MetricHero({
             amount={amount}
             locale={locale}
             variant={amountVariant}
+            className={amountClassName}
             trailing={amountAction}
           />
         ) : (

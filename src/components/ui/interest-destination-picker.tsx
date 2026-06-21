@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { AccountTypeIcon } from "@/components/ui/account-type-icon";
+import { AccountPickerOptionRow } from "@/components/accounts/account-picker-option-row";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,6 @@ import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterAccountsForDestinationSearch,
   formatAccountDestinationDisplay,
-  formatAccountDestinationSubtitle,
 } from "@/lib/finance/account-display";
 import type { Account } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
@@ -127,55 +126,39 @@ export function InterestDestinationPicker({
         }
       >
         {filteredAccounts.length === 0 && !showClearOption ? (
-            <p className="px-2 py-6 text-center text-sm text-muted-foreground">
-              {t("accounts.fields.interestDestinationAccount.noResults")}
-            </p>
-          ) : (
-            <div role="listbox" aria-label={label}>
-              {showClearOption ? (
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={value === null}
-                  onClick={() => handleSelect(null)}
-                  className={cn(
-                    "flex min-h-11 w-full items-center rounded-md px-3 py-2 text-start text-[0.9375rem] transition-colors",
-                    value === null
-                      ? "bg-muted font-medium"
-                      : "hover:bg-muted/60",
-                  )}
-                >
-                  {notSelectedLabel}
-                </button>
-              ) : null}
+          <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+            {t("accounts.fields.interestDestinationAccount.noResults")}
+          </p>
+        ) : (
+          <div role="listbox" aria-label={label}>
+            {showClearOption ? (
+              <button
+                type="button"
+                role="option"
+                aria-selected={value === null}
+                onClick={() => handleSelect(null)}
+                className={cn(
+                  "flex min-h-11 w-full items-center rounded-md px-3 py-2 text-start text-[0.9375rem] transition-colors",
+                  value === null
+                    ? "bg-muted font-medium"
+                    : "hover:bg-muted/60",
+                )}
+              >
+                {notSelectedLabel}
+              </button>
+            ) : null}
 
-              {filteredAccounts.map((account) => (
-                <button
-                  key={account.id}
-                  type="button"
-                  role="option"
-                  aria-selected={value === account.id}
-                  onClick={() => handleSelect(account.id)}
-                  className={cn(
-                    "flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-start transition-colors",
-                    value === account.id
-                      ? "bg-muted"
-                      : "hover:bg-muted/60",
-                  )}
-                >
-                  <AccountTypeIcon type={account.type} className="size-4" />
-                  <div className="min-w-0 flex-1">
-                    <span className="block truncate text-[0.9375rem] font-medium">
-                      {formatAccountDestinationDisplay(account, t)}
-                    </span>
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {formatAccountDestinationSubtitle(account, t)}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+            {filteredAccounts.map((account) => (
+              <AccountPickerOptionRow
+                key={account.id}
+                account={account}
+                selected={value === account.id}
+                t={t}
+                onClick={() => handleSelect(account.id)}
+              />
+            ))}
+          </div>
+        )}
       </PickerBottomSheet>
     </div>
   );

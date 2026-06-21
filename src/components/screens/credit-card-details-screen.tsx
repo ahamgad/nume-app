@@ -23,6 +23,7 @@ import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { calculateCreditUtilization } from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
@@ -88,9 +89,9 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
   const records = getAccountRecords(accountId).slice(0, 5);
   const isArchived = account?.status === "archived";
 
-  const paymentSourceLabel = useMemo(() => {
+  const linkedAccountLabel = useMemo(() => {
     if (!creditCard?.paymentSourceAccountId) {
-      return t("creditCards.details.paymentSourceNotSet");
+      return t("common.emptyValue");
     }
     const source = accounts.find(
       (item) => item.id === creditCard.paymentSourceAccountId,
@@ -202,23 +203,17 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
 
         <section className="rounded-lg border border-border px-4">
           <DetailRow
-            label={t("creditCards.fields.statementCloseDay.label")}
-            value={String(creditCard.statementCloseDay)}
+            label={t("creditCards.fields.linkedAccount.label")}
+            value={linkedAccountLabel}
           />
           <DetailRow
-            label={t("creditCards.fields.paymentDueDay.label")}
-            value={String(creditCard.paymentDueDay)}
+            label={t("creditCards.fields.statementDueDay.label")}
+            value={formatPostingDayLabel(creditCard.paymentDueDay, t)}
           />
           <DetailRow
-            label={t("creditCards.details.paymentSource")}
-            value={paymentSourceLabel}
+            label={t("creditCards.fields.creditLimit.label")}
+            value={formatCurrency(creditCard.creditLimit ?? 0, formatLocale)}
           />
-          {creditCard.creditLimit !== null ? (
-            <DetailRow
-              label={t("creditCards.fields.creditLimit.label")}
-              value={formatCurrency(creditCard.creditLimit, formatLocale)}
-            />
-          ) : null}
         </section>
 
         {!isArchived ? (
@@ -261,12 +256,19 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
       <CreditCardPaymentSheet
         open={showPaymentSheet}
         onOpenChange={setShowPaymentSheet}
-        accounts={accounts}
-        creditCardAccountId={accountId}
-        initialPaymentSourceAccountId={creditCard.paymentSourceAccountId}
+        linkedAccountLabel={
+          creditCard.paymentSourceAccountId ? linkedAccountLabel : null
+        }
         onSubmit={async (input) => {
+          if (!creditCard.paymentSourceAccountId) {
+            showToast(t("creditCards.validation.linkedAccountRequired"));
+            throw new Error("Linked account required");
+          }
           try {
-            await makeCreditCardPayment(accountId, input);
+            await makeCreditCardPayment(accountId, {
+              ...input,
+              paymentSourceAccountId: creditCard.paymentSourceAccountId,
+            });
             showToast(t("creditCards.payment.success"));
           } catch (error) {
             logSupabaseError("makeCreditCardPayment", error);

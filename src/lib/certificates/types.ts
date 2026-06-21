@@ -59,6 +59,7 @@ export interface Certificate {
   excludeWeekends: boolean;
   excludeEgyptianHolidays: boolean;
   certificateNumberLast4: string | null;
+  payoutDay: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -86,6 +87,7 @@ export interface CreateCertificateInput {
   autoApply?: boolean;
   renewalType?: RenewalType;
   certificateNumberLast4?: string | null;
+  payoutDay?: number;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;
 }
@@ -104,6 +106,7 @@ export interface UpdateCertificateInput {
   autoApply?: boolean;
   renewalType?: RenewalType;
   certificateNumberLast4?: string | null;
+  payoutDay?: number;
   status?: CertificateStatus;
   includeInNetWorth?: boolean;
   includeInEmergencyFund?: boolean;

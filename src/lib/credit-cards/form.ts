@@ -5,44 +5,38 @@ import {
 } from "@/lib/field-editor/field-validators";
 import { parseAmount } from "@/lib/format/currency";
 import type { TranslationKey } from "@/lib/i18n";
+import {
+  parsePostingDayFromForm,
+  postingDayToFormValue,
+} from "@/lib/savings/posting-schedule";
 
 export interface CreditCardFormValues {
   name: string;
-  institution: string;
+  linkedAccountId: string | null;
   identifier: string;
   outstandingBalance: string;
   creditLimit: string;
-  statementCloseDay: string;
-  paymentDueDay: string;
-  paymentSourceAccountId: string | null;
-  includeInNetWorth: boolean;
-  includeInEmergencyFund: boolean;
+  statementDueDay: string;
 }
 
 export const EMPTY_CREDIT_CARD_FORM_VALUES: CreditCardFormValues = {
   name: "",
-  institution: "",
+  linkedAccountId: null,
   identifier: "",
   outstandingBalance: "",
   creditLimit: "",
-  statementCloseDay: "1",
-  paymentDueDay: "15",
-  paymentSourceAccountId: null,
-  includeInNetWorth: true,
-  includeInEmergencyFund: false,
+  statementDueDay: "15",
 };
 
-export function parseCreditCardDay(value: string): number | null {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 28) return null;
-  return parsed;
+export function parseCreditCardStatementDueDay(value: string): number | null {
+  return parsePostingDayFromForm(value);
 }
 
-export function parseOptionalCreditLimit(value: string): number | null {
+export function parseCreditLimit(value: string): number | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   const parsed = parseAmount(trimmed);
-  if (parsed === null || parsed < 0) return null;
+  if (parsed === null || parsed <= 0) return null;
   return parsed;
 }
 
@@ -55,8 +49,8 @@ export function validateCreditCardForm(
   const nameError = validateAccountNameField(values.name, t);
   if (nameError) errors.name = nameError;
 
-  if (!values.institution.trim()) {
-    errors.institution = t("accounts.validation.institutionRequired");
+  if (!values.linkedAccountId) {
+    errors.linkedAccountId = t("creditCards.validation.linkedAccountRequired");
   }
 
   const identifierError = validateIdentifierLast4Field(values.identifier, t);
@@ -70,18 +64,13 @@ export function validateCreditCardForm(
     if (balanceError) errors.outstandingBalance = balanceError;
   }
 
-  if (values.creditLimit.trim()) {
-    const limit = parseOptionalCreditLimit(values.creditLimit);
-    if (limit === null) {
-      errors.creditLimit = t("creditCards.validation.creditLimitInvalid");
-    }
+  const creditLimit = parseCreditLimit(values.creditLimit);
+  if (creditLimit === null) {
+    errors.creditLimit = t("creditCards.validation.creditLimitRequired");
   }
 
-  if (parseCreditCardDay(values.statementCloseDay) === null) {
-    errors.statementCloseDay = t("creditCards.validation.statementDayInvalid");
-  }
-  if (parseCreditCardDay(values.paymentDueDay) === null) {
-    errors.paymentDueDay = t("creditCards.validation.statementDayInvalid");
+  if (parseCreditCardStatementDueDay(values.statementDueDay) === null) {
+    errors.statementDueDay = t("creditCards.validation.statementDayInvalid");
   }
 
   return errors;
@@ -90,13 +79,9 @@ export function validateCreditCardForm(
 export function creditCardFormValuesFromAccount(
   account: {
     name: string;
-    institution: string | null;
-    includeInNetWorth: boolean;
-    includeInEmergencyFund: boolean;
   },
   creditCard: {
     cardNumberLast4: string | null;
-    statementCloseDay: number;
     paymentDueDay: number;
     creditLimit: number | null;
     paymentSourceAccountId: string | null;
@@ -104,15 +89,11 @@ export function creditCardFormValuesFromAccount(
 ): CreditCardFormValues {
   return {
     name: account.name,
-    institution: account.institution ?? "",
+    linkedAccountId: creditCard.paymentSourceAccountId,
     identifier: creditCard.cardNumberLast4 ?? "",
     outstandingBalance: "",
     creditLimit:
       creditCard.creditLimit === null ? "" : String(creditCard.creditLimit),
-    statementCloseDay: String(creditCard.statementCloseDay),
-    paymentDueDay: String(creditCard.paymentDueDay),
-    paymentSourceAccountId: creditCard.paymentSourceAccountId,
-    includeInNetWorth: account.includeInNetWorth,
-    includeInEmergencyFund: account.includeInEmergencyFund,
+    statementDueDay: postingDayToFormValue(creditCard.paymentDueDay),
   };
 }

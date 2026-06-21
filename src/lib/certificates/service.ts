@@ -123,6 +123,7 @@ export async function createCertificate(
     auto_apply: input.autoApply ?? false,
     status: "active",
     certificate_number_last4: input.certificateNumberLast4 ?? null,
+    payout_day: input.payoutDay ?? 1,
   };
 
   if (renewalTypeSupported) {
@@ -221,6 +222,9 @@ export async function updateCertificate(
   }
   if (input.payoutFrequency !== undefined) {
     certificatePayload.payout_frequency = input.payoutFrequency;
+  }
+  if (input.payoutDay !== undefined) {
+    certificatePayload.payout_day = input.payoutDay;
   }
   if (input.excludeWeekends !== undefined) {
     certificatePayload.exclude_weekends = input.excludeWeekends;

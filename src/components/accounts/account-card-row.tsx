@@ -8,7 +8,10 @@ import {
 } from "@/components/institutions/institution-brand-asset";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
-import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
+import {
+  getAccountDisplayBalance,
+  getBalanceToneClassName,
+} from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
@@ -27,11 +30,9 @@ export function AccountCardRow({
   onClick,
   t,
 }: AccountCardRowProps) {
-  const displayBalance =
-    account.type === "credit_card" || account.type === "loan"
-      ? toDisplayOutstandingBalance(account.currentBalance)
-      : account.currentBalance;
+  const displayBalance = getAccountDisplayBalance(account);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
+  const balanceToneClassName = getBalanceToneClassName(account);
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
 
   const leading = brandAsset ? (
@@ -68,12 +69,7 @@ export function AccountCardRow({
               amount={displayBalance}
               locale={formatLocale}
               variant="row"
-              className={cn(
-                "w-auto shrink-0",
-                account.type === "credit_card" && displayBalance > 0
-                  ? "text-destructive"
-                  : undefined,
-              )}
+              className={cn("w-auto shrink-0", balanceToneClassName)}
             />
             <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
           </div>

@@ -3,6 +3,10 @@ import { validateIdentifierLast4Field } from "@/lib/field-editor/field-validator
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import type { TranslationKey } from "@/lib/i18n";
 import { parseAmount } from "@/lib/format/currency";
+import {
+  parsePostingDayFromForm,
+  postingDayToFormValue,
+} from "@/lib/savings/posting-schedule";
 
 /** Preset certificate terms in whole years (stored as months in DB). */
 export const CERTIFICATE_TERM_YEAR_PRESETS = [1, 2, 3, 4, 5] as const;
@@ -21,6 +25,7 @@ export interface CertificateFormValues {
   termPreset: CertificateTermPreset;
   customTermYears: string;
   payoutFrequency: PayoutFrequency;
+  payoutDay: string;
   excludeWeekends: boolean;
   excludeEgyptianHolidays: boolean;
   destinationAccountId: string | null;
@@ -38,6 +43,7 @@ export const DEFAULT_CERTIFICATE_FORM_VALUES: CertificateFormValues = {
   termPreset: 1,
   customTermYears: "",
   payoutFrequency: "monthly",
+  payoutDay: "1",
   excludeWeekends: true,
   excludeEgyptianHolidays: true,
   destinationAccountId: null,
@@ -121,6 +127,15 @@ export function validateCertificateForm(
     );
   }
 
+  const showsPayoutDay =
+    values.payoutFrequency !== "daily" &&
+    values.payoutFrequency !== "at_maturity" &&
+    values.payoutFrequency !== "instantly";
+
+  if (showsPayoutDay && parsePostingDayFromForm(values.payoutDay) === null) {
+    errors.payoutDay = t("savings.validation.postingDayInvalid");
+  }
+
   return errors;
 }
 
@@ -131,6 +146,7 @@ export function certificateFormValuesFromCertificate(
     purchaseDate: string;
     termMonths: number;
     payoutFrequency: PayoutFrequency;
+    payoutDay: number;
     excludeWeekends: boolean;
     excludeEgyptianHolidays: boolean;
     destinationAccountId: string | null;
@@ -159,6 +175,7 @@ export function certificateFormValuesFromCertificate(
         ? String(Number.isInteger(years) ? years : Number(years.toFixed(2)))
         : "",
     payoutFrequency: certificate.payoutFrequency,
+    payoutDay: postingDayToFormValue(certificate.payoutDay),
     excludeWeekends: certificate.excludeWeekends,
     excludeEgyptianHolidays: certificate.excludeEgyptianHolidays,
     destinationAccountId: certificate.destinationAccountId,
@@ -181,6 +198,7 @@ export function isCertificateFormDirty(
     values.termPreset !== initial.termPreset ||
     values.customTermYears !== initial.customTermYears ||
     values.payoutFrequency !== initial.payoutFrequency ||
+    values.payoutDay !== initial.payoutDay ||
     values.excludeWeekends !== initial.excludeWeekends ||
     values.excludeEgyptianHolidays !== initial.excludeEgyptianHolidays ||
     values.destinationAccountId !== initial.destinationAccountId ||
