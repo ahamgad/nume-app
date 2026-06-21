@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
+import { CreditCardDetailsScreen } from "@/components/screens/credit-card-details-screen";
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
 import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
@@ -160,6 +161,10 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   if (account.type === "savings_account") {
     return <SavingsDetailsScreen accountId={accountId} />;
+  }
+
+  if (account.type === "credit_card") {
+    return <CreditCardDetailsScreen accountId={accountId} />;
   }
 
   return (

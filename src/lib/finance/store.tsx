@@ -45,20 +45,30 @@ import {
 } from "@/lib/savings/service";
 import {
   getCreditCardsSafe,
+} from "@/lib/credit-cards/load-credit-cards";
+import {
+  addCreditCardPurchase as addCreditCardPurchaseService,
+  createCreditCard as createCreditCardService,
+  makeCreditCardPayment as makeCreditCardPaymentService,
+  updateCreditCard as updateCreditCardService,
+} from "@/lib/credit-cards/service";
+import type {
+  AddCreditCardPurchaseInput,
+  CreateCreditCardInput,
+  CreditCard,
+  MakeCreditCardPaymentInput,
+  UpdateCreditCardInput,
+} from "@/lib/credit-cards/types";
+import {
   getLoansSafe,
 } from "@/lib/lending/load-lending";
 import {
-  createCreditCard as createCreditCardService,
   createLoan as createLoanService,
-  updateCreditCard as updateCreditCardService,
   updateLoan as updateLoanService,
 } from "@/lib/lending/service";
 import type {
-  CreateCreditCardInput,
   CreateLoanInput,
-  CreditCard,
   Loan,
-  UpdateCreditCardInput,
   UpdateLoanInput,
 } from "@/lib/lending/types";
 import type { ProcessCertificateInterestResult } from "@/lib/certificates/recurring/types";
@@ -145,6 +155,14 @@ interface FinanceContextValue {
     accountId: string,
     input: UpdateCreditCardInput,
   ) => Promise<CreditCard>;
+  addCreditCardPurchase: (
+    accountId: string,
+    input: AddCreditCardPurchaseInput,
+  ) => Promise<FinanceRecord>;
+  makeCreditCardPayment: (
+    accountId: string,
+    input: MakeCreditCardPaymentInput,
+  ) => Promise<FinanceRecord>;
   archiveCertificate: (certificateId: string) => Promise<void>;
   processCertificateInterest: (
     certificateId: string,
@@ -505,6 +523,44 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [userId, invalidate],
   );
 
+  const addCreditCardPurchase = useCallback(
+    async (
+      accountId: string,
+      input: AddCreditCardPurchaseInput,
+    ): Promise<FinanceRecord> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const { record } = await addCreditCardPurchaseService(
+        supabase,
+        userId,
+        accountId,
+        input,
+      );
+      await invalidate();
+      return record;
+    },
+    [userId, invalidate],
+  );
+
+  const makeCreditCardPayment = useCallback(
+    async (
+      accountId: string,
+      input: MakeCreditCardPaymentInput,
+    ): Promise<FinanceRecord> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      const { record } = await makeCreditCardPaymentService(
+        supabase,
+        userId,
+        accountId,
+        input,
+      );
+      await invalidate();
+      return record;
+    },
+    [userId, invalidate],
+  );
+
   const archiveCertificate = useCallback(
     async (certificateId: string): Promise<void> => {
       if (!userId) throw new Error("Not authenticated");
@@ -718,6 +774,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       updateSavingsAccount,
       updateLoan,
       updateCreditCard,
+      addCreditCardPurchase,
+      makeCreditCardPayment,
       archiveCertificate,
       processCertificateInterest,
       getCertificateSchedules,
@@ -761,6 +819,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       updateSavingsAccount,
       updateLoan,
       updateCreditCard,
+      addCreditCardPurchase,
+      makeCreditCardPayment,
       archiveCertificate,
       processCertificateInterest,
       getCertificateSchedules,

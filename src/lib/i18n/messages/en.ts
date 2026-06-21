@@ -717,6 +717,82 @@ export const en = {
         "Select a destination account for automatic interest transfers",
     },
   },
+  creditCards: {
+    create: {
+      submit: "Create credit card",
+      creating: "Creating…",
+      success: "Credit card created",
+    },
+    edit: {
+      title: "Edit credit card",
+      submit: "Save changes",
+      saving: "Saving…",
+      success: "Credit card updated",
+    },
+    formSections: {
+      statementCycle: "Statement cycle",
+      paymentSource: "Payment source",
+    },
+    fields: {
+      outstandingBalance: {
+        label: "Amount owed",
+        hint: "Enter the outstanding balance on this card today.",
+      },
+      creditLimit: {
+        label: "Credit limit",
+        placeholder: "Optional",
+        hint: "Optional. Used to calculate utilization.",
+      },
+      statementCloseDay: {
+        label: "Statement close day",
+      },
+      paymentDueDay: {
+        label: "Payment due day",
+      },
+      paymentSource: {
+        label: "Payment source account",
+        placeholder: "Select payment source",
+        description: "Optional. Used when you make a payment from this card.",
+        hint: "You can link a payment source now or when you make your first payment.",
+        searchPlaceholder: "Search accounts",
+        noResults: "No matching accounts",
+        notSelected: "No account selected",
+      },
+    },
+    details: {
+      title: "Credit card",
+      outstandingBalance: "Outstanding balance",
+      utilization: "{value}% utilization",
+      paymentSource: "Payment source",
+      paymentSourceNotSet: "Not set",
+    },
+    actions: {
+      addPurchase: "Add purchase",
+      makePayment: "Make payment",
+    },
+    purchase: {
+      title: "Add purchase",
+      description: "Record a purchase on this credit card.",
+      descriptionPlaceholder: "e.g. Groceries",
+      submit: "Save purchase",
+      saving: "Saving…",
+      success: "Purchase recorded",
+    },
+    payment: {
+      title: "Make payment",
+      description: "Pay down this card from a linked account.",
+      descriptionPlaceholder: "e.g. Monthly payment",
+      selectSourcePrompt: "Select the account this payment comes from.",
+      submit: "Save payment",
+      saving: "Saving…",
+      success: "Payment recorded",
+    },
+    validation: {
+      creditLimitInvalid: "Enter a valid credit limit",
+      statementDayInvalid: "Choose a day between 1 and 28",
+      paymentSourceRequired: "Select a payment source account",
+    },
+  },
   records: {
     add: {
       title: "Add record",
@@ -790,6 +866,8 @@ export const en = {
       transfer: "Transfer",
       adjustment: "Adjustment",
       interest: "Interest",
+      credit_card_purchase: "Purchase",
+      credit_card_payment: "Payment",
     },
   },
   more: {

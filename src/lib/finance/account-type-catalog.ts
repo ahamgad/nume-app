@@ -42,7 +42,7 @@ export const ACCOUNT_TYPE_GROUPS: AccountTypeGroup[] = [
     id: "lending",
     labelKey: "accounts.typeGroups.lending",
     types: [
-      { type: "credit_card", enabled: false },
+      { type: "credit_card", enabled: true },
       { type: "loan", enabled: false },
     ],
   },

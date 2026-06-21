@@ -17,7 +17,13 @@ export {
 
 export type InstitutionPickerContext = Extract<
   AccountType,
-  "current_account" | "cash" | "wallet" | "certificate" | "savings_account"
+  | "current_account"
+  | "cash"
+  | "wallet"
+  | "certificate"
+  | "savings_account"
+  | "credit_card"
+  | "loan"
 >;
 
 export interface InstitutionCatalogEntry {
@@ -89,6 +95,8 @@ export function getAllowedCategories(
       return ["financial_service"];
     case "certificate":
     case "savings_account":
+    case "credit_card":
+    case "loan":
       return ["bank", "financial_service"];
     case "cash":
       return [];

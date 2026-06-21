@@ -7,15 +7,6 @@ export interface Loan {
   updatedAt: string;
 }
 
-export interface CreditCard {
-  id: string;
-  userId: string;
-  accountId: string;
-  cardNumberLast4: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface CreateLoanInput {
   name: string;
   institution?: string | null;
@@ -33,21 +24,4 @@ export interface UpdateLoanInput {
   includeInEmergencyFund?: boolean;
 }
 
-export interface CreateCreditCardInput {
-  name: string;
-  institution?: string | null;
-  currentBalance: number;
-  cardNumberLast4?: string | null;
-  includeInNetWorth?: boolean;
-  includeInEmergencyFund?: boolean;
-}
-
-export interface UpdateCreditCardInput {
-  name?: string;
-  institution?: string | null;
-  cardNumberLast4?: string | null;
-  includeInNetWorth?: boolean;
-  includeInEmergencyFund?: boolean;
-}
-
-export type LendingAccountType = "loan" | "credit_card";
+export type LendingAccountType = "loan";

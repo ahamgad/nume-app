@@ -716,6 +716,82 @@ export const ar = {
         "اختر حساب وجهة لتحويل العائد تلقائيًا",
     },
   },
+  creditCards: {
+    create: {
+      submit: "إنشاء بطاقة ائتمان",
+      creating: "جارٍ الإنشاء…",
+      success: "تم إنشاء بطاقة الائتمان",
+    },
+    edit: {
+      title: "تعديل بطاقة الائتمان",
+      submit: "حفظ التغييرات",
+      saving: "جارٍ الحفظ…",
+      success: "تم تحديث بطاقة الائتمان",
+    },
+    formSections: {
+      statementCycle: "دورة الكشف",
+      paymentSource: "مصدر السداد",
+    },
+    fields: {
+      outstandingBalance: {
+        label: "المبلغ المستحق",
+        hint: "أدخل الرصيد المستحق على البطاقة اليوم.",
+      },
+      creditLimit: {
+        label: "حد الائتمان",
+        placeholder: "اختياري",
+        hint: "اختياري. يُستخدم لحساب نسبة الاستخدام.",
+      },
+      statementCloseDay: {
+        label: "يوم إغلاق الكشف",
+      },
+      paymentDueDay: {
+        label: "يوم استحقاق السداد",
+      },
+      paymentSource: {
+        label: "حساب مصدر السداد",
+        placeholder: "اختر مصدر السداد",
+        description: "اختياري. يُستخدم عند سداد البطاقة.",
+        hint: "يمكنك ربط مصدر السداد الآن أو عند أول عملية سداد.",
+        searchPlaceholder: "ابحث في الحسابات",
+        noResults: "لا توجد حسابات مطابقة",
+        notSelected: "لم يُحدد حساب",
+      },
+    },
+    details: {
+      title: "بطاقة ائتمان",
+      outstandingBalance: "الرصيد المستحق",
+      utilization: "نسبة الاستخدام {value}%",
+      paymentSource: "مصدر السداد",
+      paymentSourceNotSet: "غير محدد",
+    },
+    actions: {
+      addPurchase: "إضافة مشترى",
+      makePayment: "سداد",
+    },
+    purchase: {
+      title: "إضافة مشترى",
+      description: "سجّل مشترى على هذه البطاقة.",
+      descriptionPlaceholder: "مثال: البقالة",
+      submit: "حفظ المشترى",
+      saving: "جارٍ الحفظ…",
+      success: "تم تسجيل المشترى",
+    },
+    payment: {
+      title: "سداد",
+      description: "سدّد البطاقة من حساب مرتبط.",
+      descriptionPlaceholder: "مثال: سداد شهري",
+      selectSourcePrompt: "اختر الحساب الذي سيُسدد منه.",
+      submit: "حفظ السداد",
+      saving: "جارٍ الحفظ…",
+      success: "تم تسجيل السداد",
+    },
+    validation: {
+      creditLimitInvalid: "أدخل حد ائتمان صالحًا",
+      statementDayInvalid: "اختر يومًا بين 1 و 28",
+      paymentSourceRequired: "اختر حساب مصدر السداد",
+    },
+  },
   records: {
     add: {
       title: "إضافة سجل",
@@ -789,6 +865,8 @@ export const ar = {
       transfer: "تحويل",
       adjustment: "تعديل",
       interest: "عائد",
+      credit_card_purchase: "مشترى",
+      credit_card_payment: "سداد",
     },
   },
   more: {

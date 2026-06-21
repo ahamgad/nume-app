@@ -3,46 +3,40 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import {
-  LendingAccountFormFields,
-  validateLendingAccountForm,
-  type LendingAccountFormValues,
-} from "@/components/accounts/lending-account-form-fields";
+import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  creditCardFormValuesFromAccount,
+  parseCreditCardDay,
+  parseOptionalCreditLimit,
+  validateCreditCardForm,
+  type CreditCardFormValues,
+} from "@/lib/credit-cards/form";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
-import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
 
-interface EditLendingAccountScreenProps {
+interface EditCreditCardAccountScreenProps {
   accountId: string;
 }
 
-function lendingFormValuesFromAccount(
-  account: { name: string; institution: string | null },
-  identifier: string,
-): LendingAccountFormValues {
-  return {
-    name: account.name,
-    institution: account.institution ?? "",
-    identifier,
-    balance: "",
-  };
-}
-
-export function EditLendingAccountScreen({ accountId }: EditLendingAccountScreenProps) {
+export function EditCreditCardAccountScreen({
+  accountId,
+}: EditCreditCardAccountScreenProps) {
   const t = useT();
   const router = useRouter();
-  const { getAccount, getLoanByAccountId, isFinanceReady } = useFinance();
+  const { getAccount, getCreditCardByAccountId, isFinanceReady } = useFinance();
   const account = getAccount(accountId);
-  const loan = getLoanByAccountId(accountId);
+  const creditCard = getCreditCardByAccountId(accountId);
 
   if (!isFinanceReady) {
     return (
@@ -55,7 +49,7 @@ export function EditLendingAccountScreen({ accountId }: EditLendingAccountScreen
     );
   }
 
-  if (!account || account.type !== "loan" || !loan) {
+  if (!account || account.type !== "credit_card" || !creditCard) {
     return (
       <>
         <ScreenHeader
@@ -73,36 +67,38 @@ export function EditLendingAccountScreen({ accountId }: EditLendingAccountScreen
   }
 
   return (
-    <EditLendingAccountForm
+    <EditCreditCardAccountForm
       accountId={accountId}
-      initialValues={lendingFormValuesFromAccount(account, loan.loanNumberLast4 ?? "")}
+      initialValues={creditCardFormValuesFromAccount(account, creditCard)}
     />
   );
 }
 
-function EditLendingAccountForm({
+function EditCreditCardAccountForm({
   accountId,
   initialValues,
 }: {
   accountId: string;
-  initialValues: LendingAccountFormValues;
+  initialValues: CreditCardFormValues;
 }) {
   const t = useT();
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { updateLoan } = useFinance();
+  const { accounts, updateCreditCard } = useFinance();
   const { showToast } = useToast();
 
   const [values, setValues] = useState(initialValues);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const paymentSourceAccounts = useMemo(
+    () => filterTransferAccounts(accounts, { excludeAccountIds: [accountId] }),
+    [accounts, accountId],
+  );
+
   const isDirty = useMemo(
-    () =>
-      values.name.trim() !== initialValues.name.trim() ||
-      values.institution.trim() !== initialValues.institution.trim() ||
-      values.identifier.trim() !== initialValues.identifier.trim(),
+    () => JSON.stringify(values) !== JSON.stringify(initialValues),
     [values, initialValues],
   );
 
@@ -116,23 +112,32 @@ function EditLendingAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateLendingAccountForm(values, t, "edit");
+    const nextErrors = validateCreditCardForm(values, t, "edit");
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const identifierLast4 = parseOptionalIdentifierLast4(values.identifier);
+    const statementCloseDay = parseCreditCardDay(values.statementCloseDay);
+    const paymentDueDay = parseCreditCardDay(values.paymentDueDay);
+    if (statementCloseDay === null || paymentDueDay === null) return;
 
     setSubmitting(true);
     try {
-      await updateLoan(accountId, {
+      await updateCreditCard(accountId, {
         name: values.name.trim(),
         institution: values.institution.trim() || null,
-        loanNumberLast4: identifierLast4,
+        cardNumberLast4: parseOptionalIdentifierLast4(values.identifier),
+        statementCloseDay,
+        paymentDueDay,
+        creditLimit: parseOptionalCreditLimit(values.creditLimit),
+        paymentSourceAccountId: values.paymentSourceAccountId ?? undefined,
+        clearPaymentSource: values.paymentSourceAccountId === null,
+        includeInNetWorth: values.includeInNetWorth,
+        includeInEmergencyFund: values.includeInEmergencyFund,
       });
-      showToast(t("accounts.edit.success"));
+      showToast(t("creditCards.edit.success"));
       router.replace(`/accounts/${accountId}`);
     } catch (error) {
-      logSupabaseError("updateLendingAccount", error);
+      logSupabaseError("updateCreditCard", error);
       setErrors({
         form: getSupabaseErrorMessage(error) || t("common.retry"),
       });
@@ -151,14 +156,15 @@ function EditLendingAccountForm({
     <>
       <ScreenHeader
         mode="stack"
-        title={t("accounts.edit.title")}
+        title={t("creditCards.edit.title")}
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} className="pb-28">
-        <LendingAccountFormFields
+        <CreditCardFormFields
           values={values}
           errors={errors}
           amountInputLocale={amountInputLocale}
+          paymentSourceAccounts={paymentSourceAccounts}
           disabled={submitting}
           mode="edit"
           onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
@@ -174,7 +180,7 @@ function EditLendingAccountForm({
           disabled={submitting || !isDirty}
           onClick={() => void handleSubmit()}
         >
-          {submitting ? t("accounts.edit.saving") : t("accounts.edit.submit")}
+          {submitting ? t("creditCards.edit.saving") : t("creditCards.edit.submit")}
         </Button>
       </StickyFooter>
     </>

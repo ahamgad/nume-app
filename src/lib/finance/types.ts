@@ -23,7 +23,14 @@ export function isEnabledAddAccountType(
   return ENABLED_ADD_ACCOUNT_TYPES.includes(type as MoneyAccountType);
 }
 
-export type RecordType = "income" | "expense" | "transfer" | "adjustment" | "interest";
+export type RecordType =
+  | "income"
+  | "expense"
+  | "transfer"
+  | "adjustment"
+  | "interest"
+  | "credit_card_purchase"
+  | "credit_card_payment";
 
 export interface Account {
   id: string;
@@ -49,6 +56,8 @@ export interface FinanceRecord {
   certificateId: string | null;
   scheduleEntryId: string | null;
   savingsAccountId: string | null;
+  creditCardId: string | null;
+  paymentSourceAccountId: string | null;
   createdAt: string;
 }
 

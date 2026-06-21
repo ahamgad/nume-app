@@ -13,8 +13,6 @@ import {
   formatAmountInput,
   sanitizeAmountInput,
 } from "@/lib/format/currency";
-import type { LendingAccountType } from "@/lib/lending/types";
-import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
 
 export interface LendingAccountFormValues {
@@ -25,7 +23,6 @@ export interface LendingAccountFormValues {
 }
 
 interface LendingAccountFormFieldsProps {
-  accountType: LendingAccountType;
   values: LendingAccountFormValues;
   errors: Record<string, string>;
   amountInputLocale: string;
@@ -35,22 +32,7 @@ interface LendingAccountFormFieldsProps {
   onClearError: (field: string) => void;
 }
 
-const IDENTIFIER_LABELS: Record<
-  LendingAccountType,
-  { label: TranslationKey; placeholder: TranslationKey }
-> = {
-  loan: {
-    label: "accounts.fields.loanNumber.label",
-    placeholder: "accounts.fields.loanNumber.placeholder",
-  },
-  credit_card: {
-    label: "accounts.fields.cardNumber.label",
-    placeholder: "accounts.fields.cardNumber.placeholder",
-  },
-};
-
 export function LendingAccountFormFields({
-  accountType,
   values,
   errors,
   amountInputLocale,
@@ -60,7 +42,6 @@ export function LendingAccountFormFields({
   onClearError,
 }: LendingAccountFormFieldsProps) {
   const t = useT();
-  const identifierLabels = IDENTIFIER_LABELS[accountType];
 
   return (
     <FormSection title={t("accounts.formSections.accountDetails")}>
@@ -80,7 +61,7 @@ export function LendingAccountFormFields({
 
       <InstitutionPicker
         id="lending-institution"
-        accountType="current_account"
+        accountType="loan"
         value={values.institution}
         disabled={disabled}
         onChange={(institution) => onChange({ institution })}
@@ -88,8 +69,8 @@ export function LendingAccountFormFields({
 
       <AccountIdentifierField
         id="lending-identifier"
-        labelKey={identifierLabels.label}
-        placeholderKey={identifierLabels.placeholder}
+        labelKey="accounts.fields.loanNumber.label"
+        placeholderKey="accounts.fields.loanNumber.placeholder"
         value={values.identifier}
         disabled={disabled}
         error={errors.identifier}

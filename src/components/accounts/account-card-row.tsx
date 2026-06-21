@@ -8,6 +8,7 @@ import {
 } from "@/components/institutions/institution-brand-asset";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
+import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
 import type { Account } from "@/lib/finance/types";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
@@ -26,6 +27,10 @@ export function AccountCardRow({
   onClick,
   t,
 }: AccountCardRowProps) {
+  const displayBalance =
+    account.type === "credit_card" || account.type === "loan"
+      ? toDisplayOutstandingBalance(account.currentBalance)
+      : account.currentBalance;
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
 
@@ -60,10 +65,15 @@ export function AccountCardRow({
           </p>
           <div className="flex shrink-0 items-center gap-2">
             <ResponsiveCurrencyAmount
-              amount={account.currentBalance}
+              amount={displayBalance}
               locale={formatLocale}
               variant="row"
-              className="w-auto shrink-0"
+              className={cn(
+                "w-auto shrink-0",
+                account.type === "credit_card" && displayBalance > 0
+                  ? "text-destructive"
+                  : undefined,
+              )}
             />
             <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
           </div>

@@ -32,6 +32,26 @@ export function AddRecordTypeScreen({ accountId }: AddRecordTypeScreenProps) {
   const { getAccount } = useFinance();
   const account = getAccount(accountId);
 
+  if (
+    account &&
+    (account.type === "credit_card" || account.type === "certificate")
+  ) {
+    return (
+      <>
+        <ScreenHeader
+          mode="stack"
+          title={t("records.add.title")}
+          onBack={() => router.back()}
+        />
+        <ScreenBody withTabBar={false}>
+          <p className="text-muted-foreground">
+            {t("accounts.add.typeUnavailable")}
+          </p>
+        </ScreenBody>
+      </>
+    );
+  }
+
   return (
     <>
       <ScreenHeader mode="stack" title={t("records.add.title")} />

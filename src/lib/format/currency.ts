@@ -1,3 +1,4 @@
+import type { RecordType } from "@/lib/finance/types";
 import { normalizeNumericInput } from "@/lib/format/numerals";
 
 const DEFAULT_LOCALE = "en-EG";
@@ -17,12 +18,20 @@ export function formatCurrency(
 
 export function formatSignedCurrency(
   amount: number,
-  type: "income" | "expense" | "adjustment" | "transfer" | "interest",
+  type: RecordType,
   locale: string = DEFAULT_LOCALE,
 ): string {
   const formatted = formatCurrency(Math.abs(amount), locale);
-  if (type === "income" || type === "interest") return `+${formatted}`;
-  if (type === "expense") return `−${formatted}`;
+  if (
+    type === "income" ||
+    type === "interest" ||
+    type === "credit_card_payment"
+  ) {
+    return `+${formatted}`;
+  }
+  if (type === "expense" || type === "credit_card_purchase") {
+    return `−${formatted}`;
+  }
   if (type === "transfer") {
     const sign = amount >= 0 ? "+" : "−";
     return `${sign}${formatted}`;

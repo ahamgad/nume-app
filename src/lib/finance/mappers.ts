@@ -26,6 +26,8 @@ export interface DbRecord {
   certificate_id: string | null;
   schedule_entry_id: string | null;
   savings_account_id: string | null;
+  credit_card_id: string | null;
+  payment_source_account_id: string | null;
   created_at: string;
 }
 
@@ -56,6 +58,8 @@ export function mapRecord(row: DbRecord): FinanceRecord {
     certificateId: row.certificate_id ?? null,
     scheduleEntryId: row.schedule_entry_id ?? null,
     savingsAccountId: row.savings_account_id ?? null,
+    creditCardId: row.credit_card_id ?? null,
+    paymentSourceAccountId: row.payment_source_account_id ?? null,
     createdAt: row.created_at,
   };
 }

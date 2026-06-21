@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { AddCertificateAccountScreen } from "@/components/screens/add-certificate-account-screen";
+import { AddCreditCardAccountScreen } from "@/components/screens/add-credit-card-account-screen";
 import { AddLendingAccountScreen } from "@/components/screens/add-lending-account-screen";
 import { AddMoneyAccountScreen } from "@/components/screens/add-money-account-screen";
 import { AddSavingsAccountScreen } from "@/components/screens/add-savings-account-screen";
@@ -12,6 +13,7 @@ import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts
 import { parseCreatableAccountType } from "@/lib/finance/account-type-catalog";
 import {
   isCertificateAccountType,
+  isCreditCardAccountType,
   isLendingAccountType,
   isMoneyAccountType,
 } from "@/lib/finance/add-account-types";
@@ -62,8 +64,12 @@ export function AddAccountTypeRouterScreen({ type }: AddAccountTypeRouterScreenP
     return <AddSavingsAccountScreen />;
   }
 
+  if (isCreditCardAccountType(accountType)) {
+    return <AddCreditCardAccountScreen />;
+  }
+
   if (isLendingAccountType(accountType)) {
-    return <AddLendingAccountScreen accountType={accountType} />;
+    return <AddLendingAccountScreen />;
   }
 
   return null;

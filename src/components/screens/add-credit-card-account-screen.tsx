@@ -1,51 +1,52 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  LendingAccountFormFields,
-  validateLendingAccountForm,
-  type LendingAccountFormValues,
-} from "@/components/accounts/lending-account-form-fields";
+import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import {
+  EMPTY_CREDIT_CARD_FORM_VALUES,
+  parseCreditCardDay,
+  parseOptionalCreditLimit,
+  validateCreditCardForm,
+  type CreditCardFormValues,
+} from "@/lib/credit-cards/form";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
+import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { cn } from "@/lib/utils";
-import { getAmountInputLocale } from "@/lib/i18n/locale";
 
-const EMPTY_VALUES: LendingAccountFormValues = {
-  name: "",
-  institution: "",
-  identifier: "",
-  balance: "",
-};
-
-export function AddLendingAccountScreen() {
+export function AddCreditCardAccountScreen() {
   const t = useT();
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { createLoan } = useFinance();
+  const { accounts, createCreditCard } = useFinance();
   const { showToast } = useToast();
 
-  const [values, setValues] = useState<LendingAccountFormValues>(EMPTY_VALUES);
+  const [values, setValues] = useState<CreditCardFormValues>(
+    EMPTY_CREDIT_CARD_FORM_VALUES,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const paymentSourceAccounts = useMemo(
+    () => filterTransferAccounts(accounts),
+    [accounts],
+  );
+
   const isDirty =
-    values.name.trim().length > 0 ||
-    values.institution.trim().length > 0 ||
-    values.identifier.trim().length > 0 ||
-    values.balance.trim().length > 0;
+    JSON.stringify(values) !== JSON.stringify(EMPTY_CREDIT_CARD_FORM_VALUES);
 
   function clearFieldError(field: string) {
     setErrors((prev) => {
@@ -57,27 +58,35 @@ export function AddLendingAccountScreen() {
   }
 
   async function handleSubmit() {
-    const nextErrors = validateLendingAccountForm(values, t, "create");
+    const nextErrors = validateCreditCardForm(values, t, "create");
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const parsedBalance = parseAmount(values.balance);
-    if (parsedBalance === null) return;
+    const outstandingBalance = parseAmount(values.outstandingBalance);
+    if (outstandingBalance === null) return;
 
-    const identifierLast4 = parseOptionalIdentifierLast4(values.identifier);
+    const statementCloseDay = parseCreditCardDay(values.statementCloseDay);
+    const paymentDueDay = parseCreditCardDay(values.paymentDueDay);
+    if (statementCloseDay === null || paymentDueDay === null) return;
 
     setSubmitting(true);
     try {
-      const loan = await createLoan({
+      const card = await createCreditCard({
         name: values.name.trim(),
         institution: values.institution.trim() || null,
-        currentBalance: parsedBalance,
-        loanNumberLast4: identifierLast4,
+        outstandingBalance,
+        cardNumberLast4: parseOptionalIdentifierLast4(values.identifier),
+        statementCloseDay,
+        paymentDueDay,
+        creditLimit: parseOptionalCreditLimit(values.creditLimit),
+        paymentSourceAccountId: values.paymentSourceAccountId,
+        includeInNetWorth: values.includeInNetWorth,
+        includeInEmergencyFund: values.includeInEmergencyFund,
       });
-      showToast(t("common.accountCreated"));
-      router.replace(`/accounts/${loan.accountId}`);
+      showToast(t("creditCards.create.success"));
+      router.replace(`/accounts/${card.accountId}`);
     } catch (error) {
-      logSupabaseError("createLoan", error);
+      logSupabaseError("createCreditCard", error);
       setErrors({
         form: getSupabaseErrorMessage(error) || t("common.retry"),
       });
@@ -96,14 +105,15 @@ export function AddLendingAccountScreen() {
     <>
       <ScreenHeader
         mode="stack"
-        title={getAddAccountScreenTitle("loan", t)}
+        title={getAddAccountScreenTitle("credit_card", t)}
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} className="pb-28">
-        <LendingAccountFormFields
+        <CreditCardFormFields
           values={values}
           errors={errors}
           amountInputLocale={amountInputLocale}
+          paymentSourceAccounts={paymentSourceAccounts}
           disabled={submitting}
           mode="create"
           onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
@@ -119,7 +129,7 @@ export function AddLendingAccountScreen() {
           disabled={submitting}
           onClick={() => void handleSubmit()}
         >
-          {submitting ? t("accounts.creating") : t("accounts.createAccount")}
+          {submitting ? t("creditCards.create.creating") : t("creditCards.create.submit")}
         </Button>
       </StickyFooter>
     </>
