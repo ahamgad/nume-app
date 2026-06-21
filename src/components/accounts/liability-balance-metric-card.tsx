@@ -1,52 +1,94 @@
 "use client";
 
-import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
-import { WidgetCard } from "@/components/patterns";
-import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
+import { Pencil } from "lucide-react";
+import type { ReactNode } from "react";
+
+import { MetricHero, WidgetCard } from "@/components/patterns";
+import { IconButton } from "@/components/ui/icon-button";
+import { toDisplayOutstandingBalance, toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
+import { validateAccountBalanceField } from "@/lib/field-editor/field-validators";
 import { getBalanceToneClassName } from "@/lib/finance/balance-display";
-import { formatRelativeTime } from "@/lib/format/date";
 import type { Account } from "@/lib/finance/types";
-import { useFormatLocale, useT } from "@/providers/i18n-provider";
+import {
+  formatAmountInput,
+  parseAmount,
+  sanitizeAmountInput,
+} from "@/lib/format/currency";
+import { formatRelativeTime } from "@/lib/format/date";
+import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { useFieldEditor } from "@/providers/field-editor-provider";
+import { useT, useFormatLocale, useLocale } from "@/providers/i18n-provider";
 
 interface LiabilityBalanceMetricCardProps {
   account: Account;
   label: string;
   meta?: string;
-  subline?: string;
+  footer?: ReactNode;
+  editable?: boolean;
+  onBalanceSave?: (outstandingBalance: number) => Promise<void>;
 }
 
 export function LiabilityBalanceMetricCard({
   account,
   label,
   meta,
-  subline,
+  footer,
+  editable = false,
+  onBalanceSave,
 }: LiabilityBalanceMetricCardProps) {
+  const t = useT();
   const formatLocale = useFormatLocale();
+  const locale = useLocale();
+  const amountInputLocale = getAmountInputLocale(locale);
+  const { openFieldEditor } = useFieldEditor();
   const outstanding = toDisplayOutstandingBalance(account.currentBalance);
+
+  const canEdit =
+    editable && account.status === "active" && Boolean(onBalanceSave);
+
+  function handleEditBalance() {
+    if (!onBalanceSave) return;
+
+    openFieldEditor({
+      mode: "numeric",
+      title: label,
+      value: sanitizeAmountInput(String(outstanding)),
+      placeholder: t("common.currency.zeroPlaceholder"),
+      inputMode: "decimal",
+      prefixLabel: t("common.currency.code"),
+      sanitizeInput: sanitizeAmountInput,
+      formatDisplay: (amount) => formatAmountInput(amount, amountInputLocale),
+      validate: (next) => validateAccountBalanceField(next, t),
+      onSave: async (next) => {
+        const parsed = parseAmount(next);
+        if (parsed === null) return;
+        await onBalanceSave(parsed);
+      },
+    });
+  }
 
   return (
     <WidgetCard>
-      <p className="text-xs font-medium tracking-wide text-muted-foreground">
-        {label}
-      </p>
-      <div className="mt-1.5 min-w-0">
-        <ResponsiveCurrencyAmount
-          amount={outstanding}
-          locale={formatLocale}
-          variant="hero"
-          className={getBalanceToneClassName(account)}
-        />
-      </div>
-      {subline ? (
-        <p className="mt-2.5 text-[0.9375rem] font-medium leading-snug text-muted-foreground">
-          {subline}
-        </p>
-      ) : null}
-      {meta ? (
-        <p className="mt-1.5 text-[0.8125rem] leading-normal text-muted-foreground">
-          {meta}
-        </p>
-      ) : null}
+      <MetricHero
+        label={label}
+        amount={outstanding}
+        locale={formatLocale}
+        meta={meta}
+        amountClassName={getBalanceToneClassName(account)}
+        amountAction={
+          canEdit ? (
+            <IconButton
+              type="button"
+              size="sm"
+              aria-label={label}
+              onClick={handleEditBalance}
+            >
+              <Pencil />
+            </IconButton>
+          ) : undefined
+        }
+      />
+      {footer}
     </WidgetCard>
   );
 }
@@ -60,3 +102,5 @@ export function liabilityBalanceMeta(
     time: formatRelativeTime(updatedAt, t, formatLocale),
   });
 }
+
+export { toStoredCreditCardBalance };

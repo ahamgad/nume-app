@@ -43,6 +43,43 @@ export function EducationalWidget({ title, body, hint }: EducationalWidgetProps)
   );
 }
 
+interface ProgressBarProps {
+  /** Current value (0–100). Values above 100 fill the bar completely. */
+  value: number;
+  className?: string;
+  /** Bar fill color class. Defaults to primary; use destructive when over limit. */
+  indicatorClassName?: string;
+}
+
+export function ProgressBar({
+  value,
+  className,
+  indicatorClassName,
+}: ProgressBarProps) {
+  const fillWidth = Math.min(100, Math.max(0, value));
+
+  return (
+    <div
+      className={cn(
+        "h-2 w-full overflow-hidden rounded-full bg-muted",
+        className,
+      )}
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={fillWidth}
+    >
+      <div
+        className={cn(
+          "h-full rounded-full bg-primary transition-[width]",
+          indicatorClassName,
+        )}
+        style={{ width: `${fillWidth}%` }}
+      />
+    </div>
+  );
+}
+
 interface MetricHeroProps {
   label: string;
   /** Preformatted display value (non-currency). */

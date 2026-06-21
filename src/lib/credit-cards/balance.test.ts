@@ -6,7 +6,7 @@ import {
   toDisplayOutstandingBalance,
   toStoredCreditCardBalance,
 } from "@/lib/credit-cards/balance";
-import { calculateCreditUtilization } from "@/lib/credit-cards/utilization";
+import { calculateCreditUtilization, calculateAvailableCredit } from "@/lib/credit-cards/utilization";
 
 describe("credit card balance conventions", () => {
   it("stores outstanding amounts as negative balances", () => {
@@ -33,5 +33,12 @@ describe("credit card balance conventions", () => {
     expect(calculateCreditUtilization(-2500, 10000)).toBe(25);
     expect(calculateCreditUtilization(0, 10000)).toBe(0);
     expect(calculateCreditUtilization(-2500, null)).toBeNull();
+  });
+
+  it("calculates available credit from limit and outstanding balance", () => {
+    expect(calculateAvailableCredit(-2500, 10000)).toBe(7500);
+    expect(calculateAvailableCredit(-12000, 10000)).toBe(0);
+    expect(calculateAvailableCredit(0, 10000)).toBe(10000);
+    expect(calculateAvailableCredit(-2500, null)).toBeNull();
   });
 });

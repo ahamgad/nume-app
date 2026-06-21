@@ -156,7 +156,7 @@ function EditCreditCardAccountForm({
         title={t("creditCards.edit.title")}
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} className="pb-28" resetScrollOnMount>
+      <ScreenBody withTabBar={false} className="pb-28">
         <CreditCardFormFields
           values={values}
           errors={errors}

@@ -25,8 +25,14 @@ export function getBalanceToneClassName(
 ): string | undefined {
   const amount = getAccountDisplayBalance(account);
   if (amount === 0) return undefined;
+
   if (isLiabilityAccountType(account.type)) {
     return "text-destructive";
   }
-  return "text-emerald-700 dark:text-emerald-300";
+
+  if (amount > 0) {
+    return "text-emerald-700 dark:text-emerald-300";
+  }
+
+  return "text-destructive";
 }

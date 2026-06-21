@@ -144,7 +144,11 @@ export function AccountPicker({
             {resolvedNoResults}
           </p>
         ) : (
-          <div role="listbox" aria-label={resolvedSheetTitle}>
+          <div
+            role="listbox"
+            aria-label={resolvedSheetTitle}
+            className="divide-y divide-border"
+          >
             {showClearOption ? (
               <button
                 type="button"

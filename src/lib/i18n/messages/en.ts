@@ -190,6 +190,7 @@ export const en = {
     headerActions: {
       addAccount: "Add account",
       addRecord: "Add record",
+      addActivity: "Add activity",
     },
     createAccount: "Create account",
     creating: "Creating…",
@@ -744,7 +745,7 @@ export const en = {
         label: "Statement due date",
       },
       linkedAccount: {
-        label: "Account",
+        label: "Linked account",
         placeholder: "Select account",
         description:
           "The existing account this credit card is tied to.",
@@ -754,8 +755,23 @@ export const en = {
     },
     details: {
       title: "Credit card",
+      summary: "Summary",
       outstandingBalance: "Outstanding balance",
-      utilization: "{value}% utilization",
+      linkedAccount: "Linked account",
+      availableToSpend: "Available to spend",
+      utilizationLabel: "Utilization",
+      utilizationValue: "{value}%",
+    },
+    activity: {
+      title: "Add activity",
+      purchase: {
+        title: "Add purchase",
+        description: "Record a purchase on this credit card",
+      },
+      payment: {
+        title: "Make payment",
+        description: "Pay down this card from the linked account",
+      },
     },
     actions: {
       addPurchase: "Add purchase",

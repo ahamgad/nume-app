@@ -109,7 +109,7 @@ export function AddCreditCardAccountScreen() {
         title={getAddAccountScreenTitle("credit_card", t)}
         onBack={handleBack}
       />
-      <ScreenBody withTabBar={false} className="pb-28" resetScrollOnMount>
+      <ScreenBody withTabBar={false} className="pb-28">
         <CreditCardFormFields
           values={values}
           errors={errors}

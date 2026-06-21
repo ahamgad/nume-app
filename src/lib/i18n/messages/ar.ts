@@ -191,6 +191,7 @@ export const ar = {
     headerActions: {
       addAccount: "إضافة حساب",
       addRecord: "إضافة سجل",
+      addActivity: "إضافة نشاط",
     },
     createAccount: "إنشاء حساب",
     creating: "جارٍ الإنشاء…",
@@ -743,7 +744,7 @@ export const ar = {
         label: "تاريخ استحقاق الكشف",
       },
       linkedAccount: {
-        label: "الحساب",
+        label: "الحساب المرتبط",
         placeholder: "اختر حسابًا",
         description: "الحساب الموجود المرتبط ببطاقة الائتمان.",
         searchPlaceholder: "ابحث في الحسابات",
@@ -752,8 +753,23 @@ export const ar = {
     },
     details: {
       title: "بطاقة ائتمان",
+      summary: "الملخص",
       outstandingBalance: "الرصيد المستحق",
-      utilization: "نسبة الاستخدام {value}%",
+      linkedAccount: "الحساب المرتبط",
+      availableToSpend: "المتاح للإنفاق",
+      utilizationLabel: "نسبة الاستخدام",
+      utilizationValue: "{value}%",
+    },
+    activity: {
+      title: "إضافة نشاط",
+      purchase: {
+        title: "إضافة مشترى",
+        description: "سجّل مشترى على هذه البطاقة",
+      },
+      payment: {
+        title: "سداد",
+        description: "سدّد البطاقة من الحساب المرتبط",
+      },
     },
     actions: {
       addPurchase: "إضافة مشترى",

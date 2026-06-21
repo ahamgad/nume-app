@@ -15,13 +15,15 @@ import {
   liabilityBalanceMeta,
 } from "@/components/accounts/liability-balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
-import { CreditCardPaymentSheet } from "@/components/credit-cards/credit-card-payment-sheet";
-import { CreditCardPurchaseSheet } from "@/components/credit-cards/credit-card-purchase-sheet";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { Button } from "@/components/ui/button";
+import { CreditUtilizationProgress } from "@/components/credit-cards/credit-utilization-progress";
+import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
-import { calculateCreditUtilization } from "@/lib/credit-cards/utilization";
+import { toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
+import {
+  calculateAvailableCredit,
+  calculateCreditUtilization,
+} from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
@@ -73,15 +75,12 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     getAccountRecords,
     accounts,
     archiveAccount,
-    addCreditCardPurchase,
-    makeCreditCardPayment,
+    updateAccount,
     isFinanceReady,
     refresh,
   } = useFinance();
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
-  const [showPurchaseSheet, setShowPurchaseSheet] = useState(false);
-  const [showPaymentSheet, setShowPaymentSheet] = useState(false);
   const [archiving, setArchiving] = useState(false);
 
   const account = getAccount(accountId);
@@ -104,6 +103,14 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
   const utilization = useMemo(() => {
     if (!account || !creditCard) return null;
     return calculateCreditUtilization(
+      account.currentBalance,
+      creditCard.creditLimit,
+    );
+  }, [account, creditCard]);
+
+  const availableToSpend = useMemo(() => {
+    if (!account || !creditCard) return null;
+    return calculateAvailableCredit(
       account.currentBalance,
       creditCard.creditLimit,
     );
@@ -163,8 +170,16 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     <>
       <ScreenHeader
         mode="stack"
-        title={t("creditCards.details.title")}
+        title={t("accounts.details.title")}
         onBack={() => router.back()}
+        rightAction={
+          !isArchived ? (
+            <ScreenHeaderActionButton
+              label={t("accounts.headerActions.addActivity")}
+              onClick={() => router.push(`/accounts/${account.id}/activity/new`)}
+            />
+          ) : undefined
+        }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
         <AccountHeaderMetadata
@@ -179,51 +194,56 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           account={account}
           label={t("creditCards.details.outstandingBalance")}
           meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
-          subline={
-            utilization !== null
-              ? t("creditCards.details.utilization", { value: utilization })
-              : undefined
+          editable={!isArchived}
+          onBalanceSave={async (outstandingBalance) => {
+            await updateAccount(account.id, {
+              currentBalance: toStoredCreditCardBalance(outstandingBalance),
+            });
+          }}
+          footer={
+            utilization !== null ? (
+              <CreditUtilizationProgress utilization={utilization} />
+            ) : undefined
           }
         />
-
-        {!isArchived ? (
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              className="h-11"
-              variant="outline"
-              onClick={() => setShowPurchaseSheet(true)}
-            >
-              {t("creditCards.actions.addPurchase")}
-            </Button>
-            <Button className="h-11" onClick={() => setShowPaymentSheet(true)}>
-              {t("creditCards.actions.makePayment")}
-            </Button>
-          </div>
-        ) : null}
-
-        <section className="rounded-lg border border-border px-4">
-          <DetailRow
-            label={t("creditCards.fields.linkedAccount.label")}
-            value={linkedAccountLabel}
-          />
-          <DetailRow
-            label={t("creditCards.fields.statementDueDay.label")}
-            value={formatPostingDayLabel(creditCard.paymentDueDay, t)}
-          />
-          <DetailRow
-            label={t("creditCards.fields.creditLimit.label")}
-            value={formatCurrency(creditCard.creditLimit ?? 0, formatLocale)}
-          />
-        </section>
 
         {!isArchived ? (
           <AccountDetailActions
             editLabel={t("accounts.edit.title")}
             archiveLabel={t("accounts.details.archiveAccount")}
+            disabled={archiving}
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}
             onArchive={() => setShowArchiveConfirm(true)}
           />
         ) : null}
+
+        <section>
+          <h2 className="mb-2 text-start text-lg font-semibold">
+            {t("creditCards.details.summary")}
+          </h2>
+          <div className="divide-y divide-border rounded-lg border border-border px-4">
+            <DetailRow
+              label={t("creditCards.details.linkedAccount")}
+              value={linkedAccountLabel}
+            />
+            <DetailRow
+              label={t("creditCards.fields.creditLimit.label")}
+              value={formatCurrency(creditCard.creditLimit ?? 0, formatLocale)}
+            />
+            <DetailRow
+              label={t("creditCards.details.availableToSpend")}
+              value={
+                availableToSpend !== null
+                  ? formatCurrency(availableToSpend, formatLocale)
+                  : t("common.emptyValue")
+              }
+            />
+            <DetailRow
+              label={t("creditCards.fields.statementDueDay.label")}
+              value={formatPostingDayLabel(creditCard.paymentDueDay, t)}
+            />
+          </div>
+        </section>
 
         <RecentRecordsSection
           records={records}
@@ -237,46 +257,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           recordIcon={(record) => recordIcon(record.type)}
         />
       </ScreenBody>
-
-      <CreditCardPurchaseSheet
-        open={showPurchaseSheet}
-        onOpenChange={setShowPurchaseSheet}
-        onSubmit={async (input) => {
-          try {
-            await addCreditCardPurchase(accountId, input);
-            showToast(t("creditCards.purchase.success"));
-          } catch (error) {
-            logSupabaseError("addCreditCardPurchase", error);
-            showToast(getSupabaseErrorMessage(error) || t("common.retry"));
-            throw error;
-          }
-        }}
-      />
-
-      <CreditCardPaymentSheet
-        open={showPaymentSheet}
-        onOpenChange={setShowPaymentSheet}
-        linkedAccountLabel={
-          creditCard.paymentSourceAccountId ? linkedAccountLabel : null
-        }
-        onSubmit={async (input) => {
-          if (!creditCard.paymentSourceAccountId) {
-            showToast(t("creditCards.validation.linkedAccountRequired"));
-            throw new Error("Linked account required");
-          }
-          try {
-            await makeCreditCardPayment(accountId, {
-              ...input,
-              paymentSourceAccountId: creditCard.paymentSourceAccountId,
-            });
-            showToast(t("creditCards.payment.success"));
-          } catch (error) {
-            logSupabaseError("makeCreditCardPayment", error);
-            showToast(getSupabaseErrorMessage(error) || t("common.retry"));
-            throw error;
-          }
-        }}
-      />
 
       <ConfirmBottomSheet
         open={showArchiveConfirm}

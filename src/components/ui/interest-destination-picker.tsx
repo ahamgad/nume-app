@@ -130,7 +130,11 @@ export function InterestDestinationPicker({
             {t("accounts.fields.interestDestinationAccount.noResults")}
           </p>
         ) : (
-          <div role="listbox" aria-label={label}>
+          <div
+            role="listbox"
+            aria-label={label}
+            className="divide-y divide-border"
+          >
             {showClearOption ? (
               <button
                 type="button"
