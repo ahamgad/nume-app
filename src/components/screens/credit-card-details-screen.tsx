@@ -27,7 +27,7 @@ import {
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
-import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
+import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -250,9 +250,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) =>
-            formatSignedCurrency(record.amount, record.type, formatLocale)
-          }
+          recordAmount={(record) => record.amount}
           recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
           recordIcon={(record) => recordIcon(record.type)}
         />

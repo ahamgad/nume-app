@@ -80,7 +80,7 @@ export const en = {
     optional: "Optional",
     active: "Active",
     currency: {
-      code: "EGP",
+      code: "E£",
       zeroPlaceholder: "0",
     },
     time: {

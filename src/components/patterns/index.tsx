@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
 
+import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -314,17 +315,21 @@ export function ListRow({
 
 interface RecordRowProps {
   label: string;
-  amount: string;
+  amount: number;
+  formatLocale: string;
   meta: string;
   icon: ReactNode;
+  amountClassName?: string;
   onClick?: () => void;
 }
 
 export function RecordRow({
   label,
   amount,
+  formatLocale,
   meta,
   icon,
+  amountClassName,
   onClick,
 }: RecordRowProps) {
   const Comp = onClick ? "button" : "div";
@@ -342,9 +347,12 @@ export function RecordRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[0.9375rem] font-medium">{label}</p>
-          <p className="shrink-0 text-[0.9375rem] font-semibold tabular-nums">
-            {amount}
-          </p>
+          <CurrencyAmount
+            amount={amount}
+            locale={formatLocale}
+            variant="inline"
+            className={amountClassName}
+          />
         </div>
         <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{meta}</p>
       </div>

@@ -12,7 +12,7 @@ interface RecentRecordsSectionProps {
   isArchived?: boolean;
   formatLocale: string;
   recordLabel: (record: FinanceRecord) => string;
-  recordAmount: (record: FinanceRecord) => string;
+  recordAmount: (record: FinanceRecord) => number;
   recordMeta: (record: FinanceRecord) => string;
   recordIcon: (record: FinanceRecord) => ReactNode;
   onRecordClick?: (record: FinanceRecord) => void;
@@ -21,7 +21,7 @@ interface RecentRecordsSectionProps {
 export function RecentRecordsSection({
   records,
   isArchived = false,
-  formatLocale: _formatLocale,
+  formatLocale,
   recordLabel,
   recordAmount,
   recordMeta,
@@ -55,6 +55,7 @@ export function RecentRecordsSection({
               key={record.id}
               label={recordLabel(record)}
               amount={recordAmount(record)}
+              formatLocale={formatLocale}
               meta={recordMeta(record)}
               icon={recordIcon(record)}
               onClick={

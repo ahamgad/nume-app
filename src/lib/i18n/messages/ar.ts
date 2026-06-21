@@ -82,7 +82,7 @@ export const ar = {
     optional: "اختياري",
     active: "نشط",
     currency: {
-      code: "ج.م",
+      code: "E£",
       zeroPlaceholder: "0",
     },
     time: {

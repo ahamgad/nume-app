@@ -6,17 +6,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
 
-import { CreditCardPaymentSheet } from "@/components/credit-cards/credit-card-payment-sheet";
-import { CreditCardPurchaseSheet } from "@/components/credit-cards/credit-card-purchase-sheet";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Card } from "@/components/ui/card";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { useFinance } from "@/lib/finance/store";
-import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT } from "@/providers/i18n-provider";
-import { useToast } from "@/providers/toast-provider";
 
 interface AddCreditCardActivityScreenProps {
   accountId: string;
@@ -35,32 +29,10 @@ export function AddCreditCardActivityScreen({
 }: AddCreditCardActivityScreenProps) {
   const t = useT();
   const router = useRouter();
-  const { showToast } = useToast();
-  const {
-    getAccount,
-    getCreditCardByAccountId,
-    accounts,
-    addCreditCardPurchase,
-    makeCreditCardPayment,
-  } = useFinance();
-
-  const [showPurchaseSheet, setShowPurchaseSheet] = useState(false);
-  const [showPaymentSheet, setShowPaymentSheet] = useState(false);
+  const { getAccount, getCreditCardByAccountId } = useFinance();
 
   const account = getAccount(accountId);
   const creditCard = getCreditCardByAccountId(accountId);
-
-  const linkedAccountLabel = useMemo(() => {
-    if (!creditCard?.paymentSourceAccountId) {
-      return null;
-    }
-    const source = accounts.find(
-      (item) => item.id === creditCard.paymentSourceAccountId,
-    );
-    return source
-      ? formatAccountDestinationDisplay(source, t)
-      : null;
-  }, [creditCard, accounts, t]);
 
   if (
     !account ||
@@ -85,11 +57,7 @@ export function AddCreditCardActivityScreen({
   }
 
   function openActivity(type: CreditCardActivityType) {
-    if (type === "purchase") {
-      setShowPurchaseSheet(true);
-      return;
-    }
-    setShowPaymentSheet(true);
+    router.push(`/accounts/${accountId}/activity/new/${type}`);
   }
 
   return (
@@ -130,46 +98,6 @@ export function AddCreditCardActivityScreen({
           ))}
         </Card>
       </ScreenBody>
-
-      <CreditCardPurchaseSheet
-        open={showPurchaseSheet}
-        onOpenChange={setShowPurchaseSheet}
-        onSubmit={async (input) => {
-          try {
-            await addCreditCardPurchase(accountId, input);
-            showToast(t("creditCards.purchase.success"));
-            router.back();
-          } catch (error) {
-            logSupabaseError("addCreditCardPurchase", error);
-            showToast(getSupabaseErrorMessage(error) || t("common.retry"));
-            throw error;
-          }
-        }}
-      />
-
-      <CreditCardPaymentSheet
-        open={showPaymentSheet}
-        onOpenChange={setShowPaymentSheet}
-        linkedAccountLabel={linkedAccountLabel}
-        onSubmit={async (input) => {
-          if (!creditCard.paymentSourceAccountId) {
-            showToast(t("creditCards.validation.linkedAccountRequired"));
-            throw new Error("Linked account required");
-          }
-          try {
-            await makeCreditCardPayment(accountId, {
-              ...input,
-              paymentSourceAccountId: creditCard.paymentSourceAccountId,
-            });
-            showToast(t("creditCards.payment.success"));
-            router.back();
-          } catch (error) {
-            logSupabaseError("makeCreditCardPayment", error);
-            showToast(getSupabaseErrorMessage(error) || t("common.retry"));
-            throw error;
-          }
-        }}
-      />
     </>
   );
 }

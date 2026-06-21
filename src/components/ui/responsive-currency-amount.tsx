@@ -8,7 +8,8 @@ import {
   type ReactNode,
 } from "react";
 
-import { formatCurrency } from "@/lib/format/currency";
+import { CurrencyAmount } from "@/components/ui/currency-amount";
+import { getCurrencyDisplayParts } from "@/lib/format/currency";
 import {
   CURRENCY_AMOUNT_TRAILING_GAP_PX,
   fitFontSizeToWidth,
@@ -38,7 +39,7 @@ export function ResponsiveCurrencyAmount({
   const trailingRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [fontSizePx, setFontSizePx] = useState<number | null>(null);
-  const formatted = formatCurrency(amount, locale);
+  const parts = getCurrencyDisplayParts(amount, locale);
   const { maxPx, minPx } = getTierFontBounds(variant);
   const hasTrailing = trailing != null;
 
@@ -76,7 +77,7 @@ export function ResponsiveCurrencyAmount({
       observer.observe(trailingRef.current);
     }
     return () => observer.disconnect();
-  }, [formatted, hasTrailing, maxPx, minPx]);
+  }, [parts.fullText, hasTrailing, maxPx, minPx]);
 
   return (
     <div
@@ -88,12 +89,14 @@ export function ResponsiveCurrencyAmount({
           : undefined
       }
     >
-      <span
-        ref={textRef}
-        className="inline-block min-w-0 max-w-full whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none"
-        style={{ fontSize: fontSizePx ?? maxPx }}
-      >
-        {formatted}
+      <span ref={textRef} className="inline-block min-w-0 max-w-full">
+        <CurrencyAmount
+          amount={amount}
+          locale={locale}
+          variant={variant}
+          className="font-semibold"
+          style={{ fontSize: fontSizePx ?? maxPx }}
+        />
       </span>
       {hasTrailing ? (
         <div ref={trailingRef} className="shrink-0">

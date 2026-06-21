@@ -17,7 +17,7 @@ import {
 } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatSignedCurrency } from "@/lib/format/currency";
+import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord, RecordType } from "@/lib/finance/types";
@@ -34,13 +34,6 @@ function recordIcon(type: RecordType) {
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
   if (record.description) return record.description;
   return t(`records.types.${record.type}`);
-}
-
-function signedRecordAmount(record: FinanceRecord, locale: string) {
-  if (record.type === "adjustment") {
-    return formatSignedCurrency(record.amount, "adjustment", locale);
-  }
-  return formatSignedCurrency(record.amount, record.type, locale);
 }
 
 export function DashboardScreen() {
@@ -181,7 +174,8 @@ export function DashboardScreen() {
                   <RecordRow
                     key={record.id}
                     label={recordLabel(record, t)}
-                    amount={signedRecordAmount(record, formatLocale)}
+                    amount={record.amount}
+                    formatLocale={formatLocale}
                     meta={t("dashboard.activity.recordMeta", {
                       account: account?.name ?? "",
                       date: formatDisplayDate(record.date, formatLocale),

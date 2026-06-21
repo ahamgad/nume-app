@@ -1,43 +1,38 @@
+import {
+  formatCurrency as formatCurrencyDisplay,
+  formatSignedCurrency as formatSignedCurrencyDisplay,
+  getCurrencyDisplayParts,
+  toDisplayCurrencyAmount,
+  CURRENCY_DECIMAL_SCALE,
+} from "@/lib/format/currency-display";
+import { CURRENCY_SYMBOL } from "@/lib/format/currency-display-settings";
 import type { RecordType } from "@/lib/finance/types";
 import { normalizeNumericInput } from "@/lib/format/numerals";
 
-const DEFAULT_LOCALE = "en-EG";
+export {
+  CURRENCY_DECIMAL_SCALE,
+  CURRENCY_SYMBOL,
+  getCurrencyDisplayParts,
+  toDisplayCurrencyAmount,
+};
+export type { CurrencyDisplayParts } from "@/lib/format/currency-display";
+export type { FormatCurrencyOptions } from "@/lib/format/currency-display";
 
 export function formatCurrency(
   amount: number,
-  locale: string = DEFAULT_LOCALE,
-  currency = "EGP",
+  locale?: string,
+  options?: import("@/lib/format/currency-display").FormatCurrencyOptions,
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  return formatCurrencyDisplay(amount, locale, options);
 }
 
 export function formatSignedCurrency(
   amount: number,
   type: RecordType,
-  locale: string = DEFAULT_LOCALE,
+  locale?: string,
+  options?: import("@/lib/format/currency-display").FormatCurrencyOptions,
 ): string {
-  const formatted = formatCurrency(Math.abs(amount), locale);
-  if (
-    type === "income" ||
-    type === "interest" ||
-    type === "credit_card_payment"
-  ) {
-    return `+${formatted}`;
-  }
-  if (type === "expense" || type === "credit_card_purchase") {
-    return `−${formatted}`;
-  }
-  if (type === "transfer") {
-    const sign = amount >= 0 ? "+" : "−";
-    return `${sign}${formatted}`;
-  }
-  const sign = amount >= 0 ? "+" : "−";
-  return `${sign}${formatCurrency(Math.abs(amount), locale)}`;
+  return formatSignedCurrencyDisplay(amount, type, locale, options);
 }
 
 export function parseAmount(value: string): number | null {

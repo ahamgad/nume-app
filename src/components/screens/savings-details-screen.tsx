@@ -20,7 +20,7 @@ import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } fro
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatSignedCurrency } from "@/lib/format/currency";
+import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -266,9 +266,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) =>
-            formatSignedCurrency(record.amount, record.type, formatLocale)
-          }
+          recordAmount={(record) => record.amount}
           recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
           recordIcon={(record) => recordIcon(record.type)}
         />
