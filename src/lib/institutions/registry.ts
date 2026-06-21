@@ -260,13 +260,6 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     matchValues: ["WE", "Telecom Egypt"],
   },
   {
-    id: "instapay",
-    shortName: "InstaPay",
-    fullName: "InstaPay Egypt",
-    category: "financial_service",
-    matchValues: ["Insta Pay"],
-  },
-  {
     id: "fawry",
     shortName: "Fawry",
     fullName: "Fawry Payments",
@@ -328,12 +321,6 @@ export const INSTITUTION_REGISTRY: readonly InstitutionRegistryEntry[] = [
     fullName: "Souhoola",
     category: "financial_service",
     matchValues: ["Souhoula"],
-  },
-  {
-    id: "paymob",
-    shortName: "Paymob",
-    fullName: "Paymob",
-    category: "financial_service",
   },
   {
     id: "meeza",

@@ -215,11 +215,11 @@ export const ar = {
       recurring: "متكرر",
     },
     types: {
-      currentAccount: "حساب جاري",
+      currentAccount: "جاري",
       currentAccountCard: "جاري",
       cash: "نقد",
       wallet: "محفظة",
-      savingsAccount: "حساب توفير",
+      savingsAccount: "توفير",
       savingsAccountCard: "توفير",
       certificate: "شهادة",
       gold: "ذهب",
@@ -347,6 +347,16 @@ export const ar = {
       restoreAccount: "استعادة الحساب",
       restoreRestoring: "جارٍ الاستعادة…",
       restoreSuccess: "تمت استعادة الحساب",
+      permanentlyDelete: "حذف نهائي",
+      permanentlyDeleteSuccess: "تم حذف الحساب",
+      permanentlyDeleteConfirm: {
+        title: "حذف هذا الحساب نهائيًا؟",
+        description:
+          "سيُزال الحساب وجميع سجلاته بالكامل. لا يمكن التراجع عن ذلك.",
+        confirm: "حذف نهائي",
+        deleting: "جارٍ الحذف…",
+        cancel: "إلغاء",
+      },
       archiveConfirm: {
         title: "أرشفة هذا الحساب؟",
         description:
@@ -366,6 +376,8 @@ export const ar = {
       institutionRequired: "المؤسسة مطلوبة",
       identifierLast4Invalid: "أدخل 4 أرقام بالضبط",
       interestDestinationAccountRequired: "اختر حساب الوجهة",
+      duplicateAccount:
+        "يوجد حساب بنفس الاسم والرقم والمؤسسة بالفعل",
     },
   },
   institutions: {

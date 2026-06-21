@@ -17,6 +17,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { parseAmount } from "@/lib/format/currency";
 import { parsePostingDayFromForm } from "@/lib/savings/posting-schedule";
@@ -48,7 +49,11 @@ function EditCertificateForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateCertificate, refresh, accounts } = useFinance();
+  const { updateCertificate, refresh, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -82,7 +87,10 @@ function EditCertificateForm({
 
   async function handleSubmit() {
     if (!values) return;
-    const nextErrors = validateCertificateForm(values, t);
+    const nextErrors = validateCertificateForm(values, t, {
+      identityContext,
+      excludeAccountId: accountId,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   MoneyAccountFormFields,
@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import type { MoneyAccountType } from "@/lib/finance/types";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
+import { validateMoneyAccountForm } from "@/lib/finance/account-form";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
@@ -42,7 +44,11 @@ export function AddMoneyAccountScreen({
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { createAccount } = useFinance();
+  const { createAccount, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState<MoneyAccountFormValues>(EMPTY_VALUES);
@@ -64,16 +70,9 @@ export function AddMoneyAccountScreen({
   }
 
   function validateForm() {
-    const nextErrors: Record<string, string> = {};
-    if (!values.name.trim()) {
-      nextErrors.name = t("accounts.validation.nameRequired");
-    }
-    const parsedBalance = parseAmount(values.balance);
-    if (parsedBalance === null) {
-      nextErrors.balance = t("accounts.validation.balanceRequired");
-    } else if (parsedBalance < 0) {
-      nextErrors.balance = t("accounts.validation.balanceNegative");
-    }
+    const nextErrors = validateMoneyAccountForm(values, accountType, t, "create", {
+      identityContext,
+    });
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }

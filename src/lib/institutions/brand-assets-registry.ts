@@ -283,16 +283,6 @@ export const INSTITUTION_BRAND_ASSET_REGISTRY: readonly InstitutionBrandAssetEnt
     source: "https://apps.apple.com/eg/search?term=HSBC%20EG",
   },
   {
-    institutionId: "instapay",
-    status: "available",
-    tier: "B",
-    assetPath: "/institutions/instapay.png",
-    assetFormat: "png",
-    isOfficial: true,
-    lastUpdated: "2026-06-20",
-    source: "https://www.instapay.eg/",
-  },
-  {
     institutionId: "kfh",
     status: "available",
     tier: "A",
@@ -421,16 +411,6 @@ export const INSTITUTION_BRAND_ASSET_REGISTRY: readonly InstitutionBrandAssetEnt
     isOfficial: true,
     lastUpdated: "2026-06-20",
     source: "https://commons.wikimedia.org/wiki/File:Orange_logo.svg",
-  },
-  {
-    institutionId: "paymob",
-    status: "available",
-    tier: "A",
-    assetPath: "/institutions/paymob.png",
-    assetFormat: "png",
-    isOfficial: true,
-    lastUpdated: "2026-06-20",
-    source: "https://apps.apple.com/eg/search?term=Paymob",
   },
   {
     institutionId: "qnb_alahli",

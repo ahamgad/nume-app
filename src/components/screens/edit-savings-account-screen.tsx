@@ -9,6 +9,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import {
   isSavingsFormDirty,
@@ -86,7 +87,11 @@ function EditSavingsAccountForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateSavingsAccount, accounts } = useFinance();
+  const { updateSavingsAccount, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -119,7 +124,10 @@ function EditSavingsAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateSavingsForm(values, t, "edit");
+    const nextErrors = validateSavingsForm(values, t, "edit", {
+      identityContext,
+      excludeAccountId: accountId,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 
 import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,8 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     getCertificateSchedules,
     updateAccount,
     archiveCertificate,
+    restoreCertificate,
+    deleteAccount,
     processCertificateInterest,
     accounts,
     isFinanceReady,
@@ -59,7 +62,10 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   } = useFinance();
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const processingInterestRef = useRef(false);
 
   const account = getAccount(accountId);
@@ -115,6 +121,36 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     } finally {
       setArchiving(false);
       setShowArchiveConfirm(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (!certificate) return;
+    setRestoring(true);
+    try {
+      await restoreCertificate(certificate.id);
+      showToast(t("accounts.details.restoreSuccess"));
+    } catch (error) {
+      logSupabaseError("restoreCertificate", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+    } finally {
+      setRestoring(false);
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    if (!account) return;
+    setDeleting(true);
+    try {
+      await deleteAccount(account.id);
+      showToast(t("accounts.details.permanentlyDeleteSuccess"));
+      router.replace(accountsListHref(getPersistedAccountsListFilter()));
+    } catch (error) {
+      logSupabaseError("deleteAccount", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   }
 
@@ -305,8 +341,32 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               </div>
             </div>
           </section>
-        ) : null}
+        ) : (
+          <ArchivedAccountActions
+            restoreLabel={t("accounts.details.restoreAccount")}
+            restoreLoadingLabel={t("accounts.details.restoreRestoring")}
+            deleteLabel={t("accounts.details.permanentlyDelete")}
+            restoring={restoring}
+            deleting={deleting}
+            onRestore={handleRestore}
+            onDelete={() => setShowDeleteConfirm(true)}
+          />
+        )}
       </ScreenBody>
+
+      <ConfirmBottomSheet
+        open={showDeleteConfirm}
+        titleId="delete-certificate-title"
+        icon="delete"
+        title={t("accounts.details.permanentlyDeleteConfirm.title")}
+        description={t("accounts.details.permanentlyDeleteConfirm.description")}
+        confirmLabel={t("accounts.details.permanentlyDeleteConfirm.confirm")}
+        confirmLoadingLabel={t("accounts.details.permanentlyDeleteConfirm.deleting")}
+        cancelLabel={t("accounts.details.permanentlyDeleteConfirm.cancel")}
+        confirmDisabled={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
 
       <ConfirmBottomSheet
         open={showArchiveConfirm}

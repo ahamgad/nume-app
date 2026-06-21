@@ -3,6 +3,12 @@ import {
   validateAccountNameField,
   validateIdentifierLast4Field,
 } from "@/lib/field-editor/field-validators";
+import {
+  applyDuplicateAccountIdentityError,
+  type AccountIdentityInput,
+  type AccountIdentityResolverContext,
+} from "@/lib/finance/account-identity-validation";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { parseAmount } from "@/lib/format/currency";
 import type { TranslationKey } from "@/lib/i18n";
 import {
@@ -44,6 +50,10 @@ export function validateCreditCardForm(
   values: CreditCardFormValues,
   t: (key: TranslationKey) => string,
   mode: "create" | "edit" = "create",
+  options?: {
+    identityContext?: AccountIdentityResolverContext;
+    excludeAccountId?: string;
+  },
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const nameError = validateAccountNameField(values.name, t);
@@ -71,6 +81,26 @@ export function validateCreditCardForm(
 
   if (parseCreditCardStatementDueDay(values.statementDueDay) === null) {
     errors.statementDueDay = t("creditCards.validation.statementDayInvalid");
+  }
+
+  if (options?.identityContext) {
+    const linkedAccount = values.linkedAccountId
+      ? options.identityContext.accounts.find(
+          (account) => account.id === values.linkedAccountId,
+        )
+      : undefined;
+    const identity: AccountIdentityInput = {
+      name: values.name,
+      institution: linkedAccount?.institution ?? null,
+      numberLast4: parseOptionalIdentifierLast4(values.identifier),
+    };
+    return applyDuplicateAccountIdentityError(
+      errors,
+      identity,
+      options.identityContext,
+      options.excludeAccountId,
+      t("accounts.validation.duplicateAccount"),
+    );
   }
 
   return errors;

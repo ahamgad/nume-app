@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  ArrowDownLeft,
-  ArrowLeftRight,
-  ArrowUpRight,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -13,8 +8,10 @@ import { CreditCardDetailsScreen } from "@/components/screens/credit-card-detail
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
 import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
+import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import {
   ToggleSettingRow,
@@ -32,13 +29,6 @@ import type { FinanceRecord } from "@/lib/finance/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-
-function recordIcon(type: FinanceRecord["type"]) {
-  if (type === "income") return <ArrowDownLeft className="size-4" />;
-  if (type === "expense") return <ArrowUpRight className="size-4" />;
-  if (type === "transfer") return <ArrowLeftRight className="size-4" />;
-  return <ArrowLeftRight className="size-4" />;
-}
 
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
   if (record.description) return record.description;
@@ -62,12 +52,15 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
     updateAccount,
     archiveAccount,
     restoreAccount,
+    deleteAccount,
     isFinanceReady,
   } = useFinance();
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
@@ -116,6 +109,22 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
       showToast(getSupabaseErrorMessage(error) || t("common.retry"));
     } finally {
       setRestoring(false);
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    if (!account) return;
+    setDeleting(true);
+    try {
+      await deleteAccount(account.id);
+      showToast(t("accounts.details.permanentlyDeleteSuccess"));
+      router.replace(accountsListHref(getPersistedAccountsListFilter()));
+    } catch (error) {
+      logSupabaseError("deleteAccount", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   }
 
@@ -244,15 +253,15 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
             </div>
           </section>
         ) : (
-          <Button
-            className="h-11 w-full"
-            disabled={restoring}
-            onClick={handleRestore}
-          >
-            {restoring
-              ? t("accounts.details.restoreRestoring")
-              : t("accounts.details.restoreAccount")}
-          </Button>
+          <ArchivedAccountActions
+            restoreLabel={t("accounts.details.restoreAccount")}
+            restoreLoadingLabel={t("accounts.details.restoreRestoring")}
+            deleteLabel={t("accounts.details.permanentlyDelete")}
+            restoring={restoring}
+            deleting={deleting}
+            onRestore={handleRestore}
+            onDelete={() => setShowDeleteConfirm(true)}
+          />
         )}
 
         <RecentRecordsSection
@@ -264,9 +273,23 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           recordMeta={(record) =>
             formatDisplayDate(record.date, formatLocale)
           }
-          recordIcon={(record) => recordIcon(record.type)}
+          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
         />
       </ScreenBody>
+
+      <ConfirmBottomSheet
+        open={showDeleteConfirm}
+        titleId="delete-account-title"
+        icon="delete"
+        title={t("accounts.details.permanentlyDeleteConfirm.title")}
+        description={t("accounts.details.permanentlyDeleteConfirm.description")}
+        confirmLabel={t("accounts.details.permanentlyDeleteConfirm.confirm")}
+        confirmLoadingLabel={t("accounts.details.permanentlyDeleteConfirm.deleting")}
+        cancelLabel={t("accounts.details.permanentlyDeleteConfirm.cancel")}
+        confirmDisabled={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
 
       <ConfirmBottomSheet
         open={showArchiveConfirm}

@@ -2,6 +2,12 @@ import type { MoneyAccountFormValues } from "@/components/accounts/money-account
 import type { AccountType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import {
+  applyDuplicateAccountIdentityError,
+  type AccountIdentityInput,
+  type AccountIdentityResolverContext,
+} from "@/lib/finance/account-identity-validation";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import {
   validateAccountBalanceField,
   validateAccountNameField,
   validateIdentifierLast4Field,
@@ -43,6 +49,10 @@ export function validateMoneyAccountForm(
   accountType: AccountType,
   t: (key: TranslationKey) => string,
   mode: "create" | "edit" = "create",
+  options?: {
+    identityContext?: AccountIdentityResolverContext;
+    excludeAccountId?: string;
+  },
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const nameError = validateAccountNameField(values.name, t);
@@ -61,6 +71,24 @@ export function validateMoneyAccountForm(
   if (mode === "create") {
     const balanceError = validateAccountBalanceField(values.balance, t);
     if (balanceError) errors.balance = balanceError;
+  }
+
+  if (options?.identityContext) {
+    const identity: AccountIdentityInput = {
+      name: values.name,
+      institution: accountType === "cash" ? null : values.institution.trim() || null,
+      numberLast4:
+        accountType === "current_account"
+          ? parseOptionalIdentifierLast4(values.accountNumber)
+          : null,
+    };
+    return applyDuplicateAccountIdentityError(
+      errors,
+      identity,
+      options.identityContext,
+      options.excludeAccountId,
+      t("accounts.validation.duplicateAccount"),
+    );
   }
 
   return errors;

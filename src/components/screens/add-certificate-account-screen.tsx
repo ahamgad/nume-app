@@ -13,6 +13,7 @@ import {
   validateCertificateForm,
   type CertificateFormValues,
 } from "@/lib/certificates/form";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
@@ -31,7 +32,11 @@ export function AddCertificateAccountScreen() {
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { accounts, createCertificate } = useFinance();
+  const { accounts, certificates, creditCards, loans, createCertificate } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState<CertificateFormValues>(
@@ -64,7 +69,7 @@ export function AddCertificateAccountScreen() {
   }
 
   async function handleSubmit() {
-    const nextErrors = validateCertificateForm(values, t);
+    const nextErrors = validateCertificateForm(values, t, { identityContext });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

@@ -1,4 +1,10 @@
 import type { PayoutFrequency, RenewalType } from "@/lib/certificates/types";
+import {
+  applyDuplicateAccountIdentityError,
+  type AccountIdentityInput,
+  type AccountIdentityResolverContext,
+} from "@/lib/finance/account-identity-validation";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { validateIdentifierLast4Field } from "@/lib/field-editor/field-validators";
 import { isFutureDate, todayIsoDate } from "@/lib/format/date";
 import type { TranslationKey } from "@/lib/i18n";
@@ -71,6 +77,10 @@ export function resolveTermMonths(values: CertificateFormValues): number | null 
 export function validateCertificateForm(
   values: CertificateFormValues,
   t: (key: TranslationKey) => string,
+  options?: {
+    identityContext?: AccountIdentityResolverContext;
+    excludeAccountId?: string;
+  },
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
@@ -134,6 +144,21 @@ export function validateCertificateForm(
 
   if (showsPayoutDay && parsePostingDayFromForm(values.payoutDay) === null) {
     errors.payoutDay = t("savings.validation.postingDayInvalid");
+  }
+
+  if (options?.identityContext) {
+    const identity: AccountIdentityInput = {
+      name: values.name,
+      institution: values.institution.trim() || null,
+      numberLast4: parseOptionalIdentifierLast4(values.certificateNumber),
+    };
+    return applyDuplicateAccountIdentityError(
+      errors,
+      identity,
+      options.identityContext,
+      options.excludeAccountId,
+      t("accounts.validation.duplicateAccount"),
+    );
   }
 
   return errors;

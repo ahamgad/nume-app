@@ -1,4 +1,9 @@
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import {
+  applyDuplicateAccountIdentityError,
+  type AccountIdentityInput,
+  type AccountIdentityResolverContext,
+} from "@/lib/finance/account-identity-validation";
 import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import {
   parsePostingDayFromForm,
@@ -101,6 +106,10 @@ export function validateSavingsForm(
   values: SavingsFormValues,
   t: (key: TranslationKey) => string,
   mode: "create" | "edit" = "create",
+  options?: {
+    identityContext?: AccountIdentityResolverContext;
+    excludeAccountId?: string;
+  },
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
@@ -145,6 +154,21 @@ export function validateSavingsForm(
   ) {
     errors.destinationAccountId = t(
       "accounts.validation.interestDestinationAccountRequired",
+    );
+  }
+
+  if (options?.identityContext) {
+    const identity: AccountIdentityInput = {
+      name: values.name,
+      institution: values.institution.trim() || null,
+      numberLast4: parseOptionalIdentifierLast4(values.accountNumber),
+    };
+    return applyDuplicateAccountIdentityError(
+      errors,
+      identity,
+      options.identityContext,
+      options.excludeAccountId,
+      t("accounts.validation.duplicateAccount"),
     );
   }
 

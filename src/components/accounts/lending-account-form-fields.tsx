@@ -5,6 +5,12 @@ import { FormSection } from "@/components/forms/form-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import {
+  applyDuplicateAccountIdentityError,
+  type AccountIdentityInput,
+  type AccountIdentityResolverContext,
+} from "@/lib/finance/account-identity-validation";
+import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import {
   validateAccountBalanceField,
   validateAccountNameField,
   validateIdentifierLast4Field,
@@ -108,6 +114,10 @@ export function validateLendingAccountForm(
   values: LendingAccountFormValues,
   t: ReturnType<typeof useT>,
   mode: "create" | "edit" = "create",
+  options?: {
+    identityContext?: AccountIdentityResolverContext;
+    excludeAccountId?: string;
+  },
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   const nameError = validateAccountNameField(values.name, t);
@@ -123,6 +133,21 @@ export function validateLendingAccountForm(
   if (mode === "create") {
     const balanceError = validateAccountBalanceField(values.balance, t);
     if (balanceError) errors.balance = balanceError;
+  }
+
+  if (options?.identityContext) {
+    const identity: AccountIdentityInput = {
+      name: values.name,
+      institution: values.institution.trim() || null,
+      numberLast4: parseOptionalIdentifierLast4(values.identifier),
+    };
+    return applyDuplicateAccountIdentityError(
+      errors,
+      identity,
+      options.identityContext,
+      options.excludeAccountId,
+      t("accounts.validation.duplicateAccount"),
+    );
   }
 
   return errors;

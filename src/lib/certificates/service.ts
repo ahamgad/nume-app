@@ -16,7 +16,7 @@ import type {
 import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import { DEFAULT_BUSINESS_DAY_SETTINGS } from "@/lib/business-days/types";
 import { assertDestinationAccount } from "@/lib/finance/interest-destination-accounts";
-import { patchAccount } from "@/lib/finance/service";
+import { patchAccount, restoreAccount } from "@/lib/finance/service";
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors";
 
 export async function getCertificates(
@@ -301,6 +301,25 @@ export async function updateCertificate(
     const refreshed = await getCertificate(supabase, userId, certificateId);
     return refreshed ?? updated;
   }
+
+  return updated;
+}
+
+export async function restoreCertificate(
+  supabase: SupabaseClient,
+  userId: string,
+  certificateId: string,
+): Promise<Certificate> {
+  const existing = await getCertificate(supabase, userId, certificateId);
+  if (!existing) {
+    throw new Error("Certificate not found");
+  }
+
+  const updated = await updateCertificate(supabase, userId, certificateId, {
+    status: "active",
+  });
+
+  await restoreAccount(supabase, userId, existing.accountId);
 
   return updated;
 }

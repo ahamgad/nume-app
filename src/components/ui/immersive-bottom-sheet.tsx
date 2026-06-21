@@ -91,7 +91,7 @@ export function ImmersiveBottomSheet({
             >
               <ChevronLeft className={cn(SCREEN_HEADER_ICON_CLASS, "rtl:rotate-180")} />
             </button>
-            <h2 className={cn(SCREEN_HEADER_TITLE_CLASS, "text-center")}>{title}</h2>
+            <h2 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h2>
             <button
               type="button"
               onClick={onConfirm}

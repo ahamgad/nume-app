@@ -12,6 +12,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
@@ -91,7 +92,11 @@ function EditLendingAccountForm({
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { updateLoan } = useFinance();
+  const { updateLoan, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState(initialValues);
@@ -116,7 +121,10 @@ function EditLendingAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateLendingAccountForm(values, t, "edit");
+    const nextErrors = validateLendingAccountForm(values, t, "edit", {
+      identityContext,
+      excludeAccountId: accountId,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

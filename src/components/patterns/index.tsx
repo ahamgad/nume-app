@@ -347,7 +347,7 @@ export function RecordRow({
         onClick && "transition-colors active:bg-muted",
       )}
     >
-      <div className="mt-0.5 shrink-0 text-muted-foreground">{icon}</div>
+      <div className="mt-0.5 shrink-0">{icon}</div>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[0.9375rem] font-medium">{label}</p>

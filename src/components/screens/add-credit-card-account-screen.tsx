@@ -15,6 +15,7 @@ import {
   type CreditCardFormValues,
 } from "@/lib/credit-cards/form";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { parseAmount } from "@/lib/format/currency";
@@ -31,7 +32,11 @@ export function AddCreditCardAccountScreen() {
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { accounts, createCreditCard } = useFinance();
+  const { accounts, certificates, creditCards, loans, createCreditCard } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState<CreditCardFormValues>(
@@ -58,7 +63,7 @@ export function AddCreditCardAccountScreen() {
   }
 
   async function handleSubmit() {
-    const nextErrors = validateCreditCardForm(values, t, "create");
+    const nextErrors = validateCreditCardForm(values, t, "create", { identityContext });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

@@ -26,6 +26,7 @@ import { getCertificatesSafe } from "@/lib/certificates/load-certificates";
 import {
   archiveCertificate as archiveCertificateService,
   createCertificate as createCertificateService,
+  restoreCertificate as restoreCertificateService,
   updateCertificate as updateCertificateService,
 } from "@/lib/certificates/service";
 import type {
@@ -164,6 +165,7 @@ interface FinanceContextValue {
     input: MakeCreditCardPaymentInput,
   ) => Promise<FinanceRecord>;
   archiveCertificate: (certificateId: string) => Promise<void>;
+  restoreCertificate: (certificateId: string) => Promise<void>;
   processCertificateInterest: (
     certificateId: string,
   ) => Promise<ProcessCertificateInterestResult>;
@@ -571,6 +573,16 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [userId, invalidate],
   );
 
+  const restoreCertificate = useCallback(
+    async (certificateId: string): Promise<void> => {
+      if (!userId) throw new Error("Not authenticated");
+      const supabase = createClient();
+      await restoreCertificateService(supabase, userId, certificateId);
+      await invalidate();
+    },
+    [userId, invalidate],
+  );
+
   const processCertificateInterest = useCallback(
     async (certificateId: string): Promise<ProcessCertificateInterestResult> => {
       if (!userId) throw new Error("Not authenticated");
@@ -777,6 +789,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       addCreditCardPurchase,
       makeCreditCardPayment,
       archiveCertificate,
+      restoreCertificate,
       processCertificateInterest,
       getCertificateSchedules,
       archiveAccount,
@@ -822,6 +835,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       addCreditCardPurchase,
       makeCreditCardPayment,
       archiveCertificate,
+      restoreCertificate,
       processCertificateInterest,
       getCertificateSchedules,
       archiveAccount,

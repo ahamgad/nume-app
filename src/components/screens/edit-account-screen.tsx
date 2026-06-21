@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import {
   isMoneyAccountFormDirty,
   moneyAccountFormValuesFromAccount,
@@ -41,7 +42,11 @@ function EditAccountForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateAccount } = useFinance();
+  const { updateAccount, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -60,7 +65,10 @@ function EditAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateMoneyAccountForm(values, accountType, t, "edit");
+    const nextErrors = validateMoneyAccountForm(values, accountType, t, "edit", {
+      identityContext,
+      excludeAccountId: accountId,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

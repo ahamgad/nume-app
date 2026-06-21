@@ -7,6 +7,7 @@ import { SavingsFormFields } from "@/components/savings/savings-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import {
@@ -28,7 +29,11 @@ export function AddSavingsAccountScreen() {
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { accounts, createSavingsAccount } = useFinance();
+  const { accounts, certificates, creditCards, loans, createSavingsAccount } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState<SavingsFormValues>(
@@ -54,7 +59,7 @@ export function AddSavingsAccountScreen() {
   }
 
   async function handleSubmit() {
-    const nextErrors = validateSavingsForm(values, t, "create");
+    const nextErrors = validateSavingsForm(values, t, "create", { identityContext });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

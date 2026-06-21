@@ -24,7 +24,7 @@ describe("institution brand assets registry", () => {
     expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(
       INSTITUTION_REGISTRY.length,
     );
-    expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(56);
+    expect(INSTITUTION_BRAND_ASSET_REGISTRY).toHaveLength(54);
 
     for (const entry of INSTITUTION_REGISTRY) {
       expect(getInstitutionBrandAssetEntry(entry.id)).toBeDefined();
@@ -42,13 +42,13 @@ describe("institution brand assets registry", () => {
     const tierB = available.filter((entry) => entry.tier === "B");
     const tierC = available.filter((entry) => entry.tier === "C");
 
-    expect(available).toHaveLength(56);
-    expect(tierA).toHaveLength(49);
-    expect(tierB).toHaveLength(5);
+    expect(available).toHaveLength(54);
+    expect(tierA).toHaveLength(48);
+    expect(tierB).toHaveLength(4);
     expect(tierC).toHaveLength(2);
     expect(fallback).toHaveLength(0);
     expect(tierA.length + tierB.length + tierC.length).toBe(available.length);
-    expect(available.length + fallback.length).toBe(56);
+    expect(available.length + fallback.length).toBe(54);
   });
 
   it("maps available assets to unique public paths", () => {
@@ -78,6 +78,6 @@ describe("institution brand assets registry", () => {
     );
 
     expect(bankAssets).toHaveLength(32);
-    expect(fsAssets).toHaveLength(24);
+    expect(fsAssets).toHaveLength(22);
   });
 });

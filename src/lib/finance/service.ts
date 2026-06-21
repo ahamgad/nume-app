@@ -21,7 +21,7 @@ export async function fetchAccounts(
     .select("*")
     .eq("user_id", userId)
     .in("status", ["active", "archived"])
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
   return (data as DbAccount[]).map(mapAccount);

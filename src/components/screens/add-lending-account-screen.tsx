@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   LendingAccountFormFields,
@@ -12,6 +12,7 @@ import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseAmount } from "@/lib/format/currency";
 import { useFinance } from "@/lib/finance/store";
@@ -34,7 +35,11 @@ export function AddLendingAccountScreen() {
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { createLoan } = useFinance();
+  const { createLoan, accounts, certificates, creditCards, loans } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState<LendingAccountFormValues>(EMPTY_VALUES);
@@ -57,7 +62,9 @@ export function AddLendingAccountScreen() {
   }
 
   async function handleSubmit() {
-    const nextErrors = validateLendingAccountForm(values, t, "create");
+    const nextErrors = validateLendingAccountForm(values, t, "create", {
+      identityContext,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

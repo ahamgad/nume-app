@@ -15,6 +15,7 @@ import {
   validateCreditCardForm,
   type CreditCardFormValues,
 } from "@/lib/credit-cards/form";
+import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { useFinance } from "@/lib/finance/store";
@@ -85,7 +86,11 @@ function EditCreditCardAccountForm({
   const locale = useLocale();
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
-  const { accounts, updateCreditCard } = useFinance();
+  const { accounts, certificates, creditCards, loans, updateCreditCard } = useFinance();
+  const identityContext = useMemo(
+    () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
+    [accounts, certificates, creditCards, loans],
+  );
   const { showToast } = useToast();
 
   const [values, setValues] = useState(initialValues);
@@ -112,7 +117,10 @@ function EditCreditCardAccountForm({
   }
 
   async function handleSubmit() {
-    const nextErrors = validateCreditCardForm(values, t, "edit");
+    const nextErrors = validateCreditCardForm(values, t, "edit", {
+      identityContext,
+      excludeAccountId: accountId,
+    });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 

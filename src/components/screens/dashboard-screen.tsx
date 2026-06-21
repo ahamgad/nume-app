@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  ArrowDownLeft,
-  ArrowLeftRight,
-  ArrowUpRight,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
@@ -15,21 +10,14 @@ import {
   SetupBanner,
   WidgetCard,
 } from "@/components/patterns";
+import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { FinanceRecord, RecordType } from "@/lib/finance/types";
+import type { FinanceRecord } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
-
-function recordIcon(type: RecordType) {
-  if (type === "income") return <ArrowDownLeft className="size-4" />;
-  if (type === "expense") return <ArrowUpRight className="size-4" />;
-  if (type === "interest") return <ArrowDownLeft className="size-4" />;
-  if (type === "transfer") return <ArrowLeftRight className="size-4" />;
-  return <ArrowLeftRight className="size-4" />;
-}
 
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
   if (record.description) return record.description;
@@ -181,7 +169,7 @@ export function DashboardScreen() {
                       account: account?.name ?? "",
                       date: formatDisplayDate(record.date, formatLocale),
                     })}
-                    icon={recordIcon(record.type)}
+                    icon={<RecordTypeIcon type={record.type} />}
                     onClick={() =>
                       router.push(`/accounts/${record.accountId}`)
                     }

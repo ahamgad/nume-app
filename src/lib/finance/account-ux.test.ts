@@ -18,8 +18,8 @@ const t = vi.fn((key: string, params?: Record<string, string>) => {
     return `${params.institution} · ${params.type}`;
   }
   const labels: Record<string, string> = {
-    "accounts.types.currentAccount": "Current account",
-    "accounts.types.cash": "Cash account",
+    "accounts.types.currentAccount": "Current",
+    "accounts.types.cash": "Cash",
     "accounts.types.wallet": "Wallet",
     "accounts.types.certificate": "Certificate",
     "institutions.banks.cib": "Commercial International Bank",
@@ -34,13 +34,13 @@ describe("formatAccountListSubtitle", () => {
         { type: "current_account", institution: "CIB" },
         t,
       ),
-    ).toBe("CIB · Current account");
+    ).toBe("CIB · Current");
   });
 
   it("shows type only when institution is missing (e.g. cash)", () => {
     expect(
       formatAccountListSubtitle({ type: "cash", institution: null }, t),
-    ).toBe("Cash account");
+    ).toBe("Cash");
   });
 
   it("uses custom institution text when not in catalog", () => {

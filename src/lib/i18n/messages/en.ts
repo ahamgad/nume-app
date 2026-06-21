@@ -214,17 +214,17 @@ export const en = {
       recurring: "Recurring",
     },
     types: {
-      currentAccount: "Current account",
+      currentAccount: "Current",
       currentAccountCard: "Current",
       cash: "Cash",
       wallet: "Wallet",
-      savingsAccount: "Savings account",
+      savingsAccount: "Savings",
       savingsAccountCard: "Savings",
       certificate: "Certificate",
       gold: "Gold",
       stocks: "Stocks",
       loan: "Loan",
-      creditCard: "Credit card",
+      creditCard: "Credit",
     },
     empty: {
       title: "Your accounts live here",
@@ -348,6 +348,16 @@ export const en = {
       restoreAccount: "Restore account",
       restoreRestoring: "Restoring…",
       restoreSuccess: "Account restored",
+      permanentlyDelete: "Permanently delete",
+      permanentlyDeleteSuccess: "Account deleted",
+      permanentlyDeleteConfirm: {
+        title: "Permanently delete this account?",
+        description:
+          "This removes the account and its records completely. This cannot be undone.",
+        confirm: "Delete permanently",
+        deleting: "Deleting…",
+        cancel: "Cancel",
+      },
       archiveConfirm: {
         title: "Archive this account?",
         description:
@@ -367,6 +377,8 @@ export const en = {
       institutionRequired: "Institution is required",
       identifierLast4Invalid: "Enter exactly 4 digits",
       interestDestinationAccountRequired: "Select a destination account",
+      duplicateAccount:
+        "An account with this name, number, and institution already exists",
     },
   },
   institutions: {
