@@ -66,12 +66,11 @@ export function AccountRowContent({
           <p className="min-w-0 flex-1 truncate text-[0.8125rem] text-muted-foreground">
             {metaLabel}
           </p>
-          <div className="flex min-w-0 max-w-[50%] shrink items-center gap-2">
+          <div className={cn("flex w-auto shrink-0 items-center gap-2", balanceToneClassName)}>
             <ResponsiveCurrencyAmount
               amount={displayBalance}
               locale={formatLocale}
               variant="row"
-              className={cn("min-w-0 shrink", balanceToneClassName)}
             />
             {trailing}
           </div>

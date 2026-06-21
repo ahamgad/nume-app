@@ -1,10 +1,18 @@
-/** Routes that represent fresh create flows — scroll should reset on every entry. */
-const FRESH_CREATE_FLOW_PATTERNS = [
-  /^\/accounts\/new(\/|$)/,
-  /^\/accounts\/[^/]+\/activity\/new(\/|$)/,
-  /^\/accounts\/[^/]+\/records\/new(\/|$)/,
-];
+/** Add Account flows — always open at the top, never restore scroll. */
+const ADD_ACCOUNT_FLOW_PATTERN = /^\/accounts\/new(\/|$)/;
 
+const ACCOUNT_ACTIVITY_CREATE_PATTERN = /^\/accounts\/[^/]+\/activity\/new(\/|$)/;
+const ACCOUNT_RECORD_CREATE_PATTERN = /^\/accounts\/[^/]+\/records\/new(\/|$)/;
+
+export function isAddAccountFlowPath(pathname: string): boolean {
+  return ADD_ACCOUNT_FLOW_PATTERN.test(pathname);
+}
+
+/** Routes that represent fresh create flows — scroll should reset on every entry. */
 export function isFreshCreateFlowPath(pathname: string): boolean {
-  return FRESH_CREATE_FLOW_PATTERNS.some((pattern) => pattern.test(pathname));
+  return (
+    isAddAccountFlowPath(pathname) ||
+    ACCOUNT_ACTIVITY_CREATE_PATTERN.test(pathname) ||
+    ACCOUNT_RECORD_CREATE_PATTERN.test(pathname)
+  );
 }

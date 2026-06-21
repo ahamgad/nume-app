@@ -135,7 +135,7 @@ export function ScreenBody({
   className,
   withTabBar,
   withStickyFooter = false,
-  resetScrollOnMount = false,
+  resetScrollOnMount,
   onRefresh,
 }: ScreenBodyProps) {
   const pathname = usePathname();

@@ -1,6 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { isFreshCreateFlowPath } from "@/lib/navigation/create-flow-paths";
+import {
+  isAddAccountFlowPath,
+  isFreshCreateFlowPath,
+} from "@/lib/navigation/create-flow-paths";
+
+describe("isAddAccountFlowPath", () => {
+  it("matches all add account routes", () => {
+    expect(isAddAccountFlowPath("/accounts/new")).toBe(true);
+    expect(isAddAccountFlowPath("/accounts/new/credit_card")).toBe(true);
+    expect(isAddAccountFlowPath("/accounts/new/savings_account")).toBe(true);
+    expect(isAddAccountFlowPath("/accounts/new/certificate")).toBe(true);
+    expect(isAddAccountFlowPath("/accounts/new/current_account")).toBe(true);
+    expect(isAddAccountFlowPath("/accounts/new/lending")).toBe(true);
+  });
+
+  it("does not match non-add-account routes", () => {
+    expect(isAddAccountFlowPath("/accounts")).toBe(false);
+    expect(isAddAccountFlowPath("/accounts/abc-123")).toBe(false);
+    expect(isAddAccountFlowPath("/accounts/abc/activity/new")).toBe(false);
+  });
+});
 
 describe("isFreshCreateFlowPath", () => {
   it("matches account create routes", () => {

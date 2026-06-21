@@ -43,25 +43,18 @@ export function CurrencyAmount({
   return (
     <span
       className={cn(
-        "inline-flex max-w-full items-baseline whitespace-nowrap tabular-nums tracking-tight leading-none",
+        "inline max-w-full whitespace-nowrap tabular-nums tracking-tight leading-none",
         staticClass,
         className,
       )}
       style={style}
     >
-      {parts.signPrefix ? (
-        <span className="shrink-0">{parts.signPrefix}</span>
-      ) : null}
-      <span className="shrink-0">{parts.code}</span>
-      <span className="mx-1 shrink-0" aria-hidden="true">
-        {" "}
-      </span>
-      <span className="shrink-0">{parts.integerText}</span>
+      {parts.signPrefix}
+      {parts.code}
+      {" "}
+      {parts.integerText}
       {parts.hasDecimals ? (
-        <span
-          className="shrink-0"
-          style={{ fontSize: `${CURRENCY_DECIMAL_SCALE}em` }}
-        >
+        <span style={{ fontSize: `${CURRENCY_DECIMAL_SCALE}em` }}>
           {parts.decimalText}
         </span>
       ) : null}

@@ -8,7 +8,6 @@ import {
   type ReactNode,
 } from "react";
 
-import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { getCurrencyDisplayParts } from "@/lib/format/currency";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
 import {
@@ -69,7 +68,7 @@ export function ResponsiveCurrencyAmount({
         minPx,
       );
 
-      setFontSizePx(nextSize);
+      setFontSizePx((prev) => (prev === nextSize ? prev : nextSize));
     }
 
     fit();
@@ -92,15 +91,12 @@ export function ResponsiveCurrencyAmount({
           : undefined
       }
     >
-      <span ref={textRef} className="inline-block min-w-0">
-        <CurrencyAmount
-          amount={amount}
-          locale={locale}
-          variant={variant}
-          signMode={signMode}
-          className="font-semibold"
-          style={{ fontSize: fontSizePx ?? maxPx }}
-        />
+      <span
+        ref={textRef}
+        className="inline-block min-w-0 max-w-full whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none"
+        style={{ fontSize: fontSizePx ?? maxPx }}
+      >
+        {parts.fullText}
       </span>
       {hasTrailing ? (
         <div ref={trailingRef} className="shrink-0">
