@@ -64,9 +64,9 @@ export function BottomSheetHeader({
     <header className={cn("shrink-0 bg-background", className)}>
       <div className={SCREEN_HEADER_BAR_CLASS}>
         {leading}
-        <h2 id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
+        <span id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
           {title}
-        </h2>
+        </span>
         {trailing ? (
           <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{trailing}</div>
         ) : null}

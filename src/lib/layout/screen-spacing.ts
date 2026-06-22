@@ -51,6 +51,23 @@ export const SCREEN_HEADER_TRAILING_SLOT_CLASS =
 export const SCREEN_HEADER_TEXT_ACTION_CLASS =
   "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-semibold text-foreground disabled:opacity-40";
 
+/**
+ * Compact navigation title — 16px / 20px regardless of heading element defaults.
+ * Includes explicit line-height so h1/h2/span/p render identically.
+ */
+export const SCREEN_HEADER_TITLE_CLASS =
+  "block min-w-0 flex-1 truncate text-base font-semibold leading-tight";
+
+/**
+ * Header content zone below safe area: inner bar (`h-14`) + bottom border (1px).
+ * Matches rendered page header height on desktop (57px at 16px root).
+ */
+export const SCREEN_HEADER_CONTENT_ZONE_HEIGHT_CLASS = "calc(3.5rem + 1px)";
+
+/** Top padding for surfaces that align with the header content zone (e.g. headerless sheets). */
+export const SCREEN_HEADER_CONTENT_ZONE_TOP_PADDING_CLASS =
+  "pt-[calc(3.5rem+1px)]";
+
 /** Full ScreenHeader zone including safe area (bottom edge of fixed header). */
 export const SCREEN_HEADER_ZONE_TOP =
   "calc(3.5rem + env(safe-area-inset-top))";

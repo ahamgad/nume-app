@@ -11,6 +11,7 @@ import {
   SCREEN_HEADER_HORIZONTAL_PADDING_CLASS,
   SCREEN_HEADER_ITEM_GAP_CLASS,
   SCREEN_HEADER_TEXT_ACTION_CLASS,
+  SCREEN_HEADER_TITLE_CLASS,
   SCREEN_HEADER_TRAILING_SLOT_CLASS,
 } from "@/lib/layout/screen-spacing";
 
@@ -20,10 +21,15 @@ describe("bottom sheet foundation", () => {
     expect(BOTTOM_SHEET_TOP_RADIUS_CLASS).toBe("rounded-t-[36px]");
   });
 
-  it("aligns headerless sheet top padding with the standard header bar height", () => {
-    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-14");
+  it("aligns headerless sheet top padding with the header content zone", () => {
+    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-[calc(3.5rem+1px)]");
     expect(SCREEN_HEADER_BAR_HEIGHT_CLASS).toBe("3.5rem");
     expect(SCREEN_HEADER_BAR_CLASS).toContain("h-14");
+  });
+
+  it("centralizes header title line-height in the shared token", () => {
+    expect(SCREEN_HEADER_TITLE_CLASS).toContain("leading-tight");
+    expect(SCREEN_HEADER_TITLE_CLASS).toContain("text-base");
   });
 
   it("composes the header bar from the same horizontal padding and gap tokens", () => {

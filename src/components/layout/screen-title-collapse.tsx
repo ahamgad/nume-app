@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
+import { SCREEN_HEADER_TITLE_CLASS } from "@/lib/layout/screen-spacing";
 
 /** Header inner bar height — matches `h-14`. */
 const HEADER_BAR_HEIGHT_PX = 56;
@@ -132,7 +133,8 @@ export function CollapsingHeaderTitle({
     <span
       aria-hidden={!collapsed}
       className={cn(
-        "block min-w-0 flex-1 truncate text-base font-semibold leading-tight transition-opacity duration-200",
+        SCREEN_HEADER_TITLE_CLASS,
+        "transition-opacity duration-200",
         collapsed ? "opacity-100" : "opacity-0",
         className,
       )}
