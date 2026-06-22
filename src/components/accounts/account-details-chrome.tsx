@@ -2,40 +2,64 @@
 
 import type { ReactNode } from "react";
 
-import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import {
+  AccountDetailsMetadataRow,
+  AccountDetailsSummary,
+  type AccountDetailsSummaryProps,
+} from "@/components/accounts/account-details-summary";
+import { StackPageHeader } from "@/components/layout/stack-page-chrome";
+import { cn } from "@/lib/utils";
 
 export {
   ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX,
+  AccountDetailsMetadataRow,
   AccountDetailsSummary,
   type AccountDetailsSummaryProps,
 } from "@/components/accounts/account-details-summary";
 
 interface AccountDetailsStackHeaderProps {
+  pageTitle: string;
   accountName: string;
   onBack?: () => void;
   rightAction?: ReactNode;
 }
 
-/** Collapsing navigation header — title is the account name. */
+/**
+ * Account details navigation header — "Account Details" until the in-content
+ * account name scrolls under, then swaps to the account name (truncated).
+ */
 export function AccountDetailsStackHeader({
+  pageTitle,
   accountName,
   onBack,
   rightAction,
 }: AccountDetailsStackHeaderProps) {
   return (
     <StackPageHeader
-      title={accountName}
+      title={pageTitle}
+      collapsedTitle={accountName}
       onBack={onBack}
       rightAction={rightAction}
     />
   );
 }
 
-/** Large in-content title — account name; pairs with collapse foundation. */
-export function AccountDetailsLargeTitle({
-  accountName,
-}: {
-  accountName: string;
-}) {
-  return <StackPageTitle>{accountName}</StackPageTitle>;
+/**
+ * Shared account details content header — type/status row, then logo block.
+ * Used by all account detail screens.
+ */
+export function AccountDetailsContentHeader({
+  className,
+  ...props
+}: AccountDetailsSummaryProps) {
+  return (
+    <div className={cn("space-y-4", className)}>
+      <AccountDetailsMetadataRow
+        accountType={props.accountType}
+        status={props.status}
+        supplementaryChips={props.supplementaryChips}
+      />
+      <AccountDetailsSummary {...props} />
+    </div>
+  );
 }

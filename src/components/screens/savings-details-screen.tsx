@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import {
-  AccountDetailsLargeTitle,
+  AccountDetailsContentHeader,
   AccountDetailsStackHeader,
-  AccountDetailsSummary,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -17,7 +16,7 @@ import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components
 import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -180,9 +179,16 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     );
   }
 
+  const institutionSubtitle = formatAccountInstitutionSubtitle(
+    account.institution,
+    account.accountNumberLast4,
+    t,
+  );
+
   return (
     <>
       <AccountDetailsStackHeader
+        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -195,10 +201,10 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsLargeTitle accountName={account.name} />
-        <AccountDetailsSummary
+        <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
+          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}
         />

@@ -8,6 +8,7 @@ import { type ReactNode, useCallback, useRef } from "react";
 import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import {
   CollapsingHeaderTitle,
+  DualCollapsingHeaderTitle,
   useScreenTitleCollapse,
 } from "@/components/layout/screen-title-collapse";
 import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicator";
@@ -34,6 +35,8 @@ interface ScreenHeaderProps {
   mode?: "tab" | "stack";
   /** Large title lives in page content; header title appears after scroll. */
   collapsibleTitle?: boolean;
+  /** When set with collapsibleTitle, swaps from title to this label on scroll. */
+  collapsedTitle?: string;
   onBack?: () => void;
   rightAction?: ReactNode;
   className?: string;
@@ -79,6 +82,7 @@ export function ScreenHeader({
   title,
   mode = "tab",
   collapsibleTitle = false,
+  collapsedTitle,
   onBack,
   rightAction,
   className,
@@ -110,7 +114,14 @@ export function ScreenHeader({
           />
         ) : null}
         {collapsibleTitle ? (
-          <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
+          collapsedTitle ? (
+            <DualCollapsingHeaderTitle
+              pageTitle={title}
+              collapsedTitle={collapsedTitle}
+            />
+          ) : (
+            <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
+          )
         ) : (
           <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
         )}

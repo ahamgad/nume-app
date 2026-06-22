@@ -7,6 +7,8 @@ import { ScreenPageTitle } from "@/components/layout/screen-title-collapse";
 
 interface StackPageHeaderProps {
   title: string;
+  /** When set, header swaps from title to this label when the large title scrolls under. */
+  collapsedTitle?: string;
   onBack?: () => void;
   rightAction?: ReactNode;
   className?: string;

@@ -6,6 +6,7 @@ import {
   SupplementaryMetadataChip,
 } from "@/components/accounts/account-header-metadata";
 import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
+import { StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import type { AccountDetailHeaderStatus } from "@/lib/finance/account-header-status";
 import type { AccountType } from "@/lib/finance/types";
@@ -20,26 +21,51 @@ export const ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX = 56;
 export interface AccountDetailsSummaryProps {
   accountName: string;
   institution?: string | null;
+  institutionSubtitle?: string | null;
   accountType: AccountType;
   status?: AccountDetailHeaderStatus | null;
   supplementaryChips?: TranslationKey[];
   className?: string;
 }
 
-/**
- * Account details summary — logo + type, status, and name rows.
- * Shared by all account detail screens.
- */
-export function AccountDetailsSummary({
-  accountName,
-  institution,
+/** Type and status chips — row A in the account details content header. */
+export function AccountDetailsMetadataRow({
   accountType,
   status,
   supplementaryChips = [],
   className,
-}: AccountDetailsSummaryProps) {
+}: Pick<
+  AccountDetailsSummaryProps,
+  "accountType" | "status" | "supplementaryChips" | "className"
+>) {
+  return (
+    <div className={cn("flex flex-wrap items-center gap-2", className)}>
+      <AccountTypeMetadataChip type={accountType} />
+      {status ? <AccountStatusMetadataChip status={status} /> : null}
+      {supplementaryChips.map((labelKey) => (
+        <SupplementaryMetadataChip key={labelKey} labelKey={labelKey} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Logo + institution subtitle + account name — row B in the account details content header.
+ * Account name uses the large-title collapse foundation.
+ */
+export function AccountDetailsSummary({
+  accountName,
+  institution,
+  institutionSubtitle,
+  accountType,
+  className,
+}: Pick<
+  AccountDetailsSummaryProps,
+  "accountName" | "institution" | "institutionSubtitle" | "accountType" | "className"
+>) {
   const t = useT();
   const brandAsset = resolveInstitutionBrandAssetProps(institution, t);
+  const showInstitutionRow = Boolean(institutionSubtitle?.trim() && brandAsset);
 
   return (
     <div className={cn("flex min-w-0 gap-4", className)}>
@@ -58,23 +84,13 @@ export function AccountDetailsSummary({
           <AccountTypeIcon type={accountType} className="size-6" />
         </span>
       )}
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex flex-wrap gap-2">
-          <AccountTypeMetadataChip type={accountType} />
-        </div>
-        {status ? (
-          <div className="flex flex-wrap gap-2">
-            <AccountStatusMetadataChip status={status} />
-          </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+        {showInstitutionRow ? (
+          <p className="truncate text-[0.8125rem] leading-snug text-muted-foreground tabular-nums">
+            {institutionSubtitle}
+          </p>
         ) : null}
-        {supplementaryChips.map((labelKey) => (
-          <div key={labelKey} className="flex flex-wrap gap-2">
-            <SupplementaryMetadataChip labelKey={labelKey} />
-          </div>
-        ))}
-        <p className="truncate text-[1.0625rem] font-semibold leading-snug">
-          {accountName}
-        </p>
+        <StackPageTitle className="pb-0">{accountName}</StackPageTitle>
       </div>
     </div>
   );

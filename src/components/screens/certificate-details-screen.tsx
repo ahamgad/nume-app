@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 import {
-  AccountDetailsLargeTitle,
+  AccountDetailsContentHeader,
   AccountDetailsStackHeader,
-  AccountDetailsSummary,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -21,7 +20,7 @@ import {
   formatCertificateRemainingLabel,
 } from "@/lib/certificates/certificate-engine";
 import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromCertificate } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
@@ -215,17 +214,24 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     certificate.id,
   );
 
+  const institutionSubtitle = formatAccountInstitutionSubtitle(
+    account.institution,
+    certificate.certificateNumberLast4,
+    t,
+  );
+
   return (
     <>
       <AccountDetailsStackHeader
+        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsLargeTitle accountName={account.name} />
-        <AccountDetailsSummary
+        <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
+          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromCertificate(certificate.status)}
         />

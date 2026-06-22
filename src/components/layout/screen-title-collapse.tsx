@@ -117,6 +117,35 @@ export function ScreenPageTitle({
 }
 
 /**
+ * Navigation title for pages with a static header label that swaps to the
+ * large-title text when the in-content title scrolls under the header.
+ */
+export function DualCollapsingHeaderTitle({
+  pageTitle,
+  collapsedTitle,
+  className,
+}: {
+  pageTitle: string;
+  collapsedTitle: string;
+  className?: string;
+}) {
+  const context = useScreenTitleCollapse();
+  const collapsed = context?.titleCollapsed ?? false;
+
+  return (
+    <span
+      className={cn(
+        SCREEN_HEADER_TITLE_CLASS,
+        "block transition-opacity duration-200",
+        className,
+      )}
+    >
+      {collapsed ? collapsedTitle : pageTitle}
+    </span>
+  );
+}
+
+/**
  * Compact navigation title — fades in when the large title scrolls under the header.
  */
 export function CollapsingHeaderTitle({

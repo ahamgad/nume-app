@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import {
-  AccountDetailsLargeTitle,
+  AccountDetailsContentHeader,
   AccountDetailsStackHeader,
-  AccountDetailsSummary,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -25,7 +24,7 @@ import {
   calculateAvailableCredit,
   calculateCreditUtilization,
 } from "@/lib/credit-cards/utilization";
-import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { formatCurrency } from "@/lib/format/currency";
@@ -186,9 +185,16 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     );
   }
 
+  const institutionSubtitle = formatAccountInstitutionSubtitle(
+    account.institution,
+    creditCard.cardNumberLast4,
+    t,
+  );
+
   return (
     <>
       <AccountDetailsStackHeader
+        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -201,10 +207,10 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsLargeTitle accountName={account.name} />
-        <AccountDetailsSummary
+        <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
+          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}
         />

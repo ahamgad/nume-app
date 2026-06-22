@@ -7,9 +7,8 @@ import { CertificateDetailsScreen } from "@/components/screens/certificate-detai
 import { CreditCardDetailsScreen } from "@/components/screens/credit-card-details-screen";
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
 import {
-  AccountDetailsLargeTitle,
+  AccountDetailsContentHeader,
   AccountDetailsStackHeader,
-  AccountDetailsSummary,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -23,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
+import { formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -49,6 +49,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const {
     getAccount,
     getAccountRecords,
+    getLoanByAccountId,
     updateAccount,
     archiveAccount,
     restoreAccount,
@@ -64,7 +65,20 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
+  const loan = getLoanByAccountId(accountId);
   const isArchived = account?.status === "archived";
+
+  const institutionSubtitle = account
+    ? formatAccountInstitutionSubtitle(
+        account.institution,
+        account.type === "current_account"
+          ? account.accountNumberLast4
+          : account.type === "loan"
+            ? (loan?.loanNumberLast4 ?? null)
+            : null,
+        t,
+      )
+    : null;
 
   async function handleArchiveConfirm() {
     if (!account) return;
@@ -163,6 +177,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   return (
     <>
       <AccountDetailsStackHeader
+        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -175,10 +190,10 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6">
-        <AccountDetailsLargeTitle accountName={account.name} />
-        <AccountDetailsSummary
+        <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
+          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}
         />

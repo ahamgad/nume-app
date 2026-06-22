@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  AccountDetailsSummary,
+  AccountDetailsContentHeader,
   type AccountDetailsSummaryProps,
-} from "@/components/accounts/account-details-summary";
+} from "@/components/accounts/account-details-chrome";
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { MetadataChip } from "@/components/accounts/metadata-chip";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
@@ -15,7 +15,6 @@ import {
 import type { AccountType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
-import { cn } from "@/lib/utils";
 
 interface AccountTypeMetadataChipProps {
   type: AccountType;
@@ -72,15 +71,10 @@ export function SupplementaryMetadataChip({
   );
 }
 
-/** @deprecated Use {@link AccountDetailsSummary} from account-details-chrome. */
-export type AccountHeaderMetadataProps = AccountDetailsSummaryProps & {
-  institutionSubtitle?: string | null;
-};
+/** @deprecated Use {@link AccountDetailsContentHeader} from account-details-chrome. */
+export type AccountHeaderMetadataProps = AccountDetailsSummaryProps;
 
-/** @deprecated Use {@link AccountDetailsSummary}. */
-export function AccountHeaderMetadata({
-  institutionSubtitle: _institutionSubtitle,
-  ...props
-}: AccountHeaderMetadataProps) {
-  return <AccountDetailsSummary {...props} />;
+/** @deprecated Use {@link AccountDetailsContentHeader}. */
+export function AccountHeaderMetadata(props: AccountHeaderMetadataProps) {
+  return <AccountDetailsContentHeader {...props} />;
 }
