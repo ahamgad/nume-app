@@ -5,10 +5,10 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
-  type RefObject,
 } from "react";
 
 import { cn } from "@/lib/utils";
@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 const HEADER_BAR_HEIGHT_PX = 56;
 
 interface ScreenTitleCollapseContextValue {
-  scrollRef: RefObject<HTMLElement | null>;
   /** True when the in-content large title has scrolled under the header zone. */
   titleCollapsed: boolean;
+  registerScrollRoot: (node: HTMLElement | null) => void;
   registerPageTitle: (node: HTMLElement | null) => void;
 }
 
@@ -27,15 +27,20 @@ const ScreenTitleCollapseContext =
   createContext<ScreenTitleCollapseContextValue | null>(null);
 
 export function ScreenTitleCollapseProvider({
-  scrollRef,
   children,
 }: {
-  scrollRef: RefObject<HTMLElement | null>;
   children: ReactNode;
 }) {
   const [titleCollapsed, setTitleCollapsed] = useState(false);
+  const scrollRootRef = useRef<HTMLElement | null>(null);
   const pageTitleRef = useRef<HTMLElement | null>(null);
+  const [hasScrollRoot, setHasScrollRoot] = useState(false);
   const [hasPageTitle, setHasPageTitle] = useState(false);
+
+  const registerScrollRoot = useCallback((node: HTMLElement | null) => {
+    scrollRootRef.current = node;
+    setHasScrollRoot(Boolean(node));
+  }, []);
 
   const registerPageTitle = useCallback((node: HTMLElement | null) => {
     pageTitleRef.current = node;
@@ -43,7 +48,7 @@ export function ScreenTitleCollapseProvider({
   }, []);
 
   useEffect(() => {
-    const scrollRoot = scrollRef.current;
+    const scrollRoot = scrollRootRef.current;
     const pageTitle = pageTitleRef.current;
     if (!scrollRoot || !pageTitle) {
       setTitleCollapsed(false);
@@ -63,12 +68,15 @@ export function ScreenTitleCollapseProvider({
 
     observer.observe(pageTitle);
     return () => observer.disconnect();
-  }, [scrollRef, hasPageTitle]);
+  }, [hasScrollRoot, hasPageTitle]);
+
+  const value = useMemo(
+    () => ({ titleCollapsed, registerScrollRoot, registerPageTitle }),
+    [titleCollapsed, registerScrollRoot, registerPageTitle],
+  );
 
   return (
-    <ScreenTitleCollapseContext.Provider
-      value={{ scrollRef, titleCollapsed, registerPageTitle }}
-    >
+    <ScreenTitleCollapseContext.Provider value={value}>
       {children}
     </ScreenTitleCollapseContext.Provider>
   );

@@ -8,7 +8,6 @@ import { type ReactNode, useCallback, useRef } from "react";
 import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import {
   CollapsingHeaderTitle,
-  ScreenTitleCollapseProvider,
   useScreenTitleCollapse,
 } from "@/components/layout/screen-title-collapse";
 import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicator";
@@ -153,6 +152,7 @@ export function ScreenBody({
   const pathname = usePathname();
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
+  const registerScrollRoot = useScreenTitleCollapse()?.registerScrollRoot;
 
   const shouldResetScroll =
     resetScrollOnMount ?? isFreshCreateFlowPath(pathname);
@@ -196,31 +196,37 @@ export function ScreenBody({
     (node: HTMLElement | null) => {
       scrollRef.current = node;
       elementRef.current = node;
+      registerScrollRoot?.(node);
     },
-    [elementRef],
+    [elementRef, registerScrollRoot],
+  );
+
+  const setScrollRef = useCallback(
+    (node: HTMLElement | null) => {
+      scrollRef.current = node;
+      registerScrollRoot?.(node);
+    },
+    [registerScrollRoot],
   );
 
   if (!onRefresh) {
     return (
-      <ScreenTitleCollapseProvider scrollRef={scrollRef}>
-        <main
-          ref={scrollRef}
-          data-app-scroll
-          className={cn(scrollContainerClassName, className)}
-        >
-          {children}
-        </main>
-      </ScreenTitleCollapseProvider>
+      <main
+        ref={setScrollRef}
+        data-app-scroll
+        className={cn(scrollContainerClassName, className)}
+      >
+        {children}
+      </main>
     );
   }
 
   return (
-    <ScreenTitleCollapseProvider scrollRef={scrollRef}>
-      <main
-        ref={setScrollContainerRef}
-        data-app-scroll
-        className={cn("relative", scrollContainerClassName)}
-      >
+    <main
+      ref={setScrollContainerRef}
+      data-app-scroll
+      className={cn("relative", scrollContainerClassName)}
+    >
       {showIndicator ? (
         <div
           aria-live="polite"
@@ -252,6 +258,5 @@ export function ScreenBody({
         {children}
       </div>
     </main>
-    </ScreenTitleCollapseProvider>
   );
 }
