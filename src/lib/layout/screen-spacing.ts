@@ -41,7 +41,15 @@ export const SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS = "size-10";
 
 /** Inner bar — stack/tab headers (56px tall, 16px padding & gaps). */
 export const SCREEN_HEADER_BAR_CLASS =
-  "flex h-14 items-center px-4 gap-4";
+  `flex h-14 items-center ${SCREEN_HEADER_HORIZONTAL_PADDING_CLASS} ${SCREEN_HEADER_ITEM_GAP_CLASS}`;
+
+/** Trailing header action slot — icon buttons and text actions. */
+export const SCREEN_HEADER_TRAILING_SLOT_CLASS =
+  "flex shrink-0 items-center justify-end";
+
+/** Trailing text action in headers (e.g. Save). */
+export const SCREEN_HEADER_TEXT_ACTION_CLASS =
+  "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-semibold text-foreground disabled:opacity-40";
 
 /** Full ScreenHeader zone including safe area (bottom edge of fixed header). */
 export const SCREEN_HEADER_ZONE_TOP =

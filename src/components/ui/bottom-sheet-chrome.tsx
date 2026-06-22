@@ -2,7 +2,9 @@ import type { ComponentProps, ReactNode } from "react";
 
 import {
   SCREEN_HEADER_BAR_CLASS,
+  SCREEN_HEADER_TEXT_ACTION_CLASS,
   SCREEN_HEADER_TITLE_CLASS,
+  SCREEN_HEADER_TRAILING_SLOT_CLASS,
 } from "@/components/layout/screen-header";
 import {
   BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS,
@@ -32,9 +34,9 @@ export const BOTTOM_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
 /** @deprecated Use BOTTOM_SHEET_PANEL_CLASS — kept for import compatibility. */
 export const CONFIRMATION_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
 
-/** Trailing text action in sheet headers (e.g. Save). */
+/** @deprecated Use {@link SCREEN_HEADER_TEXT_ACTION_CLASS}. */
 export const BOTTOM_SHEET_HEADER_TEXT_ACTION_CLASS =
-  "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-semibold text-foreground disabled:opacity-40";
+  SCREEN_HEADER_TEXT_ACTION_CLASS;
 
 /** Opening animation aligned across sheet types. */
 export { NUME_BOTTOM_SHEET_ENTER_CLASS as BOTTOM_SHEET_ENTER_CLASS } from "@/lib/layout/motion";
@@ -65,7 +67,9 @@ export function BottomSheetHeader({
         <h2 id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
           {title}
         </h2>
-        {trailing}
+        {trailing ? (
+          <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{trailing}</div>
+        ) : null}
       </div>
     </header>
   );

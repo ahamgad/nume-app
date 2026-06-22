@@ -7,10 +7,10 @@ import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock"
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  BOTTOM_SHEET_HEADER_TEXT_ACTION_CLASS,
   BOTTOM_SHEET_PANEL_CLASS,
   BottomSheetHeader,
 } from "@/components/ui/bottom-sheet-chrome";
+import { SCREEN_HEADER_TEXT_ACTION_CLASS } from "@/components/layout/screen-header";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { IMMERSIVE_SHEET_HEIGHT } from "@/lib/layout/immersive-sheet";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export function ImmersiveBottomSheet({
               type="button"
               onClick={onConfirm}
               disabled={confirmDisabled}
-              className={BOTTOM_SHEET_HEADER_TEXT_ACTION_CLASS}
+              className={SCREEN_HEADER_TEXT_ACTION_CLASS}
               aria-label={saveAriaLabel}
             >
               {saveLabel}

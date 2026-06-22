@@ -20,6 +20,7 @@ import {
   getScreenBodyScrollPadding,
   getScreenBodyTopPadding,
   SCREEN_HEADER_BAR_CLASS,
+  SCREEN_HEADER_TRAILING_SLOT_CLASS,
   SCREEN_HEADER_ZONE_TOP,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
@@ -41,6 +42,8 @@ interface ScreenHeaderProps {
 export {
   SCREEN_HEADER_BAR_CLASS,
   SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
+  SCREEN_HEADER_TEXT_ACTION_CLASS,
+  SCREEN_HEADER_TRAILING_SLOT_CLASS,
 } from "@/lib/layout/screen-spacing";
 
 /** Leading header icons (back, confirm). */
@@ -114,7 +117,7 @@ export function ScreenHeader({
           <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
         )}
         {rightAction ? (
-          <div className="flex shrink-0 items-center justify-end">{rightAction}</div>
+          <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{rightAction}</div>
         ) : null}
       </div>
     </header>
