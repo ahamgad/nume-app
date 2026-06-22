@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- BEGIN:foundation-rules -->
 # Nume Foundation v1 (frozen)
 
-Foundation interaction patterns are product rules. Read **`docs/FOUNDATION.md`** before implementing any sheet, picker, editable field, or keyboard-adjacent UI.
+Foundation interaction patterns are product rules. Read **`docs/FOUNDATION.md`** before implementing any sheet, picker, editable field, keyboard-adjacent UI, or screen header.
 
 Quick reference:
 
@@ -16,9 +16,18 @@ Quick reference:
 - **Pickers / selection lists** → `PickerBottomSheet` (+ `shouldShowPickerSearch` when > 10 items)
 - **Confirmations** → `ConfirmationBottomSheet` (destructive actions only)
 
+**Header building blocks (frozen — do not build custom headers in screens):**
+
+- **Tab-root screens** (Dashboard, Accounts, Planning, Goals, More) → `RootPageHeader` + `RootPageTitle`
+- **Stack sub-screens** → `StackPageHeader` + `StackPageTitle`
+- **Account details** (all account types) → `AccountDetailsStackHeader` + `AccountDetailsContentHeader`
+- **Bottom sheets** → `BottomSheetHeader` / `BottomSheetHeaderlessContent` via sheet Foundation wrappers
+
+Read **`docs/FOUNDATION.md`** § 9 for header reuse, propagation, and variant rules.
+
 Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard ownership.
 
 Read **`docs/CONTENT.md`** for English sentence-case and copy conventions.
 
-Do not create custom sheet implementations. Do not inline keyboard editing on form screens.
+Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only.
 <!-- END:foundation-rules -->

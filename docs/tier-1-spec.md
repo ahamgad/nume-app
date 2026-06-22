@@ -39,6 +39,7 @@ Lightweight but complete destination:
 ## Implementation Requirements
 
 - Touch targets: minimum **44×44 px** on all interactive elements (buttons, tabs, list rows, switches).
+- **Headers:** All app screens use frozen header building blocks — see **`docs/FOUNDATION.md`** § 9. Do not implement custom headers in screen files.
 - Current Account only in Add Account flow (no type picker).
 - Recent Activity hidden when no records exist.
 - Account creation: toast + redirect to Account Details (no success screen).

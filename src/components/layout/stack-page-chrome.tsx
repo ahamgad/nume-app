@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Root and stack page header building blocks (frozen).
+ * Screens must use these exports — not `ScreenHeader` directly.
+ * @see docs/FOUNDATION.md § 9
+ */
+
 import type { ReactNode } from "react";
 
 import { ScreenHeader } from "@/components/layout/screen-header";

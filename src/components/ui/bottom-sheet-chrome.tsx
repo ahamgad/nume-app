@@ -1,3 +1,9 @@
+/**
+ * Bottom sheet header building blocks (frozen).
+ * All bottom sheets compose through Foundation wrappers + these exports.
+ * @see docs/FOUNDATION.md § 9
+ */
+
 import type { ComponentProps, ReactNode } from "react";
 
 import {

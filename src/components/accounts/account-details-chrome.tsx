@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Account details header building blocks (frozen).
+ * All account detail screens must use these exports.
+ * @see docs/FOUNDATION.md § 9
+ */
+
 import type { ReactNode } from "react";
 
 import {

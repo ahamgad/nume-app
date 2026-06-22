@@ -173,10 +173,86 @@ No duplicated values or local overrides for header typography, icon sizes, touch
 
 ---
 
+## 9. Page Headers (frozen)
+
+Header components are **official building blocks** for all app screens. Header Foundation is complete and frozen.
+
+**Do not build custom headers inside screens.**
+
+Before adding a screen, ask: **"Which header building block does this use?"**
+
+### Approved header components
+
+| Building block | Component(s) | Location | When to use |
+|---|---|---|---|
+| **Root page header** | `RootPageHeader` + `RootPageTitle` | `components/layout/stack-page-chrome.tsx` | Tab-root screens: Dashboard, Accounts, Planning, Goals, More |
+| **Stack page header** | `StackPageHeader` + `StackPageTitle` | `components/layout/stack-page-chrome.tsx` | All navigated sub-screens (create, edit, pickers-as-pages, More sub-routes) |
+| **Account details header** | `AccountDetailsStackHeader` + `AccountDetailsContentHeader` | `components/accounts/account-details-chrome.tsx` | Current Account, Savings, Certificate, Credit Card, Loan, Cash, Wallet, Gold, Stocks |
+| **Bottom sheet header** | `BottomSheetHeader`, `BottomSheetHeaderlessContent` | `components/ui/bottom-sheet-chrome.tsx` | All bottom sheets: picker, workspace/editor, form, confirmation, headerless |
+
+Sheet types compose the bottom sheet header through their Foundation wrappers (`PickerBottomSheet`, `ImmersiveBottomSheet`, `ConfirmationBottomSheet`, `DatePickerBottomSheet`). **Do not** add sheet headers inline.
+
+### Component reuse rule
+
+New screens **must** consume an existing header component:
+
+- New root tab screen → `RootPageHeader` + `RootPageTitle`
+- New stack screen → `StackPageHeader` + `StackPageTitle`
+- New account details screen → `AccountDetailsStackHeader` + `AccountDetailsContentHeader`
+- New bottom sheet → bottom sheet Foundation + `BottomSheetHeader` / `BottomSheetHeaderlessContent`
+
+Creating a custom header implementation inside a screen is **not allowed**.
+
+Configure headers through **props and composition only** — never reimplement layout, spacing, typography, sizing, collapse behavior, actions, borders, icon sizing, or truncation in screen files.
+
+### Single source of truth
+
+All header behavior lives in shared foundation components and their layout tokens:
+
+- `components/layout/screen-header.tsx` — page header primitive, body layout, action buttons
+- `components/layout/screen-title-collapse.tsx` — large-title collapse system
+- `components/layout/stack-page-chrome.tsx` — root and stack page headers
+- `components/accounts/account-details-chrome.tsx` — account details header variant
+- `components/ui/bottom-sheet-chrome.tsx` — bottom sheet header chrome
+- `lib/layout/screen-spacing.ts` — page header spacing and typography tokens
+- `lib/layout/bottom-sheet.ts` — sheet header bar sizing tokens
+
+`ScreenHeader` is an **internal primitive**. Screens use `RootPageHeader`, `StackPageHeader`, or `AccountDetailsStackHeader` — not `ScreenHeader` directly — except documented transient-state exceptions below.
+
+### Propagation rule
+
+Any change to Root, Stack, Account Details, or Bottom Sheet header foundations **must propagate automatically** to every screen that uses that component.
+
+**No screen-by-screen header updates.**
+
+Fix behavior once in the foundation; all consumers inherit the change.
+
+### Variant rule
+
+If a future exception is required:
+
+1. Create a **documented foundation variant** (new exported component or prop on an existing foundation component).
+2. Add the variant to the audit table in this document.
+3. **Do not** fork header markup, spacing, or collapse logic inside individual screens.
+
+### Documented exceptions
+
+| Surface | Header approach | Status |
+|---|---|---|
+| Auth screens (login, register, reset) | Custom auth layout — no page header foundation | ✅ Excluded |
+| Transient loading / not-found guards | Direct `ScreenHeader` with static title (`collapsibleTitle={false}`) | ⚠️ Allowed until a foundation loading variant exists |
+| Institution "Other" custom name | Inline input | ⚠️ Documented in § Audit status |
+
+---
+
 ## Audit status (v1 final)
 
 | Surface | Pattern | Status |
 |---|---|---|
+| Dashboard, Accounts, Planning, Goals, More | Root page header | ✅ |
+| Stack sub-screens (create, edit, records, More routes) | Stack page header | ✅ |
+| All account detail types | Account details header | ✅ |
+| Picker / workspace / calendar / confirmation sheets | Bottom sheet header | ✅ |
 | Field Editor | Workspace | ✅ |
 | Date Picker | Calendar | ✅ |
 | Institution picker (all types) | Picker | ✅ |
@@ -190,8 +266,9 @@ No duplicated values or local overrides for header typography, icon sizes, touch
 ## Governance checklist
 
 1. Identify the Foundation pattern
-2. Reuse the component — do not fork
-3. Use shared layout tokens
-4. Document any deviation in the audit table
+2. Identify the header building block (§ 9)
+3. Reuse the component — do not fork
+4. Use shared layout tokens
+5. Document any deviation in the audit table
 
-**Foundation v1 is frozen.**
+**Foundation v1 is frozen. Header Foundation is frozen.**
