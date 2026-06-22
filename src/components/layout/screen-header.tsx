@@ -7,6 +7,7 @@ import { type ReactNode, useCallback, useRef } from "react";
 
 import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import {
+  CollapsingHeaderTitle,
   ScreenTitleCollapseProvider,
   useScreenTitleCollapse,
 } from "@/components/layout/screen-title-collapse";
@@ -19,6 +20,8 @@ import { KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER } from "@/lib/layout/keyboard-s
 import {
   getScreenBodyScrollPadding,
   getScreenBodyTopPadding,
+  SCREEN_HEADER_BAR_CLASS,
+  SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
   SCREEN_HEADER_ZONE_TOP,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
@@ -36,8 +39,11 @@ interface ScreenHeaderProps {
   className?: string;
 }
 
-/** Inner bar — matches `h-14` touch layout across stack/tab headers. */
-export const SCREEN_HEADER_BAR_CLASS = "flex h-14 items-center px-2";
+/** Re-export for sheet chrome and legacy imports. */
+export {
+  SCREEN_HEADER_BAR_CLASS,
+  SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
+} from "@/lib/layout/screen-spacing";
 
 /** Leading header icons (back, confirm). */
 export const SCREEN_HEADER_ICON_CLASS = "size-6";
@@ -66,9 +72,9 @@ export function ScreenHeaderActionButton({
   );
 }
 
-/** Stack/tab header titles. */
+/** Stack/tab header titles (static / tab mode). */
 export const SCREEN_HEADER_TITLE_CLASS =
-  "min-w-0 flex-1 truncate px-1 text-base font-semibold";
+  "min-w-0 flex-1 truncate text-base font-semibold";
 
 export function ScreenHeader({
   title,
@@ -81,21 +87,25 @@ export function ScreenHeader({
   const router = useRouter();
   const t = useT();
   const collapse = useScreenTitleCollapse();
-  const showCollapsedTitle = collapsibleTitle && collapse?.titleCollapsed;
-  const showHeaderTitle = collapsibleTitle ? showCollapsedTitle : true;
-  const showHeaderBorder = collapsibleTitle ? showCollapsedTitle : true;
+  const collapseProgress = collapse?.collapseProgress ?? 0;
+  const showHeaderBorder = collapsibleTitle
+    ? collapseProgress > 0.02
+    : true;
 
   return (
     <header
       data-screen-header
       className={cn(
-        "bg-background pt-[env(safe-area-inset-top)] transition-[border-color] duration-200",
+        "bg-background pt-[env(safe-area-inset-top)]",
         showHeaderBorder ? "border-b border-border" : "border-b border-transparent",
         KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER
           ? "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg"
           : "z-30 shrink-0",
         className,
       )}
+      style={{
+        transition: collapsibleTitle ? "border-color 80ms linear" : undefined,
+      }}
     >
       <div className={SCREEN_HEADER_BAR_CLASS}>
         {mode === "stack" ? (
@@ -104,27 +114,16 @@ export function ScreenHeader({
             aria-label={t("common.back")}
           />
         ) : (
-          <div className="size-11 shrink-0" />
+          <div className={cn(SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS, "shrink-0")} />
         )}
-        <h1
-          className={cn(
-            SCREEN_HEADER_TITLE_CLASS,
-            "transition-[opacity,transform] duration-200",
-            showHeaderTitle
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none translate-y-1 opacity-0",
-          )}
-          aria-hidden={!showHeaderTitle}
-        >
-          {title}
-        </h1>
-        {rightAction ? (
-          <div className="flex min-h-11 shrink-0 items-center justify-end">
-            {rightAction}
-          </div>
+        {collapsibleTitle ? (
+          <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
         ) : (
-          <div className="size-11 shrink-0" />
+          <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
         )}
+        {rightAction ? (
+          <div className="flex shrink-0 items-center justify-end">{rightAction}</div>
+        ) : null}
       </div>
     </header>
   );

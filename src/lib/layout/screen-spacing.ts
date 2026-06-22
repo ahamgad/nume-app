@@ -30,6 +30,19 @@ export const STICKY_FOOTER_TAB_BAR_PADDING =
 /** Matches in-flow ScreenHeader inner bar (`h-14`). */
 export const SCREEN_HEADER_BAR_HEIGHT_CLASS = "3.5rem";
 
+/** Stack header horizontal padding (16px). */
+export const SCREEN_HEADER_HORIZONTAL_PADDING_CLASS = "px-4";
+
+/** Space between header bar items (16px). */
+export const SCREEN_HEADER_ITEM_GAP_CLASS = "gap-4";
+
+/** Shared header icon touch target (40×40). */
+export const SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS = "size-10";
+
+/** Inner bar — stack/tab headers (56px tall, 16px padding & gaps). */
+export const SCREEN_HEADER_BAR_CLASS =
+  "flex h-14 items-center px-4 gap-4";
+
 /** Full ScreenHeader zone including safe area (bottom edge of fixed header). */
 export const SCREEN_HEADER_ZONE_TOP =
   "calc(3.5rem + env(safe-area-inset-top))";

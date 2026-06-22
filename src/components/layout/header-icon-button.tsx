@@ -3,7 +3,7 @@
 import { ChevronLeft, X } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { SCREEN_HEADER_ICON_CLASS } from "@/components/layout/screen-header";
+import { SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
 
 interface HeaderIconButtonProps {
@@ -21,7 +21,7 @@ export function HeaderIconButton({
 }: HeaderIconButtonProps) {
   const iconNode =
     icon === "back" ? (
-      <ChevronLeft className={cn(SCREEN_HEADER_ICON_CLASS, "rtl:rotate-180")} />
+      <ChevronLeft className={cn("size-6", "rtl:rotate-180")} />
     ) : icon === "close" ? (
       <X className="size-5" />
     ) : (
@@ -34,7 +34,8 @@ export function HeaderIconButton({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex size-11 items-center justify-center rounded-full bg-muted text-foreground",
+        "inline-flex items-center justify-center rounded-full bg-muted text-foreground",
+        SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
         className,
       )}
     >

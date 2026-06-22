@@ -120,7 +120,7 @@ export function PickerBottomSheet({
         )}
       >
         <div ref={chromeRef} className="shrink-0 bg-background">
-          <div className={cn(SCREEN_HEADER_BAR_CLASS, "gap-3")}>
+          <div className={SCREEN_HEADER_BAR_CLASS}>
             <h2
               id={resolvedTitleId}
               className={cn(SCREEN_HEADER_TITLE_CLASS, "min-w-0 flex-1 text-start")}

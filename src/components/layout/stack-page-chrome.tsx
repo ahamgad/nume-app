@@ -14,7 +14,11 @@ interface StackPageHeaderProps {
   collapsible?: boolean;
 }
 
-/** Stack screen header with collapsible title behavior (NUME foundation). */
+/**
+ * Stack screen header (NUME foundation).
+ *
+ * Pair with `StackPageTitle` in page content — the title morphs into the header on scroll.
+ */
 export function StackPageHeader({
   collapsible = true,
   ...props
