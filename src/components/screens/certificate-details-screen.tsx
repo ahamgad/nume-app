@@ -21,7 +21,6 @@ import {
 } from "@/lib/certificates/certificate-engine";
 import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
-import { getAccountHeaderStatusFromCertificate } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
@@ -223,7 +222,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   return (
     <>
       <AccountDetailsStackHeader
-        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
       />
@@ -233,7 +231,6 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
-          status={getAccountHeaderStatusFromCertificate(certificate.status)}
         />
 
         <WidgetCard>

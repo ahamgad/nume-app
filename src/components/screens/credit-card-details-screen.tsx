@@ -26,7 +26,6 @@ import {
 } from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
-import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -194,7 +193,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
   return (
     <>
       <AccountDetailsStackHeader
-        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -212,7 +210,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
-          status={getAccountHeaderStatusFromAccount(account)}
         />
 
         <LiabilityBalanceMetricCard

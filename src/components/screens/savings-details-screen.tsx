@@ -17,7 +17,6 @@ import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
-import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
@@ -188,7 +187,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
   return (
     <>
       <AccountDetailsStackHeader
-        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -206,7 +204,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
-          status={getAccountHeaderStatusFromAccount(account)}
         />
 
         <BalanceMetricCard

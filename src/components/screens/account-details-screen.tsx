@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
-import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -177,7 +176,6 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   return (
     <>
       <AccountDetailsStackHeader
-        pageTitle={t("accounts.details.title")}
         accountName={account.name}
         onBack={() => router.back()}
         rightAction={
@@ -195,7 +193,6 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           institution={account.institution}
           institutionSubtitle={institutionSubtitle}
           accountType={account.type}
-          status={getAccountHeaderStatusFromAccount(account)}
         />
 
         <BalanceMetricCard
