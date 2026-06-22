@@ -3,9 +3,17 @@
 import { useState } from "react";
 
 import { FieldEditorSurface } from "@/components/field-editor/field-editor-surface";
+import { FieldSignToggle } from "@/components/field-editor/field-sign-toggle";
 import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
 import { useFieldEditorKeyboardInset } from "@/hooks/use-field-editor-keyboard-inset";
+import {
+  applyBalanceSign,
+  parseBalanceSignFromValue,
+  stripBalanceSign,
+  type BalanceSign,
+} from "@/lib/field-editor/balance-sign";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
+import { useT } from "@/providers/i18n-provider";
 
 interface FieldEditorBottomSheetProps {
   config: FieldEditorOpenConfig;
@@ -16,18 +24,27 @@ export function FieldEditorBottomSheet({
   config,
   onDismiss,
 }: FieldEditorBottomSheetProps) {
-  const [draft, setDraft] = useState(config.value);
+  const t = useT();
+  const [sign, setSign] = useState<BalanceSign>(() =>
+    parseBalanceSignFromValue(config.value),
+  );
+  const [draft, setDraft] = useState(() =>
+    config.showSignToggle ? stripBalanceSign(config.value) : config.value,
+  );
   const [sheetError, setSheetError] = useState<string | undefined>();
   const keyboardInsetPx = useFieldEditorKeyboardInset(true);
 
   function handleConfirm() {
-    const validationError = config.validate?.(draft);
+    const valueToSave = config.showSignToggle
+      ? applyBalanceSign(draft, sign)
+      : draft;
+    const validationError = config.validate?.(valueToSave);
     if (validationError) {
       setSheetError(validationError);
       return;
     }
 
-    config.onSave(draft);
+    config.onSave(valueToSave);
     onDismiss();
   }
 
@@ -50,20 +67,29 @@ export function FieldEditorBottomSheet({
       onConfirm={handleConfirm}
       variant="workspace"
       ariaLabel={config.title}
-      bodyClassName="px-6 py-8"
+      bodyClassName="flex flex-col items-center justify-center px-6 py-8"
       bodyStyle={{ paddingBottom: bodyPaddingBottom }}
     >
+      {config.showSignToggle ? (
+        <div className="mb-6 w-full">
+          <FieldSignToggle
+            value={sign}
+            onChange={setSign}
+            positiveLabel={t("common.sign.positive")}
+            negativeLabel={t("common.sign.negative")}
+          />
+        </div>
+      ) : null}
       <FieldEditorSurface
         mode={config.mode}
         inputMode={config.inputMode}
         displayValue={displayValue}
         placeholder={config.placeholder}
-        prefixLabel={config.prefixLabel}
         suffixLabel={config.suffixLabel}
         onChange={handleDraftChange}
       />
       {sheetError ? (
-        <p className="mt-4 text-sm text-destructive" role="alert">
+        <p className="mt-4 text-center text-sm text-destructive" role="alert">
           {sheetError}
         </p>
       ) : null}

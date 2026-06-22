@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
@@ -35,6 +35,8 @@ interface InstitutionPickerProps {
   placeholder?: string;
   customLabel?: string;
   customPlaceholder?: string;
+  error?: string;
+  variant?: "input" | "row";
   "aria-invalid"?: boolean;
 }
 
@@ -48,7 +50,9 @@ export function InstitutionPicker({
   placeholder,
   customLabel,
   customPlaceholder,
-  "aria-invalid": ariaInvalid,
+  error,
+  variant = "input",
+  "aria-invalid": ariaInvalidProp,
 }: InstitutionPickerProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -138,29 +142,68 @@ export function InstitutionPicker({
 
   const selectableCount = entries.length + 1;
   const showSearch = shouldShowPickerSearch(selectableCount);
+  const ariaInvalid = ariaInvalidProp ?? Boolean(error);
+
+  const triggerContent = (
+    <span
+      className={cn(
+        "min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug",
+        !displayLabel && "font-normal text-muted-foreground",
+        error && "text-destructive",
+      )}
+    >
+      {displayLabel ?? resolvedPlaceholder}
+    </span>
+  );
 
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{resolvedLabel}</Label>
 
-      <button
-        id={id}
-        type="button"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className={cn(
-          inputClassName,
-          "flex items-center justify-between gap-2 text-start",
-          !displayLabel && "text-muted-foreground",
-          disabled && "pointer-events-none",
-          ariaInvalid && "border-destructive",
-        )}
-      >
-        <span className="truncate">{displayLabel ?? resolvedPlaceholder}</span>
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-      </button>
+      {variant === "row" ? (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-invalid={ariaInvalid || undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onClick={() => setOpen(true)}
+          className={cn(
+            "flex min-h-12 w-full items-center gap-3 px-4 py-3 text-start transition-colors",
+            disabled && "pointer-events-none opacity-50",
+          )}
+        >
+          {triggerContent}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      ) : (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+          className={cn(
+            inputClassName,
+            "flex items-center justify-between gap-2 text-start",
+            !displayLabel && "text-muted-foreground",
+            disabled && "pointer-events-none",
+            ariaInvalid && "border-destructive",
+          )}
+        >
+          {triggerContent}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      )}
+
+      {error ? (
+        <p id={`${id}-error`} className="px-4 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       {showCustomField ? (
         <Input
@@ -237,7 +280,7 @@ export function InstitutionPicker({
                     aria-selected={isOtherSelected && !matchedEntry}
                     onClick={handleSelectOther}
                     className={cn(
-                      "flex min-h-11 w-full items-center rounded-md px-3 text-start text-[0.9375rem] transition-colors",
+                      "flex min-h-11 w-full items-center px-3 text-start text-[0.9375rem] transition-colors",
                       isOtherSelected && !matchedEntry
                         ? "bg-muted font-medium"
                         : "hover:bg-muted/60",
@@ -284,7 +327,7 @@ function InstitutionSection({
             aria-selected={selectedId === entry.id}
             onClick={() => onSelect(entry)}
             className={cn(
-              "flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-start transition-colors",
+              "flex min-h-11 w-full items-center gap-3 px-3 py-2 text-start transition-colors",
               selectedId === entry.id
                 ? "bg-muted"
                 : "hover:bg-muted/60",

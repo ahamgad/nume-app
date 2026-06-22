@@ -1,10 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ChevronLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useRef } from "react";
 
+import { HeaderIconButton } from "@/components/layout/header-icon-button";
+import {
+  ScreenTitleCollapseProvider,
+  useScreenTitleCollapse,
+} from "@/components/layout/screen-title-collapse";
 import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
@@ -24,6 +29,8 @@ import { useT } from "@/providers/i18n-provider";
 interface ScreenHeaderProps {
   title: string;
   mode?: "tab" | "stack";
+  /** Large title lives in page content; header title appears after scroll. */
+  collapsibleTitle?: boolean;
   onBack?: () => void;
   rightAction?: ReactNode;
   className?: string;
@@ -66,18 +73,24 @@ export const SCREEN_HEADER_TITLE_CLASS =
 export function ScreenHeader({
   title,
   mode = "tab",
+  collapsibleTitle = false,
   onBack,
   rightAction,
   className,
 }: ScreenHeaderProps) {
   const router = useRouter();
   const t = useT();
+  const collapse = useScreenTitleCollapse();
+  const showCollapsedTitle = collapsibleTitle && collapse?.titleCollapsed;
+  const showHeaderTitle = collapsibleTitle ? showCollapsedTitle : true;
+  const showHeaderBorder = collapsibleTitle ? showCollapsedTitle : true;
 
   return (
     <header
       data-screen-header
       className={cn(
-        "border-b border-border bg-background pt-[env(safe-area-inset-top)]",
+        "bg-background pt-[env(safe-area-inset-top)] transition-[border-color] duration-200",
+        showHeaderBorder ? "border-b border-border" : "border-b border-transparent",
         KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER
           ? "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg"
           : "z-30 shrink-0",
@@ -86,18 +99,25 @@ export function ScreenHeader({
     >
       <div className={SCREEN_HEADER_BAR_CLASS}>
         {mode === "stack" ? (
-          <button
-            type="button"
+          <HeaderIconButton
             onClick={onBack ?? (() => router.back())}
-            className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
             aria-label={t("common.back")}
-          >
-            <ChevronLeft className={cn(SCREEN_HEADER_ICON_CLASS, "rtl:rotate-180")} />
-          </button>
+          />
         ) : (
           <div className="size-11 shrink-0" />
         )}
-        <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
+        <h1
+          className={cn(
+            SCREEN_HEADER_TITLE_CLASS,
+            "transition-[opacity,transform] duration-200",
+            showHeaderTitle
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none translate-y-1 opacity-0",
+          )}
+          aria-hidden={!showHeaderTitle}
+        >
+          {title}
+        </h1>
         {rightAction ? (
           <div className="flex min-h-11 shrink-0 items-center justify-end">
             {rightAction}
@@ -190,22 +210,25 @@ export function ScreenBody({
 
   if (!onRefresh) {
     return (
-      <main
-        ref={scrollRef}
-        data-app-scroll
-        className={cn(scrollContainerClassName, className)}
-      >
-        {children}
-      </main>
+      <ScreenTitleCollapseProvider scrollRef={scrollRef}>
+        <main
+          ref={scrollRef}
+          data-app-scroll
+          className={cn(scrollContainerClassName, className)}
+        >
+          {children}
+        </main>
+      </ScreenTitleCollapseProvider>
     );
   }
 
   return (
-    <main
-      ref={setScrollContainerRef}
-      data-app-scroll
-      className={cn("relative", scrollContainerClassName)}
-    >
+    <ScreenTitleCollapseProvider scrollRef={scrollRef}>
+      <main
+        ref={setScrollContainerRef}
+        data-app-scroll
+        className={cn("relative", scrollContainerClassName)}
+      >
       {showIndicator ? (
         <div
           aria-live="polite"
@@ -237,5 +260,6 @@ export function ScreenBody({
         {children}
       </div>
     </main>
+    </ScreenTitleCollapseProvider>
   );
 }

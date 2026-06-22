@@ -83,6 +83,10 @@ export const en = {
       code: "EGP",
       zeroPlaceholder: "0",
     },
+    sign: {
+      positive: "+",
+      negative: "−",
+    },
     time: {
       minutesAgo: "{count}m ago",
       hoursAgo: "{count}h ago",
@@ -259,7 +263,7 @@ export const en = {
       title: "Add account",
       createTitle: "Add {type}",
       chooseType: "Account type",
-      lead: "Enter the account name and today's balance.",
+      lead: "Enter the account details and today's balance.",
       certificateLead: "Track a fixed-term deposit with expected returns.",
       balanceHint: "Use the balance you see in your bank app today.",
       comingSoon: "Coming soon",

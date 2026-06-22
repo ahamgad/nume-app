@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormSection } from "@/components/forms/form-section";
+import { FormCardSection } from "@/components/forms/form-card-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import type { InstitutionPickerContext } from "@/lib/institutions/catalog";
@@ -9,6 +9,7 @@ import {
   validateAccountBalanceField,
   validateAccountNameField,
 } from "@/lib/field-editor/field-validators";
+import { formatBalanceTriggerDisplay } from "@/lib/field-editor/balance-sign";
 import {
   formatAmountInput,
   sanitizeAmountInput,
@@ -53,7 +54,7 @@ export function MoneyAccountFormFields({
   const showBalance = showsBalanceField(accountType, mode);
 
   return (
-    <FormSection title={t("accounts.formSections.accountDetails")}>
+    <FormCardSection title={t("accounts.formSections.accountDetails")}>
       <EditableField
         id="account-name"
         label={t("accounts.fields.name.label")}
@@ -61,6 +62,7 @@ export function MoneyAccountFormFields({
         placeholder={t("accounts.fields.name.placeholder")}
         disabled={disabled}
         error={errors.name}
+        variant="row"
         validate={(next) => validateAccountNameField(next, t)}
         onSave={(name) => {
           onChange({ name });
@@ -76,7 +78,12 @@ export function MoneyAccountFormFields({
             accountType={accountType as InstitutionPickerContext}
             value={values.institution}
             disabled={disabled}
-            onChange={(institution) => onChange({ institution })}
+            error={errors.institution}
+            variant="row"
+            onChange={(institution) => {
+              onChange({ institution });
+              onClearError("institution");
+            }}
           />
         ) : (
           <EditableField
@@ -85,7 +92,12 @@ export function MoneyAccountFormFields({
             value={values.institution}
             placeholder={t("accounts.fields.institution.placeholder")}
             disabled={disabled}
-            onSave={(institution) => onChange({ institution })}
+            error={errors.institution}
+            variant="row"
+            onSave={(institution) => {
+              onChange({ institution });
+              onClearError("institution");
+            }}
           />
         )
       ) : null}
@@ -98,6 +110,7 @@ export function MoneyAccountFormFields({
           value={values.accountNumber}
           disabled={disabled}
           error={errors.accountNumber}
+          variant="row"
           onChange={(accountNumber) => onChange({ accountNumber })}
           onClearError={() => onClearError("accountNumber")}
         />
@@ -113,15 +126,19 @@ export function MoneyAccountFormFields({
           placeholder={t("common.currency.zeroPlaceholder")}
           disabled={disabled}
           error={errors.balance}
-          hint={
-            errors.balance ? undefined : t("accounts.add.balanceHint")
-          }
-          prefixLabel={t("common.currency.code")}
+          variant="row"
+          showSignToggle
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(amount) =>
             formatAmountInput(amount, amountInputLocale)
           }
-          triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
+          displayValue={
+            values.balance.trim()
+              ? formatBalanceTriggerDisplay(values.balance, (unsigned) =>
+                  formatAmountInput(unsigned, amountInputLocale),
+                )
+              : undefined
+          }
           validate={(next) => validateAccountBalanceField(next, t)}
           onSave={(balance) => {
             onChange({ balance });
@@ -129,6 +146,6 @@ export function MoneyAccountFormFields({
           }}
         />
       ) : null}
-    </FormSection>
+    </FormCardSection>
   );
 }

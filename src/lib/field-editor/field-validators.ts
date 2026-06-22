@@ -16,7 +16,6 @@ export function validateAccountBalanceField(
 ): string | undefined {
   const parsed = parseAmount(value);
   if (parsed === null) return t("accounts.validation.balanceRequired");
-  if (parsed < 0) return t("accounts.validation.balanceNegative");
 }
 
 export function validateCertificateNameField(

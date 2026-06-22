@@ -1,5 +1,7 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
+
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type {
@@ -28,13 +30,16 @@ interface EditableFieldProps {
   triggerClassName?: string;
   prefixLabel?: string;
   suffixLabel?: string;
+  showSignToggle?: boolean;
   validate?: (value: string) => string | undefined;
   onSave: (value: string) => void;
+  /** `row` — borderless chevron row for account forms; `input` — bordered trigger. */
+  variant?: "input" | "row";
 }
 
 /**
  * Inline trigger for the Nume field-editor bottom sheet.
- * Visually identical to Input; never receives focus.
+ * Visually identical to Input (default) or a chevron row; never receives focus.
  */
 export function EditableField({
   id,
@@ -53,8 +58,10 @@ export function EditableField({
   triggerClassName,
   prefixLabel,
   suffixLabel,
+  showSignToggle,
   validate,
   onSave,
+  variant = "input",
 }: EditableFieldProps) {
   const { openFieldEditor } = useFieldEditor();
 
@@ -74,16 +81,61 @@ export function EditableField({
       inputMode,
       sanitizeInput,
       formatDisplay,
-      prefixLabel,
+      prefixLabel: variant === "row" ? undefined : prefixLabel,
       suffixLabel,
+      showSignToggle,
       validate,
       onSave,
     });
   }
 
+  if (variant === "row") {
+    return (
+      <div className="space-y-2">
+        {hideLabel ? null : <Label htmlFor={id}>{label}</Label>}
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={
+            error ? `${id}-error` : hint ? `${id}-hint` : undefined
+          }
+          onClick={handleOpen}
+          className={cn(
+            "flex min-h-12 w-full items-center gap-3 px-4 py-3 text-start transition-colors",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            triggerClassName,
+          )}
+        >
+          <span
+            className={cn(
+              "min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug",
+              showPlaceholder && "font-normal text-muted-foreground",
+              error && "text-destructive",
+            )}
+          >
+            {showPlaceholder ? placeholder : resolvedDisplay}
+          </span>
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+        {hint && !error ? (
+          <p id={`${id}-hint`} className="px-4 text-[0.8125rem] text-muted-foreground">
+            {hint}
+          </p>
+        ) : null}
+        {error ? (
+          <p id={`${id}-error`} className="px-4 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
   const triggerClasses = cn(
     inputClassName,
-    "block w-full min-w-0 cursor-text truncate text-start",
+    "block w-full min-w-0 cursor-text text-start",
     prefixLabel && "ps-16",
     suffixLabel && "pe-10",
     error && "border-destructive",

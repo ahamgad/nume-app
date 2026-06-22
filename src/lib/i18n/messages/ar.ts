@@ -85,6 +85,10 @@ export const ar = {
       code: "EGP",
       zeroPlaceholder: "0",
     },
+    sign: {
+      positive: "+",
+      negative: "−",
+    },
     time: {
       minutesAgo: "منذ {count} د",
       hoursAgo: "منذ {count} س",
@@ -259,7 +263,7 @@ export const ar = {
       title: "إضافة حساب",
       createTitle: "إضافة {type}",
       chooseType: "نوع الحساب",
-      lead: "أدخل اسم الحساب ورصيده اليوم.",
+      lead: "أدخل تفاصيل الحساب ورصيده اليوم.",
       certificateLead: "تتبّع وديعة لأجل بعائد متوقّع.",
       balanceHint: "استخدم الرصيد الظاهر في تطبيق البنك اليوم.",
       comingSoon: "قريبًا",

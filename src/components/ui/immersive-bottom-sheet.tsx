@@ -1,12 +1,11 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
+import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock";
 import {
   SCREEN_HEADER_BAR_CLASS,
-  SCREEN_HEADER_ICON_CLASS,
   SCREEN_HEADER_TITLE_CLASS,
 } from "@/components/layout/screen-header";
 import {
@@ -81,16 +80,12 @@ export function ImmersiveBottomSheet({
           isWorkspace && "touch-none overscroll-none",
         )}
       >
-        <header className="shrink-0 border-b border-border">
+        <header className="shrink-0">
           <div className={SCREEN_HEADER_BAR_CLASS}>
-            <button
-              type="button"
+            <HeaderIconButton
               onClick={onDismiss}
-              className="inline-flex size-11 items-center justify-center rounded-md text-foreground"
               aria-label={t("common.back")}
-            >
-              <ChevronLeft className={cn(SCREEN_HEADER_ICON_CLASS, "rtl:rotate-180")} />
-            </button>
+            />
             <h2 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h2>
             <button
               type="button"

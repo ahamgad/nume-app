@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { MoneyAccountFormFields } from "@/components/accounts/money-account-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { ScreenPageTitle } from "@/components/layout/screen-title-collapse";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -103,10 +104,13 @@ function EditAccountForm({
       <ScreenHeader
         mode="stack"
         title={t("accounts.edit.title")}
+        collapsibleTitle
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <div className="space-y-6 pt-2">
+        <div className="space-y-6">
+          <ScreenPageTitle>{t("accounts.edit.title")}</ScreenPageTitle>
+
           <MoneyAccountFormFields
             accountType={accountType}
             values={values}

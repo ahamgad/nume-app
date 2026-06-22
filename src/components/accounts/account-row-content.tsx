@@ -10,7 +10,7 @@ import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-am
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
 import {
   getAccountDisplayBalance,
-  getBalanceToneClassName,
+  isLiabilityAccountType,
 } from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import {
@@ -18,7 +18,6 @@ import {
   resolveInstitutionBrandAssetProps,
 } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
 
 interface AccountRowContentProps {
   account: Account;
@@ -35,7 +34,7 @@ export function AccountRowContent({
 }: AccountRowContentProps) {
   const displayBalance = getAccountDisplayBalance(account);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
-  const balanceToneClassName = getBalanceToneClassName(account);
+  const showSignedBalance = !isLiabilityAccountType(account.type);
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
   const institutionLabel = account.institution?.trim()
     ? formatInstitutionEntityLabel(account.institution, t)
@@ -66,11 +65,12 @@ export function AccountRowContent({
           <p className="min-w-0 flex-1 truncate text-[0.8125rem] text-muted-foreground">
             {metaLabel}
           </p>
-          <div className={cn("flex w-auto shrink-0 items-center gap-2", balanceToneClassName)}>
+          <div className="flex w-auto shrink-0 items-center gap-2">
             <ResponsiveCurrencyAmount
               amount={displayBalance}
               locale={formatLocale}
               variant="row"
+              signMode={showSignedBalance ? "signed" : "unsigned"}
             />
             {trailing}
           </div>

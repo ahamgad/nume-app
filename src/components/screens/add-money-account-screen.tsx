@@ -8,6 +8,7 @@ import {
   type MoneyAccountFormValues,
 } from "@/components/accounts/money-account-form-fields";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { ScreenPageTitle } from "@/components/layout/screen-title-collapse";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import type { MoneyAccountType } from "@/lib/finance/types";
@@ -113,24 +114,28 @@ export function AddMoneyAccountScreen({
     guardBack();
   }
 
+  const pageTitle =
+    isFirstAccountFlow
+      ? t("accounts.add.firstAccount.title")
+      : getAddAccountScreenTitle(accountType, t);
+
   return (
     <>
       <ScreenHeader
         mode="stack"
-        title={
-          isFirstAccountFlow
-            ? t("accounts.add.firstAccount.title")
-            : getAddAccountScreenTitle(accountType, t)
-        }
+        title={pageTitle}
+        collapsibleTitle
         onBack={handleBack}
       />
       <ScreenBody withTabBar={false} withStickyFooter>
         <div
           className={cn(
-            "space-y-6 pt-2",
+            "space-y-6",
             submitting && "pointer-events-none opacity-60",
           )}
         >
+          <ScreenPageTitle>{pageTitle}</ScreenPageTitle>
+
           <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
             {isFirstAccountFlow
               ? t("accounts.add.firstAccount.lead")

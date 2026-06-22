@@ -13,6 +13,7 @@ interface AccountIdentifierFieldProps {
   value: string;
   disabled?: boolean;
   error?: string;
+  variant?: "input" | "row";
   onChange: (value: string) => void;
   onClearError: () => void;
 }
@@ -24,6 +25,7 @@ export function AccountIdentifierField({
   value,
   disabled = false,
   error,
+  variant = "input",
   onChange,
   onClearError,
 }: AccountIdentifierFieldProps) {
@@ -39,6 +41,7 @@ export function AccountIdentifierField({
       placeholder={t(placeholderKey)}
       disabled={disabled}
       error={error}
+      variant={variant}
       sanitizeInput={sanitizeIdentifierLast4Input}
       validate={(next) => validateIdentifierLast4Field(next, t)}
       onSave={(next) => {

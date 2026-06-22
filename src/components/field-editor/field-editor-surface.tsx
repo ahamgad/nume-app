@@ -10,21 +10,19 @@ interface FieldEditorSurfaceProps {
   inputMode?: FieldEditorInputMode;
   displayValue: string;
   placeholder?: string;
-  prefixLabel?: string;
   suffixLabel?: string;
   onChange: (raw: string) => void;
 }
 
 /**
  * Borderless, caret-first editing surface for the field editor sheet.
- * Not a traditional Input — minimal chrome, large type, premium focus.
+ * Center-aligned, wrapping text — not a traditional bordered Input.
  */
 export function FieldEditorSurface({
   mode,
   inputMode,
   displayValue,
   placeholder,
-  prefixLabel,
   suffixLabel,
   onChange,
 }: FieldEditorSurfaceProps) {
@@ -52,41 +50,37 @@ export function FieldEditorSurface({
   }
 
   return (
-    <div className="relative flex min-w-0 shrink-0 touch-auto items-baseline gap-2">
-      {prefixLabel ? (
-        <span
-          aria-hidden
-          className="shrink-0 text-[1.75rem] font-medium tabular-nums text-muted-foreground"
-        >
-          {prefixLabel}
-        </span>
-      ) : null}
-      <input
-        ref={inputRef}
-        type="text"
-        inputMode={resolvedInputMode}
-        value={displayValue}
-        placeholder={placeholder}
-        autoComplete="off"
-        autoCorrect={isNumeric ? "off" : undefined}
-        spellCheck={isNumeric ? false : undefined}
-        enterKeyHint="done"
-        onChange={(event) => handleChange(event.target.value)}
-        className={cn(
-          "min-w-0 flex-1 border-0 bg-transparent p-0 outline-none placeholder:text-muted-foreground/70",
-          isNumeric
-            ? "text-[2.25rem] font-semibold tabular-nums tracking-tight"
-            : "text-[1.75rem] font-semibold leading-snug",
-        )}
-      />
-      {suffixLabel ? (
-        <span
-          aria-hidden
-          className="shrink-0 text-[1.75rem] font-medium tabular-nums text-muted-foreground"
-        >
-          {suffixLabel}
-        </span>
-      ) : null}
+    <div className="flex w-full min-w-0 shrink-0 touch-auto flex-col items-center justify-center text-center">
+      <div className="flex w-full min-w-0 flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode={resolvedInputMode}
+          value={displayValue}
+          placeholder={placeholder}
+          autoComplete="off"
+          autoCorrect={isNumeric ? "off" : undefined}
+          spellCheck={isNumeric ? false : undefined}
+          enterKeyHint="done"
+          onChange={(event) => handleChange(event.target.value)}
+          className={cn(
+            "min-w-[3ch] max-w-full border-0 bg-transparent p-0 text-center outline-none",
+            "whitespace-normal break-words placeholder:text-muted-foreground",
+            isNumeric
+              ? "text-[1.625rem] font-semibold tabular-nums tracking-tight"
+              : "text-[1.375rem] font-semibold leading-snug",
+          )}
+          style={{ width: `${Math.max(displayValue.length || (placeholder?.length ?? 0), 3)}ch` }}
+        />
+        {suffixLabel ? (
+          <span
+            aria-hidden
+            className="shrink-0 text-[1.375rem] font-medium tabular-nums text-muted-foreground"
+          >
+            {suffixLabel}
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }

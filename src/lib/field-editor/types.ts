@@ -17,6 +17,8 @@ export interface FieldEditorOpenConfig {
   prefixLabel?: string;
   /** Suffix shown inside the editor (e.g. %). */
   suffixLabel?: string;
+  /** Account balance only — +/- chips above the editor input. */
+  showSignToggle?: boolean;
   /** Return an error message to keep the sheet open; undefined when valid. */
   validate?: (value: string) => string | undefined;
   /** Called after validation passes on confirm. */

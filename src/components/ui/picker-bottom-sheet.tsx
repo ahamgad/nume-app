@@ -1,13 +1,12 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useRef, type FocusEvent, type ReactNode } from "react";
 
+import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import { usePickerSheetHeight } from "@/hooks/use-picker-sheet-height";
 import { useSearchSheetLock } from "@/hooks/use-search-sheet-lock";
 import { useVisualViewportKeyboardInset } from "@/hooks/use-visual-viewport-keyboard-inset";
 import {
-  SCREEN_HEADER_ACTION_ICON_CLASS,
   SCREEN_HEADER_BAR_CLASS,
   SCREEN_HEADER_TITLE_CLASS,
 } from "@/components/layout/screen-header";
@@ -120,7 +119,7 @@ export function PickerBottomSheet({
           BOTTOM_SHEET_ENTER_CLASS,
         )}
       >
-        <div ref={chromeRef} className="shrink-0 border-b border-border bg-background">
+        <div ref={chromeRef} className="shrink-0 bg-background">
           <div className={cn(SCREEN_HEADER_BAR_CLASS, "gap-3")}>
             <h2
               id={resolvedTitleId}
@@ -129,14 +128,11 @@ export function PickerBottomSheet({
               {title}
             </h2>
             {showCloseButton ? (
-              <button
-                type="button"
+              <HeaderIconButton
                 onClick={onClose}
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-foreground"
+                icon="close"
                 aria-label={t("a11y.dismiss")}
-              >
-                <X className={SCREEN_HEADER_ACTION_ICON_CLASS} />
-              </button>
+              />
             ) : null}
           </div>
           {search ? (

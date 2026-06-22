@@ -142,7 +142,7 @@ export function InterestDestinationPicker({
                 aria-selected={value === null}
                 onClick={() => handleSelect(null)}
                 className={cn(
-                  "flex min-h-11 w-full items-center rounded-md px-3 py-2 text-start text-[0.9375rem] transition-colors",
+                  "flex min-h-11 w-full items-center px-3 py-2 text-start text-[0.9375rem] transition-colors",
                   value === null
                     ? "bg-muted font-medium"
                     : "hover:bg-muted/60",
