@@ -115,6 +115,9 @@ export const en = {
     adjustmentRecorded: "Adjustment recorded",
     transferRecorded: "Transfer recorded",
   },
+  picker: {
+    none: "None",
+  },
   fieldEditor: {
     confirm: "Save changes",
   },

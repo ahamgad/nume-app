@@ -347,9 +347,6 @@ export function CertificateFormFields({
           accounts={transferAccounts}
           disabled={disabled || !values.autoApplyInterest}
           allowClear
-          clearLabel={t(
-            "accounts.fields.interestDestinationAccount.notSelected",
-          )}
           error={errors.destinationAccountId}
           variant="row"
           onChange={(destinationAccountId) => {

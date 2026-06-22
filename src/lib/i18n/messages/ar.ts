@@ -117,6 +117,9 @@ export const ar = {
     adjustmentRecorded: "تم تسجيل التعديل",
     transferRecorded: "تم تسجيل التحويل",
   },
+  picker: {
+    none: "لا شيء",
+  },
   fieldEditor: {
     confirm: "حفظ التغييرات",
   },

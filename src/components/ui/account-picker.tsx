@@ -5,9 +5,14 @@ import { useMemo, useState } from "react";
 
 import { AccountPickerOptionRow } from "@/components/accounts/account-picker-option-row";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import {
+  PICKER_NONE_LABEL_KEY,
+  PickerList,
+  PickerListNoneOption,
+  shouldShowPickerNoneOption,
+} from "@/components/ui/picker-list";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterAccountsForDestinationSearch,
@@ -26,7 +31,6 @@ interface AccountPickerProps {
   accounts: Account[];
   disabled?: boolean;
   allowClear?: boolean;
-  clearLabel?: string;
   sheetTitle?: string;
   searchPlaceholder?: string;
   noResultsMessage?: string;
@@ -44,7 +48,6 @@ export function AccountPicker({
   accounts,
   disabled = false,
   allowClear = false,
-  clearLabel,
   sheetTitle,
   searchPlaceholder,
   noResultsMessage,
@@ -55,6 +58,8 @@ export function AccountPicker({
   const t = useT();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const noneLabel = t(PICKER_NONE_LABEL_KEY);
 
   const selectedAccount = useMemo(
     () => accounts.find((account) => account.id === value) ?? null,
@@ -73,16 +78,16 @@ export function AccountPicker({
     [accounts, searchQuery, showSearch, t],
   );
 
-  const resolvedClearLabel =
-    clearLabel ?? t("records.fields.transfer.notSelected");
-
-  const showClearOption = useMemo(() => {
-    if (!allowClear) return false;
-    if (!showSearch) return true;
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return true;
-    return resolvedClearLabel.toLowerCase().includes(query);
-  }, [allowClear, resolvedClearLabel, searchQuery, showSearch]);
+  const showNoneOption = useMemo(
+    () =>
+      shouldShowPickerNoneOption(
+        allowClear,
+        searchQuery,
+        showSearch,
+        noneLabel,
+      ),
+    [allowClear, noneLabel, searchQuery, showSearch],
+  );
 
   const displayLabel = selectedAccount
     ? formatAccountDestinationDisplay(selectedAccount, t)
@@ -182,26 +187,17 @@ export function AccountPicker({
             : undefined
         }
       >
-        {filteredAccounts.length === 0 && !showClearOption ? (
+        {filteredAccounts.length === 0 && !showNoneOption ? (
           <p className="px-2 py-6 text-center text-sm text-muted-foreground">
             {resolvedNoResults}
           </p>
         ) : (
-          <div
-            role="listbox"
-            aria-label={resolvedSheetTitle}
-            className="divide-y divide-border"
-          >
-            {showClearOption ? (
-              <button
-                type="button"
-                role="option"
-                aria-selected={value === null}
-                onClick={() => handleSelect(null)}
-                className={pickerOptionRowClassName(value === null)}
-              >
-                {resolvedClearLabel}
-              </button>
+          <PickerList ariaLabel={resolvedSheetTitle}>
+            {showNoneOption ? (
+              <PickerListNoneOption
+                selected={value === null}
+                onSelect={() => handleSelect(null)}
+              />
             ) : null}
 
             {filteredAccounts.map((account) => (
@@ -213,7 +209,7 @@ export function AccountPicker({
                 onClick={() => handleSelect(account.id)}
               />
             ))}
-          </div>
+          </PickerList>
         )}
       </PickerBottomSheet>
     </div>

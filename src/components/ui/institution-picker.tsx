@@ -4,6 +4,11 @@ import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import {
+  PickerList,
+  PickerListDivider,
+  PickerListOption,
+} from "@/components/ui/picker-list";
 import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
 import { Input, inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +26,6 @@ import {
   type InstitutionCatalogEntry,
   type InstitutionPickerContext,
 } from "@/lib/institutions/catalog";
-import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
@@ -249,11 +253,7 @@ export function InstitutionPicker({
               ) : null}
 
               {filteredBanks.length > 0 && filteredFinancial.length > 0 ? (
-                <div
-                  role="separator"
-                  aria-hidden
-                  className="mx-3 my-2 border-t border-border"
-                />
+                <PickerListDivider />
               ) : null}
 
               {filteredFinancial.length > 0 ? (
@@ -269,26 +269,16 @@ export function InstitutionPicker({
               {showOtherOption ? (
                 <>
                   {(filteredBanks.length > 0 || filteredFinancial.length > 0) ? (
-                    <div
-                      role="separator"
-                      aria-hidden
-                      className="mx-3 my-2 border-t border-border"
-                    />
+                    <PickerListDivider />
                   ) : null}
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={isOtherSelected && !matchedEntry}
-                    onClick={handleSelectOther}
-                    className={cn(
-                      "flex min-h-11 w-full items-center px-3 text-start text-[0.9375rem] transition-colors",
-                      isOtherSelected && !matchedEntry
-                        ? "bg-muted font-medium"
-                        : "hover:bg-muted/60",
-                    )}
-                  >
-                    {t("institutions.other")}
-                  </button>
+                  <PickerList ariaLabel={t("institutions.other")}>
+                    <PickerListOption
+                      selected={isOtherSelected && !matchedEntry}
+                      onSelect={handleSelectOther}
+                    >
+                      {t("institutions.other")}
+                    </PickerListOption>
+                  </PickerList>
                 </>
               ) : null}
             </>
@@ -316,36 +306,29 @@ function InstitutionSection({
       <p className="px-3 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
         {title}
       </p>
-      <div role="listbox" aria-label={title}>
+      <PickerList ariaLabel={title}>
         {entries.map((entry) => {
           const shortcut = getInstitutionShortcut(entry);
           const fullName = getInstitutionFullName(entry, t);
           return (
-          <button
-            key={entry.id}
-            type="button"
-            role="option"
-            aria-selected={selectedId === entry.id}
-            onClick={() => onSelect(entry)}
-            className={cn(
-              "flex min-h-11 w-full items-center gap-3 px-3 py-2 text-start transition-colors",
-              selectedId === entry.id
-                ? "bg-muted"
-                : "hover:bg-muted/60",
-            )}
-          >
-            <InstitutionBrandAsset
-              institutionId={entry.id}
-              fallbackLabel={shortcut}
-            />
-            <span className="flex min-w-0 flex-1 flex-col justify-center">
-              <span className="text-[0.9375rem] font-medium">{shortcut}</span>
-              <span className="text-sm text-muted-foreground">{fullName}</span>
-            </span>
-          </button>
-        );
+            <PickerListOption
+              key={entry.id}
+              selected={selectedId === entry.id}
+              onSelect={() => onSelect(entry)}
+              className="min-h-11 gap-3"
+            >
+              <InstitutionBrandAsset
+                institutionId={entry.id}
+                fallbackLabel={shortcut}
+              />
+              <span className="flex min-w-0 flex-1 flex-col justify-center">
+                <span className="text-[0.9375rem] font-medium">{shortcut}</span>
+                <span className="text-sm text-muted-foreground">{fullName}</span>
+              </span>
+            </PickerListOption>
+          );
         })}
-      </div>
+      </PickerList>
     </section>
   );
 }

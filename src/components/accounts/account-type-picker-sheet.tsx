@@ -1,17 +1,22 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
+import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import {
+  PickerList,
+  PickerListDivider,
+  PickerListOption,
+} from "@/components/ui/picker-list";
 import {
   ACCOUNT_TYPE_GROUPS,
   getAccountTypeCreatePath,
 } from "@/lib/finance/account-type-catalog";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import { useT } from "@/providers/i18n-provider";
-import { cn } from "@/lib/utils";
 
 interface AccountTypePickerSheetProps {
   open: boolean;
@@ -41,44 +46,41 @@ export function AccountTypePickerSheet({
       ariaLabel={t("accounts.add.chooseType")}
     >
       <div className="space-y-5 px-2 pb-2">
-        {ACCOUNT_TYPE_GROUPS.map((group) => (
-          <section key={group.id}>
-            <p className="mb-2 px-2 text-xs font-medium tracking-wide text-muted-foreground">
-              {t(group.labelKey)}
-            </p>
-            <div className="overflow-hidden rounded-lg border border-border">
-              {group.types.map((entry, index) => (
-                <button
-                  key={entry.type}
-                  type="button"
-                  disabled={!entry.enabled}
-                  onClick={() => handleSelect(entry.type, entry.enabled)}
-                  className={cn(
-                    "flex w-full items-center gap-3 px-4 py-3.5 text-start transition-colors",
-                    entry.enabled
-                      ? "hover:bg-muted/60 active:bg-muted"
-                      : "cursor-not-allowed opacity-50",
-                    index < group.types.length - 1 && "border-b border-border",
-                  )}
-                >
-                  <AccountTypeIcon type={entry.type} />
-                  <span className="flex-1 text-[0.9375rem] font-medium">
-                    {t(getAccountTypeLabelKey(entry.type))}
-                  </span>
-                  {!entry.enabled ? (
-                    <span className="text-xs text-muted-foreground">
-                      {t("accounts.add.comingSoon")}
+        {ACCOUNT_TYPE_GROUPS.map((group, groupIndex) => (
+          <Fragment key={group.id}>
+            {groupIndex > 0 ? <PickerListDivider /> : null}
+            <section>
+              <p className="mb-2 px-2 text-xs font-medium tracking-wide text-muted-foreground">
+                {t(group.labelKey)}
+              </p>
+              <PickerList ariaLabel={t(group.labelKey)}>
+                {group.types.map((entry) => (
+                  <PickerListOption
+                    key={entry.type}
+                    selected={false}
+                    disabled={!entry.enabled}
+                    onSelect={() => handleSelect(entry.type, entry.enabled)}
+                    className="min-h-[4.5rem] gap-3 px-4 py-3.5 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <AccountTypeIcon type={entry.type} />
+                    <span className="flex-1 text-[0.9375rem] font-medium">
+                      {t(getAccountTypeLabelKey(entry.type))}
                     </span>
-                  ) : (
-                    <ChevronRight
-                      className="size-4 shrink-0 text-muted-foreground"
-                      aria-hidden
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
-          </section>
+                    {!entry.enabled ? (
+                      <span className="text-xs text-muted-foreground">
+                        {t("accounts.add.comingSoon")}
+                      </span>
+                    ) : (
+                      <ChevronRight
+                        className="size-4 shrink-0 text-muted-foreground"
+                        aria-hidden
+                      />
+                    )}
+                  </PickerListOption>
+                ))}
+              </PickerList>
+            </section>
+          </Fragment>
         ))}
       </div>
     </PickerBottomSheet>

@@ -1,6 +1,7 @@
 "use client";
 
 import { AccountRowContent } from "@/components/accounts/account-row-content";
+import { PickerListOption } from "@/components/ui/picker-list";
 import type { Account } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useFormatLocale } from "@/providers/i18n-provider";
@@ -22,21 +23,16 @@ export function AccountPickerOptionRow({
   const formatLocale = useFormatLocale();
 
   return (
-    <button
-      type="button"
-      role="option"
-      aria-selected={selected}
-      onClick={onClick}
-      className={cn(
-        "flex min-h-16 w-full gap-3 px-3 py-3 text-start transition-colors",
-        selected ? "bg-muted font-medium" : "hover:bg-muted/60 active:bg-muted",
-      )}
+    <PickerListOption
+      selected={selected}
+      onSelect={onClick}
+      className={cn("min-h-16 gap-3 py-3")}
     >
       <AccountRowContent
         account={account}
         formatLocale={formatLocale}
         t={t}
       />
-    </button>
+    </PickerListOption>
   );
 }

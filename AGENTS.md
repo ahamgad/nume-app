@@ -13,7 +13,8 @@ Quick reference:
 
 - **Workspace input** → `ImmersiveBottomSheet` (`variant="workspace"`) + `EditableField`
 - **Date selection** → `DatePickerBottomSheet` + `DateField`
-- **Pickers / selection lists** → `PickerBottomSheet` (+ `shouldShowPickerSearch` when > 10 items)
+- **Pickers / selection lists** → `PickerBottomSheet` + `PickerList` (+ `shouldShowPickerSearch` when > 10 items)
+- **Optional picker None row** → `PickerListNoneOption` (`picker.none`) — mandatory pickers omit it
 - **Confirmations** → `ConfirmationBottomSheet` (destructive actions only)
 
 **Header building blocks (frozen — do not build custom headers in screens):**
@@ -29,5 +30,5 @@ Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard 
 
 Read **`docs/CONTENT.md`** for English sentence-case and copy conventions.
 
-Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only.
+Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only. Do not build custom picker list rows — use `PickerList`, `PickerListOption`, and `PickerListNoneOption`.
 <!-- END:foundation-rules -->

@@ -5,6 +5,12 @@ import { useMemo, useState } from "react";
 
 import { AccountPickerOptionRow } from "@/components/accounts/account-picker-option-row";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import {
+  PICKER_NONE_LABEL_KEY,
+  PickerList,
+  PickerListNoneOption,
+  shouldShowPickerNoneOption,
+} from "@/components/ui/picker-list";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
@@ -14,7 +20,6 @@ import {
 } from "@/lib/finance/account-display";
 import type { Account } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
-import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { cn } from "@/lib/utils";
 
 interface InterestDestinationPickerProps {
@@ -36,6 +41,8 @@ export function InterestDestinationPicker({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const noneLabel = t(PICKER_NONE_LABEL_KEY);
+
   const selectedAccount = useMemo(
     () => accounts.find((account) => account.id === value) ?? null,
     [accounts, value],
@@ -53,16 +60,10 @@ export function InterestDestinationPicker({
     [accounts, searchQuery, showSearch, t],
   );
 
-  const notSelectedLabel = t(
-    "accounts.fields.interestDestinationAccount.notSelected",
+  const showNoneOption = useMemo(
+    () => shouldShowPickerNoneOption(true, searchQuery, showSearch, noneLabel),
+    [noneLabel, searchQuery, showSearch],
   );
-
-  const showClearOption = useMemo(() => {
-    if (!showSearch) return true;
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return true;
-    return notSelectedLabel.toLowerCase().includes(query);
-  }, [notSelectedLabel, searchQuery, showSearch]);
 
   const displayLabel = selectedAccount
     ? formatAccountDestinationDisplay(selectedAccount, t)
@@ -126,26 +127,17 @@ export function InterestDestinationPicker({
             : undefined
         }
       >
-        {filteredAccounts.length === 0 && !showClearOption ? (
+        {filteredAccounts.length === 0 && !showNoneOption ? (
           <p className="px-2 py-6 text-center text-sm text-muted-foreground">
             {t("accounts.fields.interestDestinationAccount.noResults")}
           </p>
         ) : (
-          <div
-            role="listbox"
-            aria-label={label}
-            className="divide-y divide-border"
-          >
-            {showClearOption ? (
-              <button
-                type="button"
-                role="option"
-                aria-selected={value === null}
-                onClick={() => handleSelect(null)}
-                className={pickerOptionRowClassName(value === null)}
-              >
-                {notSelectedLabel}
-              </button>
+          <PickerList ariaLabel={label}>
+            {showNoneOption ? (
+              <PickerListNoneOption
+                selected={value === null}
+                onSelect={() => handleSelect(null)}
+              />
             ) : null}
 
             {filteredAccounts.map((account) => (
@@ -157,7 +149,7 @@ export function InterestDestinationPicker({
                 onClick={() => handleSelect(account.id)}
               />
             ))}
-          </div>
+          </PickerList>
         )}
       </PickerBottomSheet>
     </div>

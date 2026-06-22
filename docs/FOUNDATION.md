@@ -120,6 +120,23 @@ Selection is immediate on row tap (no Save).
 
 **Examples:** Institution pickers, interest destination, future category pickers.
 
+### Picker list (frozen)
+
+All selectable option lists inside picker sheets compose through **`PickerList`** (`components/ui/picker-list.tsx`).
+
+| Rule | Foundation |
+|---|---|
+| Row dividers | `PickerList` inserts `PickerListDivider` between every row — 2px gap above and below each divider line |
+| Zero corner radius | `PickerListOption` / `PICKER_OPTION_ROW_CLASS` — `rounded-none` on every row |
+| Unified None (optional pickers) | `PickerListNoneOption` — label `picker.none` ("None"), always first row |
+| Mandatory pickers | No None row — omit `PickerListNoneOption` |
+
+**Do not** implement dividers, row radius, or clear/empty labels per picker.
+
+Optional pickers use `shouldShowPickerNoneOption()` for search filtering. Mandatory pickers include institution, renewal type, account type navigation, and account pickers without `allowClear`.
+
+**Documented exception:** Date month/year wheel (`WheelColumn`) — scroll-wheel UX, not a tap list.
+
 ---
 
 ## 4. Calendar Sheets
@@ -257,6 +274,7 @@ If a future exception is required:
 | Date Picker | Calendar | ✅ |
 | Institution picker (all types) | Picker | ✅ |
 | Interest destination picker | Picker | ✅ |
+| Account / renewal / account-type pickers | Picker list | ✅ |
 | Confirmation / discard | Confirmation | ✅ Intentional |
 | Auth screens | — | ✅ Excluded |
 | Institution "Other" custom name | Inline input | ⚠️ Documented exception |

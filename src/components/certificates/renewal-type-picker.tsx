@@ -4,12 +4,12 @@ import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
+import { PickerList, PickerListOption } from "@/components/ui/picker-list";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { RenewalType } from "@/lib/certificates/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
-import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { cn } from "@/lib/utils";
 
 export const RENEWAL_TYPE_OPTIONS: RenewalType[] = [
@@ -141,23 +141,20 @@ export function RenewalTypePicker({
         title={label}
         titleId={`${id ?? "renewal-type"}-picker-title`}
       >
-        <div role="listbox" aria-label={label}>
+        <PickerList ariaLabel={label}>
           {options.map((option) => (
-            <button
+            <PickerListOption
               key={option.value}
-              type="button"
-              role="option"
-              aria-selected={value === option.value}
-              onClick={() => {
+              selected={value === option.value}
+              onSelect={() => {
                 onChange(option.value);
                 setOpen(false);
               }}
-              className={pickerOptionRowClassName(value === option.value)}
             >
               {option.label}
-            </button>
+            </PickerListOption>
           ))}
-        </div>
+        </PickerList>
       </PickerBottomSheet>
     </div>
   );

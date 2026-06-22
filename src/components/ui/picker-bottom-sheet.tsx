@@ -56,6 +56,7 @@ function handleSearchFocus(event: FocusEvent<HTMLInputElement>) {
  * Foundation generic picker sheet — content-fitted height, conditional search,
  * fixed container, content-only scrolling.
  *
+ * List content must use `PickerList` from `picker-list.tsx`.
  * NOT a workspace or calendar sheet.
  */
 export function PickerBottomSheet({
