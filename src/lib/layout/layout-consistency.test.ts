@@ -47,7 +47,7 @@ describe("system message spacing", () => {
   it("positions surfaces 4px below the fixed header", () => {
     expect(SYSTEM_MESSAGE_GAP_PX).toBe("4px");
     expect(SYSTEM_MESSAGE_TOP_OFFSET).toBe(
-      "calc(calc(4.75rem + env(safe-area-inset-top)) + 4px)",
+      "calc(calc(3.5rem + env(safe-area-inset-top)) + 4px)",
     );
   });
 

@@ -1,12 +1,12 @@
 import type { ComponentProps, ReactNode } from "react";
 
 import {
-  SCREEN_HEADER_BAR_CLASS,
   SCREEN_HEADER_TEXT_ACTION_CLASS,
   SCREEN_HEADER_TITLE_CLASS,
   SCREEN_HEADER_TRAILING_SLOT_CLASS,
 } from "@/components/layout/screen-header";
 import {
+  BOTTOM_SHEET_HEADER_BAR_CLASS,
   BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_PX,
@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export {
+  BOTTOM_SHEET_HEADER_BAR_CLASS,
   BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_PX,
@@ -62,7 +63,7 @@ export function BottomSheetHeader({
 }: BottomSheetHeaderProps) {
   return (
     <header className={cn("shrink-0 bg-background", className)}>
-      <div className={SCREEN_HEADER_BAR_CLASS}>
+      <div className={BOTTOM_SHEET_HEADER_BAR_CLASS}>
         {leading}
         <span id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
           {title}

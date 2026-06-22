@@ -27,9 +27,6 @@ export const STICKY_FOOTER_BOTTOM_PADDING =
 export const STICKY_FOOTER_TAB_BAR_PADDING =
   "pb-[calc(9rem+env(safe-area-inset-bottom))]";
 
-/** Stack header vertical padding (16px top/bottom). */
-export const SCREEN_HEADER_VERTICAL_PADDING_CLASS = "py-4";
-
 /** Stack header horizontal padding (16px). */
 export const SCREEN_HEADER_HORIZONTAL_PADDING_CLASS = "px-4";
 
@@ -39,12 +36,12 @@ export const SCREEN_HEADER_ITEM_GAP_CLASS = "gap-4";
 /** Shared header icon touch target (40×40). */
 export const SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS = "size-10";
 
-/** Inner bar height — 16px + 44px tallest control + 16px (at 16px root). */
-export const SCREEN_HEADER_BAR_HEIGHT_CLASS = "4.75rem";
+/** Page header inner bar height (`h-14` / 56px at 16px root). */
+export const SCREEN_HEADER_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Inner bar — stack/tab/sheet headers (16px vertical padding, 16px horizontal). */
+/** Page header inner bar — fixed 56px height, content vertically centered. */
 export const SCREEN_HEADER_BAR_CLASS =
-  `flex items-center ${SCREEN_HEADER_HORIZONTAL_PADDING_CLASS} ${SCREEN_HEADER_VERTICAL_PADDING_CLASS} ${SCREEN_HEADER_ITEM_GAP_CLASS}`;
+  `flex h-14 items-center ${SCREEN_HEADER_HORIZONTAL_PADDING_CLASS} ${SCREEN_HEADER_ITEM_GAP_CLASS}`;
 
 /** Trailing header action slot — icon buttons and text actions. */
 export const SCREEN_HEADER_TRAILING_SLOT_CLASS =
@@ -62,18 +59,18 @@ export const SCREEN_HEADER_TITLE_CLASS =
   "block min-w-0 flex-1 truncate text-base font-semibold leading-tight";
 
 /**
- * Header content zone below safe area: inner bar + bottom border (1px).
- * Matches rendered page header height on desktop (77px at 16px root).
+ * Page header content zone below safe area: inner bar + bottom border (1px).
+ * Matches rendered page header height on desktop (57px at 16px root).
  */
-export const SCREEN_HEADER_CONTENT_ZONE_HEIGHT_CLASS = "calc(4.75rem + 1px)";
+export const SCREEN_HEADER_CONTENT_ZONE_HEIGHT_CLASS = "calc(3.5rem + 1px)";
 
-/** Top padding for surfaces that align with the header content zone (e.g. headerless sheets). */
+/** Top padding for page-aligned surfaces (not bottom sheets). */
 export const SCREEN_HEADER_CONTENT_ZONE_TOP_PADDING_CLASS =
-  "pt-[calc(4.75rem+1px)]";
+  "pt-[calc(3.5rem+1px)]";
 
 /** Full ScreenHeader zone including safe area (bottom edge of fixed header). */
 export const SCREEN_HEADER_ZONE_TOP =
-  "calc(4.75rem + env(safe-area-inset-top))";
+  "calc(3.5rem + env(safe-area-inset-top))";
 
 /** Shared top offset for toasts, banners, and global system messages — 4px below header. */
 export const SYSTEM_MESSAGE_GAP_PX = "4px";
@@ -88,13 +85,13 @@ export const SYSTEM_MESSAGE_INSET_X_CLASS = "inset-x-1";
 
 /** Tailwind arbitrary value class for fixed system-message surfaces. */
 export const SYSTEM_MESSAGE_TOP_CLASS =
-  "top-[calc(4.75rem+env(safe-area-inset-top)+4px)]";
+  "top-[calc(3.5rem+env(safe-area-inset-top)+4px)]";
 
 /**
  * Diagnostic: compensates for fixed ScreenHeader (inner bar + safe area + ScreenBody pt-4).
  */
 export const FIXED_HEADER_BODY_TOP_PADDING =
-  "pt-[calc(4.75rem+env(safe-area-inset-top)+1rem)]";
+  "pt-[calc(3.5rem+env(safe-area-inset-top)+1rem)]";
 
 export function getScreenBodyTopPadding(fixedHeader: boolean): string {
   return fixedHeader ? FIXED_HEADER_BODY_TOP_PADDING : "pt-4";

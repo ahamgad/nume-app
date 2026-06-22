@@ -1,9 +1,9 @@
 "use client";
 
-import { SCREEN_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/screen-spacing";
+import { BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/bottom-sheet";
 
 const TAB_BAR_REM = 3.5;
-const SCREEN_HEADER_BAR_REM = parseFloat(SCREEN_HEADER_BAR_HEIGHT_CLASS);
+const SHEET_HEADER_BAR_REM = parseFloat(BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS);
 
 function readSafeAreaInset(side: "top" | "bottom"): number {
   if (typeof document === "undefined") return 0;
@@ -34,7 +34,7 @@ export function getPickerLayoutViewportHeight(): number {
 /** Maximum picker sheet height in px — viewport − (header zone × 2). */
 export function getPickerSheetMaxHeightPx(): number {
   const rootFont = getRootFontSizePx();
-  const headerZonePx = rootFont * SCREEN_HEADER_BAR_REM + readSafeAreaInset("top");
+  const headerZonePx = rootFont * SHEET_HEADER_BAR_REM + readSafeAreaInset("top");
   return getPickerLayoutViewportHeight() - headerZonePx * 2;
 }
 

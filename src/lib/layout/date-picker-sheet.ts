@@ -7,10 +7,10 @@
  * Values mirror `NumeCalendarGrid` layout tokens (`h-14`, `size-11`, `gap-1`, etc.).
  */
 
-import { SCREEN_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/screen-spacing";
+import { BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/bottom-sheet";
 
-/** Immersive sheet header bar — matches {@link SCREEN_HEADER_BAR_HEIGHT_CLASS}. */
-const SHEET_HEADER = SCREEN_HEADER_BAR_HEIGHT_CLASS;
+/** Immersive sheet header bar — matches {@link BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS}. */
+const SHEET_HEADER = BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS;
 
 /** Body top padding (`pt-4`). */
 const BODY_TOP = "1rem";

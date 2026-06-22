@@ -1,24 +1,22 @@
 /**
  * Immersive bottom sheet sizing (NUME v1).
  *
- * Sheet height = viewport − (ScreenHeader zone × 2).
- * ScreenHeader zone = safe-area top + inner header bar.
- *
- * Bottom-anchored, this leaves one header zone visible above the sheet.
+ * Sheet height = viewport − (sheet header zone × 2).
+ * Uses bottom sheet header bar height, not page header height.
  */
 
-import { SCREEN_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/screen-spacing";
+import { BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/bottom-sheet";
 
-/** Matches in-flow ScreenHeader inner bar. */
-export const IMMERSIVE_SHEET_HEADER_BAR = SCREEN_HEADER_BAR_HEIGHT_CLASS;
+/** Matches in-flow bottom sheet header inner bar. */
+export const IMMERSIVE_SHEET_HEADER_BAR = BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS;
 
-/** Full ScreenHeader zone including safe area. */
+/** Full sheet header zone including safe area. */
 export const IMMERSIVE_SHEET_HEADER_ZONE =
-  `calc(${SCREEN_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top))`;
+  `calc(${BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top))`;
 
 /** Immersive canvas height — field editor, date picker, etc. */
 export const IMMERSIVE_SHEET_HEIGHT =
-  `calc(100dvh - (${SCREEN_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top)) - (${SCREEN_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top)))`;
+  `calc(100dvh - (${BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top)) - (${BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS} + env(safe-area-inset-top)))`;
 
-/** Visible peek above the sheet (one ScreenHeader zone). */
+/** Visible peek above the sheet (one sheet header zone). */
 export const IMMERSIVE_SHEET_TOP_PEEK = IMMERSIVE_SHEET_HEADER_ZONE;

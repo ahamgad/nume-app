@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  BOTTOM_SHEET_HEADER_BAR_CLASS,
+  BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS,
   BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_PX,
@@ -21,10 +23,16 @@ describe("bottom sheet foundation", () => {
     expect(BOTTOM_SHEET_TOP_RADIUS_CLASS).toBe("rounded-t-[36px]");
   });
 
-  it("aligns headerless sheet top padding with the header content zone", () => {
-    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-[calc(4.75rem+1px)]");
-    expect(SCREEN_HEADER_BAR_HEIGHT_CLASS).toBe("4.75rem");
-    expect(SCREEN_HEADER_BAR_CLASS).toContain("py-4");
+  it("uses separate vertical sizing from page headers", () => {
+    expect(BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS).toBe("4.75rem");
+    expect(SCREEN_HEADER_BAR_HEIGHT_CLASS).toBe("3.5rem");
+    expect(BOTTOM_SHEET_HEADER_BAR_CLASS).toContain("py-4");
+    expect(SCREEN_HEADER_BAR_CLASS).toContain("h-14");
+    expect(SCREEN_HEADER_BAR_CLASS).not.toContain("py-4");
+  });
+
+  it("aligns headerless sheet top padding with the sheet header bar", () => {
+    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-[4.75rem]");
   });
 
   it("centralizes header title line-height in the shared token", () => {
@@ -32,9 +40,11 @@ describe("bottom sheet foundation", () => {
     expect(SCREEN_HEADER_TITLE_CLASS).toContain("text-base");
   });
 
-  it("composes the header bar from the same horizontal padding and gap tokens", () => {
+  it("composes header bars from the same horizontal padding and gap tokens", () => {
     expect(SCREEN_HEADER_BAR_CLASS).toContain(SCREEN_HEADER_HORIZONTAL_PADDING_CLASS);
     expect(SCREEN_HEADER_BAR_CLASS).toContain(SCREEN_HEADER_ITEM_GAP_CLASS);
+    expect(BOTTOM_SHEET_HEADER_BAR_CLASS).toContain(SCREEN_HEADER_HORIZONTAL_PADDING_CLASS);
+    expect(BOTTOM_SHEET_HEADER_BAR_CLASS).toContain(SCREEN_HEADER_ITEM_GAP_CLASS);
   });
 
   it("shares trailing slot and text action tokens with page headers", () => {
