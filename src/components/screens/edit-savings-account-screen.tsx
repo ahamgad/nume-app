@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SavingsFormFields } from "@/components/savings/savings-form-fields";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -167,12 +168,9 @@ function EditSavingsAccountForm({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("savings.edit.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("savings.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
+        <StackPageTitle>{t("savings.edit.title")}</StackPageTitle>
         <div
           className={cn(
             "space-y-6 pt-2",

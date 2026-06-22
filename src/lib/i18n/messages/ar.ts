@@ -88,6 +88,8 @@ export const ar = {
     sign: {
       positive: "+",
       negative: "−",
+      positiveLabel: "موجب",
+      negativeLabel: "سالب",
     },
     time: {
       minutesAgo: "منذ {count} د",

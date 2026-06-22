@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Card } from "@/components/ui/card";
 import { useFinance } from "@/lib/finance/store";
@@ -62,12 +63,12 @@ export function AddCreditCardActivityScreen({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
+      <StackPageHeader
         title={t("creditCards.activity.title")}
         onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} className="space-y-4">
+        <StackPageTitle>{t("creditCards.activity.title")}</StackPageTitle>
         <p className="text-[0.8125rem] text-muted-foreground">{account.name}</p>
 
         <Card className="overflow-hidden shadow-none">

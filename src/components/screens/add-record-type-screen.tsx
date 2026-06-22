@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { Card } from "@/components/ui/card";
 import { useFinance } from "@/lib/finance/store";
@@ -54,8 +55,9 @@ export function AddRecordTypeScreen({ accountId }: AddRecordTypeScreenProps) {
 
   return (
     <>
-      <ScreenHeader mode="stack" title={t("records.add.title")} />
+      <StackPageHeader title={t("records.add.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
+        <StackPageTitle>{t("records.add.title")}</StackPageTitle>
         {account ? (
           <p className="text-[0.8125rem] text-muted-foreground">
             {account.name}

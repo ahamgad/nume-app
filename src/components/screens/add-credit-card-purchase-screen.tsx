@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { EditableField } from "@/components/field-editor";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -100,12 +101,9 @@ export function AddCreditCardPurchaseScreen({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("creditCards.purchase.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("creditCards.purchase.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
+        <StackPageTitle>{t("creditCards.purchase.title")}</StackPageTitle>
         <p className="text-[0.8125rem] text-muted-foreground">{account.name}</p>
 
         <EditableField

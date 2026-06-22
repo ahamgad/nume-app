@@ -1,12 +1,13 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AccountPickerOptionRow } from "@/components/accounts/account-picker-option-row";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { inputClassName } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterAccountsForDestinationSearch,
@@ -29,6 +30,8 @@ interface AccountPickerProps {
   sheetTitle?: string;
   searchPlaceholder?: string;
   noResultsMessage?: string;
+  error?: string;
+  variant?: "input" | "row";
   onChange: (accountId: string | null) => void;
 }
 
@@ -45,6 +48,8 @@ export function AccountPicker({
   sheetTitle,
   searchPlaceholder,
   noResultsMessage,
+  error,
+  variant = "input",
   onChange,
 }: AccountPickerProps) {
   const t = useT();
@@ -99,6 +104,18 @@ export function AccountPicker({
   const resolvedNoResults =
     noResultsMessage ?? t("records.fields.transfer.noResults");
 
+  const triggerLabel = (
+    <span
+      className={cn(
+        "min-w-0 flex-1 truncate text-[0.9375rem] font-medium",
+        !displayLabel && "font-normal text-muted-foreground",
+        error && "text-destructive",
+      )}
+    >
+      {displayLabel ?? placeholder}
+    </span>
+  );
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
@@ -106,23 +123,49 @@ export function AccountPicker({
         <p className="text-[0.8125rem] text-muted-foreground">{description}</p>
       ) : null}
 
-      <button
-        id={id}
-        type="button"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className={cn(
-          inputClassName,
-          "flex items-center justify-between gap-2 text-start",
-          !displayLabel && "text-muted-foreground",
-          disabled && "pointer-events-none opacity-60",
-        )}
-      >
-        <span className="truncate">{displayLabel ?? placeholder}</span>
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-      </button>
+      {variant === "row" ? (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onClick={() => setOpen(true)}
+          className={cn(
+            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
+            disabled && "pointer-events-none opacity-60",
+          )}
+        >
+          {triggerLabel}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      ) : (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+          className={cn(
+            inputClassName,
+            "flex items-center justify-between gap-2 text-start",
+            !displayLabel && "text-muted-foreground",
+            disabled && "pointer-events-none opacity-60",
+            error && "border-destructive",
+          )}
+        >
+          {triggerLabel}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      )}
+      {error ? (
+        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <PickerBottomSheet
         open={open}
@@ -155,12 +198,7 @@ export function AccountPicker({
                 role="option"
                 aria-selected={value === null}
                 onClick={() => handleSelect(null)}
-                className={cn(
-                  "flex min-h-11 w-full items-center px-3 py-2 text-start text-[0.9375rem] transition-colors",
-                  value === null
-                    ? "bg-muted font-medium"
-                    : "hover:bg-muted/60",
-                )}
+                className={pickerOptionRowClassName(value === null)}
               >
                 {resolvedClearLabel}
               </button>

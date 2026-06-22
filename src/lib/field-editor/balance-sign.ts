@@ -24,5 +24,5 @@ export function formatBalanceTriggerDisplay(
   const digits = stripBalanceSign(value);
   if (!digits) return "";
   const formatted = formatAmount(digits);
-  return sign === "negative" ? `− ${formatted}` : `+ ${formatted}`;
+  return sign === "negative" ? `− ${formatted}` : formatted;
 }

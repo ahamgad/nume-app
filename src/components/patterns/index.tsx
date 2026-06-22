@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
 
+import type { CurrencySignMode } from "@/lib/format/currency-display";
 import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Card, CardContent } from "@/components/ui/card";
@@ -95,6 +96,8 @@ interface MetricHeroProps {
   meta?: string;
   /** Dashboard/widget metrics show explicit +/- prefixes. */
   signedAmount?: boolean;
+  /** Override sign display mode for currency amounts. */
+  amountSignMode?: CurrencySignMode;
 }
 
 export function MetricHero({
@@ -108,7 +111,11 @@ export function MetricHero({
   subline,
   meta,
   signedAmount = false,
+  amountSignMode,
 }: MetricHeroProps) {
+  const resolvedSignMode =
+    amountSignMode ?? (signedAmount ? "signed" : "unsigned");
+
   return (
     <div className="w-full min-w-0 text-start">
       <p className="text-xs font-medium tracking-wide text-muted-foreground">
@@ -121,7 +128,7 @@ export function MetricHero({
             locale={locale}
             variant={amountVariant}
             className={amountClassName}
-            signMode={signedAmount ? "signed" : "unsigned"}
+            signMode={resolvedSignMode}
             trailing={amountAction}
           />
         ) : (

@@ -8,6 +8,7 @@ interface FieldSignToggleProps {
   onChange: (sign: BalanceSign) => void;
   positiveLabel: string;
   negativeLabel: string;
+  onAfterChange?: () => void;
 }
 
 export function FieldSignToggle({
@@ -15,7 +16,13 @@ export function FieldSignToggle({
   onChange,
   positiveLabel,
   negativeLabel,
+  onAfterChange,
 }: FieldSignToggleProps) {
+  function handleSelect(sign: BalanceSign) {
+    onChange(sign);
+    onAfterChange?.();
+  }
+
   return (
     <div
       className="flex justify-center gap-2"
@@ -30,12 +37,13 @@ export function FieldSignToggle({
             key={sign}
             type="button"
             aria-pressed={selected}
-            onClick={() => onChange(sign)}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => handleSelect(sign)}
             className={cn(
-              "inline-flex min-h-9 min-w-[4.5rem] items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               selected
-                ? "bg-foreground text-background"
-                : "bg-muted text-muted-foreground",
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-background text-foreground hover:bg-muted/60",
             )}
           >
             {label}

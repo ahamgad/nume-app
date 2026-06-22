@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SavingsFormFields } from "@/components/savings/savings-form-fields";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
@@ -101,14 +102,13 @@ export function AddSavingsAccountScreen() {
     guardBack();
   }
 
+  const pageTitle = getAddAccountScreenTitle("savings_account", t);
+
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={getAddAccountScreenTitle("savings_account", t)}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <div
           className={cn(
             "space-y-6 pt-2",

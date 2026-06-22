@@ -103,14 +103,14 @@ export function EditableField({
           }
           onClick={handleOpen}
           className={cn(
-            "flex min-h-12 w-full items-center gap-3 px-4 py-3 text-start transition-colors",
+            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
             "disabled:cursor-not-allowed disabled:opacity-50",
             triggerClassName,
           )}
         >
           <span
             className={cn(
-              "min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug",
+              "min-w-0 flex-1 truncate text-[0.9375rem] font-medium leading-snug",
               showPlaceholder && "font-normal text-muted-foreground",
               error && "text-destructive",
             )}
@@ -120,12 +120,12 @@ export function EditableField({
           <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
         </button>
         {hint && !error ? (
-          <p id={`${id}-hint`} className="px-4 text-[0.8125rem] text-muted-foreground">
+          <p id={`${id}-hint`} className="text-[0.8125rem] text-muted-foreground">
             {hint}
           </p>
         ) : null}
         {error ? (
-          <p id={`${id}-error`} className="px-4 text-sm text-destructive">
+          <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
             {error}
           </p>
         ) : null}
@@ -135,7 +135,7 @@ export function EditableField({
 
   const triggerClasses = cn(
     inputClassName,
-    "block w-full min-w-0 cursor-text text-start",
+    "block w-full min-w-0 cursor-text truncate text-start",
     prefixLabel && "ps-16",
     suffixLabel && "pe-10",
     error && "border-destructive",

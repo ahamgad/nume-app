@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { MoneyAccountFormFields } from "@/components/accounts/money-account-form-fields";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { ScreenPageTitle } from "@/components/layout/screen-title-collapse";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -101,16 +101,10 @@ function EditAccountForm({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("accounts.edit.title")}
-        collapsibleTitle
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
+        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
         <div className="space-y-6">
-          <ScreenPageTitle>{t("accounts.edit.title")}</ScreenPageTitle>
-
           <MoneyAccountFormFields
             accountType={accountType}
             values={values}

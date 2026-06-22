@@ -4,6 +4,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -86,8 +87,9 @@ export function MoreProfileScreen() {
   const { user } = useAuth();
   return (
     <>
-      <ScreenHeader mode="stack" title={t("more.profile.title")} />
+      <StackPageHeader title={t("more.profile.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
+        <StackPageTitle>{t("more.profile.title")}</StackPageTitle>
         <div className="rounded-lg border border-border px-4 py-3">
           <p className="text-sm font-medium">{t("more.profile.email")}</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -114,8 +116,9 @@ export function MoreAppearanceScreen() {
 
   return (
     <>
-      <ScreenHeader mode="stack" title={t("more.appearance.title")} />
+      <StackPageHeader title={t("more.appearance.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
+        <StackPageTitle>{t("more.appearance.title")}</StackPageTitle>
         <div className="space-y-3">
           <p className="text-sm font-medium">{t("more.appearance.theme")}</p>
           <SettingsRadioList
@@ -147,8 +150,9 @@ export function MoreLanguageScreen() {
 
   return (
     <>
-      <ScreenHeader mode="stack" title={t("more.language.title")} />
+      <StackPageHeader title={t("more.language.title")} />
       <ScreenBody withTabBar={false} className="space-y-4">
+        <StackPageTitle>{t("more.language.title")}</StackPageTitle>
         <div className="space-y-3">
           <p className="text-sm font-medium">{t("more.language.description")}</p>
           <SettingsRadioList
@@ -171,8 +175,9 @@ export function MoreAboutScreen() {
   const t = useT();
   return (
     <>
-      <ScreenHeader mode="stack" title={t("more.about.title")} />
+      <StackPageHeader title={t("more.about.title")} />
       <ScreenBody withTabBar={false}>
+        <StackPageTitle>{t("more.about.title")}</StackPageTitle>
         <div className="flex flex-col items-center py-8 text-center">
           <Image
             src="/brand-flatten-black.svg"

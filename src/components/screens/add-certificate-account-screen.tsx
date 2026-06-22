@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import {
@@ -124,14 +125,13 @@ export function AddCertificateAccountScreen() {
     guardBack();
   }
 
+  const pageTitle = getAddAccountScreenTitle("certificate", t);
+
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={getAddAccountScreenTitle("certificate", t)}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <div
           className={cn(
             "space-y-6 pt-2",

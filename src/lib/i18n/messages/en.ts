@@ -86,6 +86,8 @@ export const en = {
     sign: {
       positive: "+",
       negative: "−",
+      positiveLabel: "Positive",
+      negativeLabel: "Negative",
     },
     time: {
       minutesAgo: "{count}m ago",

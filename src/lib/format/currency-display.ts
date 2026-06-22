@@ -9,7 +9,7 @@ const DEFAULT_LOCALE = "en-EG";
 /** Decimal suffix scale relative to the main amount (design system). */
 export const CURRENCY_DECIMAL_SCALE = 0.72;
 
-export type CurrencySignMode = "unsigned" | "signed";
+export type CurrencySignMode = "unsigned" | "signed" | "balance";
 
 export interface CurrencyDisplayParts {
   signPrefix: string;
@@ -41,7 +41,10 @@ export function toDisplayCurrencyAmount(amount: number): number {
 }
 
 function signPrefixForAmount(amount: number, signMode: CurrencySignMode): string {
-  if (signMode !== "signed") return "";
+  if (signMode === "unsigned") return "";
+  if (signMode === "balance") {
+    return amount < 0 ? "− " : "";
+  }
   if (amount > 0) return "+ ";
   if (amount < 0) return "− ";
   return "";

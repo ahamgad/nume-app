@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { EditableField } from "@/components/field-editor";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
@@ -138,12 +139,9 @@ export function AddCreditCardPaymentScreen({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("creditCards.payment.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("creditCards.payment.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
+        <StackPageTitle>{t("creditCards.payment.title")}</StackPageTitle>
         <p className="text-[0.8125rem] text-muted-foreground">{account.name}</p>
 
         <AccountPicker

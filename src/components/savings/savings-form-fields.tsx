@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormSection } from "@/components/forms/form-section";
+import { FormCardSection } from "@/components/forms/form-card-section";
 import { EditableField } from "@/components/field-editor";
 import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
@@ -25,8 +25,10 @@ import {
   validateAccountNameField,
   validateCertificateRateField,
 } from "@/lib/field-editor/field-validators";
+import { formatBalanceTriggerDisplay } from "@/lib/field-editor/balance-sign";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
+
 import { Plus, Trash2 } from "lucide-react";
 
 const POSTING_FREQUENCIES = [
@@ -126,7 +128,7 @@ export function SavingsFormFields({
 
   return (
     <div className="space-y-6">
-      <FormSection title={t("accounts.formSections.accountDetails")}>
+      <FormCardSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="savings-name"
           label={t("accounts.fields.name.label")}
@@ -134,6 +136,7 @@ export function SavingsFormFields({
           placeholder={t("accounts.fields.name.placeholder")}
           disabled={disabled}
           error={errors.name}
+          variant="row"
           validate={(name) => validateAccountNameField(name, t)}
           onSave={(name) => {
             onChange({ name });
@@ -146,7 +149,12 @@ export function SavingsFormFields({
           accountType="savings_account"
           value={values.institution}
           disabled={disabled}
-          onChange={(institution) => onChange({ institution })}
+          error={errors.institution}
+          variant="row"
+          onChange={(institution) => {
+            onChange({ institution });
+            onClearError("institution");
+          }}
         />
 
         <AccountIdentifierField
@@ -156,6 +164,7 @@ export function SavingsFormFields({
           value={values.accountNumber}
           disabled={disabled}
           error={errors.accountNumber}
+          variant="row"
           onChange={(accountNumber) => onChange({ accountNumber })}
           onClearError={() => onClearError("accountNumber")}
         />
@@ -170,15 +179,19 @@ export function SavingsFormFields({
             placeholder={t("common.currency.zeroPlaceholder")}
             disabled={disabled}
             error={errors.balance}
-            hint={
-              errors.balance ? undefined : t("accounts.add.balanceHint")
-            }
-            prefixLabel={t("common.currency.code")}
+            variant="row"
+            showSignToggle
             sanitizeInput={sanitizeAmountInput}
             formatDisplay={(amount) =>
               formatAmountInput(amount, amountInputLocale)
             }
-            triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
+            displayValue={
+              values.balance.trim()
+                ? formatBalanceTriggerDisplay(values.balance, (unsigned) =>
+                    formatAmountInput(unsigned, amountInputLocale),
+                  )
+                : undefined
+            }
             validate={(next) => validateAccountBalanceField(next, t)}
             onSave={(balance) => {
               onChange({ balance });
@@ -186,11 +199,10 @@ export function SavingsFormFields({
             }}
           />
         ) : null}
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection
+      <FormCardSection
         title={t("savings.sections.interestModel")}
-        separator
       >
         <div className="space-y-2">
           <Label>{t("savings.fields.interestModel.label")}</Label>
@@ -216,6 +228,7 @@ export function SavingsFormFields({
             placeholder="0"
             disabled={disabled}
             error={errors.annualInterestRate}
+            variant="row"
             suffixLabel="%"
             sanitizeInput={sanitizeAmountInput}
             formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
@@ -313,9 +326,9 @@ export function SavingsFormFields({
             ) : null}
           </div>
         )}
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection title={t("savings.sections.posting")} separator>
+      <FormCardSection title={t("savings.sections.posting")}>
         <p className="text-sm text-muted-foreground">
           {t("savings.balanceMethodHint")}
         </p>
@@ -371,9 +384,9 @@ export function SavingsFormFields({
             />
           </div>
         )}
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection title={t("savings.sections.destination")} separator>
+      <FormCardSection title={t("savings.sections.destination")}>
         <div className="space-y-2">
           <Label>{t("accounts.fields.interestDestination.label")}</Label>
           <ScrollChipSelect
@@ -413,19 +426,16 @@ export function SavingsFormFields({
               value={values.destinationAccountId || null}
               accounts={transferAccounts}
               disabled={disabled}
+              error={errors.destinationAccountId}
+              variant="row"
               onChange={(destinationAccountId) => {
                 onChange({ destinationAccountId: destinationAccountId ?? "" });
                 onClearError("destinationAccountId");
               }}
             />
-            {errors.destinationAccountId ? (
-              <p className="text-sm text-destructive">
-                {errors.destinationAccountId}
-              </p>
-            ) : null}
           </>
         ) : null}
-      </FormSection>
+      </FormCardSection>
     </div>
   );
 }

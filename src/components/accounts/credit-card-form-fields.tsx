@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormSection } from "@/components/forms/form-section";
+import { FormCardSection } from "@/components/forms/form-card-section";
 import { EditableField } from "@/components/field-editor";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { Label } from "@/components/ui/label";
@@ -61,7 +61,7 @@ export function CreditCardFormFields({
 
   return (
     <div className="space-y-6">
-      <FormSection title={t("accounts.formSections.accountDetails")}>
+      <FormCardSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="credit-card-name"
           label={t("accounts.fields.name.label")}
@@ -69,6 +69,7 @@ export function CreditCardFormFields({
           placeholder={t("accounts.fields.name.placeholder")}
           disabled={disabled}
           error={errors.name}
+          variant="row"
           validate={(name) => validateAccountNameField(name, t)}
           onSave={(name) => {
             onChange({ name });
@@ -86,14 +87,13 @@ export function CreditCardFormFields({
           value={values.linkedAccountId}
           accounts={linkedAccounts}
           disabled={disabled}
+          error={errors.linkedAccountId}
+          variant="row"
           onChange={(linkedAccountId) => {
             onChange({ linkedAccountId });
             onClearError("linkedAccountId");
           }}
         />
-        {errors.linkedAccountId ? (
-          <p className="-mt-3 text-sm text-destructive">{errors.linkedAccountId}</p>
-        ) : null}
 
         <AccountIdentifierField
           id="credit-card-identifier"
@@ -102,6 +102,7 @@ export function CreditCardFormFields({
           value={values.identifier}
           disabled={disabled}
           error={errors.identifier}
+          variant="row"
           onChange={(identifier) => onChange({ identifier })}
           onClearError={() => onClearError("identifier")}
         />
@@ -116,10 +117,9 @@ export function CreditCardFormFields({
             placeholder={t("common.currency.zeroPlaceholder")}
             disabled={disabled}
             error={errors.outstandingBalance}
-            prefixLabel={t("common.currency.code")}
+            variant="row"
             sanitizeInput={sanitizeAmountInput}
             formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
-            triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
             validate={(next) => validateAccountBalanceField(next, t)}
             onSave={(outstandingBalance) => {
               onChange({ outstandingBalance });
@@ -137,7 +137,7 @@ export function CreditCardFormFields({
           placeholder="0"
           disabled={disabled}
           error={errors.creditLimit}
-          prefixLabel={t("common.currency.code")}
+          variant="row"
           sanitizeInput={sanitizeDecimalInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
           onSave={(creditLimit) => {
@@ -145,9 +145,9 @@ export function CreditCardFormFields({
             onClearError("creditLimit");
           }}
         />
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection title={t("creditCards.formSections.statement")} separator>
+      <FormCardSection title={t("creditCards.formSections.statement")}>
         <div className="space-y-2">
           <Label>{t("creditCards.fields.statementDueDay.label")}</Label>
           <ScrollChipSelect
@@ -163,7 +163,7 @@ export function CreditCardFormFields({
             <p className="text-sm text-destructive">{errors.statementDueDay}</p>
           ) : null}
         </div>
-      </FormSection>
+      </FormCardSection>
     </div>
   );
 }

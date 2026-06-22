@@ -8,6 +8,7 @@ import {
   validateLendingAccountForm,
   type LendingAccountFormValues,
 } from "@/components/accounts/lending-account-form-fields";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -157,12 +158,9 @@ function EditLendingAccountForm({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("accounts.edit.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
+        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
         <LendingAccountFormFields
           values={values}
           errors={errors}

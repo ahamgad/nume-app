@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronDown } from "lucide-react";
+import { CalendarDays, ChevronRight } from "lucide-react";
 import * as React from "react";
 
 import { DatePickerBottomSheet } from "@/components/ui/date-picker-bottom-sheet";
@@ -19,6 +19,7 @@ export interface DateFieldProps {
   "aria-invalid"?: boolean;
   label?: string;
   placeholder?: string;
+  variant?: "input" | "row";
 }
 
 export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
@@ -33,39 +34,68 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
       "aria-invalid": ariaInvalid,
       label,
       placeholder,
+      variant = "input",
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
+    const displayText = value ? formatDisplayDate(value, locale) : placeholder;
+
+    const rowTrigger = (
+      <button
+        ref={ref}
+        id={id}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={label}
+        onClick={() => setOpen(true)}
+        className={cn(
+          "flex min-h-12 w-full items-center gap-3 text-start transition-colors tabular-nums",
+          !value && "text-muted-foreground",
+          disabled && "pointer-events-none opacity-50",
+          ariaInvalid && "text-destructive",
+          className,
+        )}
+      >
+        <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">
+          {displayText}
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+      </button>
+    );
+
+    const inputTrigger = (
+      <button
+        ref={ref}
+        id={id}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={label}
+        onClick={() => setOpen(true)}
+        className={cn(
+          inputClassName,
+          "flex items-center justify-between gap-2 text-start tabular-nums",
+          !value && "text-muted-foreground",
+          disabled && "pointer-events-none",
+          ariaInvalid && "border-destructive ring-destructive/20",
+          className,
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-2 truncate">
+          <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
+          <span className="truncate">{displayText}</span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+      </button>
+    );
 
     return (
       <>
-        <button
-          ref={ref}
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          aria-label={label}
-          onClick={() => setOpen(true)}
-          className={cn(
-            inputClassName,
-            "flex items-center justify-between gap-2 text-start tabular-nums",
-            !value && "text-muted-foreground",
-            disabled && "pointer-events-none",
-            ariaInvalid && "border-destructive ring-destructive/20",
-            className,
-          )}
-        >
-          <span className="flex min-w-0 items-center gap-2 truncate">
-            <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
-            <span className="truncate">
-              {value ? formatDisplayDate(value, locale) : placeholder}
-            </span>
-          </span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        </button>
+        {variant === "row" ? rowTrigger : inputTrigger}
 
         <DatePickerBottomSheet
           open={open}

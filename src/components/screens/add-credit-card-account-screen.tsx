@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,14 +108,13 @@ export function AddCreditCardAccountScreen() {
     guardBack();
   }
 
+  const pageTitle = getAddAccountScreenTitle("credit_card", t);
+
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={getAddAccountScreenTitle("credit_card", t)}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <CreditCardFormFields
           values={values}
           errors={errors}

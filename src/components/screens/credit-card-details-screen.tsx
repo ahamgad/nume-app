@@ -13,6 +13,7 @@ import {
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { CreditUtilizationProgress } from "@/components/credit-cards/credit-utilization-progress";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
@@ -190,8 +191,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
+      <StackPageHeader
         title={t("accounts.details.title")}
         onBack={() => router.back()}
         rightAction={
@@ -204,6 +204,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+        <StackPageTitle>{t("accounts.details.title")}</StackPageTitle>
         <AccountHeaderMetadata
           accountName={account.name}
           institution={account.institution}

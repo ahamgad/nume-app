@@ -1,9 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react";
 
 import type { FieldEditorInputMode, FieldEditorMode } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
+
+export interface FieldEditorSurfaceHandle {
+  focus: () => void;
+}
 
 interface FieldEditorSurfaceProps {
   mode: FieldEditorMode;
@@ -16,20 +20,36 @@ interface FieldEditorSurfaceProps {
 
 /**
  * Borderless, caret-first editing surface for the field editor sheet.
- * Center-aligned, wrapping text — not a traditional bordered Input.
+ * Center-aligned with wrapping — only sheet inline inputs use this behavior.
  */
-export function FieldEditorSurface({
-  mode,
-  inputMode,
-  displayValue,
-  placeholder,
-  suffixLabel,
-  onChange,
-}: FieldEditorSurfaceProps) {
+export const FieldEditorSurface = forwardRef<
+  FieldEditorSurfaceHandle,
+  FieldEditorSurfaceProps
+>(function FieldEditorSurface(
+  {
+    mode,
+    inputMode,
+    displayValue,
+    placeholder,
+    suffixLabel,
+    onChange,
+  },
+  ref,
+) {
   const inputRef = useRef<HTMLInputElement>(null);
   const isNumeric = mode === "numeric";
   const resolvedInputMode =
     inputMode ?? (isNumeric ? "decimal" : "text");
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      const input = inputRef.current;
+      if (!input) return;
+      input.focus({ preventScroll: true });
+      const length = input.value.length;
+      input.setSelectionRange(length, length);
+    },
+  }));
 
   useLayoutEffect(() => {
     const input = inputRef.current;
@@ -70,7 +90,9 @@ export function FieldEditorSurface({
               ? "text-[1.625rem] font-semibold tabular-nums tracking-tight"
               : "text-[1.375rem] font-semibold leading-snug",
           )}
-          style={{ width: `${Math.max(displayValue.length || (placeholder?.length ?? 0), 3)}ch` }}
+          style={{
+            width: `${Math.max(displayValue.length || (placeholder?.length ?? 0), 3)}ch`,
+          }}
         />
         {suffixLabel ? (
           <span
@@ -83,4 +105,4 @@ export function FieldEditorSurface({
       </div>
     </div>
   );
-}
+});

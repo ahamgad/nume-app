@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -141,12 +142,9 @@ function EditCertificateForm({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("certificates.edit.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("certificates.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter onRefresh={refresh}>
+        <StackPageTitle>{t("certificates.edit.title")}</StackPageTitle>
         <div className="space-y-6 pt-2">
           <CertificateFormFields
             values={values}

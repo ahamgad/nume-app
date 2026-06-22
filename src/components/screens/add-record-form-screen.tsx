@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { RecordFormFields } from "@/components/records/record-form-fields";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
@@ -142,8 +143,9 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
 
   return (
     <>
-      <ScreenHeader mode="stack" title={t(titleKey)} onBack={handleBack} />
+      <StackPageHeader title={t(titleKey)} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
+        <StackPageTitle>{t(titleKey)}</StackPageTitle>
         {account ? (
           <p className="text-[0.8125rem] text-muted-foreground">
             {account.name}

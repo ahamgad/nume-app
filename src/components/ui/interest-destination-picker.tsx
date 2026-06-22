@@ -14,6 +14,7 @@ import {
 } from "@/lib/finance/account-display";
 import type { Account } from "@/lib/finance/types";
 import { useT } from "@/providers/i18n-provider";
+import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { cn } from "@/lib/utils";
 
 interface InterestDestinationPickerProps {
@@ -141,12 +142,7 @@ export function InterestDestinationPicker({
                 role="option"
                 aria-selected={value === null}
                 onClick={() => handleSelect(null)}
-                className={cn(
-                  "flex min-h-11 w-full items-center px-3 py-2 text-start text-[0.9375rem] transition-colors",
-                  value === null
-                    ? "bg-muted font-medium"
-                    : "hover:bg-muted/60",
-                )}
+                className={pickerOptionRowClassName(value === null)}
               >
                 {notSelectedLabel}
               </button>

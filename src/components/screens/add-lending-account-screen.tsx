@@ -8,7 +8,8 @@ import {
   validateLendingAccountForm,
   type LendingAccountFormValues,
 } from "@/components/accounts/lending-account-form-fields";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
@@ -101,12 +102,9 @@ export function AddLendingAccountScreen() {
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={getAddAccountScreenTitle("loan", t)}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={getAddAccountScreenTitle("loan", t)} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
+        <StackPageTitle>{getAddAccountScreenTitle("loan", t)}</StackPageTitle>
         <LendingAccountFormFields
           values={values}
           errors={errors}

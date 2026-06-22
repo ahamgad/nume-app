@@ -21,6 +21,7 @@ import {
   type InstitutionCatalogEntry,
   type InstitutionPickerContext,
 } from "@/lib/institutions/catalog";
+import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
@@ -171,7 +172,7 @@ export function InstitutionPicker({
           aria-describedby={error ? `${id}-error` : undefined}
           onClick={() => setOpen(true)}
           className={cn(
-            "flex min-h-12 w-full items-center gap-3 px-4 py-3 text-start transition-colors",
+            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
             disabled && "pointer-events-none opacity-50",
           )}
         >
@@ -200,7 +201,7 @@ export function InstitutionPicker({
       )}
 
       {error ? (
-        <p id={`${id}-error`} className="px-4 text-sm text-destructive">
+        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
           {error}
         </p>
       ) : null}

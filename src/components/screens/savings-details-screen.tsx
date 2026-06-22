@@ -9,6 +9,7 @@ import { ArchivedAccountActions } from "@/components/accounts/archived-account-a
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
@@ -184,8 +185,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
+      <StackPageHeader
         title={t("accounts.details.title")}
         onBack={() => router.back()}
         rightAction={
@@ -198,6 +198,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+        <StackPageTitle>{t("accounts.details.title")}</StackPageTitle>
         <AccountHeaderMetadata
           accountName={account.name}
           institution={account.institution}

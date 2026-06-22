@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import type { RenewalType } from "@/lib/certificates/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
+import { pickerOptionRowClassName } from "@/lib/layout/picker-option-row";
 import { cn } from "@/lib/utils";
 
 export const RENEWAL_TYPE_OPTIONS: RenewalType[] = [
@@ -24,6 +25,8 @@ interface RenewalTypePickerProps {
   disabled?: boolean;
   readOnly?: boolean;
   onChange: (value: RenewalType) => void;
+  variant?: "input" | "row";
+  error?: string;
 }
 
 export function renewalTypeLabel(
@@ -40,6 +43,8 @@ export function RenewalTypePicker({
   disabled = false,
   readOnly = false,
   onChange,
+  variant = "input",
+  error,
 }: RenewalTypePickerProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -73,25 +78,62 @@ export function RenewalTypePicker({
     );
   }
 
+  const triggerLabel = (
+    <span
+      className={cn(
+        "min-w-0 flex-1 truncate text-[0.9375rem] font-medium",
+        error && "text-destructive",
+      )}
+    >
+      {displayLabel}
+    </span>
+  );
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <button
-        id={id}
-        type="button"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => isInteractive && setOpen(true)}
-        className={cn(
-          inputClassName,
-          "flex items-center justify-between gap-2 text-start",
-          !isInteractive && "pointer-events-none opacity-60",
-        )}
-      >
-        <span className="truncate">{displayLabel}</span>
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-      </button>
+      {variant === "row" ? (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onClick={() => isInteractive && setOpen(true)}
+          className={cn(
+            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
+            !isInteractive && "pointer-events-none opacity-60",
+          )}
+        >
+          {triggerLabel}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      ) : (
+        <button
+          id={id}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => isInteractive && setOpen(true)}
+          className={cn(
+            inputClassName,
+            "flex items-center justify-between gap-2 text-start",
+            !isInteractive && "pointer-events-none opacity-60",
+            error && "border-destructive",
+          )}
+        >
+          {triggerLabel}
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        </button>
+      )}
+      {error ? (
+        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <PickerBottomSheet
         open={open}
@@ -110,10 +152,7 @@ export function RenewalTypePicker({
                 onChange(option.value);
                 setOpen(false);
               }}
-              className={cn(
-                "flex min-h-11 w-full items-center rounded-md px-3 py-2 text-start text-[0.9375rem] transition-colors",
-                value === option.value ? "bg-muted font-medium" : "hover:bg-muted/60",
-              )}
+              className={pickerOptionRowClassName(value === option.value)}
             >
               {option.label}
             </button>

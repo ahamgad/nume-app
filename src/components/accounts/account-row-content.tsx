@@ -70,7 +70,7 @@ export function AccountRowContent({
               amount={displayBalance}
               locale={formatLocale}
               variant="row"
-              signMode={showSignedBalance ? "signed" : "unsigned"}
+              signMode={showSignedBalance ? "balance" : "unsigned"}
             />
             {trailing}
           </div>

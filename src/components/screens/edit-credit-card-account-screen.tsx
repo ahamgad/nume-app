@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -159,12 +160,9 @@ function EditCreditCardAccountForm({
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("creditCards.edit.title")}
-        onBack={handleBack}
-      />
+      <StackPageHeader title={t("creditCards.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
+        <StackPageTitle>{t("creditCards.edit.title")}</StackPageTitle>
         <CreditCardFormFields
           values={values}
           errors={errors}

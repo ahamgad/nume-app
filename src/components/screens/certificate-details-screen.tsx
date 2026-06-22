@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from "react";
 import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
+import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -219,12 +220,9 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
 
   return (
     <>
-      <ScreenHeader
-        mode="stack"
-        title={t("accounts.details.title")}
-        onBack={() => router.back()}
-      />
+      <StackPageHeader title={t("accounts.details.title")} onBack={() => router.back()} />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+        <StackPageTitle>{t("accounts.details.title")}</StackPageTitle>
         <AccountHeaderMetadata
           accountName={account.name}
           institution={account.institution}

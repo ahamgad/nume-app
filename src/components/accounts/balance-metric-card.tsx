@@ -66,7 +66,7 @@ export function BalanceMetricCard({
         amount={account.currentBalance}
         locale={formatLocale}
         meta={meta}
-        signedAmount
+        amountSignMode="balance"
         amountAction={
           canEdit ? (
             <IconButton

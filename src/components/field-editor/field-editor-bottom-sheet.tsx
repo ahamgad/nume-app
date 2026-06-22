@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-import { FieldEditorSurface } from "@/components/field-editor/field-editor-surface";
+import { FieldEditorSurface, type FieldEditorSurfaceHandle } from "@/components/field-editor/field-editor-surface";
 import { FieldSignToggle } from "@/components/field-editor/field-sign-toggle";
 import { ImmersiveBottomSheet } from "@/components/ui/immersive-bottom-sheet";
 import { useFieldEditorKeyboardInset } from "@/hooks/use-field-editor-keyboard-inset";
@@ -13,6 +11,7 @@ import {
   type BalanceSign,
 } from "@/lib/field-editor/balance-sign";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
+import { useRef, useState } from "react";
 import { useT } from "@/providers/i18n-provider";
 
 interface FieldEditorBottomSheetProps {
@@ -25,6 +24,7 @@ export function FieldEditorBottomSheet({
   onDismiss,
 }: FieldEditorBottomSheetProps) {
   const t = useT();
+  const editorRef = useRef<FieldEditorSurfaceHandle>(null);
   const [sign, setSign] = useState<BalanceSign>(() =>
     parseBalanceSignFromValue(config.value),
   );
@@ -75,12 +75,14 @@ export function FieldEditorBottomSheet({
           <FieldSignToggle
             value={sign}
             onChange={setSign}
-            positiveLabel={t("common.sign.positive")}
-            negativeLabel={t("common.sign.negative")}
+            positiveLabel={t("common.sign.positiveLabel")}
+            negativeLabel={t("common.sign.negativeLabel")}
+            onAfterChange={() => editorRef.current?.focus()}
           />
         </div>
       ) : null}
       <FieldEditorSurface
+        ref={editorRef}
         mode={config.mode}
         inputMode={config.inputMode}
         displayValue={displayValue}

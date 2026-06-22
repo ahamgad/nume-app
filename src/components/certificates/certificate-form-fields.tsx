@@ -3,7 +3,7 @@
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { DateField } from "@/components/ui/date-field";
 import { EditableField } from "@/components/field-editor";
-import { FormSection } from "@/components/forms/form-section";
+import { FormCardSection } from "@/components/forms/form-card-section";
 import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
@@ -113,7 +113,7 @@ export function CertificateFormFields({
 
   return (
     <div className="space-y-6">
-      <FormSection title={t("accounts.formSections.accountDetails")}>
+      <FormCardSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="certificate-name"
           label={t("certificates.fields.name.label")}
@@ -121,6 +121,7 @@ export function CertificateFormFields({
           placeholder={t("certificates.fields.name.placeholder")}
           disabled={disabled}
           error={errors.name}
+          variant="row"
           validate={(name) => validateCertificateNameField(name, t)}
           onSave={(name) => {
             onChange({ name });
@@ -133,7 +134,12 @@ export function CertificateFormFields({
           accountType="certificate"
           value={values.institution}
           disabled={disabled}
-          onChange={(institution) => onChange({ institution })}
+          error={errors.institution}
+          variant="row"
+          onChange={(institution) => {
+            onChange({ institution });
+            onClearError("institution");
+          }}
         />
 
         <AccountIdentifierField
@@ -143,6 +149,7 @@ export function CertificateFormFields({
           value={values.certificateNumber}
           disabled={disabled}
           error={errors.certificateNumber}
+          variant="row"
           onChange={(certificateNumber) => onChange({ certificateNumber })}
           onClearError={() => onClearError("certificateNumber")}
         />
@@ -156,15 +163,9 @@ export function CertificateFormFields({
           placeholder={t("common.currency.zeroPlaceholder")}
           disabled={disabled}
           error={errors.principalAmount}
-          hint={
-            errors.principalAmount
-              ? undefined
-              : t("certificates.fields.principal.hint")
-          }
-          prefixLabel={t("common.currency.code")}
+          variant="row"
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
-          triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
           validate={(amount) => validateCertificatePrincipalField(amount, t)}
           onSave={(principalAmount) => {
             onChange({ principalAmount });
@@ -181,6 +182,7 @@ export function CertificateFormFields({
             value={values.purchaseDate}
             disabled={disabled}
             label={t("certificates.fields.purchaseDate.label")}
+            variant="row"
             onChange={(value) => {
               onChange({ purchaseDate: value });
               onClearError("purchaseDate");
@@ -189,15 +191,12 @@ export function CertificateFormFields({
             aria-invalid={Boolean(errors.purchaseDate)}
           />
           {errors.purchaseDate ? (
-            <p className="text-sm text-destructive">{errors.purchaseDate}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.purchaseDate}</p>
           ) : null}
         </div>
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection
-        title={t("accounts.formSections.interestDetails")}
-        separator
-      >
+      <FormCardSection title={t("accounts.formSections.interestDetails")}>
         <EditableField
           id="certificate-rate"
           label={t("accounts.fields.annualRate.label")}
@@ -207,11 +206,7 @@ export function CertificateFormFields({
           placeholder="0"
           disabled={disabled}
           error={errors.annualInterestRate}
-          hint={
-            errors.annualInterestRate
-              ? undefined
-              : t("certificates.fields.rate.hint")
-          }
+          variant="row"
           suffixLabel="%"
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
@@ -312,9 +307,9 @@ export function CertificateFormFields({
             />
           </div>
         ) : null}
-      </FormSection>
+      </FormCardSection>
 
-      <FormSection title={t("accounts.formSections.recurring")} separator>
+      <FormCardSection title={t("accounts.formSections.recurring")}>
         <div className="rounded-lg border border-border px-4">
           <ToggleSettingRow
             label={t("certificates.fields.autoApplyInterest.label")}
@@ -355,34 +350,27 @@ export function CertificateFormFields({
           clearLabel={t(
             "accounts.fields.interestDestinationAccount.notSelected",
           )}
+          error={errors.destinationAccountId}
+          variant="row"
           onChange={(destinationAccountId) => {
             onChange({ destinationAccountId });
             onClearError("destinationAccountId");
           }}
         />
-        {errors.destinationAccountId ? (
-          <p className="-mt-3 text-sm text-destructive">
-            {errors.destinationAccountId}
-          </p>
-        ) : null}
 
-        <div className="space-y-4 border-t border-border pt-5">
-          <h3 className="text-sm font-medium text-foreground">
-            {t("certificates.fields.renewal.title")}
-          </h3>
-          <RenewalTypePicker
-            id="certificate-renewal-type"
-            label={t("certificates.fields.renewal.type.label")}
-            value={values.renewalType}
-            disabled={disabled}
-            readOnly={!renewalEditable}
-            onChange={(renewalType) => {
-              onChange({ renewalType });
-              onClearError("renewalType");
-            }}
-          />
-        </div>
-      </FormSection>
+        <RenewalTypePicker
+          id="certificate-renewal-type"
+          label={t("certificates.fields.renewal.type.label")}
+          value={values.renewalType}
+          disabled={disabled}
+          readOnly={!renewalEditable}
+          variant="row"
+          onChange={(renewalType) => {
+            onChange({ renewalType });
+            onClearError("renewalType");
+          }}
+        />
+      </FormCardSection>
     </div>
   );
 }

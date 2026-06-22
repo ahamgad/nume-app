@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormSection } from "@/components/forms/form-section";
+import { FormCardSection } from "@/components/forms/form-card-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import {
@@ -50,7 +50,7 @@ export function LendingAccountFormFields({
   const t = useT();
 
   return (
-    <FormSection title={t("accounts.formSections.accountDetails")}>
+    <FormCardSection title={t("accounts.formSections.accountDetails")}>
       <EditableField
         id="lending-name"
         label={t("accounts.fields.name.label")}
@@ -58,6 +58,7 @@ export function LendingAccountFormFields({
         placeholder={t("accounts.fields.name.placeholder")}
         disabled={disabled}
         error={errors.name}
+        variant="row"
         validate={(name) => validateAccountNameField(name, t)}
         onSave={(name) => {
           onChange({ name });
@@ -70,7 +71,12 @@ export function LendingAccountFormFields({
         accountType="loan"
         value={values.institution}
         disabled={disabled}
-        onChange={(institution) => onChange({ institution })}
+        error={errors.institution}
+        variant="row"
+        onChange={(institution) => {
+          onChange({ institution });
+          onClearError("institution");
+        }}
       />
 
       <AccountIdentifierField
@@ -80,6 +86,7 @@ export function LendingAccountFormFields({
         value={values.identifier}
         disabled={disabled}
         error={errors.identifier}
+        variant="row"
         onChange={(identifier) => onChange({ identifier })}
         onClearError={() => onClearError("identifier")}
       />
@@ -94,11 +101,9 @@ export function LendingAccountFormFields({
           placeholder={t("common.currency.zeroPlaceholder")}
           disabled={disabled}
           error={errors.balance}
-          hint={errors.balance ? undefined : t("accounts.add.balanceHint")}
-          prefixLabel={t("common.currency.code")}
+          variant="row"
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
-          triggerClassName="h-14 text-2xl font-semibold tabular-nums tracking-tight"
           validate={(next) => validateAccountBalanceField(next, t)}
           onSave={(balance) => {
             onChange({ balance });
@@ -106,7 +111,7 @@ export function LendingAccountFormFields({
           }}
         />
       ) : null}
-    </FormSection>
+    </FormCardSection>
   );
 }
 
