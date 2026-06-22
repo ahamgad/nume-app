@@ -12,10 +12,10 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
-import { SCREEN_HEADER_TITLE_CLASS } from "@/lib/layout/screen-spacing";
+import { SCREEN_HEADER_BAR_HEIGHT_CLASS, SCREEN_HEADER_TITLE_CLASS } from "@/lib/layout/screen-spacing";
 
-/** Header inner bar height — matches `h-14`. */
-const HEADER_BAR_HEIGHT_PX = 56;
+/** Header inner bar height in px (16px root) — matches {@link SCREEN_HEADER_BAR_HEIGHT_CLASS}. */
+const HEADER_BAR_HEIGHT_PX = parseFloat(SCREEN_HEADER_BAR_HEIGHT_CLASS) * 16;
 
 interface ScreenTitleCollapseContextValue {
   /** True when the in-content large title has scrolled under the header zone. */

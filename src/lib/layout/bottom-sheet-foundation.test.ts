@@ -22,9 +22,9 @@ describe("bottom sheet foundation", () => {
   });
 
   it("aligns headerless sheet top padding with the header content zone", () => {
-    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-[calc(3.5rem+1px)]");
-    expect(SCREEN_HEADER_BAR_HEIGHT_CLASS).toBe("3.5rem");
-    expect(SCREEN_HEADER_BAR_CLASS).toContain("h-14");
+    expect(BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS).toBe("pt-[calc(4.75rem+1px)]");
+    expect(SCREEN_HEADER_BAR_HEIGHT_CLASS).toBe("4.75rem");
+    expect(SCREEN_HEADER_BAR_CLASS).toContain("py-4");
   });
 
   it("centralizes header title line-height in the shared token", () => {

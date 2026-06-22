@@ -1,6 +1,9 @@
 "use client";
 
-const HEADER_BAR_REM = 3.5;
+import { SCREEN_HEADER_BAR_HEIGHT_CLASS } from "@/lib/layout/screen-spacing";
+
+const TAB_BAR_REM = 3.5;
+const SCREEN_HEADER_BAR_REM = parseFloat(SCREEN_HEADER_BAR_HEIGHT_CLASS);
 
 function readSafeAreaInset(side: "top" | "bottom"): number {
   if (typeof document === "undefined") return 0;
@@ -31,7 +34,7 @@ export function getPickerLayoutViewportHeight(): number {
 /** Maximum picker sheet height in px — viewport − (header zone × 2). */
 export function getPickerSheetMaxHeightPx(): number {
   const rootFont = getRootFontSizePx();
-  const headerZonePx = rootFont * HEADER_BAR_REM + readSafeAreaInset("top");
+  const headerZonePx = rootFont * SCREEN_HEADER_BAR_REM + readSafeAreaInset("top");
   return getPickerLayoutViewportHeight() - headerZonePx * 2;
 }
 
@@ -43,7 +46,7 @@ export function getPickerSheetMinHeightPx(): number {
 /** Tab bar + safe-area bottom padding in px. */
 export function getPickerSheetBottomPaddingPx(): number {
   const rootFont = getRootFontSizePx();
-  return rootFont * HEADER_BAR_REM + readSafeAreaInset("bottom");
+  return rootFont * TAB_BAR_REM + readSafeAreaInset("bottom");
 }
 
 /**
