@@ -5,12 +5,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock";
 import {
-  SCREEN_HEADER_BAR_CLASS,
-  SCREEN_HEADER_TITLE_CLASS,
-} from "@/components/layout/screen-header";
-import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
+  BOTTOM_SHEET_HEADER_TEXT_ACTION_CLASS,
+  BOTTOM_SHEET_PANEL_CLASS,
+  BottomSheetHeader,
 } from "@/components/ui/bottom-sheet-chrome";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { IMMERSIVE_SHEET_HEIGHT } from "@/lib/layout/immersive-sheet";
@@ -75,29 +74,31 @@ export function ImmersiveBottomSheet({
         aria-label={ariaLabel ?? title}
         style={{ height: sheetHeight, maxHeight: sheetHeight }}
         className={cn(
-          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm",
+          BOTTOM_SHEET_PANEL_CLASS,
           BOTTOM_SHEET_ENTER_CLASS,
           isWorkspace && "touch-none overscroll-none",
         )}
       >
-        <header className="shrink-0">
-          <div className={SCREEN_HEADER_BAR_CLASS}>
+        <BottomSheetHeader
+          title={title}
+          leading={
             <HeaderIconButton
               onClick={onDismiss}
               aria-label={t("common.back")}
             />
-            <h2 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h2>
+          }
+          trailing={
             <button
               type="button"
               onClick={onConfirm}
               disabled={confirmDisabled}
-              className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-semibold text-foreground disabled:opacity-40"
+              className={BOTTOM_SHEET_HEADER_TEXT_ACTION_CLASS}
               aria-label={saveAriaLabel}
             >
               {saveLabel}
             </button>
-          </div>
-        </header>
+          }
+        />
 
         <div
           className={cn(

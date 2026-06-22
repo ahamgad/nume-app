@@ -7,12 +7,10 @@ import { usePickerSheetHeight } from "@/hooks/use-picker-sheet-height";
 import { useSearchSheetLock } from "@/hooks/use-search-sheet-lock";
 import { useVisualViewportKeyboardInset } from "@/hooks/use-visual-viewport-keyboard-inset";
 import {
-  SCREEN_HEADER_BAR_CLASS,
-  SCREEN_HEADER_TITLE_CLASS,
-} from "@/components/layout/screen-header";
-import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
+  BOTTOM_SHEET_PANEL_CLASS,
+  BottomSheetHeader,
 } from "@/components/ui/bottom-sheet-chrome";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { Input } from "@/components/ui/input";
@@ -114,27 +112,22 @@ export function PickerBottomSheet({
           minHeight: PICKER_SHEET_MIN_HEIGHT,
           maxHeight: PICKER_SHEET_MAX_HEIGHT,
         }}
-        className={cn(
-          "absolute inset-x-0 bottom-0 mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-xl bg-background shadow-sm",
-          BOTTOM_SHEET_ENTER_CLASS,
-        )}
+        className={cn(BOTTOM_SHEET_PANEL_CLASS, BOTTOM_SHEET_ENTER_CLASS)}
       >
         <div ref={chromeRef} className="shrink-0 bg-background">
-          <div className={SCREEN_HEADER_BAR_CLASS}>
-            <h2
-              id={resolvedTitleId}
-              className={cn(SCREEN_HEADER_TITLE_CLASS, "min-w-0 flex-1 text-start")}
-            >
-              {title}
-            </h2>
-            {showCloseButton ? (
-              <HeaderIconButton
-                onClick={onClose}
-                icon="close"
-                aria-label={t("a11y.dismiss")}
-              />
-            ) : null}
-          </div>
+          <BottomSheetHeader
+            title={title}
+            titleId={resolvedTitleId}
+            trailing={
+              showCloseButton ? (
+                <HeaderIconButton
+                  onClick={onClose}
+                  icon="close"
+                  aria-label={t("a11y.dismiss")}
+                />
+              ) : undefined
+            }
+          />
           {search ? (
             <div className="px-4 pb-4">
               <Input

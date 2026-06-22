@@ -5,8 +5,8 @@ import { type ReactNode } from "react";
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  CONFIRMATION_SHEET_PANEL_CLASS,
-  BottomSheetDragHandle,
+  BOTTOM_SHEET_PANEL_CLASS,
+  BottomSheetHeaderlessContent,
 } from "@/components/ui/bottom-sheet-chrome";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { useT } from "@/providers/i18n-provider";
@@ -62,15 +62,12 @@ export function ConfirmationBottomSheet({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          CONFIRMATION_SHEET_PANEL_CLASS,
+          BOTTOM_SHEET_PANEL_CLASS,
           BOTTOM_SHEET_ENTER_CLASS,
           panelClassName,
         )}
       >
-        <BottomSheetDragHandle />
-        <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-5">
-          {children}
-        </div>
+        <BottomSheetHeaderlessContent>{children}</BottomSheetHeaderlessContent>
       </div>
     </div>
   );
