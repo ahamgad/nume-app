@@ -3,18 +3,21 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
+import {
+  AccountDetailsLargeTitle,
+  AccountDetailsStackHeader,
+  AccountDetailsSummary,
+} from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
-import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
-import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -177,16 +180,10 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     );
   }
 
-  const institutionSubtitle = formatAccountInstitutionSubtitle(
-    account.institution,
-    account.accountNumberLast4,
-    t,
-  );
-
   return (
     <>
-      <StackPageHeader
-        title={t("accounts.details.title")}
+      <AccountDetailsStackHeader
+        accountName={account.name}
         onBack={() => router.back()}
         rightAction={
           !isArchived ? (
@@ -198,11 +195,10 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <StackPageTitle>{t("accounts.details.title")}</StackPageTitle>
-        <AccountHeaderMetadata
+        <AccountDetailsLargeTitle accountName={account.name} />
+        <AccountDetailsSummary
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}
         />

@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { AccountHeaderMetadata } from "@/components/accounts/account-header-metadata";
+import {
+  AccountDetailsLargeTitle,
+  AccountDetailsStackHeader,
+  AccountDetailsSummary,
+} from "@/components/accounts/account-details-chrome";
 import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import {
@@ -13,7 +17,6 @@ import {
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { CreditUtilizationProgress } from "@/components/credit-cards/credit-utilization-progress";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
-import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
@@ -22,7 +25,7 @@ import {
   calculateAvailableCredit,
   calculateCreditUtilization,
 } from "@/lib/credit-cards/utilization";
-import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { getAccountHeaderStatusFromAccount } from "@/lib/finance/account-header-status";
 import { formatCurrency } from "@/lib/format/currency";
@@ -183,16 +186,10 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     );
   }
 
-  const institutionSubtitle = formatAccountInstitutionSubtitle(
-    account.institution,
-    creditCard.cardNumberLast4,
-    t,
-  );
-
   return (
     <>
-      <StackPageHeader
-        title={t("accounts.details.title")}
+      <AccountDetailsStackHeader
+        accountName={account.name}
         onBack={() => router.back()}
         rightAction={
           !isArchived ? (
@@ -204,11 +201,10 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <StackPageTitle>{t("accounts.details.title")}</StackPageTitle>
-        <AccountHeaderMetadata
+        <AccountDetailsLargeTitle accountName={account.name} />
+        <AccountDetailsSummary
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
           accountType={account.type}
           status={getAccountHeaderStatusFromAccount(account)}
         />
