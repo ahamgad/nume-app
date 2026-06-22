@@ -3,7 +3,8 @@
 import { CalendarRange, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { RootPageHeader, RootPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { EmptyState } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { useFinance } from "@/lib/finance/store";
@@ -17,8 +18,9 @@ export function PlanningScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("planning.title")} />
+      <RootPageHeader title={t("planning.title")} />
       <ScreenBody onRefresh={refresh}>
+        <RootPageTitle>{t("planning.title")}</RootPageTitle>
         <EmptyState
           icon={<CalendarRange />}
           title={t("planning.empty.title")}
@@ -48,8 +50,9 @@ export function GoalsScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("goals.title")} />
+      <RootPageHeader title={t("goals.title")} />
       <ScreenBody onRefresh={refresh}>
+        <RootPageTitle>{t("goals.title")}</RootPageTitle>
         <EmptyState
           icon={<Target />}
           title={t("goals.empty.title")}

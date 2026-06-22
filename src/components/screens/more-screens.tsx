@@ -4,7 +4,12 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
-import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
+import {
+  RootPageHeader,
+  RootPageTitle,
+  StackPageHeader,
+  StackPageTitle,
+} from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
@@ -41,8 +46,9 @@ export function MoreScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("more.title")} />
+      <RootPageHeader title={t("more.title")} />
       <ScreenBody>
+        <RootPageTitle>{t("more.title")}</RootPageTitle>
         <Card className="overflow-hidden shadow-none">
           <MoreMenuRow
             title={t("more.profile.title")}

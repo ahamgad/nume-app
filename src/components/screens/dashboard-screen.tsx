@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { RootPageHeader, RootPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody } from "@/components/layout/screen-header";
 import {
   EducationalWidget,
   MetricHero,
@@ -40,8 +41,9 @@ export function DashboardScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("dashboard.title")} />
+      <RootPageHeader title={t("dashboard.title")} />
       <ScreenBody className="space-y-3" onRefresh={refresh}>
+        <RootPageTitle>{t("dashboard.title")}</RootPageTitle>
         {isFinanceReady && !hasAccounts ? (
           <SetupBanner
             title={t("dashboard.setup.title")}

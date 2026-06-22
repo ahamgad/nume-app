@@ -13,16 +13,12 @@ import {
 
 import { cn } from "@/lib/utils";
 
-/** Scroll distance (px) over which the page title morphs into the header title. */
-const COLLAPSE_SCROLL_DISTANCE_PX = 56;
-
 /** Header inner bar height — matches `h-14`. */
 const HEADER_BAR_HEIGHT_PX = 56;
 
 interface ScreenTitleCollapseContextValue {
   scrollRef: RefObject<HTMLElement | null>;
-  /** 0 = large in-content title; 1 = compact header title. */
-  collapseProgress: number;
+  /** True when the in-content large title has scrolled under the header zone. */
   titleCollapsed: boolean;
   registerPageTitle: (node: HTMLElement | null) => void;
 }
@@ -37,69 +33,41 @@ export function ScreenTitleCollapseProvider({
   scrollRef: RefObject<HTMLElement | null>;
   children: ReactNode;
 }) {
-  const [collapseProgress, setCollapseProgress] = useState(0);
+  const [titleCollapsed, setTitleCollapsed] = useState(false);
   const pageTitleRef = useRef<HTMLElement | null>(null);
-  const initialTitleTopRef = useRef(0);
+  const [hasPageTitle, setHasPageTitle] = useState(false);
 
   const registerPageTitle = useCallback((node: HTMLElement | null) => {
     pageTitleRef.current = node;
-    if (node && scrollRef.current) {
-      initialTitleTopRef.current = node.offsetTop;
-    }
-  }, [scrollRef]);
+    setHasPageTitle(Boolean(node));
+  }, []);
 
   useEffect(() => {
     const scrollRoot = scrollRef.current;
-    if (!scrollRoot) return;
-
-    function measureTitleTop() {
-      const titleEl = pageTitleRef.current;
-      if (titleEl) {
-        initialTitleTopRef.current = titleEl.offsetTop;
-      }
+    const pageTitle = pageTitleRef.current;
+    if (!scrollRoot || !pageTitle) {
+      setTitleCollapsed(false);
+      return;
     }
 
-    function updateProgress() {
-      const root = scrollRef.current;
-      const titleEl = pageTitleRef.current;
-      if (!root || !titleEl) {
-        setCollapseProgress(0);
-        return;
-      }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setTitleCollapsed(!entry.isIntersecting);
+      },
+      {
+        root: scrollRoot,
+        threshold: 0,
+        rootMargin: `-${HEADER_BAR_HEIGHT_PX}px 0px 0px 0px`,
+      },
+    );
 
-      measureTitleTop();
-      const collapseStart = Math.max(
-        0,
-        initialTitleTopRef.current - HEADER_BAR_HEIGHT_PX,
-      );
-      const scrolled = root.scrollTop - collapseStart;
-      const progress = Math.min(
-        1,
-        Math.max(0, scrolled / COLLAPSE_SCROLL_DISTANCE_PX),
-      );
-      setCollapseProgress(progress);
-    }
-
-    updateProgress();
-    scrollRoot.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", measureTitleTop);
-
-    return () => {
-      scrollRoot.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", measureTitleTop);
-    };
-  }, [scrollRef]);
-
-  const titleCollapsed = collapseProgress >= 0.98;
+    observer.observe(pageTitle);
+    return () => observer.disconnect();
+  }, [scrollRef, hasPageTitle]);
 
   return (
     <ScreenTitleCollapseContext.Provider
-      value={{
-        scrollRef,
-        collapseProgress,
-        titleCollapsed,
-        registerPageTitle,
-      }}
+      value={{ scrollRef, titleCollapsed, registerPageTitle }}
     >
       {children}
     </ScreenTitleCollapseContext.Provider>
@@ -110,7 +78,10 @@ export function useScreenTitleCollapse() {
   return useContext(ScreenTitleCollapseContext);
 }
 
-/** Large in-content page title — morphs into the header title on scroll. */
+/**
+ * Large in-content page title (iOS large-title style).
+ * Scrolls naturally with content — no scale, morph, or fade.
+ */
 export function ScreenPageTitle({
   children,
   className,
@@ -119,32 +90,26 @@ export function ScreenPageTitle({
   className?: string;
 }) {
   const context = useScreenTitleCollapse();
-  const progress = context?.collapseProgress ?? 0;
-
-  // 24px → 16px ≈ scale 0.667
-  const scale = 1 - progress * (1 - 16 / 24);
+  const collapsed = context?.titleCollapsed ?? false;
 
   return (
     <h1
       ref={context ? (node) => context.registerPageTitle(node) : undefined}
       data-screen-page-title
-      aria-hidden={progress > 0.5}
+      aria-hidden={collapsed}
       className={cn(
-        "origin-left pb-4 text-2xl font-semibold leading-tight tracking-tight text-foreground",
+        "pb-4 text-2xl font-semibold leading-tight tracking-tight text-foreground",
         className,
       )}
-      style={{
-        opacity: 1 - progress,
-        transform: `scale(${scale})`,
-        willChange: progress > 0 && progress < 1 ? "transform, opacity" : undefined,
-      }}
     >
       {children}
     </h1>
   );
 }
 
-/** Compact header title slot — fades in as the in-content title morphs away. */
+/**
+ * Compact navigation title — fades in when the large title scrolls under the header.
+ */
 export function CollapsingHeaderTitle({
   children,
   className,
@@ -153,22 +118,16 @@ export function CollapsingHeaderTitle({
   className?: string;
 }) {
   const context = useScreenTitleCollapse();
-  const progress = context?.collapseProgress ?? 0;
-  const scale = 16 / 24 + progress * (1 - 16 / 24);
+  const collapsed = context?.titleCollapsed ?? false;
 
   return (
     <span
-      aria-hidden={progress < 0.5}
+      aria-hidden={!collapsed}
       className={cn(
-        "block min-w-0 flex-1 truncate text-base font-semibold leading-tight",
+        "block min-w-0 flex-1 truncate text-base font-semibold leading-tight transition-opacity duration-200",
+        collapsed ? "opacity-100" : "opacity-0",
         className,
       )}
-      style={{
-        opacity: progress,
-        transform: `scale(${scale})`,
-        transformOrigin: "left center",
-        willChange: progress > 0 && progress < 1 ? "transform, opacity" : undefined,
-      }}
     >
       {children}
     </span>

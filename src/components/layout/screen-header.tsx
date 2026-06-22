@@ -21,7 +21,6 @@ import {
   getScreenBodyScrollPadding,
   getScreenBodyTopPadding,
   SCREEN_HEADER_BAR_CLASS,
-  SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
   SCREEN_HEADER_ZONE_TOP,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
@@ -87,10 +86,8 @@ export function ScreenHeader({
   const router = useRouter();
   const t = useT();
   const collapse = useScreenTitleCollapse();
-  const collapseProgress = collapse?.collapseProgress ?? 0;
-  const showHeaderBorder = collapsibleTitle
-    ? collapseProgress > 0.02
-    : true;
+  const titleCollapsed = collapse?.titleCollapsed ?? false;
+  const showHeaderBorder = collapsibleTitle ? titleCollapsed : true;
 
   return (
     <header
@@ -101,11 +98,9 @@ export function ScreenHeader({
         KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER
           ? "fixed inset-x-0 top-0 z-40 mx-auto w-full max-w-lg"
           : "z-30 shrink-0",
+        collapsibleTitle && "transition-[border-color] duration-200",
         className,
       )}
-      style={{
-        transition: collapsibleTitle ? "border-color 80ms linear" : undefined,
-      }}
     >
       <div className={SCREEN_HEADER_BAR_CLASS}>
         {mode === "stack" ? (
@@ -113,9 +108,7 @@ export function ScreenHeader({
             onClick={onBack ?? (() => router.back())}
             aria-label={t("common.back")}
           />
-        ) : (
-          <div className={cn(SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS, "shrink-0")} />
-        )}
+        ) : null}
         {collapsibleTitle ? (
           <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
         ) : (

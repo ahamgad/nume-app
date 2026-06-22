@@ -8,7 +8,8 @@ import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skelet
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
 import { AccountCardRow } from "@/components/accounts/account-card-row";
 
-import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
+import { RootPageHeader, RootPageTitle } from "@/components/layout/stack-page-chrome";
+import { ScreenBody, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -144,8 +145,9 @@ export function AccountsListScreen() {
   if (!isFinanceReady) {
     return (
       <>
-        <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
+        <RootPageHeader title={t("accounts.title")} rightAction={addAccountAction} />
         <ScreenBody withTabBar onRefresh={refresh}>
+          <RootPageTitle>{t("accounts.title")}</RootPageTitle>
           <AccountsListSkeleton />
         </ScreenBody>
       </>
@@ -157,8 +159,9 @@ export function AccountsListScreen() {
 
   return (
     <>
-      <ScreenHeader title={t("accounts.title")} rightAction={addAccountAction} />
+      <RootPageHeader title={t("accounts.title")} rightAction={addAccountAction} />
       <ScreenBody withTabBar onRefresh={refresh}>
+        <RootPageTitle>{t("accounts.title")}</RootPageTitle>
         <div className="mb-4">
           <ScrollChipSelect
             value={filter}
