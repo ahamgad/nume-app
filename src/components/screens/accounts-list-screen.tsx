@@ -5,14 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
+import { AccountCardsSection } from "@/components/accounts/account-cards-section";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
-import { AccountCardRow } from "@/components/accounts/account-card-row";
 
 import { RootPageHeader, RootPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { EmptyState } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   ScrollChipSelect,
   type ScrollChipOption,
@@ -23,55 +22,18 @@ import {
   resolveAccountsListFilter,
   type AccountsListFilter,
 } from "@/lib/accounts/accounts-list-filter";
+import { ACCOUNT_CARD_CATEGORY_GAP_PX } from "@/lib/layout/account-card-chrome";
 import { useFinance } from "@/lib/finance/store";
 import type { Account } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
-
-function AccountSection({
-  title,
-  accounts,
-  formatLocale,
-  onSelect,
-  t,
-}: {
-  title: string;
-  accounts: Account[];
-  formatLocale: string;
-  onSelect: (accountId: string) => void;
-  t: ReturnType<typeof useT>;
-}) {
-  if (accounts.length === 0) return null;
-
-  return (
-    <section>
-      <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-        {title}
-      </p>
-      <Card className="overflow-hidden shadow-none">
-        {accounts.map((account, index) => (
-          <div key={account.id}>
-            <AccountCardRow
-              account={account}
-              formatLocale={formatLocale}
-              t={t}
-              onClick={() => onSelect(account.id)}
-            />
-            {index < accounts.length - 1 ? (
-              <div className="mx-4 border-b border-border" />
-            ) : null}
-          </div>
-        ))}
-      </Card>
-    </section>
-  );
-}
 
 export function AccountsListScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { accounts, isFinanceReady, refresh } = useFinance();
+  const { accounts, certificates, creditCards, loans, isFinanceReady, refresh } =
+    useFinance();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const closePicker = useCallback(() => {
@@ -196,32 +158,47 @@ export function AccountsListScreen() {
             />
           )
         ) : (
-          <div className="space-y-6">
-            <AccountSection
+          <div
+            className="flex flex-col"
+            style={{ gap: ACCOUNT_CARD_CATEGORY_GAP_PX }}
+          >
+            <AccountCardsSection
               title={t("accounts.sections.money")}
               accounts={moneyAccounts}
               formatLocale={formatLocale}
+              certificates={certificates}
+              creditCards={creditCards}
+              loans={loans}
               onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
               t={t}
             />
-            <AccountSection
+            <AccountCardsSection
               title={t("accounts.sections.savings")}
               accounts={savingsAccounts}
               formatLocale={formatLocale}
+              certificates={certificates}
+              creditCards={creditCards}
+              loans={loans}
               onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
               t={t}
             />
-            <AccountSection
+            <AccountCardsSection
               title={t("accounts.sections.certificates")}
               accounts={certificateAccounts}
               formatLocale={formatLocale}
+              certificates={certificates}
+              creditCards={creditCards}
+              loans={loans}
               onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
               t={t}
             />
-            <AccountSection
+            <AccountCardsSection
               title={t("accounts.sections.liabilities")}
               accounts={liabilityAccounts}
               formatLocale={formatLocale}
+              certificates={certificates}
+              creditCards={creditCards}
+              loans={loans}
               onSelect={(accountId) => router.push(`/accounts/${accountId}`)}
               t={t}
             />

@@ -34,8 +34,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 6 | **Typography & copy** | Sentence case, helper description punctuation — `docs/CONTENT.md`, `en.ts` | § 10, CONTENT |
 | 7 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` | § 10 |
 | 8 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface`, `FieldSignToggle` | § 5 |
+| 9 | **Account cards** | `AccountCard`, `AccountCardsSection` | § 14 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, or field-editor headers/placeholders/typography/wrapping/sign-chip layout inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, or account-card layouts inside individual screens.
 
 ---
 
@@ -508,6 +509,49 @@ Current account, savings, certificate, credit card, loan, cash, wallet, gold, st
 
 ---
 
+## 14. Account cards (frozen)
+
+All account cards on the **Accounts** tab compose through **`AccountCard`** and **`AccountCardsSection`**.
+
+Location: `components/accounts/account-card.tsx`, `components/accounts/account-cards-section.tsx`, `lib/layout/account-card-chrome.ts`.
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `AccountCard` | Single account card — logo, institute row, name, balance |
+| `AccountCardsSection` | Category label + stacked cards with foundation spacing |
+
+### Spacing tokens
+
+| Rule | Token | Value |
+|---|---|---|
+| Category label → first card | `ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX` | 16px |
+| Card → card (same category) | `ACCOUNT_CARD_GAP_PX` | 16px |
+| Last card → next category label | `ACCOUNT_CARD_CATEGORY_GAP_PX` | 24px |
+| Card internal padding | `ACCOUNT_CARD_PADDING_PX` | 16px |
+| Logo → text block | `ACCOUNT_CARD_LOGO_TEXT_GAP_PX` | 8px |
+| Top section → divider / divider → balance | `ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX` | 16px |
+
+### Layout rules
+
+1. Logo **45×45** — existing institution logo / fallback behavior unchanged
+2. Institute row — **13px regular** — institution · last-4 via `formatAccountCardInstituteRow`
+3. Account name — **15px medium**, single-line truncated
+4. Divider — `border-border` between top section and balance
+5. Balance label — **13px medium**, sentence case (`accounts.sections.balance`)
+6. Balance value — **15px semibold** via `CurrencyAmount` (numeric typography foundation)
+7. Subtle shadow — `ACCOUNT_CARD_SHADOW_CLASS` only
+8. Corner radius — existing `rounded-lg` on card container
+
+### Propagation rule
+
+New account types on the Accounts tab **must** use `AccountCard` — no custom card layouts in screens.
+
+**Documented exception:** `AccountRowContent` in picker sheets — compact row, not an account card.
+
+---
+
 ## 12. Future screen rule (mandatory)
 
 Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
@@ -527,6 +571,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Typography / capitalization behaviors
 - Numeric display behaviors
 - Field editor headers, placeholders, typography, wrapping, sign-chip layout, unit-suffix cleanup, or keyboard-submit handlers
+- Account card layouts on the Accounts tab
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -570,6 +615,8 @@ If a genuine exception is required:
 | Currency / metric displays | Numeric typography foundation | ✅ |
 | System copy (EN) | Typography & copy foundation | ✅ |
 | All inline field editors | Field editor foundation | ✅ |
+| Accounts tab list cards | Account cards foundation | ✅ |
+| Account picker rows | `AccountRowContent` | ⚠️ Compact picker row — not account card |
 | Confirmation / discard | Confirmation | ✅ Intentional |
 | Auth screens | — | ✅ Excluded |
 | Institution "Other" custom name | Inline input | ⚠️ Documented exception |
@@ -592,4 +639,4 @@ Before shipping any screen or feature:
 5. Add copy to `en.ts` per **`docs/CONTENT.md`**
 6. Document any deviation in the audit table
 
-**All Design Audit foundations are frozen:** Header, Picker list, Account details, Create account CTA, Confirmation actions, Typography & copy, Numeric typography, Inline field editor.
+**All Design Audit foundations are frozen:** Header, Picker list, Account details, Create account CTA, Confirmation actions, Typography & copy, Numeric typography, Inline field editor, Account cards.
