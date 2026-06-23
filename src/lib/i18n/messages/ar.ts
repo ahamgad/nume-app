@@ -623,8 +623,7 @@ export const ar = {
       },
       autoApplyInterest: {
         label: "تحويل العائد تلقائيًا",
-        description:
-          "عند التفعيل، يُحوَّل العائد إلى حساب الوجهة في كل تاريخ دفع.",
+        description: "تحويل العائد في كل تاريخ دفع",
       },
       renewal: {
         title: "التجديد",

@@ -142,6 +142,7 @@ export function AddCertificateAccountScreen() {
             amountInputLocale={amountInputLocale}
             transferAccounts={transferAccounts}
             disabled={submitting}
+            mode="create"
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />

@@ -624,8 +624,7 @@ export const en = {
       },
       autoApplyInterest: {
         label: "Automatic transfer interest",
-        description:
-          "When enabled, interest will be transferred to the destination account on each payout date",
+        description: "Transfer interest on each payout date",
       },
       renewal: {
         title: "Renewal",

@@ -51,6 +51,7 @@ interface CertificateFormFieldsProps {
   amountInputLocale: string;
   transferAccounts: Account[];
   disabled?: boolean;
+  mode?: "create" | "edit";
   renewalEditable?: boolean;
   onChange: (patch: Partial<CertificateFormValues>) => void;
   onClearError: (field: string) => void;
@@ -105,12 +106,14 @@ export function CertificateFormFields({
   amountInputLocale,
   transferAccounts,
   disabled = false,
+  mode = "create",
   renewalEditable = true,
   onChange,
   onClearError,
 }: CertificateFormFieldsProps) {
   const t = useT();
   const formatLocale = useFormatLocale();
+  const isCreate = mode === "create";
 
   const termOptions: ScrollChipOption<CertificateTermPreset>[] = [
     ...CERTIFICATE_TERM_YEAR_PRESETS.map((years) => ({
@@ -150,11 +153,11 @@ export function CertificateFormFields({
     <AccountFormSections
       requirements={{
         accountType: "certificate",
-        showsInstitution: true,
+        showsInstitution: isCreate,
         showsIdentifier: true,
-        termPreset: values.termPreset,
-        payoutFrequency: values.payoutFrequency,
-        showsPayoutDay,
+        termPreset: isCreate ? values.termPreset : undefined,
+        payoutFrequency: isCreate ? values.payoutFrequency : undefined,
+        showsPayoutDay: isCreate && showsPayoutDay,
         autoApplyInterest: values.autoApplyInterest,
       }}
     >
@@ -173,54 +176,60 @@ export function CertificateFormFields({
           }}
         />
 
-        <AccountFormEditableField
-          id="certificate-principal"
-          label={t("certificates.fields.principal.label")}
-          mode="numeric"
-          inputMode="decimal"
-          value={values.principalAmount}
-          placeholder={t("common.currency.zeroPlaceholder")}
-          disabled={disabled}
-          error={errors.principalAmount}
-          sanitizeInput={sanitizeAmountInput}
-          formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
-          validate={(amount) => validateCertificatePrincipalField(amount, t)}
-          onSave={(principalAmount) => {
-            onChange({ principalAmount });
-            onClearError("principalAmount");
-          }}
-        />
+        {isCreate ? (
+          <>
+            <AccountFormEditableField
+              id="certificate-principal"
+              label={t("certificates.fields.principal.label")}
+              mode="numeric"
+              inputMode="decimal"
+              value={values.principalAmount}
+              placeholder={t("common.currency.zeroPlaceholder")}
+              disabled={disabled}
+              error={errors.principalAmount}
+              sanitizeInput={sanitizeAmountInput}
+              formatDisplay={(amount) =>
+                formatAmountInput(amount, amountInputLocale)
+              }
+              validate={(amount) => validateCertificatePrincipalField(amount, t)}
+              onSave={(principalAmount) => {
+                onChange({ principalAmount });
+                onClearError("principalAmount");
+              }}
+            />
 
-        <AccountFormEditableField
-          id="certificate-rate"
-          label={t("accounts.fields.annualRate.label")}
-          mode="numeric"
-          inputMode="decimal"
-          value={values.annualInterestRate}
-          placeholder="0"
-          disabled={disabled}
-          error={errors.annualInterestRate}
-          suffixLabel="%"
-          sanitizeInput={sanitizeAmountInput}
-          formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
-          validate={(rate) => validateCertificateRateField(rate, t)}
-          onSave={(annualInterestRate) => {
-            onChange({ annualInterestRate });
-            onClearError("annualInterestRate");
-          }}
-        />
+            <AccountFormEditableField
+              id="certificate-rate"
+              label={t("accounts.fields.annualRate.label")}
+              mode="numeric"
+              inputMode="decimal"
+              value={values.annualInterestRate}
+              placeholder="0"
+              disabled={disabled}
+              error={errors.annualInterestRate}
+              suffixLabel="%"
+              sanitizeInput={sanitizeAmountInput}
+              formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
+              validate={(rate) => validateCertificateRateField(rate, t)}
+              onSave={(annualInterestRate) => {
+                onChange({ annualInterestRate });
+                onClearError("annualInterestRate");
+              }}
+            />
 
-        <AccountFormInstitutionPicker
-          id="certificate-institution"
-          accountType="certificate"
-          value={values.institution}
-          disabled={disabled}
-          error={errors.institution}
-          onChange={(institution) => {
-            onChange({ institution });
-            onClearError("institution");
-          }}
-        />
+            <AccountFormInstitutionPicker
+              id="certificate-institution"
+              accountType="certificate"
+              value={values.institution}
+              disabled={disabled}
+              error={errors.institution}
+              onChange={(institution) => {
+                onChange({ institution });
+                onClearError("institution");
+              }}
+            />
+          </>
+        ) : null}
 
         <AccountFormIdentifierField
           id="certificate-number"
@@ -233,102 +242,113 @@ export function CertificateFormFields({
           onClearError={() => onClearError("certificateNumber")}
         />
 
-        <AccountFormDateField
-          id="certificate-purchase-date"
-          label={t("certificates.fields.purchaseDate.label")}
-          value={values.purchaseDate}
-          disabled={disabled}
-          error={errors.purchaseDate}
-          placeholder={t("certificates.fields.purchaseDate.placeholder")}
-          onChange={(value) => {
-            onChange({ purchaseDate: value });
-            onClearError("purchaseDate");
-          }}
-          locale={formatLocale}
-        />
-      </AccountFormSection>
-
-      <AccountFormSection title={t("savings.sections.posting")}>
-        <AccountFormScrollChipSelect
-          value={values.payoutFrequency}
-          options={payoutOptions}
-          ariaLabel={t("certificates.fields.payoutFrequency.label")}
-          onChange={(payoutFrequency) => onChange({ payoutFrequency })}
-        />
-
-        {showsPayoutDay ? (
-          <AccountFormScrollChipSelect
-            label={t("savings.fields.postingDay.label")}
-            fieldId="certificate-payout-day"
-            value={values.payoutDay}
-            options={payoutDayOptions}
-            ariaLabel={t("savings.fields.postingDay.label")}
-            error={errors.payoutDay}
-            onChange={(payoutDay) => {
-              onChange({ payoutDay });
-              onClearError("payoutDay");
+        {isCreate ? (
+          <AccountFormDateField
+            id="certificate-purchase-date"
+            label={t("certificates.fields.purchaseDate.label")}
+            value={values.purchaseDate}
+            disabled={disabled}
+            error={errors.purchaseDate}
+            placeholder={t("certificates.fields.purchaseDate.placeholder")}
+            onChange={(value) => {
+              onChange({ purchaseDate: value });
+              onClearError("purchaseDate");
             }}
+            locale={formatLocale}
           />
         ) : null}
-
-        {values.payoutFrequency === "daily" ? (
-          <>
-            <CertificateToggleSettingRow
-              label={t("businessDays.excludeWeekends.label")}
-              description={t("businessDays.excludeWeekends.description")}
-              checked={values.excludeWeekends}
-              disabled={disabled}
-              onCheckedChange={(excludeWeekends) => onChange({ excludeWeekends })}
-            />
-            <CertificateToggleSettingRow
-              label={t("businessDays.excludeEgyptianHolidays.label")}
-              description={t(
-                "businessDays.excludeEgyptianHolidays.description",
-              )}
-              checked={values.excludeEgyptianHolidays}
-              disabled={disabled}
-              onCheckedChange={(excludeEgyptianHolidays) =>
-                onChange({ excludeEgyptianHolidays })
-              }
-            />
-          </>
-        ) : null}
       </AccountFormSection>
+
+      {isCreate ? (
+        <AccountFormSection title={t("savings.sections.posting")}>
+          <AccountFormScrollChipSelect
+            value={values.payoutFrequency}
+            options={payoutOptions}
+            ariaLabel={t("certificates.fields.payoutFrequency.label")}
+            onChange={(payoutFrequency) => onChange({ payoutFrequency })}
+          />
+
+          {showsPayoutDay ? (
+            <AccountFormScrollChipSelect
+              label={t("savings.fields.postingDay.label")}
+              fieldId="certificate-payout-day"
+              value={values.payoutDay}
+              options={payoutDayOptions}
+              ariaLabel={t("savings.fields.postingDay.label")}
+              error={errors.payoutDay}
+              onChange={(payoutDay) => {
+                onChange({ payoutDay });
+                onClearError("payoutDay");
+              }}
+            />
+          ) : null}
+
+          {values.payoutFrequency === "daily" ? (
+            <>
+              <CertificateToggleSettingRow
+                label={t("businessDays.excludeWeekends.label")}
+                description={t("businessDays.excludeWeekends.description")}
+                checked={values.excludeWeekends}
+                disabled={disabled}
+                onCheckedChange={(excludeWeekends) =>
+                  onChange({ excludeWeekends })
+                }
+              />
+              <CertificateToggleSettingRow
+                label={t("businessDays.excludeEgyptianHolidays.label")}
+                description={t(
+                  "businessDays.excludeEgyptianHolidays.description",
+                )}
+                checked={values.excludeEgyptianHolidays}
+                disabled={disabled}
+                onCheckedChange={(excludeEgyptianHolidays) =>
+                  onChange({ excludeEgyptianHolidays })
+                }
+              />
+            </>
+          ) : null}
+        </AccountFormSection>
+      ) : null}
 
       <AccountFormSection title={t("accounts.formSections.recurring")}>
-        <AccountFormScrollChipSelect<CertificateTermPreset>
-          fieldId="certificate-term"
-          value={values.termPreset}
-          options={termOptions}
-          ariaLabel={t("certificates.fields.term.label")}
-          error={values.termPreset !== "custom" ? errors.term : undefined}
-          onChange={(termPreset) => {
-            onChange({
-              termPreset,
-              customTermYears: termPreset === "custom" ? values.customTermYears : "",
-            });
-            onClearError("term");
-          }}
-        />
+        {isCreate ? (
+          <>
+            <AccountFormScrollChipSelect<CertificateTermPreset>
+              fieldId="certificate-term"
+              value={values.termPreset}
+              options={termOptions}
+              ariaLabel={t("certificates.fields.term.label")}
+              error={values.termPreset !== "custom" ? errors.term : undefined}
+              onChange={(termPreset) => {
+                onChange({
+                  termPreset,
+                  customTermYears:
+                    termPreset === "custom" ? values.customTermYears : "",
+                });
+                onClearError("term");
+              }}
+            />
 
-        {values.termPreset === "custom" ? (
-          <AccountFormEditableField
-            id="certificate-custom-term"
-            hideLabel
-            label={t("certificates.fields.term.custom")}
-            mode="numeric"
-            inputMode="decimal"
-            value={values.customTermYears}
-            placeholder={t("certificates.fields.term.custom")}
-            disabled={disabled}
-            error={errors.term}
-            sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
-            validate={(term) => validateCertificateCustomTermField(term, t)}
-            onSave={(customTermYears) => {
-              onChange({ customTermYears });
-              onClearError("term");
-            }}
-          />
+            {values.termPreset === "custom" ? (
+              <AccountFormEditableField
+                id="certificate-custom-term"
+                hideLabel
+                label={t("certificates.fields.term.custom")}
+                mode="numeric"
+                inputMode="decimal"
+                value={values.customTermYears}
+                placeholder={t("certificates.fields.term.custom")}
+                disabled={disabled}
+                error={errors.term}
+                sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
+                validate={(term) => validateCertificateCustomTermField(term, t)}
+                onSave={(customTermYears) => {
+                  onChange({ customTermYears });
+                  onClearError("term");
+                }}
+              />
+            ) : null}
+          </>
         ) : null}
 
         <div>
@@ -348,26 +368,29 @@ export function CertificateFormFields({
             }}
           />
 
-          <AccountFormAccountPicker
-            id="certificate-interest-destination"
-            label={t("savings.fields.destinationAccount.label")}
-            placeholder={t("savings.fields.destinationAccount.placeholder")}
-            searchPlaceholder={t(
-              "accounts.fields.interestDestinationAccount.searchPlaceholder",
-            )}
-            noResultsMessage={t(
-              "accounts.fields.interestDestinationAccount.noResults",
-            )}
-            value={values.destinationAccountId}
-            accounts={transferAccounts}
-            disabled={disabled || !values.autoApplyInterest}
-            allowClear
-            error={errors.destinationAccountId}
-            onChange={(destinationAccountId) => {
-              onChange({ destinationAccountId });
-              onClearError("destinationAccountId");
-            }}
-          />
+          {values.autoApplyInterest ? (
+            <div className="mt-4">
+              <AccountFormAccountPicker
+                id="certificate-interest-destination"
+                label={t("savings.fields.destinationAccount.label")}
+                placeholder={t("savings.fields.destinationAccount.placeholder")}
+                searchPlaceholder={t(
+                  "accounts.fields.interestDestinationAccount.searchPlaceholder",
+                )}
+                noResultsMessage={t(
+                  "accounts.fields.interestDestinationAccount.noResults",
+                )}
+                value={values.destinationAccountId}
+                accounts={transferAccounts}
+                disabled={disabled}
+                error={errors.destinationAccountId}
+                onChange={(destinationAccountId) => {
+                  onChange({ destinationAccountId });
+                  onClearError("destinationAccountId");
+                }}
+              />
+            </div>
+          ) : null}
         </div>
 
         <AccountFormRenewalTypePicker

@@ -153,6 +153,7 @@ function EditCertificateForm({
             amountInputLocale={amountInputLocale}
             transferAccounts={transferAccounts}
             disabled={submitting}
+            mode="edit"
             renewalEditable={renewalEditable}
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
