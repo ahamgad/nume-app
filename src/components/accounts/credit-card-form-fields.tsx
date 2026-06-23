@@ -83,34 +83,6 @@ export function CreditCardFormFields({
           }}
         />
 
-        <AccountFormAccountPicker
-          id="credit-card-linked-account"
-          label={t("creditCards.fields.linkedAccount.label")}
-          placeholder={t("creditCards.fields.linkedAccount.placeholder")}
-          description={t("creditCards.fields.linkedAccount.description")}
-          searchPlaceholder={t("creditCards.fields.linkedAccount.searchPlaceholder")}
-          noResultsMessage={t("creditCards.fields.linkedAccount.noResults")}
-          value={values.linkedAccountId}
-          accounts={linkedAccounts}
-          disabled={disabled}
-          error={errors.linkedAccountId}
-          onChange={(linkedAccountId) => {
-            onChange({ linkedAccountId });
-            onClearError("linkedAccountId");
-          }}
-        />
-
-        <AccountFormIdentifierField
-          id="credit-card-identifier"
-          labelKey="accounts.fields.cardNumber.label"
-          placeholderKey="accounts.fields.cardNumber.placeholder"
-          value={values.identifier}
-          disabled={disabled}
-          error={errors.identifier}
-          onChange={(identifier) => onChange({ identifier })}
-          onClearError={() => onClearError("identifier")}
-        />
-
         {mode === "create" ? (
           <AccountFormEditableField
             id="credit-card-outstanding"
@@ -147,12 +119,38 @@ export function CreditCardFormFields({
             onClearError("creditLimit");
           }}
         />
+
+        <AccountFormAccountPicker
+          id="credit-card-linked-account"
+          label={t("creditCards.fields.linkedAccount.label")}
+          placeholder={t("creditCards.fields.linkedAccount.placeholder")}
+          searchPlaceholder={t("creditCards.fields.linkedAccount.searchPlaceholder")}
+          noResultsMessage={t("creditCards.fields.linkedAccount.noResults")}
+          value={values.linkedAccountId}
+          accounts={linkedAccounts}
+          disabled={disabled}
+          error={errors.linkedAccountId}
+          onChange={(linkedAccountId) => {
+            onChange({ linkedAccountId });
+            onClearError("linkedAccountId");
+          }}
+        />
+
+        <AccountFormIdentifierField
+          id="credit-card-identifier"
+          labelKey="accounts.fields.accountNumber.label"
+          placeholderKey="accounts.fields.accountNumber.placeholder"
+          value={values.identifier}
+          disabled={disabled}
+          error={errors.identifier}
+          onChange={(identifier) => onChange({ identifier })}
+          onClearError={() => onClearError("identifier")}
+        />
       </AccountFormSection>
 
       <AccountFormSection title={t("creditCards.formSections.statement")}>
         <AccountFormScrollChipSelect
           fieldId="credit-card-statement-due-day"
-          label={t("creditCards.fields.statementDueDay.label")}
           value={values.statementDueDay}
           options={statementDueDayOptions}
           ariaLabel={t("creditCards.fields.statementDueDay.label")}

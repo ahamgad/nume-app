@@ -761,7 +761,7 @@ export const en = {
     },
     fields: {
       outstandingBalance: {
-        label: "Outstanding balance",
+        label: "Current outstanding balance",
       },
       creditLimit: {
         label: "Credit limit",

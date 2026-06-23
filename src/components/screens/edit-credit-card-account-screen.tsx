@@ -26,7 +26,6 @@ import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
 
 interface EditCreditCardAccountScreenProps {
   accountId: string;
@@ -162,7 +161,7 @@ function EditCreditCardAccountForm({
   return (
     <>
       <StackPageHeader title={t("creditCards.edit.title")} onBack={handleBack} />
-      <ScreenBody withTabBar={false} className="pb-28">
+      <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{t("creditCards.edit.title")}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CreditCardFormFields
@@ -179,8 +178,8 @@ function EditCreditCardAccountForm({
       </ScreenBody>
       <StickyFooter>
         <Button
-          className={cn("h-11 w-full")}
-          disabled={submitting || !isDirty}
+          className="h-12 w-full text-base"
+          disabled={submitting}
           onClick={() => void handleSubmit()}
         >
           {submitting ? t("creditCards.edit.saving") : t("creditCards.edit.submit")}

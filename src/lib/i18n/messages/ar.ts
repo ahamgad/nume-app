@@ -760,7 +760,7 @@ export const ar = {
     },
     fields: {
       outstandingBalance: {
-        label: "الرصيد المستحق",
+        label: "الرصيد المستحق الحالي",
       },
       creditLimit: {
         label: "حد الائتمان",
