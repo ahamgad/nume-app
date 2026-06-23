@@ -556,6 +556,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 6. Balance value — **18px semibold** via `CurrencyAmount` + `ACCOUNT_CARD_BALANCE_VALUE_CLASS` (numeric typography foundation)
 7. Subtle shadow — `CARD_SURFACE_SHADOW_CLASS` via `ACCOUNT_CARD_CONTAINER_CLASS`
 8. Corner radius — `CARD_SURFACE_BORDER_RADIUS_CLASS` on card container
+9. Trailing chevron — `CardChevron` + `CARD_CHEVRON_CLASS` / `CARD_CHEVRON_ROW_CLASS` (shared with account type picker cards)
 
 ### Propagation rule
 
@@ -611,10 +612,11 @@ Location: `components/accounts/account-type-picker-sheet.tsx`, `account-type-pic
 6. **Icon frame** — 40×40px, `bg-muted` (same as `HeaderIconButton`)
 7. **Icon** — 28×28px (`size-7`); existing `AccountTypeIcon` mapping unchanged
 8. **Type label** — `ACCOUNT_CARD_NAME_CLASS` (15px medium)
-9. **Card surface** — `CARD_SURFACE_CLASS` from shared card-surface foundation
-10. **Border radius / border / shadow** — shared `card-surface.ts` tokens; same as Account Cards
-11. **Propagation** — all account-type selection sheets consume `AccountTypePickerSheet` or its card/section primitives
-12. **No custom implementations** in screens
+9. **Chevron** — `CardChevron` inherits account card chevron foundation (`CARD_CHEVRON_CLASS`, `CARD_CHEVRON_ROW_CLASS`)
+10. **Card surface** — `CARD_SURFACE_CLASS` from shared card-surface foundation
+11. **Border radius / border / shadow** — shared `card-surface.ts` tokens; same as Account Cards
+12. **Propagation** — all account-type selection sheets consume `AccountTypePickerSheet` or its card/section primitives
+13. **No custom implementations** in screens
 
 ### Card surface foundation (shared)
 

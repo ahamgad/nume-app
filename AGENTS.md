@@ -23,9 +23,9 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Typography & copy** | Sentence case, no trailing period on single-sentence helpers — `en.ts`, **`docs/CONTENT.md`** |
 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — sync, typography, wrapping, sign chips, unit cleanup, keyboard submit |
-| **Account cards** | `AccountCard`, `AccountCardsSection` — Accounts tab list; type row = account type · last-4; balance value 18px semibold |
+| **Account cards** | `AccountCard`, `AccountCardsSection` — Accounts tab list; type row = account type · last-4; balance value 18px semibold; `CardChevron` |
 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` — no balances; Institution Picker visual parity; type · last-4 metadata |
-| **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` — dedicated cards; not Picker List rows |
+| **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` — dedicated cards; inherits `CardChevron` |
 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — shared border, radius, shadow |
 
 ## Interaction patterns

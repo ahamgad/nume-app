@@ -1,12 +1,14 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-
 import { AccountTypeIcon } from "@/components/ui/account-type-icon";
+import { CardChevron } from "@/components/ui/card-chevron";
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
 import type { AccountType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
-import { ACCOUNT_CARD_NAME_CLASS } from "@/lib/layout/account-card-chrome";
+import {
+  ACCOUNT_CARD_NAME_CLASS,
+  CARD_CHEVRON_ROW_CLASS,
+} from "@/lib/layout/account-card-chrome";
 import {
   ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX,
 } from "@/lib/layout/account-type-picker-chrome";
@@ -51,19 +53,18 @@ export function AccountTypePickerCard({
       >
         <AccountTypeIcon type={type} className="size-7" />
       </span>
-      <span className={cn(ACCOUNT_CARD_NAME_CLASS, "min-w-0 flex-1")}>
-        {t(getAccountTypeLabelKey(type))}
-      </span>
-      {!enabled ? (
-        <span className="shrink-0 text-xs text-muted-foreground">
-          {t("accounts.add.comingSoon")}
+      <div className={cn(CARD_CHEVRON_ROW_CLASS, "min-w-0 flex-1")}>
+        <span className={cn(ACCOUNT_CARD_NAME_CLASS, "min-w-0 flex-1")}>
+          {t(getAccountTypeLabelKey(type))}
         </span>
-      ) : (
-        <ChevronRight
-          className="size-4 shrink-0 text-muted-foreground rtl:rotate-180"
-          aria-hidden
-        />
-      )}
+        {!enabled ? (
+          <span className="shrink-0 text-xs text-muted-foreground">
+            {t("accounts.add.comingSoon")}
+          </span>
+        ) : (
+          <CardChevron />
+        )}
+      </div>
     </button>
   );
 }

@@ -45,6 +45,13 @@ export const ACCOUNT_CARD_INSTITUTE_ROW_CLASS =
 export const ACCOUNT_CARD_NAME_CLASS =
   "min-w-0 truncate text-[0.9375rem] font-medium leading-snug";
 
+/** Trailing chevron on account cards — source of truth for card-based selection surfaces. */
+export const CARD_CHEVRON_CLASS =
+  "size-5 shrink-0 text-muted-foreground rtl:rotate-180";
+
+/** Flex row spacing between label content and trailing chevron (8px). */
+export const CARD_CHEVRON_ROW_CLASS = "flex min-w-0 items-center gap-2";
+
 export const ACCOUNT_CARD_BALANCE_LABEL_CLASS =
   "text-[0.8125rem] font-medium leading-snug text-muted-foreground";
 
