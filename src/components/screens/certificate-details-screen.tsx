@@ -8,12 +8,12 @@ import {
   AccountDetailsStackHeader,
   AccountDetailsDetailRow,
   AccountDetailsSection,
+  AccountDetailsToggleSettingRow,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { ToggleSettingRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
@@ -295,7 +295,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}
             onArchive={() => setShowArchiveConfirm(true)}
           >
-            <ToggleSettingRow
+            <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInNetWorth.label")}
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
@@ -303,7 +303,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                 void updateAccount(account.id, { includeInNetWorth: checked })
               }
             />
-            <ToggleSettingRow
+            <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInEmergencyFund.label")}
               description={t(
                 "accounts.settings.includeInEmergencyFund.description",

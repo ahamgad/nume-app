@@ -555,7 +555,7 @@ export const en = {
       },
     },
     details: {
-      summary: "Summary",
+      summary: "Details",
       interestModel: "Interest model",
       annualRate: "Annual rate",
       annualRateBelowTier: "Below minimum tier",
@@ -662,7 +662,7 @@ export const en = {
       renew_principal_and_interest: "Renew principal and interest",
     },
     details: {
-      summary: "Summary",
+      summary: "Details",
       outcomes: "Expected outcomes",
       principal: "Principal",
       rate: "Annual rate",
@@ -780,7 +780,7 @@ export const en = {
     },
     details: {
       title: "Credit card",
-      summary: "Summary",
+      summary: "Details",
       outstandingBalance: "Outstanding balance",
       linkedAccount: "Linked account",
       availableToSpend: "Available to spend",

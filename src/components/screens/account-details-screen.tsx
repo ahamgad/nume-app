@@ -9,6 +9,7 @@ import { SavingsDetailsScreen } from "@/components/screens/savings-details-scree
 import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
+  AccountDetailsToggleSettingRow,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -16,9 +17,6 @@ import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
-import {
-  ToggleSettingRow,
-} from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
@@ -230,7 +228,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}
             onArchive={() => setShowArchiveConfirm(true)}
           >
-            <ToggleSettingRow
+            <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInNetWorth.label")}
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
@@ -238,7 +236,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 void updateAccount(account.id, { includeInNetWorth: checked })
               }
             />
-            <ToggleSettingRow
+            <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInEmergencyFund.label")}
               description={t(
                 "accounts.settings.includeInEmergencyFund.description",

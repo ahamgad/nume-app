@@ -554,7 +554,7 @@ export const ar = {
       },
     },
     details: {
-      summary: "الملخص",
+      summary: "التفاصيل",
       interestModel: "نموذج العائد",
       annualRate: "المعدل السنوي",
       annualRateBelowTier: "أقل من الحد الأدنى للشريحة",
@@ -661,7 +661,7 @@ export const ar = {
       renew_principal_and_interest: "تجديد المبلغ والعائد",
     },
     details: {
-      summary: "الملخص",
+      summary: "التفاصيل",
       outcomes: "النتائج المتوقعة",
       principal: "المبلغ الأساسي",
       rate: "المعدل السنوي",
@@ -778,7 +778,7 @@ export const ar = {
     },
     details: {
       title: "بطاقة ائتمان",
-      summary: "الملخص",
+      summary: "التفاصيل",
       outstandingBalance: "الرصيد المستحق",
       linkedAccount: "الحساب المرتبط",
       availableToSpend: "المتاح للإنفاق",

@@ -25,6 +25,8 @@ export {
   AccountDetailsSection,
 } from "@/components/accounts/account-details-section";
 
+export { AccountDetailsToggleSettingRow } from "@/components/accounts/account-details-toggle-setting-row";
+
 interface AccountDetailsStackHeaderProps {
   accountName: string;
   onBack?: () => void;

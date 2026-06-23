@@ -16,11 +16,13 @@ interface AccountDetailsSectionProps {
   title: string;
   children: ReactNode;
   className?: string;
+  /** Defaults to 16px field rhythm; Recent Records uses compact 8px rhythm. */
+  fieldRowClassName?: string;
 }
 
 /**
  * Frozen account details content section — card surface, title inside card,
- * 16px padding, 16px item/divider rhythm.
+ * 16px padding, configurable item/divider rhythm.
  *
  * @see docs/FOUNDATION.md — Account details foundation
  */
@@ -28,6 +30,7 @@ export function AccountDetailsSection({
   title,
   children,
   className,
+  fieldRowClassName = ACCOUNT_FORM_FIELD_ROW_CLASS,
 }: AccountDetailsSectionProps) {
   const rows = Children.toArray(children).filter(isValidElement);
 
@@ -48,7 +51,7 @@ export function AccountDetailsSection({
         )}
       >
         {rows.map((row, index) => (
-          <div key={row.key ?? index} className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
+          <div key={row.key ?? index} className={fieldRowClassName}>
             {row}
           </div>
         ))}

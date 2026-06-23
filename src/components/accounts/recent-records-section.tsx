@@ -2,9 +2,8 @@
 
 import type { ReactNode } from "react";
 
-import {
-  AccountDetailsSection,
-} from "@/components/accounts/account-details-section";
+import { AccountDetailsSection } from "@/components/accounts/account-details-section";
+import { ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS } from "@/lib/layout/account-details-chrome";
 import { RecordRow } from "@/components/patterns";
 import { shouldShowRecentRecordsSection } from "@/lib/finance/recent-records-display";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -38,7 +37,10 @@ export function RecentRecordsSection({
   }
 
   return (
-    <AccountDetailsSection title={t("accounts.details.records.title")}>
+    <AccountDetailsSection
+      title={t("accounts.details.records.title")}
+      fieldRowClassName={ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS}
+    >
       {records.length === 0 ? (
         <div>
           <p className="text-[0.9375rem] font-medium">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, type ReactNode } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
 
 import { InputFieldRowTrigger } from "@/components/forms/input-field";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,10 @@ import {
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
 } from "@/lib/layout/account-form-chrome";
-import { ACCOUNT_DETAILS_SECTION_PADDING_CLASS } from "@/lib/layout/account-details-chrome";
+import {
+  ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS,
+  ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
+} from "@/lib/layout/account-details-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { INPUT_FIELD_VALUE_CLASS } from "@/lib/layout/input-field-chrome";
 import { cn } from "@/lib/utils";
@@ -54,19 +57,18 @@ export function AccountDetailsSettingsSection({
           ACCOUNT_FORM_SECTION_FIELDS_CLASS,
         )}
       >
-        <div className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
+        <div className={cn(ACCOUNT_FORM_FIELD_ROW_CLASS, "mt-1")}>
           <InputFieldRowTrigger className="min-h-0 py-0" onClick={onEdit}>
             <span className={INPUT_FIELD_VALUE_CLASS}>{editLabel}</span>
           </InputFieldRowTrigger>
         </div>
 
         {toggleRows.map((row, index) => (
-          <div key={row.key ?? index} className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
-            {isValidElement<{ className?: string }>(row)
-              ? cloneElement(row, {
-                  className: cn("py-0", row.props.className),
-                })
-              : row}
+          <div
+            key={row.key ?? index}
+            className={ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS}
+          >
+            {row}
           </div>
         ))}
 
