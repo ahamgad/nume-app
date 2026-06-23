@@ -20,7 +20,8 @@ export const ACCOUNT_FORM_SECTION_HEADER_CLASS =
 
 export const ACCOUNT_FORM_SECTION_FIELDS_CLASS = "divide-y divide-border";
 
-export const ACCOUNT_FORM_FIELD_ROW_CLASS = "px-4 py-3";
+/** Horizontal inset + 8px vertical rhythm to section dividers. */
+export const ACCOUNT_FORM_FIELD_ROW_CLASS = "px-4 py-2";
 
 export const ACCOUNT_FORM_DISABLED_CLASS =
   "pointer-events-none opacity-60";

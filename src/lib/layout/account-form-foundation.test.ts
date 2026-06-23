@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX,
+  ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_SECTION_GAP_PX,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
 } from "@/lib/layout/account-form-chrome";
@@ -15,6 +16,10 @@ describe("account forms foundation", () => {
     expect(ACCOUNT_FORM_SECTION_GAP_PX).toBe(24);
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("text-lg");
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("font-medium");
+  });
+
+  it("uses 8px field row padding for divider rhythm", () => {
+    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("py-2");
   });
 
   it("uses card surface and shared section component", () => {

@@ -605,6 +605,7 @@ export const ar = {
       },
       purchaseDate: {
         label: "تاريخ الشراء",
+        placeholder: "اختر تاريخ الشراء",
       },
       term: {
         label: "المدة",

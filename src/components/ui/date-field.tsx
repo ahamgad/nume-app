@@ -1,13 +1,18 @@
 "use client";
 
-import { CalendarDays, ChevronRight } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import * as React from "react";
 
+import {
+  InputField,
+  InputFieldRowTrigger,
+  InputFieldValue,
+} from "@/components/forms/input-field";
 import { DatePickerBottomSheet } from "@/components/ui/date-picker-bottom-sheet";
+import { inputClassName } from "@/components/ui/input";
+import { CardChevron } from "@/components/ui/card-chevron";
 import { formatDisplayDate } from "@/lib/format/date";
 import { cn } from "@/lib/utils";
-
-import { inputClassName } from "@/components/ui/input";
 
 export interface DateFieldProps {
   value: string;
@@ -19,6 +24,9 @@ export interface DateFieldProps {
   "aria-invalid"?: boolean;
   label?: string;
   placeholder?: string;
+  error?: string;
+  required?: boolean;
+  hideLabel?: boolean;
   variant?: "input" | "row";
 }
 
@@ -34,36 +42,37 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
       "aria-invalid": ariaInvalid,
       label,
       placeholder,
+      error,
+      required = false,
+      hideLabel = false,
       variant = "input",
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
-    const displayText = value ? formatDisplayDate(value, locale) : placeholder;
+    const hasValue = Boolean(value);
+    const displayText = hasValue
+      ? formatDisplayDate(value, locale)
+      : (placeholder ?? "");
 
     const rowTrigger = (
-      <button
+      <InputFieldRowTrigger
         ref={ref}
         id={id}
-        type="button"
         disabled={disabled}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={label}
+        aria-invalid={ariaInvalid || error ? true : undefined}
+        aria-describedby={error && id ? `${id}-error` : undefined}
         onClick={() => setOpen(true)}
         className={cn(
-          "flex min-h-12 w-full items-center gap-3 text-start transition-colors tabular-nums",
-          !value && "text-muted-foreground",
+          "tabular-nums",
           disabled && "pointer-events-none opacity-50",
-          ariaInvalid && "text-destructive",
           className,
         )}
       >
-        <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">
-          {displayText}
-        </span>
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-      </button>
+        <InputFieldValue isPlaceholder={!hasValue}>{displayText}</InputFieldValue>
+      </InputFieldRowTrigger>
     );
 
     const inputTrigger = (
@@ -79,7 +88,7 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
         className={cn(
           inputClassName,
           "flex items-center justify-between gap-2 text-start tabular-nums",
-          !value && "text-muted-foreground",
+          !hasValue && "text-muted-foreground",
           disabled && "pointer-events-none",
           ariaInvalid && "border-destructive ring-destructive/20",
           className,
@@ -89,13 +98,39 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
           <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
           <span className="truncate">{displayText}</span>
         </span>
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+        <CardChevron />
       </button>
     );
 
+    const trigger = variant === "row" ? rowTrigger : inputTrigger;
+
+    if (label) {
+      return (
+        <>
+          <InputField
+            id={id}
+            label={label}
+            required={required}
+            error={error}
+            hideLabel={hideLabel}
+          >
+            {trigger}
+          </InputField>
+
+          <DatePickerBottomSheet
+            open={open}
+            onClose={() => setOpen(false)}
+            value={value}
+            onChange={onChange}
+            title={label}
+          />
+        </>
+      );
+    }
+
     return (
       <>
-        {variant === "row" ? rowTrigger : inputTrigger}
+        {trigger}
 
         <DatePickerBottomSheet
           open={open}

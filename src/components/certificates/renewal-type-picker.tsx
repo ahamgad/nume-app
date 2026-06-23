@@ -1,12 +1,16 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import {
+  InputField,
+  InputFieldRowTrigger,
+  InputFieldValue,
+} from "@/components/forms/input-field";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import { PickerList, PickerListOption } from "@/components/ui/picker-list";
 import { inputClassName } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { CardChevron } from "@/components/ui/card-chevron";
 import type { RenewalType } from "@/lib/certificates/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
@@ -27,6 +31,7 @@ interface RenewalTypePickerProps {
   onChange: (value: RenewalType) => void;
   variant?: "input" | "row";
   error?: string;
+  required?: boolean;
 }
 
 export function renewalTypeLabel(
@@ -45,6 +50,7 @@ export function RenewalTypePicker({
   onChange,
   variant = "input",
   error,
+  required = false,
 }: RenewalTypePickerProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -63,8 +69,7 @@ export function RenewalTypePicker({
 
   if (readOnly) {
     return (
-      <div className="space-y-2">
-        <Label htmlFor={id}>{label}</Label>
+      <InputField id={id} label={label} required={required}>
         <div
           id={id}
           className={cn(
@@ -74,66 +79,53 @@ export function RenewalTypePicker({
         >
           {displayLabel}
         </div>
-      </div>
+      </InputField>
     );
   }
 
   const triggerLabel = (
-    <span
-      className={cn(
-        "min-w-0 flex-1 truncate text-[0.9375rem] font-medium",
-        error && "text-destructive",
-      )}
-    >
-      {displayLabel}
-    </span>
+    <InputFieldValue>{displayLabel}</InputFieldValue>
   );
 
+  const pickerControl =
+    variant === "row" ? (
+      <InputFieldRowTrigger
+        id={id}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        onClick={() => isInteractive && setOpen(true)}
+        className={!isInteractive ? "pointer-events-none opacity-60" : undefined}
+      >
+        {triggerLabel}
+      </InputFieldRowTrigger>
+    ) : (
+      <button
+        id={id}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => isInteractive && setOpen(true)}
+        className={cn(
+          inputClassName,
+          "flex items-center justify-between gap-2 text-start",
+          !isInteractive && "pointer-events-none opacity-60",
+          error && "border-destructive",
+        )}
+      >
+        <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">
+          {displayLabel}
+        </span>
+        <CardChevron />
+      </button>
+    );
+
   return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {variant === "row" ? (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          onClick={() => isInteractive && setOpen(true)}
-          className={cn(
-            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
-            !isInteractive && "pointer-events-none opacity-60",
-          )}
-        >
-          {triggerLabel}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      ) : (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onClick={() => isInteractive && setOpen(true)}
-          className={cn(
-            inputClassName,
-            "flex items-center justify-between gap-2 text-start",
-            !isInteractive && "pointer-events-none opacity-60",
-            error && "border-destructive",
-          )}
-        >
-          {triggerLabel}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      )}
-      {error ? (
-        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
+    <InputField id={id} label={label} required={required} error={error}>
+      {pickerControl}
 
       <PickerBottomSheet
         open={open}
@@ -145,7 +137,7 @@ export function RenewalTypePicker({
           {options.map((option) => (
             <PickerListOption
               key={option.value}
-              selected={value === option.value}
+              selected={option.value === value}
               onSelect={() => {
                 onChange(option.value);
                 setOpen(false);
@@ -156,6 +148,6 @@ export function RenewalTypePicker({
           ))}
         </PickerList>
       </PickerBottomSheet>
-    </div>
+    </InputField>
   );
 }

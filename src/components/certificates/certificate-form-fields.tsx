@@ -8,7 +8,6 @@ import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import { RenewalTypePicker } from "@/components/certificates/renewal-type-picker";
-import { Label } from "@/components/ui/label";
 import {
   ScrollChipSelect,
   type ScrollChipOption,
@@ -175,27 +174,21 @@ export function CertificateFormFields({
           }}
         />
 
-        <div className="space-y-2">
-          <Label htmlFor="certificate-purchase-date">
-            {t("certificates.fields.purchaseDate.label")}
-          </Label>
-          <DateField
-            id="certificate-purchase-date"
-            value={values.purchaseDate}
-            disabled={disabled}
-            label={t("certificates.fields.purchaseDate.label")}
-            variant="row"
-            onChange={(value) => {
-              onChange({ purchaseDate: value });
-              onClearError("purchaseDate");
-            }}
-            locale={formatLocale}
-            aria-invalid={Boolean(errors.purchaseDate)}
-          />
-          {errors.purchaseDate ? (
-            <p className="mt-1 text-sm text-destructive">{errors.purchaseDate}</p>
-          ) : null}
-        </div>
+        <DateField
+          id="certificate-purchase-date"
+          label={t("certificates.fields.purchaseDate.label")}
+          required
+          value={values.purchaseDate}
+          disabled={disabled}
+          error={errors.purchaseDate}
+          placeholder={t("certificates.fields.purchaseDate.placeholder")}
+          variant="row"
+          onChange={(value) => {
+            onChange({ purchaseDate: value });
+            onClearError("purchaseDate");
+          }}
+          locale={formatLocale}
+        />
       </AccountFormSection>
 
       <AccountFormSection title={t("accounts.formSections.interestDetails")}>
@@ -219,69 +212,66 @@ export function CertificateFormFields({
           }}
         />
 
-        <div className="space-y-2">
-          <Label>{t("certificates.fields.term.label")}</Label>
-          <ScrollChipSelect<CertificateTermPreset>
-            value={values.termPreset}
-            options={termOptions}
-            ariaLabel={t("certificates.fields.term.label")}
-            onChange={(termPreset) => {
-              onChange({
-                termPreset,
-                customTermYears: termPreset === "custom" ? values.customTermYears : "",
-              });
+        <ScrollChipSelect<CertificateTermPreset>
+          label={t("certificates.fields.term.label")}
+          required
+          fieldId="certificate-term"
+          value={values.termPreset}
+          options={termOptions}
+          ariaLabel={t("certificates.fields.term.label")}
+          error={values.termPreset !== "custom" ? errors.term : undefined}
+          onChange={(termPreset) => {
+            onChange({
+              termPreset,
+              customTermYears: termPreset === "custom" ? values.customTermYears : "",
+            });
+            onClearError("term");
+          }}
+        />
+        {values.termPreset === "custom" ? (
+          <EditableField
+            id="certificate-custom-term"
+            hideLabel
+            label={t("certificates.fields.term.custom")}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.customTermYears}
+            placeholder={t("certificates.fields.term.custom")}
+            disabled={disabled}
+            error={errors.term}
+            variant="row"
+            sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
+            validate={(term) => validateCertificateCustomTermField(term, t)}
+            onSave={(customTermYears) => {
+              onChange({ customTermYears });
               onClearError("term");
             }}
           />
-          {values.termPreset === "custom" ? (
-            <EditableField
-              id="certificate-custom-term"
-              hideLabel
-              label={t("certificates.fields.term.custom")}
-              mode="numeric"
-              inputMode="decimal"
-              value={values.customTermYears}
-              placeholder={t("certificates.fields.term.custom")}
-              disabled={disabled}
-              error={errors.term}
-              sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
-              validate={(term) => validateCertificateCustomTermField(term, t)}
-              onSave={(customTermYears) => {
-                onChange({ customTermYears });
-                onClearError("term");
-              }}
-            />
-          ) : errors.term ? (
-            <p className="text-sm text-destructive">{errors.term}</p>
-          ) : null}
-        </div>
+        ) : null}
 
-        <div className="space-y-2">
-          <Label>{t("certificates.fields.payoutFrequency.label")}</Label>
-          <ScrollChipSelect
-            value={values.payoutFrequency}
-            options={payoutOptions}
-            ariaLabel={t("certificates.fields.payoutFrequency.label")}
-            onChange={(payoutFrequency) => onChange({ payoutFrequency })}
-          />
-        </div>
+        <ScrollChipSelect
+          label={t("certificates.fields.payoutFrequency.label")}
+          required
+          value={values.payoutFrequency}
+          options={payoutOptions}
+          ariaLabel={t("certificates.fields.payoutFrequency.label")}
+          onChange={(payoutFrequency) => onChange({ payoutFrequency })}
+        />
 
         {showsPayoutDay ? (
-          <div className="space-y-2">
-            <Label>{t("savings.fields.postingDay.label")}</Label>
-            <ScrollChipSelect
-              value={values.payoutDay}
-              options={payoutDayOptions}
-              ariaLabel={t("savings.fields.postingDay.label")}
-              onChange={(payoutDay) => {
-                onChange({ payoutDay });
-                onClearError("payoutDay");
-              }}
-            />
-            {errors.payoutDay ? (
-              <p className="text-sm text-destructive">{errors.payoutDay}</p>
-            ) : null}
-          </div>
+          <ScrollChipSelect
+            label={t("savings.fields.postingDay.label")}
+            required
+            fieldId="certificate-payout-day"
+            value={values.payoutDay}
+            options={payoutDayOptions}
+            ariaLabel={t("savings.fields.postingDay.label")}
+            error={errors.payoutDay}
+            onChange={(payoutDay) => {
+              onChange({ payoutDay });
+              onClearError("payoutDay");
+            }}
+          />
         ) : null}
 
         {values.payoutFrequency === "daily" ? (

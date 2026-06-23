@@ -206,19 +206,18 @@ export function SavingsFormFields({
       <AccountFormSection
         title={t("savings.sections.interestModel")}
       >
-        <div className="space-y-2">
-          <Label>{t("savings.fields.interestModel.label")}</Label>
-          <ScrollChipSelect
-            value={values.interestModel}
-            options={interestModelOptions}
-            ariaLabel={t("savings.fields.interestModel.label")}
-            onChange={(interestModel) => {
-              onChange({ interestModel });
-              onClearError("annualInterestRate");
-              onClearError("tiers");
-            }}
-          />
-        </div>
+        <ScrollChipSelect
+          label={t("savings.fields.interestModel.label")}
+          required
+          value={values.interestModel}
+          options={interestModelOptions}
+          ariaLabel={t("savings.fields.interestModel.label")}
+          onChange={(interestModel) => {
+            onChange({ interestModel });
+            onClearError("annualInterestRate");
+            onClearError("tiers");
+          }}
+        />
 
         {values.interestModel === "fixed" ? (
           <EditableField
@@ -335,32 +334,29 @@ export function SavingsFormFields({
           {t("savings.balanceMethodHint")}
         </p>
 
-        <div className="space-y-2">
-          <Label>{t("savings.fields.postingFrequency.label")}</Label>
-          <ScrollChipSelect
-            value={values.postingFrequency}
-            options={frequencyOptions}
-            ariaLabel={t("savings.fields.postingFrequency.label")}
-            onChange={(postingFrequency) => onChange({ postingFrequency })}
-          />
-        </div>
+        <ScrollChipSelect
+          label={t("savings.fields.postingFrequency.label")}
+          required
+          value={values.postingFrequency}
+          options={frequencyOptions}
+          ariaLabel={t("savings.fields.postingFrequency.label")}
+          onChange={(postingFrequency) => onChange({ postingFrequency })}
+        />
 
         {values.postingFrequency !== "daily" ? (
-          <div className="space-y-2">
-            <Label>{t("savings.fields.postingDay.label")}</Label>
-            <ScrollChipSelect
-              value={values.postingDay}
-              options={postingDayOptions}
-              ariaLabel={t("savings.fields.postingDay.label")}
-              onChange={(postingDay) => {
-                onChange({ postingDay });
-                onClearError("postingDay");
-              }}
-            />
-            {errors.postingDay ? (
-              <p className="text-sm text-destructive">{errors.postingDay}</p>
-            ) : null}
-          </div>
+          <ScrollChipSelect
+            label={t("savings.fields.postingDay.label")}
+            required
+            fieldId="savings-posting-day"
+            value={values.postingDay}
+            options={postingDayOptions}
+            ariaLabel={t("savings.fields.postingDay.label")}
+            error={errors.postingDay}
+            onChange={(postingDay) => {
+              onChange({ postingDay });
+              onClearError("postingDay");
+            }}
+          />
         ) : (
           <div className={cn(CARD_SURFACE_FLAT_CLASS, "px-4")}>
             <p className="border-b border-border py-3 text-sm font-medium">
@@ -389,24 +385,23 @@ export function SavingsFormFields({
       </AccountFormSection>
 
       <AccountFormSection title={t("savings.sections.destination")}>
-        <div className="space-y-2">
-          <Label>{t("accounts.fields.interestDestination.label")}</Label>
-          <ScrollChipSelect
-            value={values.interestDestination}
-            options={destinationOptions}
-            ariaLabel={t("accounts.fields.interestDestination.label")}
-            onChange={(interestDestination) => {
-              onChange({
-                interestDestination,
-                destinationAccountId:
-                  interestDestination === "same_account"
-                    ? ""
-                    : values.destinationAccountId,
-              });
-              onClearError("destinationAccountId");
-            }}
-          />
-        </div>
+        <ScrollChipSelect
+          label={t("accounts.fields.interestDestination.label")}
+          required
+          value={values.interestDestination}
+          options={destinationOptions}
+          ariaLabel={t("accounts.fields.interestDestination.label")}
+          onChange={(interestDestination) => {
+            onChange({
+              interestDestination,
+              destinationAccountId:
+                interestDestination === "same_account"
+                  ? ""
+                  : values.destinationAccountId,
+            });
+            onClearError("destinationAccountId");
+          }}
+        />
 
         {values.interestDestination === "another_account" ? (
           <>

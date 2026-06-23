@@ -1,8 +1,12 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  InputField,
+  InputFieldRowTrigger,
+  InputFieldValue,
+} from "@/components/forms/input-field";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import {
   PickerList,
@@ -11,7 +15,7 @@ import {
 } from "@/components/ui/picker-list";
 import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
 import { Input, inputClassName } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { CardChevron } from "@/components/ui/card-chevron";
 import { preloadBrandAssets } from "@/lib/institutions/brand-asset-cache";
 import { getInstitutionBrandAssetPath } from "@/lib/institutions/brand-assets-registry";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
@@ -47,6 +51,7 @@ interface InstitutionPickerProps {
   customLabel?: string;
   customPlaceholder?: string;
   error?: string;
+  required?: boolean;
   variant?: "input" | "row";
   "aria-invalid"?: boolean;
 }
@@ -62,6 +67,7 @@ export function InstitutionPicker({
   customLabel,
   customPlaceholder,
   error,
+  required = true,
   variant = "input",
   "aria-invalid": ariaInvalidProp,
 }: InstitutionPickerProps) {
@@ -156,65 +162,61 @@ export function InstitutionPicker({
   const ariaInvalid = ariaInvalidProp ?? Boolean(error);
 
   const triggerContent = (
-    <span
-      className={cn(
-        "min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug",
-        !displayLabel && "font-normal text-muted-foreground",
-        error && "text-destructive",
-      )}
-    >
+    <InputFieldValue isPlaceholder={!displayLabel}>
       {displayLabel ?? resolvedPlaceholder}
-    </span>
+    </InputFieldValue>
   );
 
+  const pickerControl =
+    variant === "row" ? (
+      <InputFieldRowTrigger
+        id={id}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-invalid={ariaInvalid || undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        onClick={() => setOpen(true)}
+        className={disabled ? "pointer-events-none opacity-50" : undefined}
+      >
+        {triggerContent}
+      </InputFieldRowTrigger>
+    ) : (
+      <button
+        id={id}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className={cn(
+          inputClassName,
+          "flex items-center justify-between gap-2 text-start",
+          !displayLabel && "text-muted-foreground",
+          disabled && "pointer-events-none",
+          ariaInvalid && "border-destructive",
+        )}
+      >
+        <span
+          className={cn(
+            "min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug",
+            !displayLabel && "font-normal text-muted-foreground",
+          )}
+        >
+          {displayLabel ?? resolvedPlaceholder}
+        </span>
+        <CardChevron />
+      </button>
+    );
+
   return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{resolvedLabel}</Label>
-
-      {variant === "row" ? (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-invalid={ariaInvalid || undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          onClick={() => setOpen(true)}
-          className={cn(
-            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
-            disabled && "pointer-events-none opacity-50",
-          )}
-        >
-          {triggerContent}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      ) : (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onClick={() => setOpen(true)}
-          className={cn(
-            inputClassName,
-            "flex items-center justify-between gap-2 text-start",
-            !displayLabel && "text-muted-foreground",
-            disabled && "pointer-events-none",
-            ariaInvalid && "border-destructive",
-          )}
-        >
-          {triggerContent}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      )}
-
-      {error ? (
-        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
+    <InputField
+      id={id}
+      label={resolvedLabel}
+      required={required}
+      error={error}
+    >
+      {pickerControl}
 
       {showCustomField ? (
         <Input
@@ -290,7 +292,7 @@ export function InstitutionPicker({
             </>
           )}
       </PickerBottomSheet>
-    </div>
+    </InputField>
   );
 }
 

@@ -10,6 +10,7 @@ import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-am
 import { Switch } from "@/components/ui/switch";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
 import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
+import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
@@ -223,7 +224,7 @@ export function ToggleSettingRow({
   return (
     <div className="flex min-h-14 items-center justify-between gap-4 py-2">
       <div className="min-w-0 flex-1">
-        <p className="text-[0.9375rem] font-medium">{label}</p>
+        <p className={INPUT_FIELD_LABEL_CLASS}>{label}</p>
         <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-muted-foreground">
           {description}
         </p>

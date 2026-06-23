@@ -4,6 +4,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { InputField } from "@/components/forms/input-field";
+
 export interface ScrollChipOption<T extends string | number> {
   value: T;
   label: string;
@@ -17,6 +19,10 @@ interface ScrollChipSelectProps<T extends string | number> {
   options: ScrollChipOption<T>[];
   onChange: (value: T) => void;
   ariaLabel: string;
+  label?: string;
+  fieldId?: string;
+  required?: boolean;
+  error?: string;
   className?: string;
   /**
    * Global chip default rule (NUME v1): when enabled, selects the first
@@ -50,6 +56,10 @@ export function ScrollChipSelect<T extends string | number>({
   options,
   onChange,
   ariaLabel,
+  label,
+  fieldId,
+  required = false,
+  error,
   className,
   defaultToFirstOption = true,
   emphasis = "secondary",
@@ -68,7 +78,7 @@ export function ScrollChipSelect<T extends string | number>({
     }
   }, [defaultToFirstOption, value, options]);
 
-  return (
+  const chipList = (
     <div
       role="listbox"
       aria-label={ariaLabel}
@@ -112,4 +122,14 @@ export function ScrollChipSelect<T extends string | number>({
       })}
     </div>
   );
+
+  if (label) {
+    return (
+      <InputField id={fieldId} label={label} required={required} error={error}>
+        {chipList}
+      </InputField>
+    );
+  }
+
+  return chipList;
 }

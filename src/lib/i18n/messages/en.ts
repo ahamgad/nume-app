@@ -606,6 +606,7 @@ export const en = {
       },
       purchaseDate: {
         label: "Purchase date",
+        placeholder: "Select purchase date",
       },
       term: {
         label: "Term",

@@ -39,8 +39,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 11 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` | § 16 |
 | 12 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — `lib/layout/card-surface.ts` | § 16 |
 | 13 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
+| 14 | **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` | § 18 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, card-surface chrome, or account-form section layouts inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, card-surface chrome, account-form section layouts, or input-field label/value/error/affix chrome inside individual screens.
 
 ---
 
@@ -674,6 +675,50 @@ Current, wallet, cash, savings, certificate, credit card, loan — and **all fut
 
 ---
 
+## 18. Input fields (frozen)
+
+All account **create** and **edit** form fields compose through the shared input field foundation.
+
+Location: `components/forms/input-field.tsx`, `lib/layout/input-field-chrome.ts`.
+
+### Rules
+
+1. **Label** — `INPUT_FIELD_LABEL_CLASS` = 13px regular (`text-[0.8125rem] font-normal`)
+2. **Label → field** — `INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX` = 8px via `INPUT_FIELD_STACK_CLASS`
+3. **Required fields** — `*` immediately after label; same color and typography as label (`InputFieldLabel`)
+4. **Input value** — `INPUT_FIELD_VALUE_CLASS` = 15px regular (`text-[0.9375rem] font-normal`)
+5. **Input padding** — `INPUT_FIELD_ROW_TRIGGER_CLASS` includes `p-0` on row triggers
+6. **Chevron** — `InputFieldRowTrigger` uses `CardChevron` / `CARD_CHEVRON_CLASS` (card chevron foundation)
+7. **Field → divider** — `INPUT_FIELD_DIVIDER_GAP_PX` = 8px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-2`)
+8. **Divider → field** — same 8px row padding
+9. **Error placement** — `InputFieldError` = 4px below control (`INPUT_FIELD_ERROR_GAP_PX`); absolutely positioned
+10. **Divider rhythm** — errors must not expand row height or push section dividers
+11. **Placeholder on error** — only error text is destructive; value/placeholder styling unchanged
+12. **Placeholder required** — every field exposes a placeholder; initial empty state shows placeholder
+13. **No default values** — create flows start empty (placeholder state)
+14. **Amount fields** — fixed `INPUT_FIELD_AMOUNT_PREFIX` (`EGP`) via `InputFieldAffix` (not placeholder text)
+15. **Rate fields** — fixed `INPUT_FIELD_RATE_SUFFIX` (`%`) via `InputFieldAffix`
+16. **Conditional fields** — same foundation via shared field components (`EditableField`, pickers, `ScrollChipSelect` with `label`)
+17. **Future account types** — inherit automatically through `*-form-fields` modules
+18. **No custom field styling** in screen files
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `InputField` | Label + control slot + absolute error |
+| `InputFieldLabel` | 13px label with optional `*` |
+| `InputFieldRowTrigger` | Borderless row + `CardChevron` |
+| `InputFieldValue` | 15px value / placeholder text |
+| `InputFieldAffix` | EGP / % decorations (placeholder color) |
+| `InputFieldError` | 4px-below error without affecting dividers |
+
+### Consumers
+
+`EditableField` (`variant="row"`), `InstitutionPicker`, `AccountPicker`, `DateField`, `RenewalTypePicker`, `ScrollChipSelect` (with `label`), `AccountIdentifierField` — and **all future account form fields**.
+
+---
+
 ## 12. Future screen rule (mandatory)
 
 Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
@@ -698,6 +743,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Account type picker card layouts
 - Card border / shadow / radius outside `card-surface.ts`
 - Account form section layouts outside `AccountFormSection`
+- Input field label/value/error/affix/chevron styling outside `input-field.tsx` / `input-field-chrome.ts`
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -739,6 +785,7 @@ If a genuine exception is required:
 | Interest destination picker | Picker + picker list | ✅ |
 | Account / renewal pickers | Picker + picker list | ✅ |
 | Account create / edit forms | Account forms foundation | ✅ |
+| Account form field rows | Input fields foundation | ✅ |
 | Currency / metric displays | Numeric typography foundation | ✅ |
 | System copy (EN) | Typography & copy foundation | ✅ |
 | All inline field editors | Field editor foundation | ✅ |

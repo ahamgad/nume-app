@@ -1,9 +1,13 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AccountPickerOptionRow } from "@/components/accounts/account-picker-option-row";
+import {
+  InputField,
+  InputFieldRowTrigger,
+  InputFieldValue,
+} from "@/components/forms/input-field";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
 import {
   PICKER_NONE_LABEL_KEY,
@@ -12,7 +16,7 @@ import {
   shouldShowPickerNoneOption,
 } from "@/components/ui/picker-list";
 import { inputClassName } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { CardChevron } from "@/components/ui/card-chevron";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
   filterAccountsForDestinationSearch,
@@ -35,6 +39,7 @@ interface AccountPickerProps {
   searchPlaceholder?: string;
   noResultsMessage?: string;
   error?: string;
+  required?: boolean;
   variant?: "input" | "row";
   onChange: (accountId: string | null) => void;
 }
@@ -52,6 +57,7 @@ export function AccountPicker({
   searchPlaceholder,
   noResultsMessage,
   error,
+  required = false,
   variant = "input",
   onChange,
 }: AccountPickerProps) {
@@ -110,67 +116,62 @@ export function AccountPicker({
     noResultsMessage ?? t("records.fields.transfer.noResults");
 
   const triggerLabel = (
-    <span
-      className={cn(
-        "min-w-0 flex-1 truncate text-[0.9375rem] font-medium",
-        !displayLabel && "font-normal text-muted-foreground",
-        error && "text-destructive",
-      )}
-    >
+    <InputFieldValue isPlaceholder={!displayLabel}>
       {displayLabel ?? placeholder}
-    </span>
+    </InputFieldValue>
   );
 
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {description ? (
-        <p className="text-[0.8125rem] text-muted-foreground">{description}</p>
-      ) : null}
+  const pickerControl =
+    variant === "row" ? (
+      <InputFieldRowTrigger
+        id={id}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        onClick={() => setOpen(true)}
+        className={disabled ? "pointer-events-none opacity-60" : undefined}
+      >
+        {triggerLabel}
+      </InputFieldRowTrigger>
+    ) : (
+      <button
+        id={id}
+        type="button"
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className={cn(
+          inputClassName,
+          "flex items-center justify-between gap-2 text-start",
+          !displayLabel && "text-muted-foreground",
+          disabled && "pointer-events-none opacity-60",
+          error && "border-destructive",
+        )}
+      >
+        <span
+          className={cn(
+            "min-w-0 flex-1 truncate text-[0.9375rem] font-medium",
+            !displayLabel && "font-normal text-muted-foreground",
+          )}
+        >
+          {displayLabel ?? placeholder}
+        </span>
+        <CardChevron />
+      </button>
+    );
 
-      {variant === "row" ? (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          onClick={() => setOpen(true)}
-          className={cn(
-            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
-            disabled && "pointer-events-none opacity-60",
-          )}
-        >
-          {triggerLabel}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      ) : (
-        <button
-          id={id}
-          type="button"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onClick={() => setOpen(true)}
-          className={cn(
-            inputClassName,
-            "flex items-center justify-between gap-2 text-start",
-            !displayLabel && "text-muted-foreground",
-            disabled && "pointer-events-none opacity-60",
-            error && "border-destructive",
-          )}
-        >
-          {triggerLabel}
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-      )}
-      {error ? (
-        <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
+  return (
+    <InputField
+      id={id}
+      label={label}
+      required={required}
+      error={error}
+      hint={description}
+    >
+      {pickerControl}
 
       <PickerBottomSheet
         open={open}
@@ -212,6 +213,6 @@ export function AccountPicker({
           </PickerList>
         )}
       </PickerBottomSheet>
-    </div>
+    </InputField>
   );
 }

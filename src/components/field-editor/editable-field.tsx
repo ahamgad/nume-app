@@ -1,14 +1,21 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-
 import { inputClassName } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  InputField,
+  InputFieldAffix,
+  InputFieldRowTrigger,
+  InputFieldValue,
+} from "@/components/forms/input-field";
 import type {
   FieldEditorInputMode,
   FieldEditorMode,
 } from "@/lib/field-editor/types";
 import { sanitizeFieldEditorPlaceholder } from "@/lib/field-editor/placeholder";
+import {
+  INPUT_FIELD_AMOUNT_PREFIX,
+  INPUT_FIELD_RATE_SUFFIX,
+} from "@/lib/layout/input-field-chrome";
 import { cn } from "@/lib/utils";
 import { useFieldEditor } from "@/providers/field-editor-provider";
 
@@ -20,6 +27,7 @@ interface EditableFieldProps {
   disabled?: boolean;
   error?: string;
   hint?: string;
+  required?: boolean;
   /** Hide the inline label row; editor title still uses `label`. */
   hideLabel?: boolean;
   mode?: FieldEditorMode;
@@ -38,11 +46,39 @@ interface EditableFieldProps {
   variant?: "input" | "row";
 }
 
+function resolveFieldDecorations(
+  mode: FieldEditorMode,
+  options: {
+    prefixLabel?: string;
+    suffixLabel?: string;
+    showSignToggle?: boolean;
+    formatDisplay?: (value: string) => string;
+  },
+) {
+  const isRateField = options.suffixLabel === "%";
+  const isAmountField =
+    options.showSignToggle ||
+    Boolean(options.prefixLabel) ||
+    (mode === "numeric" &&
+      options.formatDisplay != null &&
+      !isRateField);
+
+  return {
+    prefix:
+      isAmountField && !isRateField
+        ? (options.prefixLabel ?? INPUT_FIELD_AMOUNT_PREFIX)
+        : options.prefixLabel,
+    suffix: isRateField
+      ? (options.suffixLabel ?? INPUT_FIELD_RATE_SUFFIX)
+      : options.suffixLabel,
+  };
+}
+
 /**
  * Inline trigger for the Nume field-editor bottom sheet.
  * Visually identical to Input (default) or a chevron row; never receives focus.
  *
- * @see docs/FOUNDATION.md § 5 — Inline field editor (frozen)
+ * @see docs/FOUNDATION.md — Input fields foundation, Inline field editor
  */
 export function EditableField({
   id,
@@ -52,6 +88,7 @@ export function EditableField({
   disabled = false,
   error,
   hint,
+  required,
   hideLabel = false,
   mode = "text",
   inputMode,
@@ -73,6 +110,14 @@ export function EditableField({
   const hasValue = resolvedDisplay.trim().length > 0;
   const resolvedPlaceholder = sanitizeFieldEditorPlaceholder(placeholder);
   const showPlaceholder = !hasValue && resolvedPlaceholder;
+  const isRequired = required ?? validate !== undefined;
+
+  const { prefix, suffix } = resolveFieldDecorations(mode, {
+    prefixLabel,
+    suffixLabel,
+    showSignToggle,
+    formatDisplay,
+  });
 
   function handleOpen() {
     if (disabled) return;
@@ -85,8 +130,8 @@ export function EditableField({
       inputMode,
       sanitizeInput,
       formatDisplay,
-      prefixLabel: variant === "row" ? undefined : prefixLabel,
-      suffixLabel,
+      prefixLabel: prefix,
+      suffixLabel: suffix,
       showSignToggle,
       validate,
       onSave,
@@ -95,66 +140,60 @@ export function EditableField({
 
   if (variant === "row") {
     return (
-      <div className="space-y-2">
-        {hideLabel ? null : <Label htmlFor={id}>{label}</Label>}
-        <button
+      <InputField
+        id={id}
+        label={label}
+        required={isRequired}
+        error={error}
+        hint={hint}
+        hideLabel={hideLabel}
+      >
+        <InputFieldRowTrigger
           id={id}
-          type="button"
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={
             error ? `${id}-error` : hint ? `${id}-hint` : undefined
           }
           onClick={handleOpen}
-          className={cn(
-            "flex min-h-12 w-full items-center gap-3 text-start transition-colors",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            triggerClassName,
-          )}
+          className={triggerClassName}
         >
-          <span
-            className={cn(
-              "min-w-0 flex-1 truncate text-[0.9375rem] font-medium leading-snug",
-              showPlaceholder && "font-normal text-muted-foreground",
-              error && "text-destructive",
-            )}
-          >
-            {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
+          <span className="flex min-w-0 flex-1 items-center gap-1.5">
+            {prefix ? <InputFieldAffix>{prefix}</InputFieldAffix> : null}
+            <InputFieldValue isPlaceholder={Boolean(showPlaceholder)}>
+              {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
+            </InputFieldValue>
+            {suffix ? <InputFieldAffix>{suffix}</InputFieldAffix> : null}
           </span>
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
-        </button>
-        {hint && !error ? (
-          <p id={`${id}-hint`} className="text-[0.8125rem] text-muted-foreground">
-            {hint}
-          </p>
-        ) : null}
-        {error ? (
-          <p id={`${id}-error`} className="mt-1 text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
-      </div>
+        </InputFieldRowTrigger>
+      </InputField>
     );
   }
 
   const triggerClasses = cn(
     inputClassName,
     "block w-full min-w-0 cursor-text truncate text-start",
-    prefixLabel && "ps-16",
-    suffixLabel && "pe-10",
+    prefix && "ps-16",
+    suffix && "pe-10",
     error && "border-destructive",
     showPlaceholder && "text-muted-foreground",
     triggerClassName,
   );
 
   return (
-    <div className="space-y-2">
-      {hideLabel ? null : <Label htmlFor={id}>{label}</Label>}
-      {prefixLabel || suffixLabel ? (
+    <InputField
+      id={id}
+      label={label}
+      required={isRequired}
+      error={error}
+      hint={hint}
+      hideLabel={hideLabel}
+    >
+      {prefix || suffix ? (
         <div className="relative min-w-0">
-          {prefixLabel ? (
+          {prefix ? (
             <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4 text-base font-medium text-muted-foreground">
-              {prefixLabel}
+              {prefix}
             </span>
           ) : null}
           <button
@@ -169,9 +208,9 @@ export function EditableField({
           >
             {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
           </button>
-          {suffixLabel ? (
+          {suffix ? (
             <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-4 text-sm text-muted-foreground">
-              {suffixLabel}
+              {suffix}
             </span>
           ) : null}
         </div>
@@ -189,16 +228,6 @@ export function EditableField({
           {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
         </button>
       )}
-      {hint && !error ? (
-        <p id={`${id}-hint`} className="text-[0.8125rem] text-muted-foreground">
-          {hint}
-        </p>
-      ) : null}
-      {error ? (
-        <p id={`${id}-error`} className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-    </div>
+    </InputField>
   );
 }

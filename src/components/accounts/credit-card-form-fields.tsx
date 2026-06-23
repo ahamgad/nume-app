@@ -4,7 +4,6 @@ import { AccountIdentifierField } from "@/components/accounts/account-identifier
 import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { EditableField } from "@/components/field-editor";
 import { AccountPicker } from "@/components/ui/account-picker";
-import { Label } from "@/components/ui/label";
 import {
   ScrollChipSelect,
   type ScrollChipOption,
@@ -87,6 +86,7 @@ export function CreditCardFormFields({
           value={values.linkedAccountId}
           accounts={linkedAccounts}
           disabled={disabled}
+          required
           error={errors.linkedAccountId}
           variant="row"
           onChange={(linkedAccountId) => {
@@ -148,21 +148,19 @@ export function CreditCardFormFields({
       </AccountFormSection>
 
       <AccountFormSection title={t("creditCards.formSections.statement")}>
-        <div className="space-y-2">
-          <Label>{t("creditCards.fields.statementDueDay.label")}</Label>
-          <ScrollChipSelect
-            value={values.statementDueDay}
-            options={statementDueDayOptions}
-            ariaLabel={t("creditCards.fields.statementDueDay.label")}
-            onChange={(statementDueDay) => {
-              onChange({ statementDueDay });
-              onClearError("statementDueDay");
-            }}
-          />
-          {errors.statementDueDay ? (
-            <p className="text-sm text-destructive">{errors.statementDueDay}</p>
-          ) : null}
-        </div>
+        <ScrollChipSelect
+          label={t("creditCards.fields.statementDueDay.label")}
+          required
+          fieldId="credit-card-statement-due-day"
+          value={values.statementDueDay}
+          options={statementDueDayOptions}
+          ariaLabel={t("creditCards.fields.statementDueDay.label")}
+          error={errors.statementDueDay}
+          onChange={(statementDueDay) => {
+            onChange({ statementDueDay });
+            onClearError("statementDueDay");
+          }}
+        />
       </AccountFormSection>
     </AccountFormSections>
   );
