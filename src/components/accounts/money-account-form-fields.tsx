@@ -63,7 +63,7 @@ export function MoneyAccountFormFields({
         accountType,
         showsInstitution: showInstitution,
         showsBalance: showBalance,
-        showsIdentifier: accountType === "current_account" && mode === "create",
+        showsIdentifier: accountType === "current_account",
       }}
     >
       <AccountFormSection title={t("accounts.formSections.accountDetails")}>
@@ -141,7 +141,7 @@ export function MoneyAccountFormFields({
           )
         ) : null}
 
-        {accountType === "current_account" && mode === "create" ? (
+        {accountType === "current_account" ? (
           <AccountFormIdentifierField
             id="account-number-last4"
             labelKey="accounts.fields.accountNumber.label"
