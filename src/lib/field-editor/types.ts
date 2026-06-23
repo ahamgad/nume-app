@@ -4,8 +4,10 @@ export type FieldEditorInputMode = "text" | "decimal" | "numeric";
 
 export interface FieldEditorOpenConfig {
   mode: FieldEditorMode;
-  /** Centered header title — typically the field label. */
-  title: string;
+  /** Inline field label — bottom sheet header title (source of truth). */
+  label?: string;
+  /** @deprecated Use `label`. Normalized on open when `label` is omitted. */
+  title?: string;
   value: string;
   placeholder?: string;
   inputMode?: FieldEditorInputMode;

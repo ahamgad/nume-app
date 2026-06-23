@@ -1,7 +1,11 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useRef } from "react";
 
+import {
+  FIELD_EDITOR_SUFFIX_LABEL_CLASS,
+  FIELD_EDITOR_SURFACE_INPUT_CLASS,
+} from "@/lib/field-editor/field-editor-chrome";
 import type { FieldEditorInputMode, FieldEditorMode } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +24,9 @@ interface FieldEditorSurfaceProps {
 
 /**
  * Borderless, caret-first editing surface for the field editor sheet.
- * Center-aligned with wrapping — only sheet inline inputs use this behavior.
+ * Center-aligned with natural wrapping — only sheet inline inputs use this behavior.
+ *
+ * @see docs/FOUNDATION.md § 5 — Inline field editor (frozen)
  */
 export const FieldEditorSurface = forwardRef<
   FieldEditorSurfaceHandle,
@@ -36,10 +42,17 @@ export const FieldEditorSurface = forwardRef<
   },
   ref,
 ) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const isNumeric = mode === "numeric";
   const resolvedInputMode =
     inputMode ?? (isNumeric ? "decimal" : "text");
+
+  const syncHeight = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = "auto";
+    input.style.height = `${input.scrollHeight}px`;
+  }, []);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -57,7 +70,12 @@ export const FieldEditorSurface = forwardRef<
     input.focus({ preventScroll: true });
     const length = input.value.length;
     input.setSelectionRange(length, length);
-  }, []);
+    syncHeight();
+  }, [syncHeight]);
+
+  useLayoutEffect(() => {
+    syncHeight();
+  }, [displayValue, placeholder, syncHeight]);
 
   function handleChange(raw: string) {
     onChange(raw);
@@ -66,15 +84,16 @@ export const FieldEditorSurface = forwardRef<
       if (!input) return;
       const length = input.value.length;
       input.setSelectionRange(length, length);
+      syncHeight();
     });
   }
 
   return (
     <div className="flex w-full min-w-0 shrink-0 touch-auto flex-col items-center justify-center text-center">
       <div className="flex w-full min-w-0 flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
-        <input
+        <textarea
           ref={inputRef}
-          type="text"
+          rows={1}
           inputMode={resolvedInputMode}
           value={displayValue}
           placeholder={placeholder}
@@ -83,22 +102,18 @@ export const FieldEditorSurface = forwardRef<
           spellCheck={isNumeric ? false : undefined}
           enterKeyHint="done"
           onChange={(event) => handleChange(event.target.value)}
-          className={cn(
-            "min-w-[3ch] max-w-full border-0 bg-transparent p-0 text-center outline-none",
-            "whitespace-normal break-words placeholder:text-muted-foreground",
-            isNumeric
-              ? "text-[1.625rem] font-semibold tabular-nums tracking-tight"
-              : "text-[1.375rem] font-semibold leading-snug",
-          )}
-          style={{
-            width: `${Math.max(displayValue.length || (placeholder?.length ?? 0), 3)}ch`,
+          onKeyDown={(event) => {
+            if (isNumeric && event.key === "Enter") {
+              event.preventDefault();
+            }
           }}
+          className={cn(
+            FIELD_EDITOR_SURFACE_INPUT_CLASS,
+            isNumeric && "tabular-nums tracking-tight",
+          )}
         />
         {suffixLabel ? (
-          <span
-            aria-hidden
-            className="shrink-0 text-[1.375rem] font-medium tabular-nums text-muted-foreground"
-          >
+          <span aria-hidden className={FIELD_EDITOR_SUFFIX_LABEL_CLASS}>
             {suffixLabel}
           </span>
         ) : null}

@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { FieldEditorBottomSheet } from "@/components/field-editor/field-editor-bottom-sheet";
+import { normalizeFieldEditorOpenConfig } from "@/lib/field-editor/normalize-config";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
 
 interface FieldEditorContextValue {
@@ -33,7 +34,10 @@ export function FieldEditorProvider({ children }: { children: ReactNode }) {
 
   const openFieldEditor = useCallback((config: FieldEditorOpenConfig) => {
     sessionIdRef.current += 1;
-    setSession({ ...config, id: sessionIdRef.current });
+    setSession({
+      ...normalizeFieldEditorOpenConfig(config),
+      id: sessionIdRef.current,
+    });
   }, []);
 
   const value = useMemo(

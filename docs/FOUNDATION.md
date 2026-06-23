@@ -33,8 +33,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 5 | **Confirmation actions** | `ConfirmationSheetActions`, `ConfirmationBottomSheet` | § 10, § 6 |
 | 6 | **Typography & copy** | Sentence case, helper description punctuation — `docs/CONTENT.md`, `en.ts` | § 10, CONTENT |
 | 7 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` | § 10 |
+| 8 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface`, `FieldSignToggle` | § 5 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, or numeric display behaviors inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, or field-editor headers/placeholders/typography/wrapping/sign-chip layout inside individual screens.
 
 ---
 
@@ -169,7 +170,114 @@ Trigger: `DateField` only.
 
 ---
 
-## 5. Editable Fields
+## 5. Inline field editor (frozen)
+
+All inline-field editors opened in workspace bottom sheets compose through **`EditableField`** + **`FieldEditorProvider`** + **`FieldEditorBottomSheet`**.
+
+Location: `components/field-editor/`, `lib/field-editor/`, `providers/field-editor-provider.tsx`.
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `EditableField` | Inline trigger — opens the field editor with synchronized label, placeholder, and value |
+| `FieldEditorBottomSheet` | Workspace sheet chrome, sign-chip layout, keyboard inset |
+| `FieldEditorSurface` | Borderless centered editor input — typography, placeholder, wrapping |
+| `FieldSignToggle` | Positive / negative chips for eligible balance fields only |
+
+### Rule 1 — Header title synchronization
+
+Bottom sheet header title **must** match the originating field label exactly.
+
+- Source of truth: field `label`
+- No separate sheet titles or custom overrides
+- Normalized in `normalizeFieldEditorOpenConfig`
+
+### Rule 2 — Placeholder synchronization
+
+Editor placeholder **must** match the originating field placeholder.
+
+- Single definition on `EditableField` — passed through on open
+- Sanitized once via `sanitizeFieldEditorPlaceholder` (Rule 4.1)
+
+### Rule 3 — Existing value synchronization
+
+When a field has a value, the editor displays the **same formatted value** as the inline trigger.
+
+- Raw `value` drives draft state; `formatDisplay` / `displayValue` keep presentation aligned
+- Balance fields with sign chips: unsigned amount in editor, sign on chips (existing sign logic unchanged)
+
+### Rule 4 — Placeholder styling
+
+| Requirement | Foundation |
+|---|---|
+| One shared placeholder color | `FIELD_EDITOR_PLACEHOLDER_CLASS` — `placeholder:text-muted-foreground` |
+| One shared implementation | `FieldEditorSurface` only |
+| No black placeholder text | Enforced via muted foreground token |
+| No field-specific placeholder colors | Prohibited |
+
+Location: `lib/field-editor/field-editor-chrome.ts`.
+
+### Rule 4.1 — Placeholder content cleanup
+
+Placeholders describe the field only — **no unit suffixes** (EGP, %, currency codes, parenthetical units).
+
+- Applied in `sanitizeFieldEditorPlaceholder` on open and on inline trigger display
+- Units belong in labels, `suffixLabel`, `prefixLabel`, helper text, or formatting layers
+
+### Rule 5 — Typography
+
+| Property | Rule |
+|---|---|
+| Font weight | Regular (`font-normal`) |
+| Maximum size | 22px (`text-[1.375rem]`) |
+| Larger than 22px | Reduced to 22px |
+| Smaller than 22px | Not upscaled in editor |
+
+Location: `FIELD_EDITOR_SURFACE_INPUT_CLASS`, `FIELD_EDITOR_SUFFIX_LABEL_CLASS`.
+
+### Rule 6 — Multi-line behavior
+
+Editor content wraps naturally — no truncate, overflow, or clip.
+
+- `FieldEditorSurface` uses auto-height `textarea` with `whitespace-pre-wrap break-words`
+- Full width (`w-full max-w-full`)
+
+### Rule 7 — Positive / negative chips
+
+Applies **only** to account balance fields for: Current Account, Wallet, Cash, Savings.
+
+**Not** for: Loans, Credit Cards, Records, Certificates, or other numeric fields.
+
+Layout (top → bottom):
+
+```text
+Field editor content
+24px gap
+Positive / negative chips
+24px gap
+Keyboard
+```
+
+Tokens: `FIELD_EDITOR_SIGN_CHIP_GAP_PX`, `FIELD_EDITOR_KEYBOARD_CHIP_GAP_PX`.
+
+Chips remain visible above the keyboard. Sign logic unchanged — layout only.
+
+### Propagation rule
+
+Changes to the field editor foundation **must propagate** to every consumer automatically. No screen-by-screen field editor updates.
+
+### Documented exceptions
+
+| Surface | Approach | Status |
+|---|---|---|
+| Auth credentials | Native inputs — not field editor | ✅ Excluded |
+| Institution "Other" custom name | Inline `Input` | ⚠️ Documented in § Audit status |
+| Picker search fields | Search inside picker sheet | ✅ Not field editor |
+
+---
+
+## 5a. Editable field triggers
 
 All editable form fields → `EditableField`.
 
@@ -391,6 +499,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Confirmation action stacks
 - Typography / capitalization behaviors
 - Numeric display behaviors
+- Field editor headers, placeholders, typography, wrapping, or sign-chip layout
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -433,6 +542,7 @@ If a genuine exception is required:
 | Account / renewal / account-type pickers | Picker + picker list | ✅ |
 | Currency / metric displays | Numeric typography foundation | ✅ |
 | System copy (EN) | Typography & copy foundation | ✅ |
+| All inline field editors | Field editor foundation | ✅ |
 | Confirmation / discard | Confirmation | ✅ Intentional |
 | Auth screens | — | ✅ Excluded |
 | Institution "Other" custom name | Inline input | ⚠️ Documented exception |
@@ -450,9 +560,9 @@ Before shipping any screen or feature:
 
 1. Identify the Foundation pattern(s) from the registry
 2. Identify the header building block (§ 9) if applicable
-3. Identify picker list, account details, CTA, confirmation, typography, and numeric foundations
+3. Identify picker list, account details, CTA, confirmation, typography, numeric, and field editor foundations
 4. Reuse shared components — do not fork
 5. Add copy to `en.ts` per **`docs/CONTENT.md`**
 6. Document any deviation in the audit table
 
-**All Design Audit foundations are frozen:** Header, Picker list, Account details, Create account CTA, Confirmation actions, Typography & copy, Numeric typography.
+**All Design Audit foundations are frozen:** Header, Picker list, Account details, Create account CTA, Confirmation actions, Typography & copy, Numeric typography, Inline field editor.

@@ -22,10 +22,11 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Confirmation actions** | `ConfirmationSheetActions` via `ConfirmBottomSheet` / `DiscardDialog` |
 | **Typography & copy** | Sentence case, no trailing period on single-sentence helpers — `en.ts`, **`docs/CONTENT.md`** |
 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
+| **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — label/placeholder/value sync, typography, wrapping, sign chips |
 
 ## Interaction patterns
 
-- **Workspace input** → `ImmersiveBottomSheet` (`variant="workspace"`) + `EditableField`
+- **Workspace input** → `ImmersiveBottomSheet` (`variant="workspace"`) + `EditableField` + `FieldEditorBottomSheet`
 - **Date selection** → `DatePickerBottomSheet` + `DateField`
 - **Pickers / selection lists** → `PickerBottomSheet` + `PickerList` (+ `shouldShowPickerSearch` when > 10 items)
 - **Optional picker None row** → `PickerListNoneOption` (`picker.none`) — mandatory pickers omit it
@@ -39,7 +40,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 
 ## Prohibited in screen files
 
-- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks
+- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor headers, placeholder styling, editor typography, or sign-chip layout
 
 Read **`docs/FOUNDATION.md`** for full rules, audit table, and documented exceptions.
 

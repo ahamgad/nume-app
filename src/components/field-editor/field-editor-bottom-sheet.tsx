@@ -10,7 +10,12 @@ import {
   stripBalanceSign,
   type BalanceSign,
 } from "@/lib/field-editor/balance-sign";
+import {
+  FIELD_EDITOR_KEYBOARD_CHIP_GAP_PX,
+  FIELD_EDITOR_SIGN_CHIP_GAP_PX,
+} from "@/lib/field-editor/field-editor-chrome";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
+import { cn } from "@/lib/utils";
 import { useRef, useState } from "react";
 import { useT } from "@/providers/i18n-provider";
 
@@ -19,12 +24,18 @@ interface FieldEditorBottomSheetProps {
   onDismiss: () => void;
 }
 
+/**
+ * Workspace bottom sheet for inline field editing.
+ *
+ * @see docs/FOUNDATION.md § 5 — Inline field editor (frozen)
+ */
 export function FieldEditorBottomSheet({
   config,
   onDismiss,
 }: FieldEditorBottomSheetProps) {
   const t = useT();
   const editorRef = useRef<FieldEditorSurfaceHandle>(null);
+  const headerLabel = config.label ?? config.title ?? "";
   const [sign, setSign] = useState<BalanceSign>(() =>
     parseBalanceSignFromValue(config.value),
   );
@@ -58,20 +69,55 @@ export function FieldEditorBottomSheet({
     ? config.formatDisplay(draft)
     : draft;
 
-  const bodyPaddingBottom = `calc(2rem + env(safe-area-inset-bottom) + ${keyboardInsetPx}px)`;
+  const bottomPaddingPx = config.showSignToggle
+    ? FIELD_EDITOR_KEYBOARD_CHIP_GAP_PX
+    : 32;
+
+  const bodyPaddingBottom = `calc(${bottomPaddingPx}px + env(safe-area-inset-bottom) + ${keyboardInsetPx}px)`;
 
   return (
     <ImmersiveBottomSheet
-      title={config.title}
+      title={headerLabel}
       onDismiss={onDismiss}
       onConfirm={handleConfirm}
       variant="workspace"
-      ariaLabel={config.title}
-      bodyClassName="flex flex-col items-center justify-center px-6 py-8"
+      ariaLabel={headerLabel}
+      bodyClassName={cn(
+        "flex min-h-0 flex-col px-6 py-8",
+        config.showSignToggle ? "justify-end" : "items-center justify-center",
+      )}
       bodyStyle={{ paddingBottom: bodyPaddingBottom }}
     >
+      <div
+        className={cn(
+          "flex w-full min-w-0 flex-col",
+          config.showSignToggle
+            ? "min-h-0 flex-1 justify-center"
+            : "items-center justify-center",
+        )}
+      >
+        <FieldEditorSurface
+          ref={editorRef}
+          mode={config.mode}
+          inputMode={config.inputMode}
+          displayValue={displayValue}
+          placeholder={config.placeholder}
+          suffixLabel={config.suffixLabel}
+          onChange={handleDraftChange}
+        />
+        {sheetError ? (
+          <p className="mt-4 text-center text-sm text-destructive" role="alert">
+            {sheetError}
+          </p>
+        ) : null}
+      </div>
       {config.showSignToggle ? (
-        <div className="mb-6 w-full">
+        <>
+          <div
+            className="w-full shrink-0"
+            style={{ height: FIELD_EDITOR_SIGN_CHIP_GAP_PX }}
+            aria-hidden
+          />
           <FieldSignToggle
             value={sign}
             onChange={setSign}
@@ -79,21 +125,7 @@ export function FieldEditorBottomSheet({
             negativeLabel={t("common.sign.negativeLabel")}
             onAfterChange={() => editorRef.current?.focus()}
           />
-        </div>
-      ) : null}
-      <FieldEditorSurface
-        ref={editorRef}
-        mode={config.mode}
-        inputMode={config.inputMode}
-        displayValue={displayValue}
-        placeholder={config.placeholder}
-        suffixLabel={config.suffixLabel}
-        onChange={handleDraftChange}
-      />
-      {sheetError ? (
-        <p className="mt-4 text-center text-sm text-destructive" role="alert">
-          {sheetError}
-        </p>
+        </>
       ) : null}
     </ImmersiveBottomSheet>
   );

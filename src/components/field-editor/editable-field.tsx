@@ -8,6 +8,7 @@ import type {
   FieldEditorInputMode,
   FieldEditorMode,
 } from "@/lib/field-editor/types";
+import { sanitizeFieldEditorPlaceholder } from "@/lib/field-editor/placeholder";
 import { cn } from "@/lib/utils";
 import { useFieldEditor } from "@/providers/field-editor-provider";
 
@@ -40,6 +41,8 @@ interface EditableFieldProps {
 /**
  * Inline trigger for the Nume field-editor bottom sheet.
  * Visually identical to Input (default) or a chevron row; never receives focus.
+ *
+ * @see docs/FOUNDATION.md § 5 — Inline field editor (frozen)
  */
 export function EditableField({
   id,
@@ -68,16 +71,17 @@ export function EditableField({
   const resolvedDisplay =
     displayValue ?? (formatDisplay ? formatDisplay(value) : value);
   const hasValue = resolvedDisplay.trim().length > 0;
-  const showPlaceholder = !hasValue && placeholder;
+  const resolvedPlaceholder = sanitizeFieldEditorPlaceholder(placeholder);
+  const showPlaceholder = !hasValue && resolvedPlaceholder;
 
   function handleOpen() {
     if (disabled) return;
 
     openFieldEditor({
       mode,
-      title: label,
+      label,
       value,
-      placeholder,
+      placeholder: resolvedPlaceholder,
       inputMode,
       sanitizeInput,
       formatDisplay,
@@ -115,7 +119,7 @@ export function EditableField({
               error && "text-destructive",
             )}
           >
-            {showPlaceholder ? placeholder : resolvedDisplay}
+            {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
           </span>
           <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
         </button>
@@ -163,7 +167,7 @@ export function EditableField({
             onClick={handleOpen}
             className={triggerClasses}
           >
-            {showPlaceholder ? placeholder : resolvedDisplay}
+            {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
           </button>
           {suffixLabel ? (
             <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-4 text-sm text-muted-foreground">
@@ -182,7 +186,7 @@ export function EditableField({
           onClick={handleOpen}
           className={triggerClasses}
         >
-          {showPlaceholder ? placeholder : resolvedDisplay}
+          {showPlaceholder ? resolvedPlaceholder : resolvedDisplay}
         </button>
       )}
       {hint && !error ? (
