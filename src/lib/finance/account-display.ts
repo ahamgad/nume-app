@@ -1,5 +1,6 @@
 import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
-import type { Account } from "@/lib/finance/types";
+import { formatAccountCardInstituteRow } from "@/lib/finance/account-card-display";
+import type { Account, AccountType } from "@/lib/finance/types";
 import {
   formatInstitutionEntityLabel,
   institutionMatchesSearch,
@@ -9,6 +10,19 @@ import type { TranslationKey } from "@/lib/i18n";
 type AccountLabelTranslator = (key: TranslationKey, params?: Record<string, string>) => string;
 
 const INSTITUTION_IDENTIFIER_SEPARATOR = " · ";
+
+/** Header metadata on account details — localized account type · last-4 when available. */
+export function formatAccountDetailsHeaderSubtitle(
+  accountType: AccountType,
+  identifierLast4: string | null | undefined,
+  t: AccountLabelTranslator,
+): string {
+  return formatAccountCardInstituteRow(
+    { type: accountType },
+    identifierLast4,
+    t,
+  );
+}
 
 /** Institution subtitle on account details headers, optionally with last-4 identifier. */
 export function formatAccountInstitutionSubtitle(

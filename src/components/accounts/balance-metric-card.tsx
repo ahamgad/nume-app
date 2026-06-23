@@ -6,6 +6,11 @@ import { MetricHero, WidgetCard } from "@/components/patterns";
 import { IconButton } from "@/components/ui/icon-button";
 import { validateAccountBalanceField } from "@/lib/field-editor/field-validators";
 import { supportsQuickBalanceEdit } from "@/lib/finance/account-form";
+import {
+  getAccountDisplayBalance,
+  getBalanceToneClassName,
+  isLiabilityAccountType,
+} from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import {
   formatAmountInput,
@@ -60,13 +65,16 @@ export function BalanceMetricCard({
   }
 
   return (
-    <WidgetCard>
+    <WidgetCard elevated>
       <MetricHero
         label={label}
-        amount={account.currentBalance}
+        amount={getAccountDisplayBalance(account)}
         locale={formatLocale}
         meta={meta}
-        amountSignMode="balance"
+        amountSignMode={
+          isLiabilityAccountType(account.type) ? "unsigned" : "balance"
+        }
+        amountClassName={getBalanceToneClassName(account)}
         amountAction={
           canEdit ? (
             <IconButton

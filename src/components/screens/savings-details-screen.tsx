@@ -7,7 +7,7 @@ import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
-import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
@@ -16,7 +16,7 @@ import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components
 import { ToggleSettingRow } from "@/components/patterns";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
-import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
@@ -178,8 +178,8 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     );
   }
 
-  const institutionSubtitle = formatAccountInstitutionSubtitle(
-    account.institution,
+  const headerSubtitle = formatAccountDetailsHeaderSubtitle(
+    account.type,
     account.accountNumberLast4,
     t,
   );
@@ -202,7 +202,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
+          institutionSubtitle={headerSubtitle}
           accountType={account.type}
         />
 
@@ -217,16 +217,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             await updateAccount(account.id, { currentBalance: balance });
           }}
         />
-
-        {!isArchived ? (
-          <AccountDetailActions
-            editLabel={t("accounts.edit.title")}
-            archiveLabel={t("accounts.details.archiveAccount")}
-            disabled={archiving}
-            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
-            onArchive={() => setShowArchiveConfirm(true)}
-          />
-        ) : null}
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
@@ -258,19 +248,23 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         </section>
 
         {!isArchived ? (
-          <section>
-            <h2 className="mb-2 text-start text-lg font-semibold">
-              {t("accounts.details.settingsTitle")}
-            </h2>
-            <div className="rounded-lg border border-border px-4">
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInNetWorth.label")}
-                description={t("accounts.settings.includeInNetWorth.description")}
-                checked={account.includeInNetWorth}
-                onCheckedChange={(checked) =>
-                  updateAccount(account.id, { includeInNetWorth: checked })
-                }
-              />
+          <AccountDetailsSettingsSection
+            title={t("accounts.details.settingsTitle")}
+            editLabel={t("accounts.edit.title")}
+            archiveLabel={t("accounts.details.archiveAccount")}
+            archiveDisabled={archiving}
+            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
+            onArchive={() => setShowArchiveConfirm(true)}
+          >
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInNetWorth.label")}
+              description={t("accounts.settings.includeInNetWorth.description")}
+              checked={account.includeInNetWorth}
+              onCheckedChange={(checked) =>
+                updateAccount(account.id, { includeInNetWorth: checked })
+              }
+            />
+            <div className="border-t border-border">
               <ToggleSettingRow
                 label={t("accounts.settings.includeInEmergencyFund.label")}
                 description={t(
@@ -282,7 +276,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
                 }
               />
             </div>
-          </section>
+          </AccountDetailsSettingsSection>
         ) : (
           <ArchivedAccountActions
             restoreLabel={t("accounts.details.restoreAccount")}

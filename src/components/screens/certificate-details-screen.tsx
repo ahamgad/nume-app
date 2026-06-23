@@ -7,7 +7,7 @@ import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
-import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
@@ -20,7 +20,7 @@ import {
   formatCertificateRemainingLabel,
 } from "@/lib/certificates/certificate-engine";
 import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
-import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
@@ -213,8 +213,8 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     certificate.id,
   );
 
-  const institutionSubtitle = formatAccountInstitutionSubtitle(
-    account.institution,
+  const headerSubtitle = formatAccountDetailsHeaderSubtitle(
+    account.type,
     certificate.certificateNumberLast4,
     t,
   );
@@ -229,30 +229,21 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
+          institutionSubtitle={headerSubtitle}
           accountType={account.type}
         />
 
-        <WidgetCard>
+        <WidgetCard elevated>
           <MetricHero
             label={t("certificates.details.principal")}
             amount={certificate.principalAmount}
             locale={formatLocale}
+            amountSignMode="balance"
             meta={t("dashboard.netWorth.updated", {
               time: formatRelativeTime(account.updatedAt, t, formatLocale),
             })}
           />
         </WidgetCard>
-
-        {!isArchived ? (
-          <AccountDetailActions
-            editLabel={t("certificates.details.edit")}
-            archiveLabel={t("certificates.details.archive")}
-            disabled={archiving}
-            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
-            onArchive={() => setShowArchiveConfirm(true)}
-          />
-        ) : null}
 
         {canProcessInterest ? (
           <Button
@@ -312,35 +303,37 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         </section>
 
         {!isArchived ? (
-          <section>
-            <h2 className="mb-2 text-start text-lg font-semibold">
-              {t("accounts.details.settingsTitle")}
-            </h2>
-            <div className="rounded-lg border border-border px-4">
+          <AccountDetailsSettingsSection
+            title={t("accounts.details.settingsTitle")}
+            editLabel={t("certificates.details.edit")}
+            archiveLabel={t("certificates.details.archive")}
+            archiveDisabled={archiving}
+            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
+            onArchive={() => setShowArchiveConfirm(true)}
+          >
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInNetWorth.label")}
+              description={t("accounts.settings.includeInNetWorth.description")}
+              checked={account.includeInNetWorth}
+              onCheckedChange={(checked) =>
+                void updateAccount(account.id, { includeInNetWorth: checked })
+              }
+            />
+            <div className="border-t border-border">
               <ToggleSettingRow
-                label={t("accounts.settings.includeInNetWorth.label")}
-                description={t("accounts.settings.includeInNetWorth.description")}
-                checked={account.includeInNetWorth}
+                label={t("accounts.settings.includeInEmergencyFund.label")}
+                description={t(
+                  "accounts.settings.includeInEmergencyFund.description",
+                )}
+                checked={account.includeInEmergencyFund}
                 onCheckedChange={(checked) =>
-                  void updateAccount(account.id, { includeInNetWorth: checked })
+                  void updateAccount(account.id, {
+                    includeInEmergencyFund: checked,
+                  })
                 }
               />
-              <div className="border-t border-border">
-                <ToggleSettingRow
-                  label={t("accounts.settings.includeInEmergencyFund.label")}
-                  description={t(
-                    "accounts.settings.includeInEmergencyFund.description",
-                  )}
-                  checked={account.includeInEmergencyFund}
-                  onCheckedChange={(checked) =>
-                    void updateAccount(account.id, {
-                      includeInEmergencyFund: checked,
-                    })
-                  }
-                />
-              </div>
             </div>
-          </section>
+          </AccountDetailsSettingsSection>
         ) : (
           <ArchivedAccountActions
             restoreLabel={t("accounts.details.restoreAccount")}

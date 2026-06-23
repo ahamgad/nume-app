@@ -10,7 +10,7 @@ import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
-import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
@@ -22,7 +22,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
-import { formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
+import { resolveAccountNumberLast4 } from "@/lib/finance/account-identity-validation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
@@ -48,11 +49,13 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
   const {
     getAccount,
     getAccountRecords,
-    getLoanByAccountId,
     updateAccount,
     archiveAccount,
     restoreAccount,
     deleteAccount,
+    certificates,
+    creditCards,
+    loans,
     isFinanceReady,
   } = useFinance();
 
@@ -64,17 +67,16 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   const account = getAccount(accountId);
   const records = getAccountRecords(accountId).slice(0, 5);
-  const loan = getLoanByAccountId(accountId);
   const isArchived = account?.status === "archived";
 
-  const institutionSubtitle = account
-    ? formatAccountInstitutionSubtitle(
-        account.institution,
-        account.type === "current_account"
-          ? account.accountNumberLast4
-          : account.type === "loan"
-            ? (loan?.loanNumberLast4 ?? null)
-            : null,
+  const headerSubtitle = account
+    ? formatAccountDetailsHeaderSubtitle(
+        account.type,
+        resolveAccountNumberLast4(account, {
+          certificates,
+          creditCards,
+          loans,
+        }),
         t,
       )
     : null;
@@ -191,7 +193,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
+          institutionSubtitle={headerSubtitle}
           accountType={account.type}
         />
 
@@ -208,45 +210,37 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         />
 
         {!isArchived ? (
-          <AccountDetailActions
+          <AccountDetailsSettingsSection
+            title={t("accounts.details.settingsTitle")}
             editLabel={t("accounts.edit.title")}
             archiveLabel={t("accounts.details.archiveAccount")}
-            disabled={archiving}
+            archiveDisabled={archiving}
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}
             onArchive={() => setShowArchiveConfirm(true)}
-          />
-        ) : null}
-
-        {!isArchived ? (
-          <section>
-            <h2 className="mb-2 text-start text-lg font-semibold">
-              {t("accounts.details.settingsTitle")}
-            </h2>
-            <div className="rounded-lg border border-border px-4">
+          >
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInNetWorth.label")}
+              description={t("accounts.settings.includeInNetWorth.description")}
+              checked={account.includeInNetWorth}
+              onCheckedChange={(checked) =>
+                void updateAccount(account.id, { includeInNetWorth: checked })
+              }
+            />
+            <div className="border-t border-border">
               <ToggleSettingRow
-                label={t("accounts.settings.includeInNetWorth.label")}
-                description={t("accounts.settings.includeInNetWorth.description")}
-                checked={account.includeInNetWorth}
+                label={t("accounts.settings.includeInEmergencyFund.label")}
+                description={t(
+                  "accounts.settings.includeInEmergencyFund.description",
+                )}
+                checked={account.includeInEmergencyFund}
                 onCheckedChange={(checked) =>
-                  void updateAccount(account.id, { includeInNetWorth: checked })
+                  void updateAccount(account.id, {
+                    includeInEmergencyFund: checked,
+                  })
                 }
               />
-              <div className="border-t border-border">
-                <ToggleSettingRow
-                  label={t("accounts.settings.includeInEmergencyFund.label")}
-                  description={t(
-                    "accounts.settings.includeInEmergencyFund.description",
-                  )}
-                  checked={account.includeInEmergencyFund}
-                  onCheckedChange={(checked) =>
-                    void updateAccount(account.id, {
-                      includeInEmergencyFund: checked,
-                    })
-                  }
-                />
-              </div>
             </div>
-          </section>
+          </AccountDetailsSettingsSection>
         ) : (
           <ArchivedAccountActions
             restoreLabel={t("accounts.details.restoreAccount")}

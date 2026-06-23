@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { formatAccountInstitutionSubtitle, formatAccountListSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDetailsHeaderSubtitle, formatAccountInstitutionSubtitle, formatAccountListSubtitle } from "@/lib/finance/account-display";
 import {
   isMoneyAccountFormDirty,
   moneyAccountFormValuesFromAccount,
@@ -50,6 +50,18 @@ describe("formatAccountListSubtitle", () => {
         t,
       ),
     ).toBe("Lucky · Wallet");
+  });
+});
+
+describe("formatAccountDetailsHeaderSubtitle", () => {
+  it("shows localized account type and last-4 when both exist", () => {
+    expect(
+      formatAccountDetailsHeaderSubtitle("current_account", "1234", t),
+    ).toBe("Current · 1234");
+  });
+
+  it("shows type only when identifier is missing", () => {
+    expect(formatAccountDetailsHeaderSubtitle("cash", null, t)).toBe("Cash");
   });
 });
 

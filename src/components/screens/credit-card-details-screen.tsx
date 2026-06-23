@@ -7,7 +7,7 @@ import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
-import { AccountDetailActions } from "@/components/accounts/account-detail-actions";
+import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import {
   LiabilityBalanceMetricCard,
@@ -24,7 +24,7 @@ import {
   calculateAvailableCredit,
   calculateCreditUtilization,
 } from "@/lib/credit-cards/utilization";
-import { formatAccountDestinationDisplay, formatAccountInstitutionSubtitle } from "@/lib/finance/account-display";
+import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
@@ -184,8 +184,8 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     );
   }
 
-  const institutionSubtitle = formatAccountInstitutionSubtitle(
-    account.institution,
+  const headerSubtitle = formatAccountDetailsHeaderSubtitle(
+    account.type,
     creditCard.cardNumberLast4,
     t,
   );
@@ -208,7 +208,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         <AccountDetailsContentHeader
           accountName={account.name}
           institution={account.institution}
-          institutionSubtitle={institutionSubtitle}
+          institutionSubtitle={headerSubtitle}
           accountType={account.type}
         />
 
@@ -228,26 +228,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
             ) : undefined
           }
         />
-
-        {!isArchived ? (
-          <AccountDetailActions
-            editLabel={t("accounts.edit.title")}
-            archiveLabel={t("accounts.details.archiveAccount")}
-            disabled={archiving}
-            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
-            onArchive={() => setShowArchiveConfirm(true)}
-          />
-        ) : (
-          <ArchivedAccountActions
-            restoreLabel={t("accounts.details.restoreAccount")}
-            restoreLoadingLabel={t("accounts.details.restoreRestoring")}
-            deleteLabel={t("accounts.details.permanentlyDelete")}
-            restoring={restoring}
-            deleting={deleting}
-            onRestore={handleRestore}
-            onDelete={() => setShowDeleteConfirm(true)}
-          />
-        )}
 
         <section>
           <h2 className="mb-2 text-start text-lg font-semibold">
@@ -276,6 +256,27 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
             />
           </div>
         </section>
+
+        {!isArchived ? (
+          <AccountDetailsSettingsSection
+            title={t("accounts.details.settingsTitle")}
+            editLabel={t("accounts.edit.title")}
+            archiveLabel={t("accounts.details.archiveAccount")}
+            archiveDisabled={archiving}
+            onEdit={() => router.push(`/accounts/${account.id}/edit`)}
+            onArchive={() => setShowArchiveConfirm(true)}
+          />
+        ) : (
+          <ArchivedAccountActions
+            restoreLabel={t("accounts.details.restoreAccount")}
+            restoreLoadingLabel={t("accounts.details.restoreRestoring")}
+            deleteLabel={t("accounts.details.permanentlyDelete")}
+            restoring={restoring}
+            deleting={deleting}
+            onRestore={handleRestore}
+            onDelete={() => setShowDeleteConfirm(true)}
+          />
+        )}
 
         <RecentRecordsSection
           records={records}

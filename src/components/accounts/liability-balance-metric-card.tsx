@@ -68,12 +68,13 @@ export function LiabilityBalanceMetricCard({
   }
 
   return (
-    <WidgetCard>
+    <WidgetCard elevated>
       <MetricHero
         label={label}
         amount={outstanding}
         locale={formatLocale}
         meta={meta}
+        amountSignMode="unsigned"
         amountClassName={getBalanceToneClassName(account)}
         amountAction={
           canEdit ? (

@@ -32,7 +32,7 @@ export function AccountDetailsSummary({
 }: AccountDetailsSummaryProps) {
   const t = useT();
   const brandAsset = resolveInstitutionBrandAssetProps(institution, t);
-  const showInstitutionRow = Boolean(institutionSubtitle?.trim() && brandAsset);
+  const showMetadataRow = Boolean(institutionSubtitle?.trim());
 
   return (
     <div className={cn("flex min-w-0 gap-4", className)}>
@@ -52,7 +52,7 @@ export function AccountDetailsSummary({
         </span>
       )}
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        {showInstitutionRow ? (
+        {showMetadataRow ? (
           <p className="truncate text-[0.8125rem] leading-snug text-muted-foreground tabular-nums">
             {institutionSubtitle}
           </p>

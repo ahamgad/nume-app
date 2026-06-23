@@ -9,18 +9,26 @@ import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
 import { Switch } from "@/components/ui/switch";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
-import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
+import { CARD_SURFACE_FLAT_CLASS, CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
   children: ReactNode;
   className?: string;
+  /** When true, uses elevated card surface (shadow). Balance sections use this. */
+  elevated?: boolean;
 }
 
-export function WidgetCard({ children, className }: WidgetCardProps) {
+export function WidgetCard({ children, className, elevated = false }: WidgetCardProps) {
   return (
-    <div className={cn(CARD_SURFACE_FLAT_CLASS, "min-w-0 w-full", className)}>
+    <div
+      className={cn(
+        elevated ? CARD_SURFACE_CLASS : CARD_SURFACE_FLAT_CLASS,
+        "min-w-0 w-full",
+        className,
+      )}
+    >
       <div className="w-full min-w-0 p-5 text-start">{children}</div>
     </div>
   );
