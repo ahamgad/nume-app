@@ -29,4 +29,10 @@ describe("sanitizeFieldEditorPlaceholder", () => {
     );
     expect(sanitizeFieldEditorPlaceholder("EGP 0")).toBe("0");
   });
+
+  it("removes embedded percent in numeric placeholders", () => {
+    expect(sanitizeFieldEditorPlaceholder("0%")).toBe("0");
+    expect(sanitizeFieldEditorPlaceholder("%")).toBeUndefined();
+    expect(sanitizeFieldEditorPlaceholder("EGP")).toBeUndefined();
+  });
 });

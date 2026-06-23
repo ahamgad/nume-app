@@ -2,10 +2,8 @@
 
 import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useRef } from "react";
 
-import {
-  FIELD_EDITOR_SUFFIX_LABEL_CLASS,
-  FIELD_EDITOR_SURFACE_INPUT_CLASS,
-} from "@/lib/field-editor/field-editor-chrome";
+import { FIELD_EDITOR_SURFACE_INPUT_CLASS } from "@/lib/field-editor/field-editor-chrome";
+import { isFieldEditorKeyboardSubmitKey } from "@/lib/field-editor/editor-display";
 import type { FieldEditorInputMode, FieldEditorMode } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +16,8 @@ interface FieldEditorSurfaceProps {
   inputMode?: FieldEditorInputMode;
   displayValue: string;
   placeholder?: string;
-  suffixLabel?: string;
+  /** Same path as the sheet Save action — validation and submit. */
+  onSubmit: () => void;
   onChange: (raw: string) => void;
 }
 
@@ -37,7 +36,7 @@ export const FieldEditorSurface = forwardRef<
     inputMode,
     displayValue,
     placeholder,
-    suffixLabel,
+    onSubmit,
     onChange,
   },
   ref,
@@ -88,6 +87,12 @@ export const FieldEditorSurface = forwardRef<
     });
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (!isFieldEditorKeyboardSubmitKey(event.nativeEvent)) return;
+    event.preventDefault();
+    onSubmit();
+  }
+
   return (
     <div className="flex w-full min-w-0 shrink-0 touch-auto flex-col items-center justify-center text-center">
       <div className="flex w-full min-w-0 flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
@@ -102,21 +107,12 @@ export const FieldEditorSurface = forwardRef<
           spellCheck={isNumeric ? false : undefined}
           enterKeyHint="done"
           onChange={(event) => handleChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (isNumeric && event.key === "Enter") {
-              event.preventDefault();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           className={cn(
             FIELD_EDITOR_SURFACE_INPUT_CLASS,
             isNumeric && "tabular-nums tracking-tight",
           )}
         />
-        {suffixLabel ? (
-          <span aria-hidden className={FIELD_EDITOR_SUFFIX_LABEL_CLASS}>
-            {suffixLabel}
-          </span>
-        ) : null}
       </div>
     </div>
   );

@@ -22,5 +22,13 @@ export function sanitizeFieldEditorPlaceholder(
   // "0 EGP" → "0"
   result = result.replace(/^([\d,.]+)\s+EGP$/i, "$1").trim();
 
+  // Embedded percent: "0%" → "0"
+  result = result.replace(/^([\d,.]+)%$/, "$1").trim();
+
+  // Lone unit token
+  if (/^%+$/.test(result) || /^EGP$/i.test(result)) {
+    return undefined;
+  }
+
   return result || undefined;
 }

@@ -1,3 +1,4 @@
+import { stripFieldEditorUnitLabels } from "@/lib/field-editor/editor-display";
 import { sanitizeFieldEditorPlaceholder } from "@/lib/field-editor/placeholder";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
 
@@ -10,10 +11,10 @@ export function normalizeFieldEditorOpenConfig(
     throw new Error("FieldEditorOpenConfig requires label or title");
   }
 
-  return {
+  return stripFieldEditorUnitLabels({
     ...config,
     label,
     title: label,
     placeholder: sanitizeFieldEditorPlaceholder(config.placeholder),
-  };
+  });
 }

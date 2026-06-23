@@ -223,7 +223,10 @@ Location: `lib/field-editor/field-editor-chrome.ts`.
 Placeholders describe the field only — **no unit suffixes** (EGP, %, currency codes, parenthetical units).
 
 - Applied in `sanitizeFieldEditorPlaceholder` on open and on inline trigger display
-- Units belong in labels, `suffixLabel`, `prefixLabel`, helper text, or formatting layers
+- **`stripFieldEditorUnitLabels`** removes `prefixLabel` / `suffixLabel` from the editor session — unit tokens never render beside the editor input (e.g. rate fields must not show `%` in the sheet)
+- Units belong on the **inline trigger**, field labels, helper text, or formatting layers — not in the editor surface or placeholder state
+
+Location: `lib/field-editor/placeholder.ts`, `lib/field-editor/editor-display.ts`.
 
 ### Rule 5 — Typography
 
@@ -234,7 +237,7 @@ Placeholders describe the field only — **no unit suffixes** (EGP, %, currency 
 | Larger than 22px | Reduced to 22px |
 | Smaller than 22px | Not upscaled in editor |
 
-Location: `FIELD_EDITOR_SURFACE_INPUT_CLASS`, `FIELD_EDITOR_SUFFIX_LABEL_CLASS`.
+Location: `FIELD_EDITOR_SURFACE_INPUT_CLASS`.
 
 ### Rule 6 — Multi-line behavior
 
@@ -262,6 +265,20 @@ Keyboard
 Tokens: `FIELD_EDITOR_SIGN_CHIP_GAP_PX`, `FIELD_EDITOR_KEYBOARD_CHIP_GAP_PX`.
 
 Chips remain visible above the keyboard. Sign logic unchanged — layout only.
+
+### Rule 8 — Keyboard submit
+
+Keyboard confirmation actions (**Done**, **Enter**, **Return**, **Go**, platform checkmark / equivalent) **must** invoke the same save path as the sheet **Save** action.
+
+- `FieldEditorSurface` calls `onSubmit` → `FieldEditorBottomSheet.handleConfirm`
+- Same validation, error display, sign application, and `onSave` — no duplicated logic
+- **Shift+Enter** inserts a newline in text fields (multi-line); plain **Enter** submits
+
+Location: `lib/field-editor/editor-display.ts` (`isFieldEditorKeyboardSubmitKey`), `FieldEditorSurface`.
+
+### Future inline-field rule
+
+Any current or future inline-field editor **must** inherit unit-suffix cleanup and keyboard-submit behavior through the shared foundation. Do not implement these in individual screens.
 
 ### Propagation rule
 
@@ -499,7 +516,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Confirmation action stacks
 - Typography / capitalization behaviors
 - Numeric display behaviors
-- Field editor headers, placeholders, typography, wrapping, or sign-chip layout
+- Field editor headers, placeholders, typography, wrapping, sign-chip layout, unit-suffix cleanup, or keyboard-submit handlers
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 

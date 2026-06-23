@@ -16,7 +16,7 @@ import {
 } from "@/lib/field-editor/field-editor-chrome";
 import type { FieldEditorOpenConfig } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useT } from "@/providers/i18n-provider";
 
 interface FieldEditorBottomSheetProps {
@@ -45,7 +45,7 @@ export function FieldEditorBottomSheet({
   const [sheetError, setSheetError] = useState<string | undefined>();
   const keyboardInsetPx = useFieldEditorKeyboardInset(true);
 
-  function handleConfirm() {
+  const handleConfirm = useCallback(() => {
     const valueToSave = config.showSignToggle
       ? applyBalanceSign(draft, sign)
       : draft;
@@ -57,7 +57,7 @@ export function FieldEditorBottomSheet({
 
     config.onSave(valueToSave);
     onDismiss();
-  }
+  }, [config, draft, onDismiss, sign]);
 
   function handleDraftChange(raw: string) {
     const next = config.sanitizeInput ? config.sanitizeInput(raw) : raw;
@@ -102,7 +102,7 @@ export function FieldEditorBottomSheet({
           inputMode={config.inputMode}
           displayValue={displayValue}
           placeholder={config.placeholder}
-          suffixLabel={config.suffixLabel}
+          onSubmit={handleConfirm}
           onChange={handleDraftChange}
         />
         {sheetError ? (

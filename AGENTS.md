@@ -22,7 +22,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Confirmation actions** | `ConfirmationSheetActions` via `ConfirmBottomSheet` / `DiscardDialog` |
 | **Typography & copy** | Sentence case, no trailing period on single-sentence helpers — `en.ts`, **`docs/CONTENT.md`** |
 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
-| **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — label/placeholder/value sync, typography, wrapping, sign chips |
+| **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — sync, typography, wrapping, sign chips, unit cleanup, keyboard submit |
 
 ## Interaction patterns
 
@@ -40,7 +40,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 
 ## Prohibited in screen files
 
-- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor headers, placeholder styling, editor typography, or sign-chip layout
+- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor headers, placeholder styling, editor typography, sign-chip layout, unit suffixes in editor, or per-field keyboard submit
 
 Read **`docs/FOUNDATION.md`** for full rules, audit table, and documented exceptions.
 

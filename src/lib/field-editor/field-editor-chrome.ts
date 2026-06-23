@@ -20,8 +20,8 @@ export const FIELD_EDITOR_SURFACE_INPUT_CLASS = cn(
   FIELD_EDITOR_PLACEHOLDER_CLASS,
 );
 
-/** Suffix unit label inside the editor (display layer — not placeholder). */
-export const FIELD_EDITOR_SUFFIX_LABEL_CLASS = cn(
+/** Suffix unit label inside the inline trigger (never rendered in the field editor). */
+export const FIELD_EDITOR_TRIGGER_SUFFIX_LABEL_CLASS = cn(
   "shrink-0 font-normal tabular-nums text-muted-foreground",
   FIELD_EDITOR_MAX_FONT_SIZE_CLASS,
 );
