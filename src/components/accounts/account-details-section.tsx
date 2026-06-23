@@ -16,7 +16,6 @@ interface AccountDetailsSectionProps {
   title: string;
   children: ReactNode;
   className?: string;
-  /** Defaults to 16px on all sides; Recent Records uses reduced bottom padding. */
   paddingClassName?: string;
   /** Defaults to 16px field rhythm; Recent Records uses compact 8px rhythm. */
   fieldRowClassName?: string;
