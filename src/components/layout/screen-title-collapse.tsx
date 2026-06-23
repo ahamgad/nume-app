@@ -12,7 +12,11 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
-import { SCREEN_HEADER_BAR_HEIGHT_CLASS, SCREEN_HEADER_TITLE_CLASS } from "@/lib/layout/screen-spacing";
+import {
+  SCREEN_HEADER_BAR_HEIGHT_CLASS,
+  SCREEN_HEADER_TITLE_CLASS,
+  SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS,
+} from "@/lib/layout/screen-spacing";
 
 /** Header inner bar height in px (16px root) — matches {@link SCREEN_HEADER_BAR_HEIGHT_CLASS}. */
 const HEADER_BAR_HEIGHT_PX = parseFloat(SCREEN_HEADER_BAR_HEIGHT_CLASS) * 16;
@@ -107,7 +111,8 @@ export function ScreenPageTitle({
       data-screen-page-title
       aria-hidden={collapsed}
       className={cn(
-        "pb-4 text-2xl font-semibold leading-tight tracking-tight text-foreground",
+        "text-2xl font-semibold leading-tight tracking-tight text-foreground",
+        SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS,
         className,
       )}
     >

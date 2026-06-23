@@ -57,7 +57,7 @@ export function AccountDetailsSummary({
             {institutionSubtitle}
           </p>
         ) : null}
-        <StackPageTitle className="truncate pb-0">{accountName}</StackPageTitle>
+        <StackPageTitle className="mb-0 truncate">{accountName}</StackPageTitle>
       </div>
     </div>
   );

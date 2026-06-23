@@ -44,5 +44,8 @@ export const ACCOUNT_CARD_NAME_CLASS =
 export const ACCOUNT_CARD_BALANCE_LABEL_CLASS =
   "text-[0.8125rem] font-medium leading-snug text-muted-foreground";
 
+/** Balance amount on account cards — 18px semibold (numeric typography foundation). */
+export const ACCOUNT_CARD_BALANCE_VALUE_FONT_SIZE_PX = 18;
+
 export const ACCOUNT_CARD_BALANCE_VALUE_CLASS =
-  "text-[0.9375rem] font-semibold";
+  "text-[1.125rem] font-semibold";

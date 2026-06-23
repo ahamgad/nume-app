@@ -58,6 +58,12 @@ export const SCREEN_HEADER_TEXT_ACTION_CLASS =
 export const SCREEN_HEADER_TITLE_CLASS =
   "block min-w-0 flex-1 truncate text-base font-semibold leading-tight";
 
+/** Large in-content page title → next content block (px). */
+export const SCREEN_PAGE_TITLE_TO_CONTENT_GAP_PX = 24;
+
+/** Margin below `ScreenPageTitle` / `RootPageTitle` / `StackPageTitle`. */
+export const SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS = "mb-6";
+
 /**
  * Page header content zone below safe area: inner bar + bottom border (1px).
  * Matches rendered page header height on desktop (57px at 16px root).

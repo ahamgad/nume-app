@@ -398,6 +398,16 @@ Any change to Root, Stack, Account Details, or Bottom Sheet header foundations *
 
 Fix behavior once in the foundation; all consumers inherit the change.
 
+### Page title spacing (frozen)
+
+Large in-content page title → next content block = **24px**.
+
+- Token: `SCREEN_PAGE_TITLE_TO_CONTENT_GAP_PX` / `SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS` (`mb-6`)
+- Applied on `ScreenPageTitle` (`RootPageTitle`, `StackPageTitle`)
+- **Do not** add per-screen margins below page titles
+
+**Documented exception:** `AccountDetailsSummary` uses `StackPageTitle` with `mb-0` — in-card account name, not a page-title block.
+
 ### Variant rule
 
 If a future exception is required:
@@ -540,7 +550,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 3. Account name — **15px medium**, single-line truncated
 4. Divider — `border-border` between top section and balance
 5. Balance label — **13px medium**, sentence case (`accounts.sections.balance`)
-6. Balance value — **15px semibold** via `CurrencyAmount` (numeric typography foundation)
+6. Balance value — **18px semibold** via `CurrencyAmount` + `ACCOUNT_CARD_BALANCE_VALUE_CLASS` (numeric typography foundation)
 7. Subtle shadow — `ACCOUNT_CARD_SHADOW_CLASS` only
 8. Corner radius — existing `rounded-lg` on card container
 
