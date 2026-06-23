@@ -36,8 +36,10 @@ import { Plus, Trash2 } from "lucide-react";
 /** Matches `FormSection` / Add Record field stack spacing (`space-y-5`). */
 const SAVINGS_FORM_STACK_GAP_CLASS = "mt-5";
 
-/** Tiered interest vertical rhythm (px). */
-const SAVINGS_TIER_SECTION_GAP_CLASS = "mt-4";
+/** Tiered interest vertical rhythm — 16px (`p-4` / `gap-4` / `mb-4`). */
+const SAVINGS_TIER_GAP_CLASS = "gap-4";
+const SAVINGS_TIER_BLOCK_GAP_CLASS = "mb-4";
+const SAVINGS_TIER_INPUTS_TO_DIVIDER_CLASS = "pb-4";
 
 const SAVINGS_TIER_LABEL_CLASS =
   "text-[0.9375rem] font-semibold leading-5 text-foreground";
@@ -182,10 +184,15 @@ export function SavingsFormFields({
   }
 
   function addTier() {
+    const last = values.tiers.at(-1);
+    const nextMin =
+      last && last.maxBalance.trim()
+        ? String(Number(last.maxBalance.replace(/,/g, "")) + 1)
+        : "";
     onChange({
       tiers: [
         ...values.tiers,
-        { minBalance: "", maxBalance: "", annualInterestRate: "" },
+        { minBalance: nextMin, maxBalance: "", annualInterestRate: "" },
       ],
     });
   }
@@ -313,15 +320,14 @@ export function SavingsFormFields({
             {values.tiers.map((tier, index) => (
               <div
                 key={index}
-                className={cn(
-                  index > 0 &&
-                    cn(
-                      "border-t border-border",
-                      SAVINGS_TIER_SECTION_GAP_CLASS,
-                    ),
-                )}
+                className={cn(index > 0 && "border-t border-border pt-4")}
               >
-                <div className="mb-4 flex h-8 items-center justify-between gap-3">
+                <div
+                  className={cn(
+                    "flex h-8 items-center justify-between gap-3",
+                    SAVINGS_TIER_BLOCK_GAP_CLASS,
+                  )}
+                >
                   <span className={SAVINGS_TIER_LABEL_CLASS}>
                     {t("savings.fields.tiers.tierLabel", { index: index + 1 })}
                   </span>
@@ -339,7 +345,13 @@ export function SavingsFormFields({
                     ) : null}
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 pb-4">
+                <div
+                  className={cn(
+                    "flex flex-col",
+                    SAVINGS_TIER_GAP_CLASS,
+                    SAVINGS_TIER_INPUTS_TO_DIVIDER_CLASS,
+                  )}
+                >
                   <AccountFormEditableField
                     id={`tier-min-${index}`}
                     label={t("savings.fields.tiers.minBalance")}
