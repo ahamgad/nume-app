@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
+import { AccountFormCreateContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
 import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
@@ -113,19 +114,21 @@ export function AddCreditCardAccountScreen() {
       <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{pageTitle}</StackPageTitle>
-        <CreditCardFormFields
-          values={values}
-          errors={errors}
-          amountInputLocale={amountInputLocale}
-          linkedAccounts={linkedAccounts}
+        <AccountFormCreateContent
           disabled={submitting}
-          mode="create"
-          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
-          onClearError={clearFieldError}
-        />
-        {errors.form ? (
-          <p className="mt-4 text-sm text-destructive">{errors.form}</p>
-        ) : null}
+          formError={errors.form}
+        >
+          <CreditCardFormFields
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            linkedAccounts={linkedAccounts}
+            disabled={submitting}
+            mode="create"
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
+        </AccountFormCreateContent>
       </ScreenBody>
       <StickyFooter>
         <AccountCreateActionButton

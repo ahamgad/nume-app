@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
@@ -163,19 +164,18 @@ function EditCreditCardAccountForm({
       <StackPageHeader title={t("creditCards.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{t("creditCards.edit.title")}</StackPageTitle>
-        <CreditCardFormFields
-          values={values}
-          errors={errors}
-          amountInputLocale={amountInputLocale}
-          linkedAccounts={linkedAccounts}
-          disabled={submitting}
-          mode="edit"
-          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
-          onClearError={clearFieldError}
-        />
-        {errors.form ? (
-          <p className="mt-4 text-sm text-destructive">{errors.form}</p>
-        ) : null}
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
+          <CreditCardFormFields
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            linkedAccounts={linkedAccounts}
+            disabled={submitting}
+            mode="edit"
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
+        </AccountFormEditContent>
       </ScreenBody>
       <StickyFooter>
         <Button

@@ -38,8 +38,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 10 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` | § 15 |
 | 11 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` | § 16 |
 | 12 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — `lib/layout/card-surface.ts` | § 16 |
+| 13 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, or card-surface chrome inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, card-surface chrome, or account-form section layouts inside individual screens.
 
 ---
 
@@ -639,6 +640,40 @@ Account cards consume via `ACCOUNT_CARD_CONTAINER_CLASS`. Future cards **must** 
 
 ---
 
+## 17. Account forms (frozen)
+
+All account **create** and **edit** screens compose through the shared account form section foundation.
+
+Location: `components/forms/account-form-section.tsx`, `components/forms/account-form-layout.tsx`, `lib/layout/account-form-chrome.ts`.
+
+### Rules
+
+1. **Description → first section** (create only) — `ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX` = 16px via `AccountFormCreateContent`
+2. **Section → section** — `ACCOUNT_FORM_SECTION_GAP_PX` = 24px via `AccountFormSections`
+3. **Card surface** — `CARD_SURFACE_CLASS` on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
+4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium (`text-lg font-medium`)
+5. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
+6. **Create flows** — `AccountFormCreateContent` wraps description + fields
+7. **Edit flows** — `AccountFormEditContent` wraps fields
+8. **Propagation** — all `*-form-fields` modules consume `AccountFormSection` / `AccountFormSections`
+9. **No custom section styling** in screen files
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `AccountFormSection` | Bordered section with title + divided field rows |
+| `AccountFormSections` | Stacks sections with 24px gap |
+| `AccountFormCreateContent` | Create wrapper — 16px description gap, disabled state, form error |
+| `AccountFormEditContent` | Edit wrapper — disabled state, form error |
+| `AccountFormDescription` | Lead copy on create screens |
+
+### Applies to
+
+Current, wallet, cash, savings, certificate, credit card, loan — and **all future account types** with create/edit forms.
+
+---
+
 ## 12. Future screen rule (mandatory)
 
 Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
@@ -662,6 +697,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Account picker row layouts in selection sheets
 - Account type picker card layouts
 - Card border / shadow / radius outside `card-surface.ts`
+- Account form section layouts outside `AccountFormSection`
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -702,7 +738,7 @@ If a genuine exception is required:
 | Institution picker (all types) | Picker + picker list | ✅ |
 | Interest destination picker | Picker + picker list | ✅ |
 | Account / renewal pickers | Picker + picker list | ✅ |
-| Add Account type picker sheet | Account type picker sheet foundation | ✅ |
+| Account create / edit forms | Account forms foundation | ✅ |
 | Currency / metric displays | Numeric typography foundation | ✅ |
 | System copy (EN) | Typography & copy foundation | ✅ |
 | All inline field editors | Field editor foundation | ✅ |

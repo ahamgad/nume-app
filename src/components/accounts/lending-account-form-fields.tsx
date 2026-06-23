@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormCardSection } from "@/components/forms/form-card-section";
+import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import {
@@ -50,7 +50,8 @@ export function LendingAccountFormFields({
   const t = useT();
 
   return (
-    <FormCardSection title={t("accounts.formSections.accountDetails")}>
+    <AccountFormSections>
+      <AccountFormSection title={t("accounts.formSections.accountDetails")}>
       <EditableField
         id="lending-name"
         label={t("accounts.fields.name.label")}
@@ -111,7 +112,8 @@ export function LendingAccountFormFields({
           }}
         />
       ) : null}
-    </FormCardSection>
+      </AccountFormSection>
+    </AccountFormSections>
   );
 }
 

@@ -27,6 +27,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` — no balances; Institution Picker visual parity; type · last-4 metadata |
 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` — dedicated cards; inherits `CardChevron` |
 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — shared border, radius, shadow |
+| **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` — 16px description gap, 24px section gap, 18px medium titles |
 
 ## Interaction patterns
 
@@ -44,7 +45,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 
 ## Prohibited in screen files
 
-- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor behaviors, account card layouts on the Accounts tab, account picker row layouts, account type picker cards, or duplicated card-surface chrome
+- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor behaviors, account card layouts on the Accounts tab, account picker row layouts, account type picker cards, duplicated card-surface chrome, or account form section layouts
 
 Read **`docs/FOUNDATION.md`** for full rules, audit table, and documented exceptions.
 

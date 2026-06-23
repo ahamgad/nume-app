@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormCardSection } from "@/components/forms/form-card-section";
+import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { EditableField } from "@/components/field-editor";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
 import type { InstitutionPickerContext } from "@/lib/institutions/catalog";
@@ -54,7 +54,8 @@ export function MoneyAccountFormFields({
   const showBalance = showsBalanceField(accountType, mode);
 
   return (
-    <FormCardSection title={t("accounts.formSections.accountDetails")}>
+    <AccountFormSections>
+      <AccountFormSection title={t("accounts.formSections.accountDetails")}>
       <EditableField
         id="account-name"
         label={t("accounts.fields.name.label")}
@@ -146,6 +147,7 @@ export function MoneyAccountFormFields({
           }}
         />
       ) : null}
-    </FormCardSection>
+      </AccountFormSection>
+    </AccountFormSections>
   );
 }

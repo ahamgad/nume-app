@@ -3,7 +3,7 @@
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
 import { DateField } from "@/components/ui/date-field";
 import { EditableField } from "@/components/field-editor";
-import { FormCardSection } from "@/components/forms/form-card-section";
+import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { InstitutionPicker } from "@/components/ui/institution-picker";
@@ -33,6 +33,8 @@ import {
   validateCertificateRateField,
 } from "@/lib/field-editor/field-validators";
 import type { TranslationKey } from "@/lib/i18n";
+import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
+import { cn } from "@/lib/utils";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 const PAYOUT_FREQUENCIES: PayoutFrequency[] = [
@@ -112,8 +114,8 @@ export function CertificateFormFields({
     values.payoutFrequency !== "instantly";
 
   return (
-    <div className="space-y-6">
-      <FormCardSection title={t("accounts.formSections.accountDetails")}>
+    <AccountFormSections>
+      <AccountFormSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="certificate-name"
           label={t("certificates.fields.name.label")}
@@ -194,9 +196,9 @@ export function CertificateFormFields({
             <p className="mt-1 text-sm text-destructive">{errors.purchaseDate}</p>
           ) : null}
         </div>
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection title={t("accounts.formSections.interestDetails")}>
+      <AccountFormSection title={t("accounts.formSections.interestDetails")}>
         <EditableField
           id="certificate-rate"
           label={t("accounts.fields.annualRate.label")}
@@ -283,7 +285,7 @@ export function CertificateFormFields({
         ) : null}
 
         {values.payoutFrequency === "daily" ? (
-          <div className="rounded-lg border border-border px-4">
+          <div className={cn(CARD_SURFACE_FLAT_CLASS, "px-4")}>
             <p className="border-b border-border py-3 text-sm font-medium">
               {t("businessDays.title")}
             </p>
@@ -307,10 +309,10 @@ export function CertificateFormFields({
             />
           </div>
         ) : null}
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection title={t("accounts.formSections.recurring")}>
-        <div className="rounded-lg border border-border px-4">
+      <AccountFormSection title={t("accounts.formSections.recurring")}>
+        <div className={cn(CARD_SURFACE_FLAT_CLASS, "px-4")}>
           <ToggleSettingRow
             label={t("certificates.fields.autoApplyInterest.label")}
             description={t("certificates.fields.autoApplyInterest.description")}
@@ -367,7 +369,7 @@ export function CertificateFormFields({
             onClearError("renewalType");
           }}
         />
-      </FormCardSection>
-    </div>
+      </AccountFormSection>
+    </AccountFormSections>
   );
 }

@@ -8,6 +8,7 @@ import {
   validateLendingAccountForm,
   type LendingAccountFormValues,
 } from "@/components/accounts/lending-account-form-fields";
+import { AccountFormCreateContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
 import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
@@ -103,18 +104,20 @@ export function AddLendingAccountScreen() {
       <StackPageHeader title={getAddAccountScreenTitle("loan", t)} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{getAddAccountScreenTitle("loan", t)}</StackPageTitle>
-        <LendingAccountFormFields
-          values={values}
-          errors={errors}
-          amountInputLocale={amountInputLocale}
+        <AccountFormCreateContent
           disabled={submitting}
-          mode="create"
-          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
-          onClearError={clearFieldError}
-        />
-        {errors.form ? (
-          <p className="mt-4 text-sm text-destructive">{errors.form}</p>
-        ) : null}
+          formError={errors.form}
+        >
+          <LendingAccountFormFields
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            disabled={submitting}
+            mode="create"
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
+        </AccountFormCreateContent>
       </ScreenBody>
       <StickyFooter>
         <AccountCreateActionButton

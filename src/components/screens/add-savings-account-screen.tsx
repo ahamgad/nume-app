@@ -22,7 +22,7 @@ import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
+import { AccountFormCreateContent } from "@/components/forms/account-form-layout";
 
 export function AddSavingsAccountScreen() {
   const t = useT();
@@ -108,16 +108,11 @@ export function AddSavingsAccountScreen() {
       <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{pageTitle}</StackPageTitle>
-        <div
-          className={cn(
-            "space-y-6 pt-2",
-            submitting && "pointer-events-none opacity-60",
-          )}
+        <AccountFormCreateContent
+          description={t("savings.create.lead")}
+          disabled={submitting}
+          formError={errors.form}
         >
-          <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-            {t("savings.create.lead")}
-          </p>
-
           <SavingsFormFields
             values={values}
             errors={errors}
@@ -127,11 +122,7 @@ export function AddSavingsAccountScreen() {
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
-
-          {errors.form ? (
-            <p className="text-sm text-destructive">{errors.form}</p>
-          ) : null}
-        </div>
+        </AccountFormCreateContent>
       </ScreenBody>
 
       <StickyFooter>

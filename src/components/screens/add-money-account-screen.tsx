@@ -22,7 +22,7 @@ import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
+import { AccountFormCreateContent } from "@/components/forms/account-form-layout";
 
 const EMPTY_VALUES: MoneyAccountFormValues = {
   name: "",
@@ -123,18 +123,15 @@ export function AddMoneyAccountScreen({
       <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{pageTitle}</StackPageTitle>
-        <div
-          className={cn(
-            "space-y-6",
-            submitting && "pointer-events-none opacity-60",
-          )}
-        >
-          <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-            {isFirstAccountFlow
+        <AccountFormCreateContent
+          description={
+            isFirstAccountFlow
               ? t("accounts.add.firstAccount.lead")
-              : t("accounts.add.lead")}
-          </p>
-
+              : t("accounts.add.lead")
+          }
+          disabled={submitting}
+          formError={errors.form}
+        >
           <MoneyAccountFormFields
             accountType={accountType}
             values={values}
@@ -144,11 +141,7 @@ export function AddMoneyAccountScreen({
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
-
-          {errors.form ? (
-            <p className="text-sm text-destructive">{errors.form}</p>
-          ) : null}
-        </div>
+        </AccountFormCreateContent>
       </ScreenBody>
 
       <StickyFooter>

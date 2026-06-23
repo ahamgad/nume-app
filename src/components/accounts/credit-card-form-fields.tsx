@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormCardSection } from "@/components/forms/form-card-section";
+import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { EditableField } from "@/components/field-editor";
 import { AccountPicker } from "@/components/ui/account-picker";
 import { Label } from "@/components/ui/label";
@@ -60,8 +60,8 @@ export function CreditCardFormFields({
   ];
 
   return (
-    <div className="space-y-6">
-      <FormCardSection title={t("accounts.formSections.accountDetails")}>
+    <AccountFormSections>
+      <AccountFormSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="credit-card-name"
           label={t("accounts.fields.name.label")}
@@ -145,9 +145,9 @@ export function CreditCardFormFields({
             onClearError("creditLimit");
           }}
         />
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection title={t("creditCards.formSections.statement")}>
+      <AccountFormSection title={t("creditCards.formSections.statement")}>
         <div className="space-y-2">
           <Label>{t("creditCards.fields.statementDueDay.label")}</Label>
           <ScrollChipSelect
@@ -163,7 +163,7 @@ export function CreditCardFormFields({
             <p className="text-sm text-destructive">{errors.statementDueDay}</p>
           ) : null}
         </div>
-      </FormCardSection>
-    </div>
+      </AccountFormSection>
+    </AccountFormSections>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { FormCardSection } from "@/components/forms/form-card-section";
+import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
 import { EditableField } from "@/components/field-editor";
 import { ToggleSettingRow } from "@/components/patterns";
 import { AccountPicker } from "@/components/ui/account-picker";
@@ -26,7 +26,9 @@ import {
   validateCertificateRateField,
 } from "@/lib/field-editor/field-validators";
 import { formatBalanceTriggerDisplay } from "@/lib/field-editor/balance-sign";
+import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
 import type { TranslationKey } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
 import { Plus, Trash2 } from "lucide-react";
@@ -127,8 +129,8 @@ export function SavingsFormFields({
   }
 
   return (
-    <div className="space-y-6">
-      <FormCardSection title={t("accounts.formSections.accountDetails")}>
+    <AccountFormSections>
+      <AccountFormSection title={t("accounts.formSections.accountDetails")}>
         <EditableField
           id="savings-name"
           label={t("accounts.fields.name.label")}
@@ -199,9 +201,9 @@ export function SavingsFormFields({
             }}
           />
         ) : null}
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection
+      <AccountFormSection
         title={t("savings.sections.interestModel")}
       >
         <div className="space-y-2">
@@ -244,7 +246,7 @@ export function SavingsFormFields({
             {values.tiers.map((tier, index) => (
               <div
                 key={index}
-                className="space-y-2 rounded-lg border border-border p-3"
+                className={cn(CARD_SURFACE_FLAT_CLASS, "space-y-2 p-3")}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">
@@ -326,9 +328,9 @@ export function SavingsFormFields({
             ) : null}
           </div>
         )}
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection title={t("savings.sections.posting")}>
+      <AccountFormSection title={t("savings.sections.posting")}>
         <p className="text-sm text-muted-foreground">
           {t("savings.balanceMethodHint")}
         </p>
@@ -360,7 +362,7 @@ export function SavingsFormFields({
             ) : null}
           </div>
         ) : (
-          <div className="rounded-lg border border-border px-4">
+          <div className={cn(CARD_SURFACE_FLAT_CLASS, "px-4")}>
             <p className="border-b border-border py-3 text-sm font-medium">
               {t("businessDays.title")}
             </p>
@@ -384,9 +386,9 @@ export function SavingsFormFields({
             />
           </div>
         )}
-      </FormCardSection>
+      </AccountFormSection>
 
-      <FormCardSection title={t("savings.sections.destination")}>
+      <AccountFormSection title={t("savings.sections.destination")}>
         <div className="space-y-2">
           <Label>{t("accounts.fields.interestDestination.label")}</Label>
           <ScrollChipSelect
@@ -435,7 +437,7 @@ export function SavingsFormFields({
             />
           </>
         ) : null}
-      </FormCardSection>
-    </div>
+      </AccountFormSection>
+    </AccountFormSections>
   );
 }

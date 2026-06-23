@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
@@ -145,7 +146,7 @@ function EditCertificateForm({
       <StackPageHeader title={t("certificates.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter onRefresh={refresh}>
         <StackPageTitle>{t("certificates.edit.title")}</StackPageTitle>
-        <div className="space-y-6 pt-2">
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CertificateFormFields
             values={values}
             errors={errors}
@@ -156,10 +157,7 @@ function EditCertificateForm({
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
-          {errors.form ? (
-            <p className="text-sm text-destructive">{errors.form}</p>
-          ) : null}
-        </div>
+        </AccountFormEditContent>
       </ScreenBody>
 
       <StickyFooter>

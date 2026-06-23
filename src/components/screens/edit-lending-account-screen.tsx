@@ -21,6 +21,7 @@ import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 import { cn } from "@/lib/utils";
 
 interface EditLendingAccountScreenProps {
@@ -161,18 +162,17 @@ function EditLendingAccountForm({
       <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
-        <LendingAccountFormFields
-          values={values}
-          errors={errors}
-          amountInputLocale={amountInputLocale}
-          disabled={submitting}
-          mode="edit"
-          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
-          onClearError={clearFieldError}
-        />
-        {errors.form ? (
-          <p className="mt-4 text-sm text-destructive">{errors.form}</p>
-        ) : null}
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
+          <LendingAccountFormFields
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            disabled={submitting}
+            mode="edit"
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
+        </AccountFormEditContent>
       </ScreenBody>
       <StickyFooter>
         <Button

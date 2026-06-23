@@ -24,6 +24,7 @@ import { useFinance } from "@/lib/finance/store";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 
 interface EditAccountScreenProps {
   accountId: string;
@@ -104,7 +105,7 @@ function EditAccountForm({
       <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
-        <div className="space-y-6">
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <MoneyAccountFormFields
             accountType={accountType}
             values={values}
@@ -115,10 +116,7 @@ function EditAccountForm({
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
-          {errors.form ? (
-            <p className="text-sm text-destructive">{errors.form}</p>
-          ) : null}
-        </div>
+        </AccountFormEditContent>
       </ScreenBody>
 
       <StickyFooter>

@@ -24,7 +24,7 @@ import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 
 interface EditSavingsAccountScreenProps {
   accountId: string;
@@ -171,12 +171,7 @@ function EditSavingsAccountForm({
       <StackPageHeader title={t("savings.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{t("savings.edit.title")}</StackPageTitle>
-        <div
-          className={cn(
-            "space-y-6 pt-2",
-            submitting && "pointer-events-none opacity-60",
-          )}
-        >
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <SavingsFormFields
             values={values}
             errors={errors}
@@ -187,11 +182,7 @@ function EditSavingsAccountForm({
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClearError={clearFieldError}
           />
-
-          {errors.form ? (
-            <p className="text-sm text-destructive">{errors.form}</p>
-          ) : null}
-        </div>
+        </AccountFormEditContent>
       </ScreenBody>
 
       <StickyFooter>
