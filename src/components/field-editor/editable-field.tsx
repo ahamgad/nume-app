@@ -110,7 +110,7 @@ export function EditableField({
   const hasValue = resolvedDisplay.trim().length > 0;
   const resolvedPlaceholder = sanitizeFieldEditorPlaceholder(placeholder);
   const showPlaceholder = !hasValue && resolvedPlaceholder;
-  const isRequired = required ?? validate !== undefined;
+  const isRequired = required === true;
 
   const { prefix, suffix } = resolveFieldDecorations(mode, {
     prefixLabel,

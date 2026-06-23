@@ -1,20 +1,23 @@
 "use client";
 
-import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
-import { EditableField } from "@/components/field-editor";
-import { InstitutionPicker } from "@/components/ui/institution-picker";
+import {
+  AccountFormEditableField,
+  AccountFormIdentifierField,
+  AccountFormInstitutionPicker,
+  AccountFormSection,
+  AccountFormSections,
+} from "@/components/forms/account-form-section";
+import {
+  validateAccountBalanceField,
+  validateAccountNameField,
+  validateIdentifierLast4Field,
+} from "@/lib/field-editor/field-validators";
 import {
   applyDuplicateAccountIdentityError,
   type AccountIdentityInput,
   type AccountIdentityResolverContext,
 } from "@/lib/finance/account-identity-validation";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
-import {
-  validateAccountBalanceField,
-  validateAccountNameField,
-  validateIdentifierLast4Field,
-} from "@/lib/field-editor/field-validators";
 import {
   formatAmountInput,
   sanitizeAmountInput,
@@ -50,68 +53,72 @@ export function LendingAccountFormFields({
   const t = useT();
 
   return (
-    <AccountFormSections>
+    <AccountFormSections
+      requirements={{
+        mode,
+        accountType: "loan",
+        showsInstitution: true,
+        showsBalance: mode === "create",
+        showsIdentifier: true,
+      }}
+    >
       <AccountFormSection title={t("accounts.formSections.accountDetails")}>
-      <EditableField
-        id="lending-name"
-        label={t("accounts.fields.name.label")}
-        value={values.name}
-        placeholder={t("accounts.fields.name.placeholder")}
-        disabled={disabled}
-        error={errors.name}
-        variant="row"
-        validate={(name) => validateAccountNameField(name, t)}
-        onSave={(name) => {
-          onChange({ name });
-          onClearError("name");
-        }}
-      />
-
-      <InstitutionPicker
-        id="lending-institution"
-        accountType="loan"
-        value={values.institution}
-        disabled={disabled}
-        error={errors.institution}
-        variant="row"
-        onChange={(institution) => {
-          onChange({ institution });
-          onClearError("institution");
-        }}
-      />
-
-      <AccountIdentifierField
-        id="lending-identifier"
-        labelKey="accounts.fields.loanNumber.label"
-        placeholderKey="accounts.fields.loanNumber.placeholder"
-        value={values.identifier}
-        disabled={disabled}
-        error={errors.identifier}
-        variant="row"
-        onChange={(identifier) => onChange({ identifier })}
-        onClearError={() => onClearError("identifier")}
-      />
-
-      {mode === "create" ? (
-        <EditableField
-          id="lending-balance"
-          label={t("accounts.fields.balance.label")}
-          mode="numeric"
-          inputMode="decimal"
-          value={values.balance}
-          placeholder={t("common.currency.zeroPlaceholder")}
+        <AccountFormEditableField
+          id="lending-name"
+          label={t("accounts.fields.name.label")}
+          value={values.name}
+          placeholder={t("accounts.fields.name.placeholder")}
           disabled={disabled}
-          error={errors.balance}
-          variant="row"
-          sanitizeInput={sanitizeAmountInput}
-          formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
-          validate={(next) => validateAccountBalanceField(next, t)}
-          onSave={(balance) => {
-            onChange({ balance });
-            onClearError("balance");
+          error={errors.name}
+          validate={(name) => validateAccountNameField(name, t)}
+          onSave={(name) => {
+            onChange({ name });
+            onClearError("name");
           }}
         />
-      ) : null}
+
+        <AccountFormInstitutionPicker
+          id="lending-institution"
+          accountType="loan"
+          value={values.institution}
+          disabled={disabled}
+          error={errors.institution}
+          onChange={(institution) => {
+            onChange({ institution });
+            onClearError("institution");
+          }}
+        />
+
+        <AccountFormIdentifierField
+          id="lending-identifier"
+          labelKey="accounts.fields.loanNumber.label"
+          placeholderKey="accounts.fields.loanNumber.placeholder"
+          value={values.identifier}
+          disabled={disabled}
+          error={errors.identifier}
+          onChange={(identifier) => onChange({ identifier })}
+          onClearError={() => onClearError("identifier")}
+        />
+
+        {mode === "create" ? (
+          <AccountFormEditableField
+            id="lending-balance"
+            label={t("accounts.fields.balance.label")}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.balance}
+            placeholder={t("common.currency.zeroPlaceholder")}
+            disabled={disabled}
+            error={errors.balance}
+            sanitizeInput={sanitizeAmountInput}
+            formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
+            validate={(next) => validateAccountBalanceField(next, t)}
+            onSave={(balance) => {
+              onChange({ balance });
+              onClearError("balance");
+            }}
+          />
+        ) : null}
       </AccountFormSection>
     </AccountFormSections>
   );

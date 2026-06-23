@@ -645,7 +645,7 @@ Account cards consume via `ACCOUNT_CARD_CONTAINER_CLASS`. Future cards **must** 
 
 All account **create** and **edit** screens compose through the shared account form section foundation.
 
-Location: `components/forms/account-form-section.tsx`, `components/forms/account-form-layout.tsx`, `lib/layout/account-form-chrome.ts`.
+Location: `components/forms/account-form-section.tsx`, `components/forms/account-form-field.tsx`, `components/forms/account-form-layout.tsx`, `lib/layout/account-form-chrome.ts`, `lib/finance/account-form-required.ts`.
 
 ### Rules
 
@@ -653,18 +653,25 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 2. **Section → section** — `ACCOUNT_FORM_SECTION_GAP_PX` = 24px via `AccountFormSections`
 3. **Card surface** — `CARD_SURFACE_CLASS` on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
 4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium (`text-lg font-medium`)
-5. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
-6. **Create flows** — `AccountFormCreateContent` wraps description + fields
-7. **Edit flows** — `AccountFormEditContent` wraps fields
-8. **Propagation** — all `*-form-fields` modules consume `AccountFormSection` / `AccountFormSections`
-9. **No custom section styling** in screen files
+5. **Section fields padding** — `ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX` = 16px top and bottom via `ACCOUNT_FORM_SECTION_FIELDS_CLASS` (`py-4`)
+6. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`)
+7. **Divider → field** — same 16px row padding
+8. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
+9. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
+10. **Requirement context** — `AccountFormSections` `requirements` prop drives required indicators via `account-form-required.ts`
+11. **Create flows** — `AccountFormCreateContent` wraps description + fields
+12. **Edit flows** — `AccountFormEditContent` wraps fields
+13. **Propagation** — all `*-form-fields` modules consume account form wrappers + sections
+14. **No custom section styling** in screen files
 
 ### Approved components
 
 | Component | Role |
 |---|---|
 | `AccountFormSection` | Bordered section with title + divided field rows |
-| `AccountFormSections` | Stacks sections with 24px gap |
+| `AccountFormSections` | Stacks sections with 24px gap + requirement context |
+| `AccountFormEditableField` | Row `EditableField` for all account form inputs |
+| `AccountFormGroupError` | In-flow group validation for conditional clusters |
 | `AccountFormCreateContent` | Create wrapper — 16px description gap, disabled state, form error |
 | `AccountFormEditContent` | Edit wrapper — disabled state, form error |
 | `AccountFormDescription` | Lead copy on create screens |
@@ -679,43 +686,44 @@ Current, wallet, cash, savings, certificate, credit card, loan — and **all fut
 
 All account **create** and **edit** form fields compose through the shared input field foundation.
 
-Location: `components/forms/input-field.tsx`, `lib/layout/input-field-chrome.ts`.
+Location: `components/forms/input-field.tsx`, `components/forms/account-form-field.tsx`, `lib/layout/input-field-chrome.ts`, `lib/finance/account-form-required.ts`.
 
 ### Rules
 
 1. **Label** — `INPUT_FIELD_LABEL_CLASS` = 13px regular (`text-[0.8125rem] font-normal`)
 2. **Label → field** — `INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX` = 8px via `INPUT_FIELD_STACK_CLASS`
-3. **Required fields** — `*` immediately after label; same color and typography as label (`InputFieldLabel`)
+3. **Required fields** — `*` only when `isAccountFormFieldRequired` is true for that field; same color and typography as label
 4. **Input value** — `INPUT_FIELD_VALUE_CLASS` = 15px regular (`text-[0.9375rem] font-normal`)
 5. **Input padding** — `INPUT_FIELD_ROW_TRIGGER_CLASS` includes `p-0` on row triggers
 6. **Chevron** — `InputFieldRowTrigger` uses `CardChevron` / `CARD_CHEVRON_CLASS` (card chevron foundation)
-7. **Field → divider** — `INPUT_FIELD_DIVIDER_GAP_PX` = 8px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-2`)
-8. **Divider → field** — same 8px row padding
-9. **Error placement** — `InputFieldError` = 4px below control (`INPUT_FIELD_ERROR_GAP_PX`); absolutely positioned
-10. **Divider rhythm** — errors must not expand row height or push section dividers
+7. **Field → divider** — 16px via account form field row padding (see § 17)
+8. **Divider → field** — same 16px row padding
+9. **Error placement** — `InputFieldError` = 4px below control (`INPUT_FIELD_ERROR_GAP_PX`); **in normal document flow**
+10. **Error layout** — errors never overlap dividers, fields, or adjacent content
 11. **Placeholder on error** — only error text is destructive; value/placeholder styling unchanged
 12. **Placeholder required** — every field exposes a placeholder; initial empty state shows placeholder
 13. **No default values** — create flows start empty (placeholder state)
 14. **Amount fields** — fixed `INPUT_FIELD_AMOUNT_PREFIX` (`EGP`) via `InputFieldAffix` (not placeholder text)
 15. **Rate fields** — fixed `INPUT_FIELD_RATE_SUFFIX` (`%`) via `InputFieldAffix`
-16. **Conditional fields** — same foundation via shared field components (`EditableField`, pickers, `ScrollChipSelect` with `label`)
-17. **Future account types** — inherit automatically through `*-form-fields` modules
-18. **No custom field styling** in screen files
+16. **Conditional fields** — inherit via `AccountForm*` wrappers; fragment children in `AccountFormSection` each become field rows
+17. **Validation presentation** — submit validation surfaces **all** visible field errors simultaneously
+18. **Future account types** — inherit automatically through `*-form-fields` modules + `AccountFormSections` requirements
+19. **No custom field styling** in screen files
 
 ### Approved components
 
 | Component | Role |
 |---|---|
-| `InputField` | Label + control slot + absolute error |
-| `InputFieldLabel` | 13px label with optional `*` |
+| `InputField` | Label + control slot + in-flow error |
+| `InputFieldLabel` | 13px label with optional `*` (required fields only) |
 | `InputFieldRowTrigger` | Borderless row + `CardChevron` |
 | `InputFieldValue` | 15px value / placeholder text |
 | `InputFieldAffix` | EGP / % decorations (placeholder color) |
-| `InputFieldError` | 4px-below error without affecting dividers |
+| `InputFieldError` | 4px-below error in document flow |
 
 ### Consumers
 
-`EditableField` (`variant="row"`), `InstitutionPicker`, `AccountPicker`, `DateField`, `RenewalTypePicker`, `ScrollChipSelect` (with `label`), `AccountIdentifierField` — and **all future account form fields**.
+`AccountFormEditableField`, `AccountFormInstitutionPicker`, `AccountFormAccountPicker`, `AccountFormDateField`, `AccountFormScrollChipSelect`, `AccountFormIdentifierField`, `AccountFormRenewalTypePicker` — and **all future account form fields**.
 
 ---
 

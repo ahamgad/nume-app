@@ -1,13 +1,14 @@
 "use client";
 
-import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
-import { EditableField } from "@/components/field-editor";
-import { AccountPicker } from "@/components/ui/account-picker";
 import {
-  ScrollChipSelect,
+  AccountFormAccountPicker,
+  AccountFormEditableField,
+  AccountFormIdentifierField,
+  AccountFormScrollChipSelect,
+  AccountFormSection,
+  AccountFormSections,
   type ScrollChipOption,
-} from "@/components/ui/scroll-chip-select";
+} from "@/components/forms/account-form-section";
 import type { CreditCardFormValues } from "@/lib/credit-cards/form";
 import {
   formatAmountInput,
@@ -59,16 +60,22 @@ export function CreditCardFormFields({
   ];
 
   return (
-    <AccountFormSections>
+    <AccountFormSections
+      requirements={{
+        mode,
+        accountType: "credit_card",
+        showsIdentifier: true,
+        showsBalance: mode === "create",
+      }}
+    >
       <AccountFormSection title={t("accounts.formSections.accountDetails")}>
-        <EditableField
+        <AccountFormEditableField
           id="credit-card-name"
           label={t("accounts.fields.name.label")}
           value={values.name}
           placeholder={t("accounts.fields.name.placeholder")}
           disabled={disabled}
           error={errors.name}
-          variant="row"
           validate={(name) => validateAccountNameField(name, t)}
           onSave={(name) => {
             onChange({ name });
@@ -76,7 +83,7 @@ export function CreditCardFormFields({
           }}
         />
 
-        <AccountPicker
+        <AccountFormAccountPicker
           id="credit-card-linked-account"
           label={t("creditCards.fields.linkedAccount.label")}
           placeholder={t("creditCards.fields.linkedAccount.placeholder")}
@@ -86,29 +93,26 @@ export function CreditCardFormFields({
           value={values.linkedAccountId}
           accounts={linkedAccounts}
           disabled={disabled}
-          required
           error={errors.linkedAccountId}
-          variant="row"
           onChange={(linkedAccountId) => {
             onChange({ linkedAccountId });
             onClearError("linkedAccountId");
           }}
         />
 
-        <AccountIdentifierField
+        <AccountFormIdentifierField
           id="credit-card-identifier"
           labelKey="accounts.fields.cardNumber.label"
           placeholderKey="accounts.fields.cardNumber.placeholder"
           value={values.identifier}
           disabled={disabled}
           error={errors.identifier}
-          variant="row"
           onChange={(identifier) => onChange({ identifier })}
           onClearError={() => onClearError("identifier")}
         />
 
         {mode === "create" ? (
-          <EditableField
+          <AccountFormEditableField
             id="credit-card-outstanding"
             label={t("creditCards.fields.outstandingBalance.label")}
             mode="numeric"
@@ -117,7 +121,6 @@ export function CreditCardFormFields({
             placeholder={t("common.currency.zeroPlaceholder")}
             disabled={disabled}
             error={errors.outstandingBalance}
-            variant="row"
             sanitizeInput={sanitizeAmountInput}
             formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
             validate={(next) => validateAccountBalanceField(next, t)}
@@ -128,7 +131,7 @@ export function CreditCardFormFields({
           />
         ) : null}
 
-        <EditableField
+        <AccountFormEditableField
           id="credit-card-limit"
           label={t("creditCards.fields.creditLimit.label")}
           mode="numeric"
@@ -137,7 +140,6 @@ export function CreditCardFormFields({
           placeholder="0"
           disabled={disabled}
           error={errors.creditLimit}
-          variant="row"
           sanitizeInput={sanitizeDecimalInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
           onSave={(creditLimit) => {
@@ -148,10 +150,9 @@ export function CreditCardFormFields({
       </AccountFormSection>
 
       <AccountFormSection title={t("creditCards.formSections.statement")}>
-        <ScrollChipSelect
-          label={t("creditCards.fields.statementDueDay.label")}
-          required
+        <AccountFormScrollChipSelect
           fieldId="credit-card-statement-due-day"
+          label={t("creditCards.fields.statementDueDay.label")}
           value={values.statementDueDay}
           options={statementDueDayOptions}
           ariaLabel={t("creditCards.fields.statementDueDay.label")}

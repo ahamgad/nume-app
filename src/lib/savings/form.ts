@@ -117,6 +117,10 @@ export function validateSavingsForm(
     errors.name = t("accounts.validation.nameRequired");
   }
 
+  if (!values.institution.trim()) {
+    errors.institution = t("accounts.validation.institutionRequired");
+  }
+
   const identifierError = validateIdentifierLast4Field(values.accountNumber, t);
   if (identifierError) errors.accountNumber = identifierError;
 

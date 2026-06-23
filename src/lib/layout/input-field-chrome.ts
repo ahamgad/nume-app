@@ -6,7 +6,7 @@ import { CARD_CHEVRON_ROW_CLASS } from "@/lib/layout/account-card-chrome";
 export const INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX = 8;
 
 /** Field content → section divider, divider → next field (px). */
-export const INPUT_FIELD_DIVIDER_GAP_PX = 8;
+export const INPUT_FIELD_DIVIDER_GAP_PX = 16;
 
 /** Control → error text gap (px). */
 export const INPUT_FIELD_ERROR_GAP_PX = 4;
@@ -44,7 +44,11 @@ export const INPUT_FIELD_ROW_TRIGGER_CLASS = cn(
   CARD_CHEVRON_ROW_CLASS,
 );
 
-/** Error text — 4px below control; positioned without affecting divider rhythm. */
+/** In-flow field hint below control. */
+export const INPUT_FIELD_HINT_CLASS =
+  "text-[0.8125rem] text-muted-foreground";
+
+/** Error text — 4px below control, in normal document flow. */
 export const INPUT_FIELD_ERROR_CLASS = "text-[0.8125rem] text-destructive";
 
 export const INPUT_FIELD_ERROR_OFFSET_CLASS = "mt-1";

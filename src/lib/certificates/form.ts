@@ -88,6 +88,10 @@ export function validateCertificateForm(
     errors.name = t("certificates.validation.nameRequired");
   }
 
+  if (!values.institution.trim()) {
+    errors.institution = t("accounts.validation.institutionRequired");
+  }
+
   const identifierError = validateIdentifierLast4Field(values.certificateNumber, t);
   if (identifierError) errors.certificateNumber = identifierError;
 

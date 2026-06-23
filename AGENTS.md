@@ -27,8 +27,8 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` — no balances; Institution Picker visual parity; type · last-4 metadata |
 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` — dedicated cards; inherits `CardChevron` |
 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — shared border, radius, shadow |
-| **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` — 16px description gap, 24px section gap, 18px medium titles |
-| **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` — 13px labels, 15px values, 8px label gap, 8px divider rhythm, `CardChevron`, EGP/% affixes, absolute errors |
+| **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent`, `AccountFormEditableField` — 16px section padding, 16px divider rhythm, requirement context |
+| **Input fields** | `InputField`, `AccountForm*` field wrappers — 13px labels, 15px values, in-flow errors, required `*` from `account-form-required.ts`, EGP/% affixes |
 
 ## Interaction patterns
 

@@ -17,7 +17,7 @@ import {
 describe("input fields foundation", () => {
   it("freezes label, value, spacing, and decoration tokens", () => {
     expect(INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX).toBe(8);
-    expect(INPUT_FIELD_DIVIDER_GAP_PX).toBe(8);
+    expect(INPUT_FIELD_DIVIDER_GAP_PX).toBe(16);
     expect(INPUT_FIELD_ERROR_GAP_PX).toBe(4);
     expect(INPUT_FIELD_LABEL_CLASS).toContain("text-[0.8125rem]");
     expect(INPUT_FIELD_LABEL_CLASS).toContain("font-normal");
@@ -40,6 +40,7 @@ describe("input fields foundation", () => {
 
     expect(inputFieldSource).toContain("CardChevron");
     expect(inputFieldSource).toContain("InputFieldError");
+    expect(inputFieldSource).not.toContain("absolute");
     expect(editableSource).toContain("InputFieldRowTrigger");
     expect(editableSource).toContain("INPUT_FIELD_AMOUNT_PREFIX");
   });

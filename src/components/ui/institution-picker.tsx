@@ -67,7 +67,7 @@ export function InstitutionPicker({
   customLabel,
   customPlaceholder,
   error,
-  required = true,
+  required = false,
   variant = "input",
   "aria-invalid": ariaInvalidProp,
 }: InstitutionPickerProps) {

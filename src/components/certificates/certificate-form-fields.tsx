@@ -1,17 +1,18 @@
 "use client";
 
-import { AccountIdentifierField } from "@/components/accounts/account-identifier-field";
-import { DateField } from "@/components/ui/date-field";
-import { EditableField } from "@/components/field-editor";
-import { AccountFormSection, AccountFormSections } from "@/components/forms/account-form-section";
-import { ToggleSettingRow } from "@/components/patterns";
-import { AccountPicker } from "@/components/ui/account-picker";
-import { InstitutionPicker } from "@/components/ui/institution-picker";
-import { RenewalTypePicker } from "@/components/certificates/renewal-type-picker";
 import {
-  ScrollChipSelect,
+  AccountFormAccountPicker,
+  AccountFormDateField,
+  AccountFormEditableField,
+  AccountFormIdentifierField,
+  AccountFormInstitutionPicker,
+  AccountFormRenewalTypePicker,
+  AccountFormScrollChipSelect,
+  AccountFormSection,
+  AccountFormSections,
   type ScrollChipOption,
-} from "@/components/ui/scroll-chip-select";
+} from "@/components/forms/account-form-section";
+import { ToggleSettingRow } from "@/components/patterns";
 import {
   CERTIFICATE_TERM_YEAR_PRESETS,
   type CertificateFormValues,
@@ -113,16 +114,25 @@ export function CertificateFormFields({
     values.payoutFrequency !== "instantly";
 
   return (
-    <AccountFormSections>
+    <AccountFormSections
+      requirements={{
+        accountType: "certificate",
+        showsInstitution: true,
+        showsIdentifier: true,
+        termPreset: values.termPreset,
+        payoutFrequency: values.payoutFrequency,
+        showsPayoutDay,
+        autoApplyInterest: values.autoApplyInterest,
+      }}
+    >
       <AccountFormSection title={t("accounts.formSections.accountDetails")}>
-        <EditableField
+        <AccountFormEditableField
           id="certificate-name"
           label={t("certificates.fields.name.label")}
           value={values.name}
           placeholder={t("certificates.fields.name.placeholder")}
           disabled={disabled}
           error={errors.name}
-          variant="row"
           validate={(name) => validateCertificateNameField(name, t)}
           onSave={(name) => {
             onChange({ name });
@@ -130,32 +140,30 @@ export function CertificateFormFields({
           }}
         />
 
-        <InstitutionPicker
+        <AccountFormInstitutionPicker
           id="certificate-institution"
           accountType="certificate"
           value={values.institution}
           disabled={disabled}
           error={errors.institution}
-          variant="row"
           onChange={(institution) => {
             onChange({ institution });
             onClearError("institution");
           }}
         />
 
-        <AccountIdentifierField
+        <AccountFormIdentifierField
           id="certificate-number"
           labelKey="accounts.fields.certificateNumber.label"
           placeholderKey="accounts.fields.certificateNumber.placeholder"
           value={values.certificateNumber}
           disabled={disabled}
           error={errors.certificateNumber}
-          variant="row"
           onChange={(certificateNumber) => onChange({ certificateNumber })}
           onClearError={() => onClearError("certificateNumber")}
         />
 
-        <EditableField
+        <AccountFormEditableField
           id="certificate-principal"
           label={t("certificates.fields.principal.label")}
           mode="numeric"
@@ -164,7 +172,6 @@ export function CertificateFormFields({
           placeholder={t("common.currency.zeroPlaceholder")}
           disabled={disabled}
           error={errors.principalAmount}
-          variant="row"
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(amount) => formatAmountInput(amount, amountInputLocale)}
           validate={(amount) => validateCertificatePrincipalField(amount, t)}
@@ -174,15 +181,13 @@ export function CertificateFormFields({
           }}
         />
 
-        <DateField
+        <AccountFormDateField
           id="certificate-purchase-date"
           label={t("certificates.fields.purchaseDate.label")}
-          required
           value={values.purchaseDate}
           disabled={disabled}
           error={errors.purchaseDate}
           placeholder={t("certificates.fields.purchaseDate.placeholder")}
-          variant="row"
           onChange={(value) => {
             onChange({ purchaseDate: value });
             onClearError("purchaseDate");
@@ -192,7 +197,7 @@ export function CertificateFormFields({
       </AccountFormSection>
 
       <AccountFormSection title={t("accounts.formSections.interestDetails")}>
-        <EditableField
+        <AccountFormEditableField
           id="certificate-rate"
           label={t("accounts.fields.annualRate.label")}
           mode="numeric"
@@ -201,7 +206,6 @@ export function CertificateFormFields({
           placeholder="0"
           disabled={disabled}
           error={errors.annualInterestRate}
-          variant="row"
           suffixLabel="%"
           sanitizeInput={sanitizeAmountInput}
           formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
@@ -212,9 +216,8 @@ export function CertificateFormFields({
           }}
         />
 
-        <ScrollChipSelect<CertificateTermPreset>
+        <AccountFormScrollChipSelect<CertificateTermPreset>
           label={t("certificates.fields.term.label")}
-          required
           fieldId="certificate-term"
           value={values.termPreset}
           options={termOptions}
@@ -228,8 +231,9 @@ export function CertificateFormFields({
             onClearError("term");
           }}
         />
+
         {values.termPreset === "custom" ? (
-          <EditableField
+          <AccountFormEditableField
             id="certificate-custom-term"
             hideLabel
             label={t("certificates.fields.term.custom")}
@@ -239,7 +243,6 @@ export function CertificateFormFields({
             placeholder={t("certificates.fields.term.custom")}
             disabled={disabled}
             error={errors.term}
-            variant="row"
             sanitizeInput={(raw) => sanitizeDecimalInput(raw, 1)}
             validate={(term) => validateCertificateCustomTermField(term, t)}
             onSave={(customTermYears) => {
@@ -249,9 +252,8 @@ export function CertificateFormFields({
           />
         ) : null}
 
-        <ScrollChipSelect
+        <AccountFormScrollChipSelect
           label={t("certificates.fields.payoutFrequency.label")}
-          required
           value={values.payoutFrequency}
           options={payoutOptions}
           ariaLabel={t("certificates.fields.payoutFrequency.label")}
@@ -259,9 +261,8 @@ export function CertificateFormFields({
         />
 
         {showsPayoutDay ? (
-          <ScrollChipSelect
+          <AccountFormScrollChipSelect
             label={t("savings.fields.postingDay.label")}
-            required
             fieldId="certificate-payout-day"
             value={values.payoutDay}
             options={payoutDayOptions}
@@ -320,7 +321,7 @@ export function CertificateFormFields({
           />
         </div>
 
-        <AccountPicker
+        <AccountFormAccountPicker
           id="certificate-interest-destination"
           label={t("accounts.fields.interestDestinationAccount.label")}
           description={t(
@@ -340,20 +341,18 @@ export function CertificateFormFields({
           disabled={disabled || !values.autoApplyInterest}
           allowClear
           error={errors.destinationAccountId}
-          variant="row"
           onChange={(destinationAccountId) => {
             onChange({ destinationAccountId });
             onClearError("destinationAccountId");
           }}
         />
 
-        <RenewalTypePicker
+        <AccountFormRenewalTypePicker
           id="certificate-renewal-type"
           label={t("certificates.fields.renewal.type.label")}
           value={values.renewalType}
           disabled={disabled}
           readOnly={!renewalEditable}
-          variant="row"
           onChange={(renewalType) => {
             onChange({ renewalType });
             onClearError("renewalType");

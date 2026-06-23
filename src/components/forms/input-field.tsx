@@ -7,6 +7,7 @@ import {
   INPUT_FIELD_AFFIX_CLASS,
   INPUT_FIELD_ERROR_CLASS,
   INPUT_FIELD_ERROR_OFFSET_CLASS,
+  INPUT_FIELD_HINT_CLASS,
   INPUT_FIELD_LABEL_CLASS,
   INPUT_FIELD_PLACEHOLDER_CLASS,
   INPUT_FIELD_REQUIRED_INDICATOR_CLASS,
@@ -48,9 +49,7 @@ interface InputFieldErrorProps {
   className?: string;
 }
 
-/**
- * Field error — absolutely positioned so section divider rhythm is unchanged.
- */
+/** Field error — 4px below control, in normal document flow. */
 export function InputFieldError({ id, children, className }: InputFieldErrorProps) {
   return (
     <p
@@ -59,7 +58,6 @@ export function InputFieldError({ id, children, className }: InputFieldErrorProp
       className={cn(
         INPUT_FIELD_ERROR_CLASS,
         INPUT_FIELD_ERROR_OFFSET_CLASS,
-        "pointer-events-none absolute inset-x-0 top-full",
         className,
       )}
     >
@@ -80,7 +78,7 @@ interface InputFieldProps {
 }
 
 /**
- * Frozen input field shell — label, control slot, error placement.
+ * Frozen input field shell — label, control slot, in-flow error.
  *
  * @see docs/FOUNDATION.md — Input fields foundation
  */
@@ -95,25 +93,20 @@ export function InputField({
   className,
 }: InputFieldProps) {
   return (
-    <div className={cn("relative", className)}>
-      <div className={INPUT_FIELD_STACK_CLASS}>
-        {label && !hideLabel ? (
-          <InputFieldLabel htmlFor={id} required={required}>
-            {label}
-          </InputFieldLabel>
-        ) : null}
-        {children}
-      </div>
-      {hint && !error ? (
-        <p
-          id={id ? `${id}-hint` : undefined}
-          className="pointer-events-none absolute inset-x-0 top-full mt-1 text-[0.8125rem] text-muted-foreground"
-        >
-          {hint}
-        </p>
+    <div className={cn(INPUT_FIELD_STACK_CLASS, className)}>
+      {label && !hideLabel ? (
+        <InputFieldLabel htmlFor={id} required={required}>
+          {label}
+        </InputFieldLabel>
       ) : null}
+      {children}
       {error ? (
         <InputFieldError id={id ? `${id}-error` : undefined}>{error}</InputFieldError>
+      ) : null}
+      {hint && !error ? (
+        <p id={id ? `${id}-hint` : undefined} className={INPUT_FIELD_HINT_CLASS}>
+          {hint}
+        </p>
       ) : null}
     </div>
   );

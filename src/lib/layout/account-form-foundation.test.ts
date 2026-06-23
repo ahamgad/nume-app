@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX,
+  ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX,
   ACCOUNT_FORM_FIELD_ROW_CLASS,
+  ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX,
   ACCOUNT_FORM_SECTION_GAP_PX,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
 } from "@/lib/layout/account-form-chrome";
@@ -14,12 +16,27 @@ describe("account forms foundation", () => {
   it("freezes spacing and section title tokens", () => {
     expect(ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX).toBe(16);
     expect(ACCOUNT_FORM_SECTION_GAP_PX).toBe(24);
+    expect(ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX).toBe(16);
+    expect(ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX).toBe(16);
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("text-lg");
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("font-medium");
   });
 
-  it("uses 8px field row padding for divider rhythm", () => {
-    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("py-2");
+  it("uses 16px field row padding for divider rhythm", () => {
+    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("py-4");
+  });
+
+  it("uses account form field wrappers in form modules", () => {
+    const modules = [
+      "src/components/accounts/money-account-form-fields.tsx",
+      "src/components/savings/savings-form-fields.tsx",
+    ];
+
+    for (const modulePath of modules) {
+      const source = fs.readFileSync(path.join(process.cwd(), modulePath), "utf8");
+      expect(source).toContain("AccountFormEditableField");
+      expect(source).toContain("requirements=");
+    }
   });
 
   it("uses card surface and shared section component", () => {

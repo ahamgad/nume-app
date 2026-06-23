@@ -4,11 +4,24 @@ import {
   ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_SECTION_FIELDS_CLASS,
   ACCOUNT_FORM_SECTION_HEADER_CLASS,
-  ACCOUNT_FORM_SECTION_STACK_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
 } from "@/lib/layout/account-form-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
+
+export {
+  AccountFormAccountPicker,
+  AccountFormDateField,
+  AccountFormEditableField,
+  AccountFormGroupError,
+  AccountFormIdentifierField,
+  AccountFormInstitutionPicker,
+  AccountFormRenewalTypePicker,
+  AccountFormScrollChipSelect,
+  AccountFormSections,
+  useAccountFormFieldRequired,
+  type ScrollChipOption,
+} from "@/components/forms/account-form-field";
 
 interface AccountFormFieldProps {
   children: ReactNode;
@@ -57,22 +70,5 @@ export function AccountFormSection({
         ))}
       </div>
     </section>
-  );
-}
-
-interface AccountFormSectionsProps {
-  children: ReactNode;
-  className?: string;
-}
-
-/** Stacks account form sections with foundation spacing (24px). */
-export function AccountFormSections({
-  children,
-  className,
-}: AccountFormSectionsProps) {
-  return (
-    <div className={cn(ACCOUNT_FORM_SECTION_STACK_CLASS, className)}>
-      {children}
-    </div>
   );
 }
