@@ -20,6 +20,24 @@ If none apply → propose a new Foundation pattern **before** implementation.
 
 ---
 
+## Design Audit — frozen foundations registry
+
+All foundations below are **mandatory building blocks**. Future screens, flows, modules, account types, dialogs, bottom sheets, pickers, and features **must consume** them.
+
+| # | Foundation | Key components | Doc section |
+|---|---|---|---|
+| 1 | **Header** | `RootPageHeader`, `StackPageHeader`, `AccountDetailsStackHeader`, `BottomSheetHeader` | § 9 |
+| 2 | **Picker list** | `PickerList`, `PickerListOption`, `PickerListDivider`, `PickerListNoneOption` | § 3 |
+| 3 | **Account details** | `AccountDetailsStackHeader`, `AccountDetailsContentHeader`, `AccountDetailsSummary` | § 11 |
+| 4 | **Create account CTA** | `AccountCreateActionButton`, shared i18n copy | § 10 |
+| 5 | **Confirmation actions** | `ConfirmationSheetActions`, `ConfirmationBottomSheet` | § 10, § 6 |
+| 6 | **Typography & copy** | Sentence case, helper description punctuation — `docs/CONTENT.md`, `en.ts` | § 10, CONTENT |
+| 7 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` | § 10 |
+
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, or numeric display behaviors inside individual screens.
+
+---
+
 ## 1. Immersive Bottom Sheets
 
 Shared chrome for all sheet types:
@@ -262,38 +280,7 @@ If a future exception is required:
 
 ---
 
-## Audit status (v1 final)
-
-| Surface | Pattern | Status |
-|---|---|---|
-| Dashboard, Accounts, Planning, Goals, More | Root page header | ✅ |
-| Stack sub-screens (create, edit, records, More routes) | Stack page header | ✅ |
-| All account detail types | Account details header | ✅ |
-| Picker / workspace / calendar / confirmation sheets | Bottom sheet header | ✅ |
-| Field Editor | Workspace | ✅ |
-| Date Picker | Calendar | ✅ |
-| Institution picker (all types) | Picker | ✅ |
-| Interest destination picker | Picker | ✅ |
-| Account / renewal / account-type pickers | Picker list | ✅ |
-| Confirmation / discard | Confirmation | ✅ Intentional |
-| Auth screens | — | ✅ Excluded |
-| Institution "Other" custom name | Inline input | ⚠️ Documented exception |
-
----
-
-## Governance checklist
-
-1. Identify the Foundation pattern
-2. Identify the header building block (§ 9)
-3. Reuse the component — do not fork
-4. Use shared layout tokens
-5. Document any deviation in the audit table
-
-**Foundation v1 is frozen. Header Foundation is frozen.**
-
----
-
-## 10. Form actions and copy (frozen)
+## 10. Form actions, typography, and numeric display (frozen)
 
 ### Account creation CTA
 
@@ -308,36 +295,164 @@ Do not add per-type create button labels in screens or i18n.
 
 **Exception:** First-account onboarding may override with `accounts.add.firstAccount.cta`.
 
+Keys: `lib/finance/account-create-copy.ts`.
+
 ### Form primary button sizing
 
 `FORM_PRIMARY_ACTION_BUTTON_CLASS` (`h-12 w-full text-base`) — account create/edit sticky footers.
 
+Location: `lib/layout/form-action-chrome.ts`.
+
 ### Confirmation sheet actions
 
-`ConfirmationSheetActions` + `CONFIRMATION_SHEET_ACTION_BUTTON_CLASS` — same height as form primary actions (`h-12`).
+All confirmation surfaces use **`ConfirmationSheetActions`** (`components/ui/confirmation-sheet-presentation.tsx`).
 
-Used by `ConfirmBottomSheet`, `DiscardDialog`, and future confirmation patterns.
+- Shared button sizing via `CONFIRMATION_SHEET_ACTION_BUTTON_CLASS` (`h-12`) — matches form primary actions
+- Shared primary + secondary action layout
+- Shared loading-label behavior on primary action
 
-### Sentence case
+Used by `ConfirmBottomSheet`, `DiscardDialog`, and future confirmation patterns. Do not inline confirmation button stacks in screens.
+
+### Typography and copy
 
 System-generated copy uses **sentence case**. See **`docs/CONTENT.md`**.
 
-Never modify user-entered content.
+| Rule | Where |
+|---|---|
+| Sentence case for labels, titles, CTAs, helpers, empty states, validation | `en.ts` |
+| No modification of user-entered content | App-wide |
+| Single-sentence helpers omit trailing period | `en.ts` |
+| Multi-sentence copy uses normal punctuation | `en.ts` |
 
-### Description copy
-
-Single-sentence helper descriptions do **not** end with a period. Multi-sentence copy uses normal punctuation.
-
-Apply in `src/lib/i18n/messages/en.ts` — not inline in screens.
+Never apply capitalization transforms to user-entered values (account names, notes, institution names, imported data).
 
 ### Numeric typography
 
 Currency amounts render integer and decimal digits at the **same font size**.
 
-- `CurrencyAmount` — inline/tabular displays
-- `ResponsiveCurrencyAmount` — hero/metric displays
-- `getCurrencyDisplayParts` / `formatCurrency` — string formatting
+| Component | Location | Use |
+|---|---|---|
+| `CurrencyAmount` | `components/ui/currency-amount.tsx` | Inline / row displays |
+| `ResponsiveCurrencyAmount` | `components/ui/responsive-currency-amount.tsx` | Hero / metric displays |
+| `formatCurrency` / `getCurrencyDisplayParts` | `lib/format/currency-display.ts` | String formatting |
 
-Do not scale decimal portions separately. Removed: `CURRENCY_DECIMAL_SCALE`.
+Do not scale decimal portions separately.
 
 ---
+
+## 11. Account details (frozen)
+
+All account detail screens compose through **`account-details-chrome.tsx`**.
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `AccountDetailsStackHeader` | Navigation header — account name collapse into header on scroll |
+| `AccountDetailsContentHeader` | Content header wrapper for all detail screens |
+| `AccountDetailsSummary` | Logo block + institution subtitle + account name (large title) |
+
+Location: `components/accounts/account-details-chrome.tsx`, `components/accounts/account-details-summary.tsx`.
+
+### Rules
+
+- **Shared layout** — logo block, metadata, and large title live in the foundation, not per screen
+- **Shared collapse behavior** — large title + header transition via `ScreenTitleCollapseProvider`
+- **Shared logo block** — 56×56 logo, 16px gap to metadata, type-initial fallback
+- **Shared metadata structure** — institution · account number, then account name
+
+### Component reuse rule
+
+New account detail screen (any account type) → `AccountDetailsStackHeader` + `AccountDetailsContentHeader`.
+
+Configure through **props only** (`accountName`, `institution`, `institutionSubtitle`, `accountType`). Do not fork layout markup in screen files.
+
+### Applies to
+
+Current account, savings, certificate, credit card, loan, cash, wallet, gold, stocks — and **all future account types**.
+
+---
+
+## 12. Future screen rule (mandatory)
+
+Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
+
+1. Identify which frozen foundation(s) apply (registry above).
+2. Consume the approved shared component(s) — configure via props and composition only.
+3. Add copy to `src/lib/i18n/messages/en.ts` following **`docs/CONTENT.md`**.
+4. Document any required exception in the audit table (§ Audit status).
+
+**Developers must not recreate inside individual screens:**
+
+- Headers
+- Picker lists
+- Account details layouts
+- Create-account CTAs
+- Confirmation action stacks
+- Typography / capitalization behaviors
+- Numeric display behaviors
+
+If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
+
+---
+
+## 13. Global propagation and variant rules
+
+These rules apply to **all** frozen foundations (headers, picker lists, account details, CTAs, confirmations, typography, numeric display).
+
+### Propagation rule
+
+Changes to a foundation component **must propagate automatically** to every existing and future consumer.
+
+Fix behavior once in the shared foundation. **No screen-by-screen updates.**
+
+### Variant rule
+
+If a genuine exception is required:
+
+1. Create a **documented foundation variant** (new exported component or prop on an existing foundation component).
+2. Add the variant to the audit table in this document.
+3. **Do not** fork markup, spacing, typography, or interaction logic inside individual screens.
+
+---
+
+## Audit status (v1 final)
+
+| Surface | Pattern | Status |
+|---|---|---|
+| Dashboard, Accounts, Planning, Goals, More | Root page header | ✅ |
+| Stack sub-screens (create, edit, records, More routes) | Stack page header | ✅ |
+| All account detail types | Account details foundation | ✅ |
+| All account creation flows | Create account CTA foundation | ✅ |
+| Confirm / discard / archive dialogs | Confirmation actions foundation | ✅ |
+| Picker / workspace / calendar / confirmation sheets | Bottom sheet header | ✅ |
+| Field Editor | Workspace | ✅ |
+| Date Picker | Calendar | ✅ |
+| Institution picker (all types) | Picker + picker list | ✅ |
+| Interest destination picker | Picker + picker list | ✅ |
+| Account / renewal / account-type pickers | Picker + picker list | ✅ |
+| Currency / metric displays | Numeric typography foundation | ✅ |
+| System copy (EN) | Typography & copy foundation | ✅ |
+| Confirmation / discard | Confirmation | ✅ Intentional |
+| Auth screens | — | ✅ Excluded |
+| Institution "Other" custom name | Inline input | ⚠️ Documented exception |
+| Transient loading / not-found guards | Direct `ScreenHeader` | ⚠️ Until loading-header variant |
+| Date month/year wheel | `WheelColumn` | ⚠️ Scroll-wheel UX — not tap list |
+| First-account onboarding CTA | `Continue` override | ⚠️ Documented exception |
+| Detail screen settings / record lists | `divide-y` list rows | ✅ Not picker lists — separate pattern |
+| Auth register submit | Auth layout | ⚠️ Separate auth flow — same copy keys |
+
+---
+
+## Governance checklist
+
+Before shipping any screen or feature:
+
+1. Identify the Foundation pattern(s) from the registry
+2. Identify the header building block (§ 9) if applicable
+3. Identify picker list, account details, CTA, confirmation, typography, and numeric foundations
+4. Reuse shared components — do not fork
+5. Add copy to `en.ts` per **`docs/CONTENT.md`**
+6. Document any deviation in the audit table
+
+**All Design Audit foundations are frozen:** Header, Picker list, Account details, Create account CTA, Confirmation actions, Typography & copy, Numeric typography.

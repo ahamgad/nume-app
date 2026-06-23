@@ -7,36 +7,41 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- BEGIN:foundation-rules -->
 # Nume Foundation v1 (frozen)
 
-Foundation interaction patterns are product rules. Read **`docs/FOUNDATION.md`** before implementing any sheet, picker, editable field, keyboard-adjacent UI, or screen header.
+Foundation interaction patterns are **mandatory product rules**. Read **`docs/FOUNDATION.md`** before implementing any screen, sheet, picker, field, header, or copy.
 
-Quick reference:
+## Frozen foundations registry
+
+All new screens, flows, modules, account types, dialogs, bottom sheets, pickers, and features **must consume** these building blocks. **Do not recreate them inside individual screens.**
+
+| Foundation | Use |
+|---|---|
+| **Header** | `RootPageHeader`, `StackPageHeader`, `AccountDetailsStackHeader`, `BottomSheetHeader` |
+| **Picker list** | `PickerList`, `PickerListOption`, `PickerListDivider`, `PickerListNoneOption` |
+| **Account details** | `AccountDetailsStackHeader`, `AccountDetailsContentHeader`, `AccountDetailsSummary` |
+| **Create account CTA** | `AccountCreateActionButton` — "Create account" / "Creating account" |
+| **Confirmation actions** | `ConfirmationSheetActions` via `ConfirmBottomSheet` / `DiscardDialog` |
+| **Typography & copy** | Sentence case, no trailing period on single-sentence helpers — `en.ts`, **`docs/CONTENT.md`** |
+| **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
+
+## Interaction patterns
 
 - **Workspace input** → `ImmersiveBottomSheet` (`variant="workspace"`) + `EditableField`
 - **Date selection** → `DatePickerBottomSheet` + `DateField`
 - **Pickers / selection lists** → `PickerBottomSheet` + `PickerList` (+ `shouldShowPickerSearch` when > 10 items)
 - **Optional picker None row** → `PickerListNoneOption` (`picker.none`) — mandatory pickers omit it
-- **Confirmations** → `ConfirmationBottomSheet` (destructive actions only)
+- **Confirmations** → `ConfirmationBottomSheet` + `ConfirmationSheetActions`
 
-**Header building blocks (frozen — do not build custom headers in screens):**
+## Global rules
 
-- **Tab-root screens** (Dashboard, Accounts, Planning, Goals, More) → `RootPageHeader` + `RootPageTitle`
-- **Stack sub-screens** → `StackPageHeader` + `StackPageTitle`
-- **Account details** (all account types) → `AccountDetailsStackHeader` + `AccountDetailsContentHeader`
-- **Bottom sheets** → `BottomSheetHeader` / `BottomSheetHeaderlessContent` via sheet Foundation wrappers
+- **Future screen rule** — every new feature must identify and consume applicable frozen foundations (FOUNDATION § 12)
+- **Propagation rule** — fix foundations once; changes propagate to all consumers; no screen-by-screen updates (FOUNDATION § 13)
+- **Variant rule** — exceptions require a documented foundation variant, not inline forks (FOUNDATION § 13)
 
-Read **`docs/FOUNDATION.md`** § 9 for header reuse, propagation, and variant rules.
+## Prohibited in screen files
 
-Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard ownership.
+- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks
 
-Read **`docs/CONTENT.md`** for English sentence-case and copy conventions.
+Read **`docs/FOUNDATION.md`** for full rules, audit table, and documented exceptions.
 
-**Form and copy foundations (frozen):**
-
-- **Account create CTA** → `AccountCreateActionButton` (`Create account` / `Creating account`)
-- **Form primary actions** → `FORM_PRIMARY_ACTION_BUTTON_CLASS` (`h-12`)
-- **Confirmation sheet actions** → `ConfirmationSheetActions` (same button height)
-- **Currency display** → `CurrencyAmount` / `ResponsiveCurrencyAmount` — unified decimal sizing
-- **Copy** → sentence case + single-sentence descriptions without trailing periods in `en.ts`
-
-Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only. Do not build custom picker list rows — use `PickerList`, `PickerListOption`, and `PickerListNoneOption`. Do not add per-type account create button labels.
+Read **`docs/CONTENT.md`** for copy conventions.
 <!-- END:foundation-rules -->

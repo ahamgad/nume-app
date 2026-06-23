@@ -2,6 +2,8 @@
 
 English copy in NUME uses **sentence case** by default.
 
+Governance: copy rules are **frozen foundation** requirements. See **`docs/FOUNDATION.md`** § 10 (typography & copy) and § 12 (future screen rule).
+
 ## Sentence case rule
 
 Capitalize only the first word (and proper nouns, brand names, acronyms).
@@ -76,8 +78,18 @@ All account creation flows use `AccountCreateActionButton` — do not add per-ty
 
 **Documented exception:** First-account onboarding may use `accounts.add.firstAccount.cta` ("Continue").
 
+## Numeric display
+
+Use shared components only — do not scale decimal digits separately:
+
+- `CurrencyAmount` — inline displays
+- `ResponsiveCurrencyAmount` — hero/metric displays
+- `formatCurrency` — string formatting
+
 ## Implementation
 
 User-facing English strings live in `src/lib/i18n/messages/en.ts`. Add and update strings there in sentence case.
 
 Arabic copy follows natural Arabic conventions in `src/lib/i18n/messages/ar.ts`.
+
+Future screens must follow these standards automatically — do not inline copy rules in screen files.
