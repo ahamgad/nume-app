@@ -1,21 +1,15 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 
-import { AccountTypeIcon } from "@/components/ui/account-type-icon";
+import { AccountTypePickerCard } from "@/components/accounts/account-type-picker-card";
+import { AccountTypePickerSection } from "@/components/accounts/account-type-picker-section";
 import { PickerBottomSheet } from "@/components/ui/picker-bottom-sheet";
-import {
-  PickerList,
-  PickerListDivider,
-  PickerListOption,
-} from "@/components/ui/picker-list";
 import {
   ACCOUNT_TYPE_GROUPS,
   getAccountTypeCreatePath,
 } from "@/lib/finance/account-type-catalog";
-import { getAccountTypeLabelKey } from "@/lib/finance/account-labels";
+import { ACCOUNT_TYPE_PICKER_CATEGORY_GAP_PX } from "@/lib/layout/account-type-picker-chrome";
 import { useT } from "@/providers/i18n-provider";
 
 interface AccountTypePickerSheetProps {
@@ -23,6 +17,11 @@ interface AccountTypePickerSheetProps {
   onClose: () => void;
 }
 
+/**
+ * Frozen Add Account type picker — dedicated foundation, not Picker List rows.
+ *
+ * @see docs/FOUNDATION.md — Account type picker sheet foundation
+ */
 export function AccountTypePickerSheet({
   open,
   onClose,
@@ -45,42 +44,22 @@ export function AccountTypePickerSheet({
       title={t("accounts.add.chooseType")}
       ariaLabel={t("accounts.add.chooseType")}
     >
-      <div className="space-y-5 px-2 pb-2">
-        {ACCOUNT_TYPE_GROUPS.map((group, groupIndex) => (
-          <Fragment key={group.id}>
-            {groupIndex > 0 ? <PickerListDivider /> : null}
-            <section>
-              <p className="mb-2 px-2 text-xs font-medium tracking-wide text-muted-foreground">
-                {t(group.labelKey)}
-              </p>
-              <PickerList ariaLabel={t(group.labelKey)}>
-                {group.types.map((entry) => (
-                  <PickerListOption
-                    key={entry.type}
-                    selected={false}
-                    disabled={!entry.enabled}
-                    onSelect={() => handleSelect(entry.type, entry.enabled)}
-                    className="min-h-[4.5rem] gap-3 px-4 py-3.5 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <AccountTypeIcon type={entry.type} />
-                    <span className="flex-1 text-[0.9375rem] font-medium">
-                      {t(getAccountTypeLabelKey(entry.type))}
-                    </span>
-                    {!entry.enabled ? (
-                      <span className="text-xs text-muted-foreground">
-                        {t("accounts.add.comingSoon")}
-                      </span>
-                    ) : (
-                      <ChevronRight
-                        className="size-4 shrink-0 text-muted-foreground"
-                        aria-hidden
-                      />
-                    )}
-                  </PickerListOption>
-                ))}
-              </PickerList>
-            </section>
-          </Fragment>
+      <div
+        className="flex flex-col px-2 pb-2"
+        style={{ gap: ACCOUNT_TYPE_PICKER_CATEGORY_GAP_PX }}
+      >
+        {ACCOUNT_TYPE_GROUPS.map((group) => (
+          <AccountTypePickerSection key={group.id} title={t(group.labelKey)}>
+            {group.types.map((entry) => (
+              <AccountTypePickerCard
+                key={entry.type}
+                type={entry.type}
+                enabled={entry.enabled}
+                t={t}
+                onSelect={() => handleSelect(entry.type, entry.enabled)}
+              />
+            ))}
+          </AccountTypePickerSection>
         ))}
       </div>
     </PickerBottomSheet>

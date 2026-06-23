@@ -23,7 +23,7 @@ export interface AccountTypeGroup {
 export const ACCOUNT_TYPE_GROUPS: AccountTypeGroup[] = [
   {
     id: "money",
-    labelKey: "accounts.typeGroups.money",
+    labelKey: "accounts.sections.money",
     types: [
       { type: "current_account", enabled: true },
       { type: "wallet", enabled: true },
@@ -32,7 +32,7 @@ export const ACCOUNT_TYPE_GROUPS: AccountTypeGroup[] = [
   },
   {
     id: "savings",
-    labelKey: "accounts.typeGroups.savings",
+    labelKey: "accounts.sections.savings",
     types: [
       { type: "savings_account", enabled: true },
       { type: "certificate", enabled: true },
@@ -40,7 +40,7 @@ export const ACCOUNT_TYPE_GROUPS: AccountTypeGroup[] = [
   },
   {
     id: "lending",
-    labelKey: "accounts.typeGroups.lending",
+    labelKey: "accounts.sections.liabilities",
     types: [
       { type: "credit_card", enabled: true },
       { type: "loan", enabled: false },

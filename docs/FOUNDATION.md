@@ -36,8 +36,10 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 8 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface`, `FieldSignToggle` | § 5 |
 | 9 | **Account cards** | `AccountCard`, `AccountCardsSection` | § 14 |
 | 10 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` | § 15 |
+| 11 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` | § 16 |
+| 12 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — `lib/layout/card-surface.ts` | § 16 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, or account-picker row layouts inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, or card-surface chrome inside individual screens.
 
 ---
 
@@ -524,7 +526,7 @@ Current account, savings, certificate, credit card, loan, cash, wallet, gold, st
 
 All account cards on the **Accounts** tab compose through **`AccountCard`** and **`AccountCardsSection`**.
 
-Location: `components/accounts/account-card.tsx`, `components/accounts/account-cards-section.tsx`, `lib/layout/account-card-chrome.ts`.
+Location: `components/accounts/account-card.tsx`, `components/accounts/account-cards-section.tsx`, `lib/layout/account-card-chrome.ts`, `lib/layout/card-surface.ts`.
 
 ### Approved components
 
@@ -552,8 +554,8 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 4. Divider — `border-border` between top section and balance
 5. Balance label — **13px medium**, sentence case (`accounts.sections.balance`)
 6. Balance value — **18px semibold** via `CurrencyAmount` + `ACCOUNT_CARD_BALANCE_VALUE_CLASS` (numeric typography foundation)
-7. Subtle shadow — `ACCOUNT_CARD_SHADOW_CLASS` only
-8. Corner radius — existing `rounded-lg` on card container
+7. Subtle shadow — `CARD_SURFACE_SHADOW_CLASS` via `ACCOUNT_CARD_CONTAINER_CLASS`
+8. Corner radius — `CARD_SURFACE_BORDER_RADIUS_CLASS` on card container
 
 ### Propagation rule
 
@@ -593,6 +595,48 @@ Location: `components/ui/account-picker.tsx`, `components/accounts/account-picke
 
 ---
 
+## 16. Account type picker sheet (frozen)
+
+Dedicated foundation for **account type selection** — intentionally separate from the Picker List Foundation.
+
+Location: `components/accounts/account-type-picker-sheet.tsx`, `account-type-picker-card.tsx`, `account-type-picker-section.tsx`, `lib/layout/account-type-picker-chrome.ts`, `lib/layout/card-surface.ts`.
+
+### Rules
+
+1. **Dedicated foundation** — do not use `PickerList` / `PickerListOption` for account type cards
+2. **Category labels** — `ACCOUNT_CARD_CATEGORY_LABEL_CLASS`; same localized names as Accounts tab sections (`accounts.sections.*`); no "Account" / "Accounts" suffix
+3. **Category → first card** — `ACCOUNT_TYPE_PICKER_CATEGORY_TO_FIRST_GAP_PX` = 8px
+4. **Card → card** — `ACCOUNT_TYPE_PICKER_CARD_GAP_PX` = 8px
+5. **Category → category** — `ACCOUNT_TYPE_PICKER_CATEGORY_GAP_PX` = 16px
+6. **Icon frame** — 40×40px, `bg-muted` (same as `HeaderIconButton`)
+7. **Icon** — 28×28px (`size-7`); existing `AccountTypeIcon` mapping unchanged
+8. **Type label** — `ACCOUNT_CARD_NAME_CLASS` (15px medium)
+9. **Card surface** — `CARD_SURFACE_CLASS` from shared card-surface foundation
+10. **Border radius / border / shadow** — shared `card-surface.ts` tokens; same as Account Cards
+11. **Propagation** — all account-type selection sheets consume `AccountTypePickerSheet` or its card/section primitives
+12. **No custom implementations** in screens
+
+### Card surface foundation (shared)
+
+`lib/layout/card-surface.ts` centralizes border radius, border, background, and shadow:
+
+| Token | Use |
+|---|---|
+| `CARD_SURFACE_CLASS` | Elevated cards — account cards, account type picker cards |
+| `CARD_SURFACE_FLAT_CLASS` | Flat bordered surfaces — dashboard `WidgetCard`, form sections |
+
+Account cards consume via `ACCOUNT_CARD_CONTAINER_CLASS`. Future cards **must** use card-surface tokens — no duplicated chrome.
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `AccountTypePickerSheet` | Add Account type selection sheet |
+| `AccountTypePickerSection` | Category label + stacked type cards |
+| `AccountTypePickerCard` | Single type card — icon frame, label, chevron |
+
+---
+
 ## 12. Future screen rule (mandatory)
 
 Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
@@ -614,6 +658,8 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Field editor headers, placeholders, typography, wrapping, sign-chip layout, unit-suffix cleanup, or keyboard-submit handlers
 - Account card layouts on the Accounts tab
 - Account picker row layouts in selection sheets
+- Account type picker card layouts
+- Card border / shadow / radius outside `card-surface.ts`
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -653,7 +699,8 @@ If a genuine exception is required:
 | Date Picker | Calendar | ✅ |
 | Institution picker (all types) | Picker + picker list | ✅ |
 | Interest destination picker | Picker + picker list | ✅ |
-| Account / renewal / account-type pickers | Picker + picker list | ✅ |
+| Account / renewal pickers | Picker + picker list | ✅ |
+| Add Account type picker sheet | Account type picker sheet foundation | ✅ |
 | Currency / metric displays | Numeric typography foundation | ✅ |
 | System copy (EN) | Typography & copy foundation | ✅ |
 | All inline field editors | Field editor foundation | ✅ |

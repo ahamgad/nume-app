@@ -208,7 +208,7 @@ export const ar = {
       submitting: "جارٍ إنشاء الحساب",
     },
     sections: {
-      money: "حسابات النقد",
+      money: "النقد",
       savings: "التوفير",
       certificates: "الشهادات",
       liabilities: "الالتزامات",
@@ -216,7 +216,7 @@ export const ar = {
       balance: "الرصيد",
     },
     typeGroups: {
-      money: "حسابات النقد",
+      money: "النقد",
       savings: "التوفير",
       lending: "الإقراض",
       investments: "الاستثمارات",

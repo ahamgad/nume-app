@@ -7,9 +7,9 @@ import { ChevronRight } from "lucide-react";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
 import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
-import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
+import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
@@ -19,9 +19,9 @@ interface WidgetCardProps {
 
 export function WidgetCard({ children, className }: WidgetCardProps) {
   return (
-    <Card className={cn("min-w-0 w-full shadow-none", className)}>
-      <CardContent className="w-full min-w-0 p-5 text-start">{children}</CardContent>
-    </Card>
+    <div className={cn(CARD_SURFACE_FLAT_CLASS, "min-w-0 w-full", className)}>
+      <div className="w-full min-w-0 p-5 text-start">{children}</div>
+    </div>
   );
 }
 

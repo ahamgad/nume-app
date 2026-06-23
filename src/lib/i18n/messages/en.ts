@@ -207,7 +207,7 @@ export const en = {
       submitting: "Creating account",
     },
     sections: {
-      money: "Money accounts",
+      money: "Money",
       savings: "Savings",
       certificates: "Certificates",
       liabilities: "Liabilities",
@@ -215,7 +215,7 @@ export const en = {
       balance: "Balance",
     },
     typeGroups: {
-      money: "Money accounts",
+      money: "Money",
       savings: "Savings",
       lending: "Lending",
       investments: "Investments",
