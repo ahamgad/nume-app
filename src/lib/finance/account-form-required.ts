@@ -15,7 +15,11 @@ export interface AccountFormRequirements {
   termPreset?: string | number;
 }
 
-/** Maps field ids / keys to validation-required state for account form labels. */
+/**
+ * Whether a field shows the required indicator (*).
+ * Mirrors submit-time validation: only fields that fail when empty/unset.
+ * Chip selects with default selections are never required indicators.
+ */
 export function isAccountFormFieldRequired(
   fieldKey: string,
   requirements: AccountFormRequirements,
@@ -40,11 +44,8 @@ export function isAccountFormFieldRequired(
     case "annualInterestRate":
       return requirements.interestModel === "fixed";
     case "principalAmount":
-      return true;
     case "purchaseDate":
-      return true;
     case "creditLimit":
-      return true;
     case "linkedAccountId":
       return true;
     case "destinationAccountId":
@@ -52,23 +53,27 @@ export function isAccountFormFieldRequired(
         requirements.interestDestination === "another_account" ||
         requirements.autoApplyInterest === true
       );
-    case "postingDay":
-      return Boolean(
-        requirements.postingFrequency &&
-          requirements.postingFrequency !== "daily",
-      );
-    case "payoutDay":
-      return requirements.showsPayoutDay === true;
     case "tierMinBalance":
-    case "tierMaxBalance":
     case "tierAnnualRate":
       return requirements.interestModel === "tiered";
+    case "tierMaxBalance":
+      return false;
     case "customTermYears":
     case "certificate-custom-term":
       return requirements.termPreset === "custom";
     default:
       return false;
   }
+}
+
+export function resolveAccountFormFieldRequired(
+  fieldKey: string,
+  requirements: AccountFormRequirements,
+  explicit?: boolean,
+): boolean {
+  if (explicit === true) return true;
+  if (explicit === false) return false;
+  return isAccountFormFieldRequired(fieldKey, requirements);
 }
 
 function normalizeAccountFormFieldKey(fieldKey: string): string {
@@ -103,8 +108,6 @@ function normalizeAccountFormFieldKey(fieldKey: string): string {
     "credit-card-linked-account": "linkedAccountId",
     "savings-destination": "destinationAccountId",
     "certificate-interest-destination": "destinationAccountId",
-    "savings-posting-day": "postingDay",
-    "certificate-payout-day": "payoutDay",
   };
 
   return aliases[fieldKey] ?? fieldKey;

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   isAccountFormFieldRequired,
+  resolveAccountFormFieldRequired,
   type AccountFormRequirements,
 } from "@/lib/finance/account-form-required";
 
@@ -36,17 +37,24 @@ describe("account form required fields", () => {
     ).toBe(false);
   });
 
-  it("requires tier fields only for tiered interest model", () => {
+  it("requires tier min and rate but not open-ended max balance", () => {
+    const tiered = { ...base, interestModel: "tiered" as const };
+    expect(isAccountFormFieldRequired("tier-min-0", tiered)).toBe(true);
+    expect(isAccountFormFieldRequired("tier-rate-0", tiered)).toBe(true);
+    expect(isAccountFormFieldRequired("tier-max-0", tiered)).toBe(false);
+  });
+
+  it("does not mark chip posting day fields as required", () => {
     expect(
-      isAccountFormFieldRequired("tier-min-0", {
+      isAccountFormFieldRequired("savings-posting-day", {
         ...base,
-        interestModel: "tiered",
+        postingFrequency: "monthly",
       }),
-    ).toBe(true);
+    ).toBe(false);
     expect(
-      isAccountFormFieldRequired("tier-min-0", {
+      isAccountFormFieldRequired("certificate-payout-day", {
         ...base,
-        interestModel: "fixed",
+        showsPayoutDay: true,
       }),
     ).toBe(false);
   });
@@ -73,5 +81,14 @@ describe("account form required fields", () => {
         accountType: "cash",
       }),
     ).toBe(false);
+  });
+
+  it("honours explicit required overrides", () => {
+    expect(resolveAccountFormFieldRequired("interestModel", base, false)).toBe(
+      false,
+    );
+    expect(resolveAccountFormFieldRequired("interestModel", base, true)).toBe(
+      true,
+    );
   });
 });

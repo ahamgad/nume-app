@@ -6,8 +6,11 @@ export const ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX = 16;
 /** Between account form sections (px). */
 export const ACCOUNT_FORM_SECTION_GAP_PX = 24;
 
-/** Vertical padding inside account form section field stacks (px). */
-export const ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX = 16;
+/** Section container padding on all sides (px). */
+export const ACCOUNT_FORM_SECTION_PADDING_PX = 16;
+
+/** Section title → first field (px). */
+export const ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX = 16;
 
 /** Field row → divider / divider → next field (px). */
 export const ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX = 16;
@@ -21,13 +24,17 @@ export const ACCOUNT_FORM_DESCRIPTION_CLASS =
 /** Section title — 18px medium. */
 export const ACCOUNT_FORM_SECTION_TITLE_CLASS = "text-lg font-medium";
 
-export const ACCOUNT_FORM_SECTION_HEADER_CLASS =
-  "border-b border-border px-4 pb-3 pt-4";
+/** Single card section — 16px padding on all sides. */
+export const ACCOUNT_FORM_SECTION_PADDING_CLASS = "p-4";
 
-export const ACCOUNT_FORM_SECTION_FIELDS_CLASS = "divide-y divide-border py-4";
+/** 16px between section title and first field row. */
+export const ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS = "mt-4";
 
-/** Horizontal inset + 16px vertical rhythm to section dividers. */
-export const ACCOUNT_FORM_FIELD_ROW_CLASS = "px-4 py-4";
+export const ACCOUNT_FORM_SECTION_FIELDS_CLASS = "divide-y divide-border";
+
+/** Field rows inside a section — 16px to dividers; first/last flush to title/section edge. */
+export const ACCOUNT_FORM_FIELD_ROW_CLASS =
+  "py-4 first:pt-0 last:pb-0";
 
 export const ACCOUNT_FORM_DISABLED_CLASS =
   "pointer-events-none opacity-60";

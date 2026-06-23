@@ -7,23 +7,30 @@ import {
   ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX,
   ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX,
   ACCOUNT_FORM_FIELD_ROW_CLASS,
-  ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX,
   ACCOUNT_FORM_SECTION_GAP_PX,
+  ACCOUNT_FORM_SECTION_PADDING_CLASS,
+  ACCOUNT_FORM_SECTION_PADDING_PX,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
+  ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+  ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX,
 } from "@/lib/layout/account-form-chrome";
 
 describe("account forms foundation", () => {
   it("freezes spacing and section title tokens", () => {
     expect(ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX).toBe(16);
     expect(ACCOUNT_FORM_SECTION_GAP_PX).toBe(24);
-    expect(ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX).toBe(16);
+    expect(ACCOUNT_FORM_SECTION_PADDING_PX).toBe(16);
+    expect(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX).toBe(16);
     expect(ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX).toBe(16);
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("text-lg");
     expect(ACCOUNT_FORM_SECTION_TITLE_CLASS).toContain("font-medium");
   });
 
-  it("uses 16px field row padding for divider rhythm", () => {
-    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("py-4");
+  it("uses unified section container with 16px padding", () => {
+    expect(ACCOUNT_FORM_SECTION_PADDING_CLASS).toContain("p-4");
+    expect(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS).toContain("mt-4");
+    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("first:pt-0");
+    expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("last:pb-0");
   });
 
   it("uses account form field wrappers in form modules", () => {
@@ -46,7 +53,9 @@ describe("account forms foundation", () => {
     );
 
     expect(sectionSource).toContain("CARD_SURFACE_CLASS");
+    expect(sectionSource).toContain("ACCOUNT_FORM_SECTION_PADDING_CLASS");
     expect(sectionSource).toContain("ACCOUNT_FORM_SECTION_TITLE_CLASS");
+    expect(sectionSource).not.toContain("border-b");
     expect(sectionSource).not.toContain("shadow-none");
   });
 

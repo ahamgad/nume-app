@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/scroll-chip-select";
 import {
   type AccountFormRequirements,
-  isAccountFormFieldRequired,
+  resolveAccountFormFieldRequired,
 } from "@/lib/finance/account-form-required";
 import { ACCOUNT_FORM_SECTION_STACK_CLASS } from "@/lib/layout/account-form-chrome";
 import { cn } from "@/lib/utils";
@@ -28,9 +28,16 @@ const AccountFormRequirementsContext = createContext<AccountFormRequirements>(
   {},
 );
 
-export function useAccountFormFieldRequired(fieldKey: string): boolean {
+function useResolvedAccountFormFieldRequired(
+  fieldKey: string,
+  explicit?: boolean,
+): boolean {
   const requirements = useContext(AccountFormRequirementsContext);
-  return isAccountFormFieldRequired(fieldKey, requirements);
+  return resolveAccountFormFieldRequired(fieldKey, requirements, explicit);
+}
+
+export function useAccountFormFieldRequired(fieldKey: string): boolean {
+  return useResolvedAccountFormFieldRequired(fieldKey);
 }
 
 interface AccountFormSectionsProps {
@@ -65,12 +72,12 @@ export function AccountFormEditableField({
   id,
   ...props
 }: AccountFormEditableFieldProps) {
-  const contextRequired = useAccountFormFieldRequired(id);
+  const resolvedRequired = useResolvedAccountFormFieldRequired(id, required);
   return (
     <EditableField
       id={id}
       variant="row"
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       {...props}
     />
   );
@@ -85,11 +92,11 @@ export function AccountFormInstitutionPicker({
   id = "institution",
   ...props
 }: AccountFormInstitutionPickerProps) {
-  const contextRequired = useAccountFormFieldRequired(id);
+  const resolvedRequired = useResolvedAccountFormFieldRequired(id, required);
   return (
     <InstitutionPicker
       id={id}
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       variant="row"
       {...props}
     />
@@ -103,11 +110,11 @@ export function AccountFormAccountPicker({
   id,
   ...props
 }: AccountFormAccountPickerProps) {
-  const contextRequired = useAccountFormFieldRequired(id ?? "");
+  const resolvedRequired = useResolvedAccountFormFieldRequired(id ?? "", required);
   return (
     <AccountPicker
       id={id}
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       variant="row"
       {...props}
     />
@@ -122,12 +129,12 @@ export function AccountFormDateField({
   variant = "row",
   ...props
 }: AccountFormDateFieldProps) {
-  const contextRequired = useAccountFormFieldRequired(id ?? "");
+  const resolvedRequired = useResolvedAccountFormFieldRequired(id ?? "", required);
   return (
     <DateField
       id={id}
       variant={variant}
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       {...props}
     />
   );
@@ -152,12 +159,12 @@ export function AccountFormIdentifierField({
   id,
   ...props
 }: AccountFormIdentifierFieldProps) {
-  const contextRequired = useAccountFormFieldRequired(id);
+  const resolvedRequired = useResolvedAccountFormFieldRequired(id, required);
   return (
     <AccountIdentifierField
       id={id}
       variant="row"
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       {...props}
     />
   );
@@ -174,13 +181,14 @@ export function AccountFormScrollChipSelect<T extends string | number>({
   fieldKey,
   ...props
 }: AccountFormScrollChipSelectProps<T>) {
-  const contextRequired = useAccountFormFieldRequired(
+  const resolvedRequired = useResolvedAccountFormFieldRequired(
     fieldKey ?? fieldId ?? "",
+    required,
   );
   return (
     <ScrollChipSelect
       fieldId={fieldId}
-      required={required ?? contextRequired}
+      required={resolvedRequired}
       {...props}
     />
   );

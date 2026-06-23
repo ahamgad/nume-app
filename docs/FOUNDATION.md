@@ -651,24 +651,25 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 
 1. **Description → first section** (create only) — `ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX` = 16px via `AccountFormCreateContent`
 2. **Section → section** — `ACCOUNT_FORM_SECTION_GAP_PX` = 24px via `AccountFormSections`
-3. **Card surface** — `CARD_SURFACE_CLASS` on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
-4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium (`text-lg font-medium`)
-5. **Section fields padding** — `ACCOUNT_FORM_SECTION_FIELDS_PADDING_PX` = 16px top and bottom via `ACCOUNT_FORM_SECTION_FIELDS_CLASS` (`py-4`)
-6. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`)
-7. **Divider → field** — same 16px row padding
-8. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
-9. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
-10. **Requirement context** — `AccountFormSections` `requirements` prop drives required indicators via `account-form-required.ts`
-11. **Create flows** — `AccountFormCreateContent` wraps description + fields
-12. **Edit flows** — `AccountFormEditContent` wraps fields
-13. **Propagation** — all `*-form-fields` modules consume account form wrappers + sections
-14. **No custom section styling** in screen files
+3. **Card surface** — `CARD_SURFACE_CLASS` + `ACCOUNT_FORM_SECTION_PADDING_CLASS` (`p-4`) on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
+4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium; title lives **inside** the section container (no detached header, no title divider)
+5. **Section padding** — `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`
+6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`)
+7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`)
+8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` (title/section padding owns outer edges)
+9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
+10. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
+11. **Requirement context** — `AccountFormSections` `requirements` prop + `resolveAccountFormFieldRequired()`; `*` only when submit validation fails on empty/unset (chip defaults excluded)
+12. **Create flows** — `AccountFormCreateContent` wraps description + fields
+13. **Edit flows** — `AccountFormEditContent` wraps fields
+14. **Propagation** — all `*-form-fields` modules consume account form wrappers + sections
+15. **No custom section styling** in screen files
 
 ### Approved components
 
 | Component | Role |
 |---|---|
-| `AccountFormSection` | Bordered section with title + divided field rows |
+| `AccountFormSection` | Single card surface — title + fields share 16px padding |
 | `AccountFormSections` | Stacks sections with 24px gap + requirement context |
 | `AccountFormEditableField` | Row `EditableField` for all account form inputs |
 | `AccountFormGroupError` | In-flow group validation for conditional clusters |
@@ -692,7 +693,7 @@ Location: `components/forms/input-field.tsx`, `components/forms/account-form-fie
 
 1. **Label** — `INPUT_FIELD_LABEL_CLASS` = 13px regular (`text-[0.8125rem] font-normal`)
 2. **Label → field** — `INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX` = 8px via `INPUT_FIELD_STACK_CLASS`
-3. **Required fields** — `*` only when `isAccountFormFieldRequired` is true for that field; same color and typography as label
+3. **Required fields** — `*` only when `resolveAccountFormFieldRequired` is true (mirrors submit validation; optional/chip-default fields never show `*`)
 4. **Input value** — `INPUT_FIELD_VALUE_CLASS` = 15px regular (`text-[0.9375rem] font-normal`)
 5. **Input padding** — `INPUT_FIELD_ROW_TRIGGER_CLASS` includes `p-0` on row triggers
 6. **Chevron** — `InputFieldRowTrigger` uses `CardChevron` / `CARD_CHEVRON_CLASS` (card chevron foundation)

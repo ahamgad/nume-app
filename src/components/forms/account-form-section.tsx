@@ -3,8 +3,9 @@ import { Children, isValidElement, type ReactNode } from "react";
 import {
   ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_SECTION_FIELDS_CLASS,
-  ACCOUNT_FORM_SECTION_HEADER_CLASS,
+  ACCOUNT_FORM_SECTION_PADDING_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
+  ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
 } from "@/lib/layout/account-form-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,7 @@ interface AccountFormSectionProps {
 }
 
 /**
- * Frozen account form section — card surface, title, field rows.
+ * Frozen account form section — one card surface; title and fields share 16px padding.
  *
  * @see docs/FOUNDATION.md — Account forms foundation
  */
@@ -57,14 +58,18 @@ export function AccountFormSection({
     <section
       className={cn(
         CARD_SURFACE_CLASS,
+        ACCOUNT_FORM_SECTION_PADDING_CLASS,
         "min-w-0 w-full overflow-hidden",
         className,
       )}
     >
-      <div className={ACCOUNT_FORM_SECTION_HEADER_CLASS}>
-        <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
-      </div>
-      <div className={ACCOUNT_FORM_SECTION_FIELDS_CLASS}>
+      <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
+      <div
+        className={cn(
+          ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+          ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+        )}
+      >
         {fields.map((field, index) => (
           <AccountFormField key={field.key ?? index}>{field}</AccountFormField>
         ))}
