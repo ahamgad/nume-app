@@ -529,7 +529,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 
 | Component | Role |
 |---|---|
-| `AccountCard` | Single account card — logo, institute row, name, balance |
+| `AccountCard` | Single account card — logo, type row, name, balance |
 | `AccountCardsSection` | Category label + stacked cards with foundation spacing |
 
 ### Spacing tokens
@@ -546,7 +546,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 ### Layout rules
 
 1. Logo **45×45** — existing institution logo / fallback behavior unchanged
-2. Institute row — **13px regular** — institution · last-4 via `formatAccountCardInstituteRow`
+2. Type row — **13px regular** — localized account type · last-4 via `formatAccountCardInstituteRow` (type label from `getAccountTypeCardLabelKey`; when no account number, type label only)
 3. Account name — **15px medium**, single-line truncated
 4. Divider — `border-border` between top section and balance
 5. Balance label — **13px medium**, sentence case (`accounts.sections.balance`)

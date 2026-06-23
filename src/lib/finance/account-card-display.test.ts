@@ -5,29 +5,29 @@ import { formatAccountCardInstituteRow } from "@/lib/finance/account-card-displa
 const t = (key: string) => {
   const labels: Record<string, string> = {
     "accounts.types.cash": "Cash",
-    "institutions.nbe": "NBE",
+    "accounts.types.currentAccount": "Current",
+    "accounts.types.savingsAccount": "Savings",
+    "accounts.types.creditCard": "Credit",
   };
   return labels[key] ?? key;
 };
 
 describe("formatAccountCardInstituteRow", () => {
-  it("formats institution and last four", () => {
+  it("formats account type and last four", () => {
     expect(
-      formatAccountCardInstituteRow(
-        { type: "current_account", institution: "nbe" },
-        "1234",
-        t,
-      ),
-    ).toBe("NBE · 1234");
+      formatAccountCardInstituteRow({ type: "current_account" }, "1234", t),
+    ).toBe("Current · 1234");
   });
 
-  it("falls back to account type when no institution subtitle", () => {
+  it("formats account type only when no last four", () => {
     expect(
-      formatAccountCardInstituteRow(
-        { type: "cash", institution: null },
-        null,
-        t,
-      ),
+      formatAccountCardInstituteRow({ type: "cash" }, null, t),
     ).toBe("Cash");
+  });
+
+  it("ignores institution — type label is canonical", () => {
+    expect(
+      formatAccountCardInstituteRow({ type: "savings_account" }, "5678", t),
+    ).toBe("Savings · 5678");
   });
 });

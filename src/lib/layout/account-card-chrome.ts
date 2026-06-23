@@ -35,6 +35,7 @@ export const ACCOUNT_CARD_CONTAINER_CLASS = cn(
 
 export const ACCOUNT_CARD_PADDING_CLASS = "p-4";
 
+/** Top metadata row (account type · last-4) — 13px regular. */
 export const ACCOUNT_CARD_INSTITUTE_ROW_CLASS =
   "min-w-0 flex-1 truncate text-[0.8125rem] font-normal leading-snug text-muted-foreground tabular-nums";
 

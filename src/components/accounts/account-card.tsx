@@ -52,7 +52,7 @@ export function AccountCard({
   const showSignedBalance = !isLiabilityAccountType(account.type);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
-  const instituteRow = formatAccountCardInstituteRow(
+  const typeRow = formatAccountCardInstituteRow(
     account,
     identifierLast4,
     t,
@@ -87,7 +87,7 @@ export function AccountCard({
         {logo}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className="flex min-w-0 items-center gap-2">
-            <p className={ACCOUNT_CARD_INSTITUTE_ROW_CLASS}>{instituteRow}</p>
+            <p className={ACCOUNT_CARD_INSTITUTE_ROW_CLASS}>{typeRow}</p>
             <ChevronRight
               className="size-5 shrink-0 text-muted-foreground rtl:rotate-180"
               aria-hidden
