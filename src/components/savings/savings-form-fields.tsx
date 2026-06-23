@@ -83,7 +83,7 @@ function SavingsToggleSettingRow({
   return (
     <div className="flex min-h-14 items-center justify-between gap-4 py-2">
       <div className="min-w-0 flex-1">
-        <p className="text-[0.8125rem] font-bold leading-none text-foreground">
+        <p className="text-[0.8125rem] font-medium leading-none text-foreground">
           {label}
         </p>
         <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-muted-foreground">
