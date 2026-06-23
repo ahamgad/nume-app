@@ -706,6 +706,11 @@ export const ar = {
         empty: "لا توجد بنود في الجدول بعد.",
         transferFailed: "فشل التحويل",
       },
+      renewalDisplay: {
+        label: "التجديد",
+        yes: "نعم",
+        no: "لا",
+      },
       renewal: {
         title: "معلومات التجديد",
         type: "نوع التجديد",

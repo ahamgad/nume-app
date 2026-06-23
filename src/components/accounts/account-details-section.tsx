@@ -16,6 +16,8 @@ interface AccountDetailsSectionProps {
   title: string;
   children: ReactNode;
   className?: string;
+  /** Defaults to 16px on all sides; Recent Records uses reduced bottom padding. */
+  paddingClassName?: string;
   /** Defaults to 16px field rhythm; Recent Records uses compact 8px rhythm. */
   fieldRowClassName?: string;
 }
@@ -30,6 +32,7 @@ export function AccountDetailsSection({
   title,
   children,
   className,
+  paddingClassName = ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
   fieldRowClassName = ACCOUNT_FORM_FIELD_ROW_CLASS,
 }: AccountDetailsSectionProps) {
   const rows = Children.toArray(children).filter(isValidElement);
@@ -38,7 +41,7 @@ export function AccountDetailsSection({
     <section
       className={cn(
         CARD_SURFACE_CLASS,
-        ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
+        paddingClassName,
         "min-w-0 w-full",
         className,
       )}

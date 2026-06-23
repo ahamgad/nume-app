@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   AccountDetailsContentHeader,
@@ -22,10 +22,8 @@ import {
   computeCertificateMetrics,
   formatCertificateRemainingLabel,
 } from "@/lib/certificates/certificate-engine";
-import { calculateScheduleSummary } from "@/lib/certificates/schedule-generator";
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime, todayIsoDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { TranslationKey } from "@/lib/i18n";
@@ -68,15 +66,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
   const certificate = getCertificateByAccountId(accountId);
   const schedules = certificate ? getCertificateSchedules(certificate.id) : [];
 
-  const metrics = useMemo(() => {
-    if (!certificate) return null;
-    return computeCertificateMetrics(certificate);
-  }, [certificate]);
-
-  const scheduleSummary = useMemo(
-    () => calculateScheduleSummary(schedules),
-    [schedules],
-  );
+  const metrics = certificate ? computeCertificateMetrics(certificate) : null;
 
   const dueCount = certificate
     ? countDueEntries(schedules, certificate.id, todayIsoDate())
@@ -186,12 +176,16 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     );
   }
 
-  const statusKey = `certificates.status.${certificate.status}` as TranslationKey;
   const remainingValue = formatCertificateRemainingLabel(
     metrics.maturityDate,
     todayIsoDate(),
     t,
   );
+
+  const renewalDisplay =
+    certificate.renewalType === "none"
+      ? t("certificates.details.renewalDisplay.no")
+      : t("certificates.details.renewalDisplay.yes");
 
   const destinationAccount = certificate.destinationAccountId
     ? accounts.find((item) => item.id === certificate.destinationAccountId) ?? null
@@ -266,23 +260,16 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             value={remainingValue}
           />
           <AccountDetailsDetailRow
-            label={t("certificates.details.status")}
-            value={t(statusKey)}
-          />
-        </AccountDetailsSection>
-
-        <AccountDetailsSection title={t("certificates.details.interestPayout.title")}>
-          <AccountDetailsDetailRow
-            label={t("certificates.details.interestPayout.totalExpected")}
-            value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
-          />
-          <AccountDetailsDetailRow
             label={t("certificates.details.interestPayout.frequency")}
             value={t(payoutFrequencyKey)}
           />
           <AccountDetailsDetailRow
             label={t("accounts.fields.interestDestination.label")}
             value={destinationDisplay}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.renewalDisplay.label")}
+            value={renewalDisplay}
           />
         </AccountDetailsSection>
 

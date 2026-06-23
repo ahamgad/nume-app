@@ -3,7 +3,10 @@
 import type { ReactNode } from "react";
 
 import { AccountDetailsSection } from "@/components/accounts/account-details-section";
-import { ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS } from "@/lib/layout/account-details-chrome";
+import {
+  ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS,
+  ACCOUNT_DETAILS_RECORDS_SECTION_PADDING_CLASS,
+} from "@/lib/layout/account-details-chrome";
 import { RecordRow } from "@/components/patterns";
 import { shouldShowRecentRecordsSection } from "@/lib/finance/recent-records-display";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -39,6 +42,7 @@ export function RecentRecordsSection({
   return (
     <AccountDetailsSection
       title={t("accounts.details.records.title")}
+      paddingClassName={ACCOUNT_DETAILS_RECORDS_SECTION_PADDING_CLASS}
       fieldRowClassName={ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS}
     >
       {records.length === 0 ? (

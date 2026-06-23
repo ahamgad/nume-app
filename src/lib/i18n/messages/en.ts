@@ -712,6 +712,11 @@ export const en = {
         type: "Renewal type",
         status: "Certificate status",
       },
+      renewalDisplay: {
+        label: "Renewal",
+        yes: "Yes",
+        no: "No",
+      },
       edit: "Edit certificate",
       archive: "Archive certificate",
       archiveSuccess: "Certificate archived",

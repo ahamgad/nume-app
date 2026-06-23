@@ -3,6 +3,9 @@ import { cn } from "@/lib/utils";
 /** Account detail card sections — 16px padding on all sides. */
 export const ACCOUNT_DETAILS_SECTION_PADDING_CLASS = "p-4";
 
+/** Recent Records section — 16px top/sides, 8px bottom. */
+export const ACCOUNT_DETAILS_RECORDS_SECTION_PADDING_CLASS = "px-4 pt-4 pb-2";
+
 /** 8px field row rhythm — Recent Records and Settings toggles. */
 export const ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS = "py-2 first:pt-0 last:pb-0";
 
