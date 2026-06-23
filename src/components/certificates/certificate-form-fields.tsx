@@ -177,58 +177,60 @@ export function CertificateFormFields({
         />
 
         {isCreate ? (
-          <>
-            <AccountFormEditableField
-              id="certificate-principal"
-              label={t("certificates.fields.principal.label")}
-              mode="numeric"
-              inputMode="decimal"
-              value={values.principalAmount}
-              placeholder={t("common.currency.zeroPlaceholder")}
-              disabled={disabled}
-              error={errors.principalAmount}
-              sanitizeInput={sanitizeAmountInput}
-              formatDisplay={(amount) =>
-                formatAmountInput(amount, amountInputLocale)
-              }
-              validate={(amount) => validateCertificatePrincipalField(amount, t)}
-              onSave={(principalAmount) => {
-                onChange({ principalAmount });
-                onClearError("principalAmount");
-              }}
-            />
+          <AccountFormEditableField
+            id="certificate-principal"
+            label={t("certificates.fields.principal.label")}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.principalAmount}
+            placeholder={t("common.currency.zeroPlaceholder")}
+            disabled={disabled}
+            error={errors.principalAmount}
+            sanitizeInput={sanitizeAmountInput}
+            formatDisplay={(amount) =>
+              formatAmountInput(amount, amountInputLocale)
+            }
+            validate={(amount) => validateCertificatePrincipalField(amount, t)}
+            onSave={(principalAmount) => {
+              onChange({ principalAmount });
+              onClearError("principalAmount");
+            }}
+          />
+        ) : null}
 
-            <AccountFormEditableField
-              id="certificate-rate"
-              label={t("accounts.fields.annualRate.label")}
-              mode="numeric"
-              inputMode="decimal"
-              value={values.annualInterestRate}
-              placeholder="0"
-              disabled={disabled}
-              error={errors.annualInterestRate}
-              suffixLabel="%"
-              sanitizeInput={sanitizeAmountInput}
-              formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
-              validate={(rate) => validateCertificateRateField(rate, t)}
-              onSave={(annualInterestRate) => {
-                onChange({ annualInterestRate });
-                onClearError("annualInterestRate");
-              }}
-            />
+        {isCreate ? (
+          <AccountFormEditableField
+            id="certificate-rate"
+            label={t("accounts.fields.annualRate.label")}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.annualInterestRate}
+            placeholder="0"
+            disabled={disabled}
+            error={errors.annualInterestRate}
+            suffixLabel="%"
+            sanitizeInput={sanitizeAmountInput}
+            formatDisplay={(rate) => formatAmountInput(rate, amountInputLocale)}
+            validate={(rate) => validateCertificateRateField(rate, t)}
+            onSave={(annualInterestRate) => {
+              onChange({ annualInterestRate });
+              onClearError("annualInterestRate");
+            }}
+          />
+        ) : null}
 
-            <AccountFormInstitutionPicker
-              id="certificate-institution"
-              accountType="certificate"
-              value={values.institution}
-              disabled={disabled}
-              error={errors.institution}
-              onChange={(institution) => {
-                onChange({ institution });
-                onClearError("institution");
-              }}
-            />
-          </>
+        {isCreate ? (
+          <AccountFormInstitutionPicker
+            id="certificate-institution"
+            accountType="certificate"
+            value={values.institution}
+            disabled={disabled}
+            error={errors.institution}
+            onChange={(institution) => {
+              onChange({ institution });
+              onClearError("institution");
+            }}
+          />
         ) : null}
 
         <AccountFormIdentifierField
