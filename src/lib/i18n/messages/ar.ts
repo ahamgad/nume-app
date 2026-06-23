@@ -549,7 +549,8 @@ export const ar = {
         label: "وجهة العائد",
       },
       destinationAccount: {
-        label: "حساب وجهة العائد",
+        label: "حساب الوجهة",
+        placeholder: "اختر حسابًا",
       },
     },
     details: {

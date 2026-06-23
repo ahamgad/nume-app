@@ -1,7 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
-
 import {
   AccountFormAccountPicker,
   AccountFormEditableField,
@@ -29,12 +27,14 @@ import {
   validateCertificateRateField,
 } from "@/lib/field-editor/field-validators";
 import { formatBalanceTriggerDisplay } from "@/lib/field-editor/balance-sign";
-import { CARD_SURFACE_FLAT_CLASS } from "@/lib/layout/card-surface";
 import type { TranslationKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
 import { Plus, Trash2 } from "lucide-react";
+
+/** Matches `FormSection` / Add Record field stack spacing (`space-y-5`). */
+const SAVINGS_FORM_STACK_GAP_CLASS = "mt-5";
 
 const POSTING_FREQUENCIES = [
   "daily",
@@ -159,29 +159,6 @@ export function SavingsFormFields({
           }}
         />
 
-        <AccountFormInstitutionPicker
-          id="savings-institution"
-          accountType="savings_account"
-          value={values.institution}
-          disabled={disabled}
-          error={errors.institution}
-          onChange={(institution) => {
-            onChange({ institution });
-            onClearError("institution");
-          }}
-        />
-
-        <AccountFormIdentifierField
-          id="savings-account-number"
-          labelKey="accounts.fields.accountNumber.label"
-          placeholderKey="accounts.fields.accountNumber.placeholder"
-          value={values.accountNumber}
-          disabled={disabled}
-          error={errors.accountNumber}
-          onChange={(accountNumber) => onChange({ accountNumber })}
-          onClearError={() => onClearError("accountNumber")}
-        />
-
         {mode === "create" ? (
           <AccountFormEditableField
             id="savings-balance"
@@ -211,11 +188,33 @@ export function SavingsFormFields({
             }}
           />
         ) : null}
+
+        <AccountFormInstitutionPicker
+          id="savings-institution"
+          accountType="savings_account"
+          value={values.institution}
+          disabled={disabled}
+          error={errors.institution}
+          onChange={(institution) => {
+            onChange({ institution });
+            onClearError("institution");
+          }}
+        />
+
+        <AccountFormIdentifierField
+          id="savings-account-number"
+          labelKey="accounts.fields.accountNumber.label"
+          placeholderKey="accounts.fields.accountNumber.placeholder"
+          value={values.accountNumber}
+          disabled={disabled}
+          error={errors.accountNumber}
+          onChange={(accountNumber) => onChange({ accountNumber })}
+          onClearError={() => onClearError("accountNumber")}
+        />
       </AccountFormSection>
 
       <AccountFormSection title={t("savings.sections.interestModel")}>
         <AccountFormScrollChipSelect
-          label={t("savings.fields.interestModel.label")}
           value={values.interestModel}
           options={interestModelOptions}
           ariaLabel={t("savings.fields.interestModel.label")}
@@ -246,11 +245,17 @@ export function SavingsFormFields({
             }}
           />
         ) : (
-          <>
+          <div className="flex flex-col">
             {values.tiers.map((tier, index) => (
-              <Fragment key={index}>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">
+              <div
+                key={index}
+                className={cn(
+                  "flex flex-col",
+                  index > 0 && "border-t border-border pt-4",
+                )}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[0.8125rem] font-medium text-foreground">
                     {t("savings.fields.tiers.tierLabel", { index: index + 1 })}
                   </span>
                   {values.tiers.length > 1 ? (
@@ -267,75 +272,76 @@ export function SavingsFormFields({
                     </Button>
                   ) : null}
                 </div>
-                <AccountFormEditableField
-                  id={`tier-min-${index}`}
-                  label={t("savings.fields.tiers.minBalance")}
-                  mode="numeric"
-                  inputMode="decimal"
-                  value={tier.minBalance}
-                  placeholder={t("common.currency.zeroPlaceholder")}
-                  disabled={disabled}
-                  sanitizeInput={sanitizeDecimalInput}
-                  formatDisplay={(amount) =>
-                    formatAmountInput(amount, amountInputLocale)
-                  }
-                  onSave={(minBalance) => updateTier(index, { minBalance })}
-                />
-                <AccountFormEditableField
-                  id={`tier-max-${index}`}
-                  label={t("savings.fields.tiers.maxBalance")}
-                  mode="numeric"
-                  inputMode="decimal"
-                  value={tier.maxBalance}
-                  placeholder={t("savings.fields.tiers.openEnded")}
-                  disabled={disabled}
-                  sanitizeInput={sanitizeDecimalInput}
-                  formatDisplay={(amount) =>
-                    formatAmountInput(amount, amountInputLocale)
-                  }
-                  onSave={(maxBalance) => updateTier(index, { maxBalance })}
-                />
-                <AccountFormEditableField
-                  id={`tier-rate-${index}`}
-                  label={t("accounts.fields.annualRate.label")}
-                  mode="numeric"
-                  inputMode="decimal"
-                  value={tier.annualInterestRate}
-                  placeholder="0"
-                  disabled={disabled}
-                  suffixLabel="%"
-                  sanitizeInput={sanitizeAmountInput}
-                  formatDisplay={(rate) =>
-                    formatAmountInput(rate, amountInputLocale)
-                  }
-                  onSave={(annualInterestRate) =>
-                    updateTier(index, { annualInterestRate })
-                  }
-                />
-              </Fragment>
+                <div className="flex flex-col gap-2">
+                  <AccountFormEditableField
+                    id={`tier-min-${index}`}
+                    label={t("savings.fields.tiers.minBalance")}
+                    mode="numeric"
+                    inputMode="decimal"
+                    value={tier.minBalance}
+                    placeholder={t("common.currency.zeroPlaceholder")}
+                    disabled={disabled}
+                    sanitizeInput={sanitizeDecimalInput}
+                    formatDisplay={(amount) =>
+                      formatAmountInput(amount, amountInputLocale)
+                    }
+                    onSave={(minBalance) => updateTier(index, { minBalance })}
+                  />
+                  <AccountFormEditableField
+                    id={`tier-max-${index}`}
+                    label={t("savings.fields.tiers.maxBalance")}
+                    mode="numeric"
+                    inputMode="decimal"
+                    value={tier.maxBalance}
+                    placeholder={t("savings.fields.tiers.openEnded")}
+                    disabled={disabled}
+                    sanitizeInput={sanitizeDecimalInput}
+                    formatDisplay={(amount) =>
+                      formatAmountInput(amount, amountInputLocale)
+                    }
+                    onSave={(maxBalance) => updateTier(index, { maxBalance })}
+                  />
+                  <AccountFormEditableField
+                    id={`tier-rate-${index}`}
+                    label={t("accounts.fields.annualRate.label")}
+                    mode="numeric"
+                    inputMode="decimal"
+                    value={tier.annualInterestRate}
+                    placeholder="0"
+                    disabled={disabled}
+                    suffixLabel="%"
+                    sanitizeInput={sanitizeAmountInput}
+                    formatDisplay={(rate) =>
+                      formatAmountInput(rate, amountInputLocale)
+                    }
+                    onSave={(annualInterestRate) =>
+                      updateTier(index, { annualInterestRate })
+                    }
+                  />
+                </div>
+              </div>
             ))}
             <Button
               type="button"
               variant="outline"
-              className="h-10 w-full"
+              className={cn("h-10 w-full", SAVINGS_FORM_STACK_GAP_CLASS)}
               disabled={disabled}
               onClick={addTier}
             >
               <Plus className="mr-2 size-4" />
               {t("savings.fields.tiers.add")}
             </Button>
-            <AccountFormGroupError id="savings-tiers-error" error={errors.tiers} />
-          </>
+            {errors.tiers ? (
+              <div className="mt-2">
+                <AccountFormGroupError id="savings-tiers-error" error={errors.tiers} />
+              </div>
+            ) : null}
+          </div>
         )}
       </AccountFormSection>
 
       <AccountFormSection title={t("savings.sections.posting")}>
-        <p className="text-sm text-muted-foreground">
-          {t("savings.balanceMethodHint")}
-        </p>
-
         <AccountFormScrollChipSelect
-          label={t("savings.fields.postingFrequency.label")}
           value={values.postingFrequency}
           options={frequencyOptions}
           ariaLabel={t("savings.fields.postingFrequency.label")}
@@ -356,10 +362,7 @@ export function SavingsFormFields({
             }}
           />
         ) : (
-          <div className={cn(CARD_SURFACE_FLAT_CLASS, "px-4")}>
-            <p className="border-b border-border py-3 text-sm font-medium">
-              {t("businessDays.title")}
-            </p>
+          <>
             <ToggleSettingRow
               label={t("businessDays.excludeWeekends.label")}
               description={t("businessDays.excludeWeekends.description")}
@@ -378,13 +381,12 @@ export function SavingsFormFields({
                 onChange({ excludeEgyptianHolidays })
               }
             />
-          </div>
+          </>
         )}
       </AccountFormSection>
 
       <AccountFormSection title={t("savings.sections.destination")}>
         <AccountFormScrollChipSelect
-          label={t("accounts.fields.interestDestination.label")}
           value={values.interestDestination}
           options={destinationOptions}
           ariaLabel={t("accounts.fields.interestDestination.label")}
@@ -403,13 +405,8 @@ export function SavingsFormFields({
         {values.interestDestination === "another_account" ? (
           <AccountFormAccountPicker
             id="savings-destination"
-            label={t("accounts.fields.interestDestinationAccount.label")}
-            placeholder={t(
-              "accounts.fields.interestDestinationAccount.placeholder",
-            )}
-            description={t(
-              "accounts.fields.interestDestinationAccount.description",
-            )}
+            label={t("savings.fields.destinationAccount.label")}
+            placeholder={t("savings.fields.destinationAccount.placeholder")}
             searchPlaceholder={t(
               "accounts.fields.interestDestinationAccount.searchPlaceholder",
             )}

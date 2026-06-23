@@ -550,7 +550,8 @@ export const en = {
         label: "Interest destination",
       },
       destinationAccount: {
-        label: "Interest destination account",
+        label: "Destination account",
+        placeholder: "Select account",
       },
     },
     details: {
