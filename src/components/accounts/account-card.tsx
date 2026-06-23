@@ -9,7 +9,6 @@ import { formatAccountCardInstituteRow } from "@/lib/finance/account-card-displa
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
 import {
   getAccountDisplayBalance,
-  isLiabilityAccountType,
 } from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
@@ -49,7 +48,6 @@ export function AccountCard({
   t,
 }: AccountCardProps) {
   const displayBalance = getAccountDisplayBalance(account);
-  const showSignedBalance = !isLiabilityAccountType(account.type);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
   const typeRow = formatAccountCardInstituteRow(
@@ -111,7 +109,6 @@ export function AccountCard({
           amount={displayBalance}
           locale={formatLocale}
           variant="inline"
-          signMode={showSignedBalance ? "balance" : "unsigned"}
           className={ACCOUNT_CARD_BALANCE_VALUE_CLASS}
         />
       </div>

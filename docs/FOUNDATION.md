@@ -28,11 +28,11 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 |---|---|---|---|
 | 1 | **Header** | `RootPageHeader`, `StackPageHeader`, `AccountDetailsStackHeader`, `BottomSheetHeader` | § 9 |
 | 2 | **Picker list** | `PickerList`, `PickerListOption`, `PickerListDivider`, `PickerListNoneOption` | § 3 |
-| 3 | **Account details** | `AccountDetailsStackHeader`, `AccountDetailsContentHeader`, `AccountDetailsSummary` | § 11 |
+| 3 | **Account details** | `AccountDetailsStackHeader`, `AccountDetailsContentHeader`, `AccountDetailsSection`, `AccountDetailsBalanceCard` | § 11 |
 | 4 | **Create account CTA** | `AccountCreateActionButton`, shared i18n copy | § 10 |
 | 5 | **Confirmation actions** | `ConfirmationSheetActions`, `ConfirmationBottomSheet` | § 10, § 6 |
 | 6 | **Typography & copy** | Sentence case, helper description punctuation — `docs/CONTENT.md`, `en.ts` | § 10, CONTENT |
-| 7 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` | § 10 |
+| 7 | **Numeric typography & balance display** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `getBalanceDisplayProps` | § 10 |
 | 8 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface`, `FieldSignToggle` | § 5 |
 | 9 | **Account cards** | `AccountCard`, `AccountCardsSection` | § 14 |
 | 10 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` | § 15 |
@@ -486,14 +486,27 @@ Currency amounts render integer and decimal digits at the **same font size**.
 | `CurrencyAmount` | `components/ui/currency-amount.tsx` | Inline / row displays |
 | `ResponsiveCurrencyAmount` | `components/ui/responsive-currency-amount.tsx` | Hero / metric displays |
 | `formatCurrency` / `getCurrencyDisplayParts` | `lib/format/currency-display.ts` | String formatting |
+| `getBalanceDisplayProps` | `lib/finance/balance-display.ts` | Sign + color rules for all monetary values |
 
 Do not scale decimal portions separately.
+
+### Balance display (frozen)
+
+All monetary balances and indicators compose through **`lib/finance/balance-display.ts`** and the currency components above.
+
+| Rule | Value |
+|---|---|
+| Sign mode | `balance` — no `+` prefix for positive values; `−` prefix for negative values |
+| Color | `text-foreground` only — no semantic green/red balance tones |
+| Default | `CurrencyAmount`, `ResponsiveCurrencyAmount`, and `formatCurrency` default to balance sign mode |
+
+**Propagation rule:** Dashboard, Accounts, Planning, Goals, More, all detail screens, summary cards, metrics, and future screens **must not** override balance sign mode or color at the screen level. Use `getBalanceDisplayProps()` when wiring custom amount displays.
 
 ---
 
 ## 11. Account details (frozen)
 
-All account detail screens compose through **`account-details-chrome.tsx`**.
+All account detail screens compose through **`account-details-chrome.tsx`** and shared section components.
 
 ### Approved components
 
@@ -501,20 +514,33 @@ All account detail screens compose through **`account-details-chrome.tsx`**.
 |---|---|
 | `AccountDetailsStackHeader` | Navigation header — account name collapse into header on scroll |
 | `AccountDetailsContentHeader` | Content header wrapper for all detail screens |
-| `AccountDetailsSummary` | Logo block + institution subtitle + account name (large title) |
+| `AccountDetailsSummary` | Logo block + account type subtitle + account name (large title) |
+| `AccountDetailsBalanceCard` | Balance/principal hero section — elevated card surface, 16px padding |
+| `AccountDetailsSection` | Content sections (summary, activity, interest, liability details) |
+| `AccountDetailsDetailRow` | Label/value row inside a section |
+| `AccountDetailsSettingsSection` | Settings — edit row, toggles, archive action |
 
-Location: `components/accounts/account-details-chrome.tsx`, `components/accounts/account-details-summary.tsx`.
+Location: `components/accounts/account-details-chrome.tsx`, `components/accounts/account-details-section.tsx`, `components/accounts/account-details-settings-section.tsx`, `components/accounts/account-details-balance-card.tsx`, `lib/layout/account-details-chrome.ts`.
+
+### Section layout rules
+
+1. **Card surface** — `CARD_SURFACE_CLASS` on every content section (balance uses elevated variant via `AccountDetailsBalanceCard`)
+2. **Title inside card** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` (18px medium); same as Add/Edit Account form sections
+3. **Padding** — 16px on all sides (`ACCOUNT_DETAILS_SECTION_PADDING_CLASS`)
+4. **Item rhythm** — 16px between items and dividers via `ACCOUNT_FORM_SECTION_FIELDS_CLASS` + `ACCOUNT_FORM_FIELD_ROW_CLASS`
+5. **Settings last** — Settings (or `ArchivedAccountActions` when archived) is always the final section; no content below it
 
 ### Rules
 
 - **Shared layout** — logo block, metadata, and large title live in the foundation, not per screen
 - **Shared collapse behavior** — large title + header transition via `ScreenTitleCollapseProvider`
 - **Shared logo block** — 56×56 logo, 16px gap to metadata, type-initial fallback
-- **Shared metadata structure** — institution · account number, then account name
+- **Shared metadata structure** — account type · account number, then account name
+- **Archive action** — center-aligned text button; last item in Settings
 
 ### Component reuse rule
 
-New account detail screen (any account type) → `AccountDetailsStackHeader` + `AccountDetailsContentHeader`.
+New account detail screen (any account type) → `AccountDetailsStackHeader` + `AccountDetailsContentHeader` + `AccountDetailsSection` for content blocks.
 
 Configure through **props only** (`accountName`, `institution`, `institutionSubtitle`, `accountType`). Do not fork layout markup in screen files.
 

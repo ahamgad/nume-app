@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
 import { CARD_SURFACE_FLAT_CLASS, CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
+import { getBalanceDisplayProps } from "@/lib/finance/balance-display";
 import { cn } from "@/lib/utils";
 
 interface WidgetCardProps {
@@ -132,8 +133,9 @@ export function MetricHero({
   amountSignMode,
   metaClassName,
 }: MetricHeroProps) {
+  const balanceDisplay = getBalanceDisplayProps();
   const resolvedSignMode =
-    amountSignMode ?? (signedAmount ? "signed" : "unsigned");
+    amountSignMode ?? (signedAmount ? "balance" : balanceDisplay.signMode);
 
   return (
     <div className="w-full min-w-0 text-start">
@@ -146,7 +148,7 @@ export function MetricHero({
             amount={amount}
             locale={locale}
             variant={amountVariant}
-            className={amountClassName}
+            className={cn(balanceDisplay.className, amountClassName)}
             signMode={resolvedSignMode}
             trailing={amountAction}
           />
@@ -362,6 +364,7 @@ interface RecordRowProps {
   meta: string;
   icon: ReactNode;
   amountClassName?: string;
+  className?: string;
   onClick?: () => void;
 }
 
@@ -372,6 +375,7 @@ export function RecordRow({
   meta,
   icon,
   amountClassName,
+  className,
   onClick,
 }: RecordRowProps) {
   const Comp = onClick ? "button" : "div";
@@ -383,6 +387,7 @@ export function RecordRow({
       className={cn(
         "flex w-full min-h-14 items-start gap-3 py-3 text-start",
         onClick && "transition-colors active:bg-muted",
+        className,
       )}
     >
       <div className="mt-0.5 shrink-0">{icon}</div>
@@ -393,7 +398,7 @@ export function RecordRow({
             amount={amount}
             locale={formatLocale}
             variant="inline"
-            className={amountClassName}
+            className={cn(getBalanceDisplayProps().className, amountClassName)}
           />
         </div>
         <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{meta}</p>

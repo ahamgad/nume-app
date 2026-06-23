@@ -66,7 +66,6 @@ export function DashboardScreen() {
                 label={t("dashboard.netWorth.title")}
                 amount={netWorth.netWorth}
                 locale={formatLocale}
-                signedAmount
                 subline={t("dashboard.netWorth.subline", {
                   assetsLabel: t("dashboard.netWorth.assets"),
                   assets: formatCurrency(netWorth.assets, formatLocale),

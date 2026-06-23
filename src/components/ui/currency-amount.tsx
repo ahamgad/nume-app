@@ -5,6 +5,10 @@ import type { CSSProperties } from "react";
 import {
   getCurrencyDisplayParts,
 } from "@/lib/format/currency";
+import {
+  BALANCE_DISPLAY_CLASS,
+  BALANCE_DISPLAY_SIGN_MODE,
+} from "@/lib/finance/balance-display";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
 import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency";
 import { cn } from "@/lib/utils";
@@ -34,7 +38,7 @@ export function CurrencyAmount({
   className,
   style,
   showDecimals,
-  signMode = "unsigned",
+  signMode = BALANCE_DISPLAY_SIGN_MODE,
 }: CurrencyAmountProps) {
   const parts = getCurrencyDisplayParts(amount, locale, { showDecimals, signMode });
   const staticClass = STATIC_VARIANT_CLASS[variant];
@@ -43,6 +47,7 @@ export function CurrencyAmount({
     <span
       className={cn(
         "inline max-w-full whitespace-nowrap tabular-nums tracking-tight leading-none",
+        BALANCE_DISPLAY_CLASS,
         staticClass,
         className,
       )}

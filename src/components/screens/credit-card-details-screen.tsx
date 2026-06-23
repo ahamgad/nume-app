@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
+  AccountDetailsDetailRow,
+  AccountDetailsSection,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -14,16 +16,12 @@ import {
   liabilityBalanceMeta,
 } from "@/components/accounts/liability-balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
-import { CreditUtilizationProgress } from "@/components/credit-cards/credit-utilization-progress";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
-import {
-  calculateAvailableCredit,
-  calculateCreditUtilization,
-} from "@/lib/credit-cards/utilization";
+import { calculateAvailableCredit } from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { formatCurrency } from "@/lib/format/currency";
@@ -37,15 +35,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface CreditCardDetailsScreenProps {
   accountId: string;
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <span className="text-[0.9375rem] text-muted-foreground">{label}</span>
-      <span className="text-end text-[0.9375rem] font-medium tabular-nums">{value}</span>
-    </div>
-  );
 }
 
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
@@ -93,14 +82,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
       ? formatAccountDestinationDisplay(source, t)
       : t("common.emptyValue");
   }, [creditCard, accounts, t]);
-
-  const utilization = useMemo(() => {
-    if (!account || !creditCard) return null;
-    return calculateCreditUtilization(
-      account.currentBalance,
-      creditCard.creditLimit,
-    );
-  }, [account, creditCard]);
 
   const availableToSpend = useMemo(() => {
     if (!account || !creditCard) return null;
@@ -222,40 +203,40 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
               currentBalance: toStoredCreditCardBalance(outstandingBalance),
             });
           }}
-          footer={
-            utilization !== null ? (
-              <CreditUtilizationProgress utilization={utilization} />
-            ) : undefined
-          }
         />
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("creditCards.details.summary")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("creditCards.details.linkedAccount")}
-              value={linkedAccountLabel}
-            />
-            <DetailRow
-              label={t("creditCards.fields.creditLimit.label")}
-              value={formatCurrency(creditCard.creditLimit ?? 0, formatLocale)}
-            />
-            <DetailRow
-              label={t("creditCards.details.availableToSpend")}
-              value={
-                availableToSpend !== null
-                  ? formatCurrency(availableToSpend, formatLocale)
-                  : t("common.emptyValue")
-              }
-            />
-            <DetailRow
-              label={t("creditCards.fields.statementDueDay.label")}
-              value={formatPostingDayLabel(creditCard.paymentDueDay, t)}
-            />
-          </div>
-        </section>
+        <AccountDetailsSection title={t("creditCards.details.summary")}>
+          <AccountDetailsDetailRow
+            label={t("creditCards.details.linkedAccount")}
+            value={linkedAccountLabel}
+          />
+          <AccountDetailsDetailRow
+            label={t("creditCards.fields.creditLimit.label")}
+            value={formatCurrency(creditCard.creditLimit ?? 0, formatLocale)}
+          />
+          <AccountDetailsDetailRow
+            label={t("creditCards.details.availableToSpend")}
+            value={
+              availableToSpend !== null
+                ? formatCurrency(availableToSpend, formatLocale)
+                : t("common.emptyValue")
+            }
+          />
+          <AccountDetailsDetailRow
+            label={t("creditCards.fields.statementDueDay.label")}
+            value={formatPostingDayLabel(creditCard.paymentDueDay, t)}
+          />
+        </AccountDetailsSection>
+
+        <RecentRecordsSection
+          records={records}
+          isArchived={isArchived}
+          formatLocale={formatLocale}
+          recordLabel={(record) => recordLabel(record, t)}
+          recordAmount={(record) => record.amount}
+          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
+          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
+        />
 
         {!isArchived ? (
           <AccountDetailsSettingsSection
@@ -277,16 +258,6 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
             onDelete={() => setShowDeleteConfirm(true)}
           />
         )}
-
-        <RecentRecordsSection
-          records={records}
-          isArchived={isArchived}
-          formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) => record.amount}
-          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
-          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
-        />
       </ScreenBody>
 
       <ConfirmBottomSheet

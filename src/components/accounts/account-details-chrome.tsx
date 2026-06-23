@@ -20,6 +20,11 @@ export {
   type AccountDetailsSummaryProps,
 } from "@/components/accounts/account-details-summary";
 
+export {
+  AccountDetailsDetailRow,
+  AccountDetailsSection,
+} from "@/components/accounts/account-details-section";
+
 interface AccountDetailsStackHeaderProps {
   accountName: string;
   onBack?: () => void;

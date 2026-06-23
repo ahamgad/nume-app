@@ -209,6 +209,18 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           }}
         />
 
+        <RecentRecordsSection
+          records={records}
+          isArchived={isArchived}
+          formatLocale={formatLocale}
+          recordLabel={(record) => recordLabel(record, t)}
+          recordAmount={(record) => record.amount}
+          recordMeta={(record) =>
+            formatDisplayDate(record.date, formatLocale)
+          }
+          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
+        />
+
         {!isArchived ? (
           <AccountDetailsSettingsSection
             title={t("accounts.details.settingsTitle")}
@@ -251,17 +263,6 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           />
         )}
 
-        <RecentRecordsSection
-          records={records}
-          isArchived={isArchived}
-          formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) => record.amount}
-          recordMeta={(record) =>
-            formatDisplayDate(record.date, formatLocale)
-          }
-          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
-        />
       </ScreenBody>
 
       <ConfirmBottomSheet

@@ -6,6 +6,8 @@ import { useMemo, useRef, useState } from "react";
 import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
+  AccountDetailsDetailRow,
+  AccountDetailsSection,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
@@ -33,15 +35,6 @@ import { useToast } from "@/providers/toast-provider";
 
 interface CertificateDetailsScreenProps {
   accountId: string;
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <span className="text-[0.9375rem] text-muted-foreground">{label}</span>
-      <span className="text-end text-[0.9375rem] font-medium tabular-nums">{value}</span>
-    </div>
-  );
 }
 
 export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreenProps) {
@@ -255,50 +248,43 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           </Button>
         ) : null}
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.summary")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("accounts.fields.annualRate.label")}
-              value={`${certificate.annualInterestRate}%`}
-            />
-            <DetailRow
-              label={t("certificates.details.purchaseDate")}
-              value={formatDisplayDate(certificate.purchaseDate, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.maturityDate")}
-              value={formatDisplayDate(metrics.maturityDate, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.remaining")}
-              value={remainingValue}
-            />
-            <DetailRow label={t("certificates.details.status")} value={t(statusKey)} />
-          </div>
-        </section>
+        <AccountDetailsSection title={t("certificates.details.summary")}>
+          <AccountDetailsDetailRow
+            label={t("accounts.fields.annualRate.label")}
+            value={`${certificate.annualInterestRate}%`}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.purchaseDate")}
+            value={formatDisplayDate(certificate.purchaseDate, formatLocale)}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.maturityDate")}
+            value={formatDisplayDate(metrics.maturityDate, formatLocale)}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.remaining")}
+            value={remainingValue}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.status")}
+            value={t(statusKey)}
+          />
+        </AccountDetailsSection>
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("certificates.details.interestPayout.title")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("certificates.details.interestPayout.totalExpected")}
-              value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
-            />
-            <DetailRow
-              label={t("certificates.details.interestPayout.frequency")}
-              value={t(payoutFrequencyKey)}
-            />
-            <DetailRow
-              label={t("accounts.fields.interestDestination.label")}
-              value={destinationDisplay}
-            />
-          </div>
-        </section>
+        <AccountDetailsSection title={t("certificates.details.interestPayout.title")}>
+          <AccountDetailsDetailRow
+            label={t("certificates.details.interestPayout.totalExpected")}
+            value={formatCurrency(scheduleSummary.totalExpectedInterest, formatLocale)}
+          />
+          <AccountDetailsDetailRow
+            label={t("certificates.details.interestPayout.frequency")}
+            value={t(payoutFrequencyKey)}
+          />
+          <AccountDetailsDetailRow
+            label={t("accounts.fields.interestDestination.label")}
+            value={destinationDisplay}
+          />
+        </AccountDetailsSection>
 
         {!isArchived ? (
           <AccountDetailsSettingsSection

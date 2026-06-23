@@ -2,6 +2,9 @@
 
 import type { ReactNode } from "react";
 
+import {
+  AccountDetailsSection,
+} from "@/components/accounts/account-details-section";
 import { RecordRow } from "@/components/patterns";
 import { shouldShowRecentRecordsSection } from "@/lib/finance/recent-records-display";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -35,12 +38,9 @@ export function RecentRecordsSection({
   }
 
   return (
-    <section>
-      <h2 className="mb-2 text-start text-lg font-semibold">
-        {t("accounts.details.records.title")}
-      </h2>
+    <AccountDetailsSection title={t("accounts.details.records.title")}>
       {records.length === 0 ? (
-        <div className="rounded-lg border border-border px-4 py-4">
+        <div>
           <p className="text-[0.9375rem] font-medium">
             {t("accounts.details.records.emptyTitle")}
           </p>
@@ -49,22 +49,19 @@ export function RecentRecordsSection({
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-border rounded-lg border border-border px-4">
-          {records.map((record) => (
-            <RecordRow
-              key={record.id}
-              label={recordLabel(record)}
-              amount={recordAmount(record)}
-              formatLocale={formatLocale}
-              meta={recordMeta(record)}
-              icon={recordIcon(record)}
-              onClick={
-                onRecordClick ? () => onRecordClick(record) : undefined
-              }
-            />
-          ))}
-        </div>
+        records.map((record) => (
+          <RecordRow
+            key={record.id}
+            className="py-0"
+            label={recordLabel(record)}
+            amount={recordAmount(record)}
+            formatLocale={formatLocale}
+            meta={recordMeta(record)}
+            icon={recordIcon(record)}
+            onClick={onRecordClick ? () => onRecordClick(record) : undefined}
+          />
+        ))
       )}
-    </section>
+    </AccountDetailsSection>
   );
 }

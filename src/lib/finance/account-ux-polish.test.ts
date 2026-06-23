@@ -15,7 +15,7 @@ describe("RecentRecordsSection", () => {
 
     expect(source).toContain("accounts.details.records.emptyTitle");
     expect(source).toContain("accounts.details.records.emptyDescription");
-    expect(source).toContain("rounded-lg border border-border");
+    expect(source).toContain("AccountDetailsSection");
     expect(source).not.toContain('"accounts.details.records.empty"');
   });
 

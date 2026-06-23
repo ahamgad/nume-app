@@ -74,7 +74,7 @@ export function AccountDetailsSettingsSection({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-0 w-full justify-start px-0 py-0 text-destructive hover:bg-transparent hover:text-destructive"
+            className="h-auto min-h-0 w-full justify-center px-0 py-0 text-center text-destructive hover:bg-transparent hover:text-destructive"
             disabled={archiveDisabled}
             onClick={onArchive}
           >

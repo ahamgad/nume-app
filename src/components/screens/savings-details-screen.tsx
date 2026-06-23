@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
+  AccountDetailsDetailRow,
+  AccountDetailsSection,
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -19,7 +21,6 @@ import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
 import type { FinanceRecord } from "@/lib/finance/types";
@@ -29,15 +30,6 @@ import { useToast } from "@/providers/toast-provider";
 
 interface SavingsDetailsScreenProps {
   accountId: string;
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <span className="text-[0.9375rem] text-muted-foreground">{label}</span>
-      <span className="text-end text-[0.9375rem] font-medium tabular-nums">{value}</span>
-    </div>
-  );
 }
 
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
@@ -218,34 +210,42 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           }}
         />
 
-        <section>
-          <h2 className="mb-2 text-start text-lg font-semibold">
-            {t("savings.details.summary")}
-          </h2>
-          <div className="divide-y divide-border rounded-lg border border-border px-4">
-            <DetailRow
-              label={t("savings.details.interestModel")}
-              value={t(
-                savings.interestModel === "fixed"
-                  ? "savings.interestModel.fixed"
-                  : "savings.interestModel.tiered",
-              )}
-            />
-            <DetailRow label={t("accounts.fields.annualRate.label")} value={rateLabel} />
-            <DetailRow
-              label={t("savings.details.nextPosting")}
-              value={
-                savings.nextPostingDate
-                  ? formatDisplayDate(savings.nextPostingDate, formatLocale)
-                  : t("common.emptyValue")
-              }
-            />
-            <DetailRow
-              label={t("accounts.fields.interestDestination.label")}
-              value={destinationLabel}
-            />
-          </div>
-        </section>
+        <AccountDetailsSection title={t("savings.details.summary")}>
+          <AccountDetailsDetailRow
+            label={t("savings.details.interestModel")}
+            value={t(
+              savings.interestModel === "fixed"
+                ? "savings.interestModel.fixed"
+                : "savings.interestModel.tiered",
+            )}
+          />
+          <AccountDetailsDetailRow
+            label={t("accounts.fields.annualRate.label")}
+            value={rateLabel}
+          />
+          <AccountDetailsDetailRow
+            label={t("savings.details.nextPosting")}
+            value={
+              savings.nextPostingDate
+                ? formatDisplayDate(savings.nextPostingDate, formatLocale)
+                : t("common.emptyValue")
+            }
+          />
+          <AccountDetailsDetailRow
+            label={t("accounts.fields.interestDestination.label")}
+            value={destinationLabel}
+          />
+        </AccountDetailsSection>
+
+        <RecentRecordsSection
+          records={records}
+          isArchived={isArchived}
+          formatLocale={formatLocale}
+          recordLabel={(record) => recordLabel(record, t)}
+          recordAmount={(record) => record.amount}
+          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
+          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
+        />
 
         {!isArchived ? (
           <AccountDetailsSettingsSection
@@ -287,15 +287,6 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           />
         )}
 
-        <RecentRecordsSection
-          records={records}
-          isArchived={isArchived}
-          formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
-          recordAmount={(record) => record.amount}
-          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
-          recordIcon={(record) => <RecordTypeIcon type={record.type} />}
-        />
       </ScreenBody>
 
       <ConfirmBottomSheet

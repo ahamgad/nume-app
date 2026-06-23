@@ -9,6 +9,10 @@ import {
 } from "react";
 
 import { getCurrencyDisplayParts } from "@/lib/format/currency";
+import {
+  BALANCE_DISPLAY_CLASS,
+  BALANCE_DISPLAY_SIGN_MODE,
+} from "@/lib/finance/balance-display";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
 import {
   CURRENCY_AMOUNT_TRAILING_GAP_PX,
@@ -34,7 +38,7 @@ export function ResponsiveCurrencyAmount({
   locale,
   variant = "hero",
   className,
-  signMode = "unsigned",
+  signMode = BALANCE_DISPLAY_SIGN_MODE,
   trailing,
 }: ResponsiveCurrencyAmountProps) {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -93,7 +97,10 @@ export function ResponsiveCurrencyAmount({
     >
       <span
         ref={textRef}
-        className="inline-block min-w-0 max-w-full whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none"
+        className={cn(
+          "inline-block min-w-0 max-w-full whitespace-nowrap font-semibold tabular-nums tracking-tight leading-none",
+          BALANCE_DISPLAY_CLASS,
+        )}
         style={{ fontSize: fontSizePx ?? maxPx }}
       >
         {parts.fullText}

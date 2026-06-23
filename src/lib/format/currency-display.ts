@@ -29,7 +29,7 @@ function resolveShowDecimals(showDecimals?: boolean): boolean {
 }
 
 function resolveSignMode(signMode?: CurrencySignMode): CurrencySignMode {
-  return signMode ?? "unsigned";
+  return signMode ?? "balance";
 }
 
 /** Absolute display amount for unsigned contexts. */
@@ -111,21 +111,21 @@ export function formatCurrency(
   return getCurrencyDisplayParts(amount, locale, options).fullText;
 }
 
-/** Dashboard/widget metrics — explicit +/- prefix. */
+/** Dashboard/widget metrics — balance sign rules (no + prefix for positive). */
 export function formatMetricCurrency(
   amount: number,
   locale: string = DEFAULT_LOCALE,
   options?: Omit<FormatCurrencyOptions, "signMode">,
 ): string {
-  return formatCurrency(amount, locale, { ...options, signMode: "signed" });
+  return formatCurrency(amount, locale, { ...options, signMode: "balance" });
 }
 
-/** Record and account balance displays — no sign prefix. */
+/** Record and account balance displays — balance sign rules. */
 export function formatSignedCurrency(
   amount: number,
   _type?: RecordType,
   locale: string = DEFAULT_LOCALE,
   options?: FormatCurrencyOptions,
 ): string {
-  return formatCurrency(amount, locale, { ...options, signMode: "unsigned" });
+  return formatCurrency(amount, locale, { ...options, signMode: "balance" });
 }

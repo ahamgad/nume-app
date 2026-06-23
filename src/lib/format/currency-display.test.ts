@@ -8,13 +8,16 @@ import {
 } from "@/lib/format/currency-display";
 
 describe("currency display", () => {
-  it("formats amounts as EGP prefix without sign in unsigned mode", () => {
+  it("formats amounts as EGP prefix without sign for positive values", () => {
     expect(formatCurrency(5000, "en-EG")).toBe("EGP 5,000");
-    expect(formatCurrency(-5000, "en-EG")).toBe("EGP 5,000");
   });
 
-  it("formats dashboard metrics with explicit signs", () => {
-    expect(formatMetricCurrency(5000, "en-EG")).toBe("+ EGP 5,000");
+  it("formats negative amounts with minus prefix in balance mode", () => {
+    expect(formatCurrency(-5000, "en-EG")).toBe("− EGP 5,000");
+  });
+
+  it("formats dashboard metrics with balance sign rules", () => {
+    expect(formatMetricCurrency(5000, "en-EG")).toBe("EGP 5,000");
     expect(formatMetricCurrency(-5000, "en-EG")).toBe("− EGP 5,000");
   });
 
@@ -25,8 +28,8 @@ describe("currency display", () => {
     expect(parts.fullText).toBe("EGP 999,999.99");
   });
 
-  it("omits sign prefixes for record and balance displays", () => {
-    expect(formatSignedCurrency(-250, "expense", "en-EG")).toBe("EGP 250");
+  it("formats record and balance displays with balance sign rules", () => {
+    expect(formatSignedCurrency(-250, "expense", "en-EG")).toBe("− EGP 250");
     expect(formatSignedCurrency(250, "income", "en-EG")).toBe("EGP 250");
   });
 

@@ -2,22 +2,34 @@ import type { AccountType } from "@/lib/finance/types";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
 import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
 
-export const ACCOUNT_DETAILS_BALANCE_SIGN_MODE: CurrencySignMode = "balance";
+/** Global balance sign mode — no + prefix for positive; − prefix for negative. */
+export const BALANCE_DISPLAY_SIGN_MODE: CurrencySignMode = "balance";
 
-/** Unified balance color for account detail hero amounts — no semantic green/red. */
-export const ACCOUNT_DETAILS_BALANCE_CLASS = "text-foreground";
+/** Unified monetary value color — no semantic green/red tones. */
+export const BALANCE_DISPLAY_CLASS = "text-foreground";
 
-export interface AccountDetailsBalanceDisplayProps {
+/** @deprecated Use {@link BALANCE_DISPLAY_SIGN_MODE}. */
+export const ACCOUNT_DETAILS_BALANCE_SIGN_MODE = BALANCE_DISPLAY_SIGN_MODE;
+
+/** @deprecated Use {@link BALANCE_DISPLAY_CLASS}. */
+export const ACCOUNT_DETAILS_BALANCE_CLASS = BALANCE_DISPLAY_CLASS;
+
+export interface BalanceDisplayProps {
   signMode: CurrencySignMode;
   className: string;
 }
 
-/** Sign and color rules for account detail balance heroes. */
-export function getAccountDetailsBalanceDisplayProps(): AccountDetailsBalanceDisplayProps {
+/** Sign and color rules for all monetary balance displays app-wide. */
+export function getBalanceDisplayProps(): BalanceDisplayProps {
   return {
-    signMode: ACCOUNT_DETAILS_BALANCE_SIGN_MODE,
-    className: ACCOUNT_DETAILS_BALANCE_CLASS,
+    signMode: BALANCE_DISPLAY_SIGN_MODE,
+    className: BALANCE_DISPLAY_CLASS,
   };
+}
+
+/** @deprecated Use {@link getBalanceDisplayProps}. */
+export function getAccountDetailsBalanceDisplayProps(): BalanceDisplayProps {
+  return getBalanceDisplayProps();
 }
 
 export function isLiabilityAccountType(type: AccountType): boolean {
@@ -38,20 +50,10 @@ interface AccountTypeFields {
   currentBalance: number;
 }
 
-/** Semantic balance color for account lists and summary cards. */
+/** @deprecated Use {@link BALANCE_DISPLAY_CLASS} via {@link getBalanceDisplayProps}. */
 export function getBalanceToneClassName(
-  account: Pick<AccountTypeFields, "type" | "currentBalance">,
-): string | undefined {
-  const amount = getAccountDisplayBalance(account);
-  if (amount === 0) return undefined;
-
-  if (isLiabilityAccountType(account.type)) {
-    return "text-destructive";
-  }
-
-  if (amount > 0) {
-    return "text-emerald-700 dark:text-emerald-300";
-  }
-
-  return "text-destructive";
+  account?: Pick<AccountTypeFields, "type" | "currentBalance">,
+): string {
+  void account;
+  return BALANCE_DISPLAY_CLASS;
 }

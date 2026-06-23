@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { MetricHero, WidgetCard } from "@/components/patterns";
-import { getAccountDetailsBalanceDisplayProps } from "@/lib/finance/balance-display";
+import { getBalanceDisplayProps } from "@/lib/finance/balance-display";
 import {
   accountDetailsBalanceMetaClassName,
   ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
@@ -30,7 +30,7 @@ export function AccountDetailsBalanceCard({
   amountAction,
   footer,
 }: AccountDetailsBalanceCardProps) {
-  const balanceDisplay = getAccountDetailsBalanceDisplayProps();
+  const balanceDisplay = getBalanceDisplayProps();
 
   return (
     <WidgetCard elevated paddingClass={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>
