@@ -63,7 +63,7 @@ export function MoneyAccountFormFields({
         accountType,
         showsInstitution: showInstitution,
         showsBalance: showBalance,
-        showsIdentifier: accountType === "current_account",
+        showsIdentifier: accountType === "current_account" && mode === "create",
       }}
     >
       <AccountFormSection title={t("accounts.formSections.accountDetails")}>
@@ -80,6 +80,36 @@ export function MoneyAccountFormFields({
             onClearError("name");
           }}
         />
+
+        {showBalance ? (
+          <AccountFormEditableField
+            id="balance"
+            label={t("accounts.fields.balance.label")}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.balance}
+            placeholder={t("common.currency.zeroPlaceholder")}
+            disabled={disabled}
+            error={errors.balance}
+            showSignToggle
+            sanitizeInput={sanitizeAmountInput}
+            formatDisplay={(amount) =>
+              formatAmountInput(amount, amountInputLocale)
+            }
+            displayValue={
+              values.balance.trim()
+                ? formatBalanceTriggerDisplay(values.balance, (unsigned) =>
+                    formatAmountInput(unsigned, amountInputLocale),
+                  )
+                : undefined
+            }
+            validate={(next) => validateAccountBalanceField(next, t)}
+            onSave={(balance) => {
+              onChange({ balance });
+              onClearError("balance");
+            }}
+          />
+        ) : null}
 
         {showInstitution ? (
           shouldShowInstitutionPicker(accountType as InstitutionPickerContext) ? (
@@ -111,7 +141,7 @@ export function MoneyAccountFormFields({
           )
         ) : null}
 
-        {accountType === "current_account" ? (
+        {accountType === "current_account" && mode === "create" ? (
           <AccountFormIdentifierField
             id="account-number-last4"
             labelKey="accounts.fields.accountNumber.label"
@@ -121,36 +151,6 @@ export function MoneyAccountFormFields({
             error={errors.accountNumber}
             onChange={(accountNumber) => onChange({ accountNumber })}
             onClearError={() => onClearError("accountNumber")}
-          />
-        ) : null}
-
-        {showBalance ? (
-          <AccountFormEditableField
-            id="balance"
-            label={t("accounts.fields.balance.label")}
-            mode="numeric"
-            inputMode="decimal"
-            value={values.balance}
-            placeholder={t("common.currency.zeroPlaceholder")}
-            disabled={disabled}
-            error={errors.balance}
-            showSignToggle
-            sanitizeInput={sanitizeAmountInput}
-            formatDisplay={(amount) =>
-              formatAmountInput(amount, amountInputLocale)
-            }
-            displayValue={
-              values.balance.trim()
-                ? formatBalanceTriggerDisplay(values.balance, (unsigned) =>
-                    formatAmountInput(unsigned, amountInputLocale),
-                  )
-                : undefined
-            }
-            validate={(next) => validateAccountBalanceField(next, t)}
-            onSave={(balance) => {
-              onChange({ balance });
-              onClearError("balance");
-            }}
           />
         ) : null}
       </AccountFormSection>
