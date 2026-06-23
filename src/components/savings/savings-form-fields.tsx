@@ -11,8 +11,8 @@ import {
   AccountFormSections,
   type ScrollChipOption,
 } from "@/components/forms/account-form-section";
-import { ToggleSettingRow } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
+import { Switch } from "@/components/ui/switch";
 import type { SavingsFormValues } from "@/lib/savings/form";
 import { POSTING_DAY_FORM_LAST } from "@/lib/savings/posting-schedule";
 import type { Account } from "@/lib/finance/types";
@@ -36,6 +36,12 @@ import { Plus, Trash2 } from "lucide-react";
 /** Matches `FormSection` / Add Record field stack spacing (`space-y-5`). */
 const SAVINGS_FORM_STACK_GAP_CLASS = "mt-5";
 
+/** Tiered interest vertical rhythm (px). */
+const SAVINGS_TIER_SECTION_GAP_CLASS = "mt-4";
+
+const SAVINGS_TIER_LABEL_CLASS =
+  "text-[0.9375rem] font-semibold leading-5 text-foreground";
+
 const POSTING_FREQUENCIES = [
   "daily",
   "monthly",
@@ -55,6 +61,69 @@ interface SavingsFormFieldsProps {
   mode?: "create" | "edit";
   onChange: (patch: Partial<SavingsFormValues>) => void;
   onClearError: (field: string) => void;
+}
+
+interface SavingsToggleSettingRowProps {
+  label: string;
+  description: string;
+  checked: boolean;
+  disabled?: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}
+
+function SavingsToggleSettingRow({
+  label,
+  description,
+  checked,
+  disabled,
+  onCheckedChange,
+}: SavingsToggleSettingRowProps) {
+  return (
+    <div className="flex min-h-14 items-center justify-between gap-4 py-2">
+      <div className="min-w-0 flex-1">
+        <p className="text-[0.8125rem] font-bold leading-none text-foreground">
+          {label}
+        </p>
+        <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <Switch
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        disabled={disabled}
+        className="shrink-0"
+      />
+    </div>
+  );
+}
+
+interface SavingsAddTierButtonProps {
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+}
+
+/** Full-width Add Tier — mirrors `ScreenHeaderActionButton` icon/text rhythm. */
+function SavingsAddTierButton({
+  label,
+  disabled,
+  onClick,
+}: SavingsAddTierButtonProps) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-11 w-full items-center justify-center gap-1 rounded-md border border-border bg-background px-1 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50",
+        SAVINGS_FORM_STACK_GAP_CLASS,
+      )}
+    >
+      <Plus className={cn(SCREEN_HEADER_ACTION_ICON_CLASS, "shrink-0")} />
+      <span>{label}</span>
+    </button>
+  );
 }
 
 export function SavingsFormFields({
@@ -113,15 +182,10 @@ export function SavingsFormFields({
   }
 
   function addTier() {
-    const last = values.tiers.at(-1);
-    const nextMin =
-      last && last.maxBalance.trim()
-        ? String(Number(last.maxBalance.replace(/,/g, "")) + 1)
-        : "0";
     onChange({
       tiers: [
         ...values.tiers,
-        { minBalance: nextMin, maxBalance: "", annualInterestRate: "" },
+        { minBalance: "", maxBalance: "", annualInterestRate: "" },
       ],
     });
   }
@@ -250,29 +314,32 @@ export function SavingsFormFields({
               <div
                 key={index}
                 className={cn(
-                  "flex flex-col",
-                  index > 0 && "border-t border-border pt-4",
+                  index > 0 &&
+                    cn(
+                      "border-t border-border",
+                      SAVINGS_TIER_SECTION_GAP_CLASS,
+                    ),
                 )}
               >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[0.8125rem] font-medium text-foreground">
+                <div className="mb-4 flex h-8 items-center justify-between gap-3">
+                  <span className={SAVINGS_TIER_LABEL_CLASS}>
                     {t("savings.fields.tiers.tierLabel", { index: index + 1 })}
                   </span>
-                  {values.tiers.length > 1 ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      disabled={disabled}
-                      aria-label={t("savings.fields.tiers.remove")}
-                      onClick={() => removeTier(index)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  ) : null}
+                  <div className="flex size-8 shrink-0 items-center justify-center">
+                    {values.tiers.length > 1 ? (
+                      <button
+                        type="button"
+                        className="inline-flex size-8 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
+                        disabled={disabled}
+                        aria-label={t("savings.fields.tiers.remove")}
+                        onClick={() => removeTier(index)}
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 pb-4">
                   <AccountFormEditableField
                     id={`tier-min-${index}`}
                     label={t("savings.fields.tiers.minBalance")}
@@ -321,16 +388,11 @@ export function SavingsFormFields({
                 </div>
               </div>
             ))}
-            <Button
-              type="button"
-              variant="outline"
-              className={cn("h-10 w-full", SAVINGS_FORM_STACK_GAP_CLASS)}
+            <SavingsAddTierButton
+              label={t("savings.fields.tiers.add")}
               disabled={disabled}
               onClick={addTier}
-            >
-              <Plus className="mr-2 size-4" />
-              {t("savings.fields.tiers.add")}
-            </Button>
+            />
             {errors.tiers ? (
               <div className="mt-2">
                 <AccountFormGroupError id="savings-tiers-error" error={errors.tiers} />
@@ -363,14 +425,14 @@ export function SavingsFormFields({
           />
         ) : (
           <>
-            <ToggleSettingRow
+            <SavingsToggleSettingRow
               label={t("businessDays.excludeWeekends.label")}
               description={t("businessDays.excludeWeekends.description")}
               checked={values.excludeWeekends}
               disabled={disabled}
               onCheckedChange={(excludeWeekends) => onChange({ excludeWeekends })}
             />
-            <ToggleSettingRow
+            <SavingsToggleSettingRow
               label={t("businessDays.excludeEgyptianHolidays.label")}
               description={t(
                 "businessDays.excludeEgyptianHolidays.description",

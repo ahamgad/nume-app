@@ -54,7 +54,7 @@ export const DEFAULT_SAVINGS_FORM_VALUES: SavingsFormValues = {
   balance: "",
   interestModel: "fixed",
   annualInterestRate: "",
-  tiers: [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
+  tiers: [{ minBalance: "", maxBalance: "", annualInterestRate: "" }],
   postingFrequency: "monthly",
   postingDay: "1",
   excludeWeekends: DEFAULT_BUSINESS_DAY_SETTINGS.excludeWeekends,
@@ -85,7 +85,7 @@ export function savingsFormValuesFromAccount(
               tier.maxBalance === null ? "" : String(tier.maxBalance),
             annualInterestRate: String(tier.annualInterestRate),
           }))
-        : [{ minBalance: "0", maxBalance: "", annualInterestRate: "" }],
+        : [{ minBalance: "", maxBalance: "", annualInterestRate: "" }],
     postingFrequency: savings.postingFrequency,
     postingDay: postingDayToFormValue(savings.postingDay),
     excludeWeekends: savings.excludeWeekends,
