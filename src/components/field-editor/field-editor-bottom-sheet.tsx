@@ -35,6 +35,7 @@ export function FieldEditorBottomSheet({
 }: FieldEditorBottomSheetProps) {
   const t = useT();
   const editorRef = useRef<FieldEditorSurfaceHandle>(null);
+  const discardIntentRef = useRef(false);
   const headerLabel = config.label ?? config.title ?? "";
   const [sign, setSign] = useState<BalanceSign>(() =>
     parseBalanceSignFromValue(config.value),
@@ -80,6 +81,9 @@ export function FieldEditorBottomSheet({
       title={headerLabel}
       onDismiss={onDismiss}
       onConfirm={handleConfirm}
+      onDiscardPointerDown={() => {
+        discardIntentRef.current = true;
+      }}
       variant="workspace"
       ariaLabel={headerLabel}
       bodyClassName={cn(
@@ -103,6 +107,7 @@ export function FieldEditorBottomSheet({
           displayValue={displayValue}
           placeholder={config.placeholder}
           onSubmit={handleConfirm}
+          isDiscardIntent={() => discardIntentRef.current}
           onChange={handleDraftChange}
         />
         {sheetError ? (

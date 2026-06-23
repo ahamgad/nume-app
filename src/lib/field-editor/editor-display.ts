@@ -12,12 +12,4 @@ export function stripFieldEditorUnitLabels<
   };
 }
 
-/** True when Enter / Return should commit the field editor (same as Save). */
-export function isFieldEditorKeyboardSubmitKey(
-  event: Pick<KeyboardEvent, "key" | "shiftKey">,
-): boolean {
-  if (event.key !== "Enter") return false;
-  // Shift+Enter inserts a newline in multi-line text fields.
-  if (event.shiftKey) return false;
-  return true;
-}
+export { isFieldEditorKeyboardSubmitKey } from "@/lib/field-editor/keyboard-submit";

@@ -1,9 +1,20 @@
 "use client";
 
-import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import { FIELD_EDITOR_SURFACE_INPUT_CLASS } from "@/lib/field-editor/field-editor-chrome";
-import { isFieldEditorKeyboardSubmitKey } from "@/lib/field-editor/editor-display";
+import {
+  createFieldEditorKeyboardSubmitDebouncer,
+  isFieldEditorKeyboardSubmitKey,
+  shouldFieldEditorSubmitOnBlur,
+} from "@/lib/field-editor/keyboard-submit";
 import type { FieldEditorInputMode, FieldEditorMode } from "@/lib/field-editor/types";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +29,19 @@ interface FieldEditorSurfaceProps {
   placeholder?: string;
   /** Same path as the sheet Save action — validation and submit. */
   onSubmit: () => void;
+  /** When true, blur must not commit (backdrop / back discard in progress). */
+  isDiscardIntent?: () => boolean;
   onChange: (raw: string) => void;
 }
 
 /**
  * Borderless, caret-first editing surface for the field editor sheet.
  * Center-aligned with natural wrapping — only sheet inline inputs use this behavior.
+ *
+ * Keyboard submit paths (all route to `onSubmit`):
+ * - Enter / Return / keyCode 13 (text keyboard Done, Android Go)
+ * - Form submit (hidden submit control)
+ * - Blur after keyboard Done on iOS numeric / decimal pads (no Enter key)
  *
  * @see docs/FOUNDATION.md § 5 — Inline field editor (frozen)
  */
@@ -37,6 +55,7 @@ export const FieldEditorSurface = forwardRef<
     displayValue,
     placeholder,
     onSubmit,
+    isDiscardIntent,
     onChange,
   },
   ref,
@@ -45,6 +64,11 @@ export const FieldEditorSurface = forwardRef<
   const isNumeric = mode === "numeric";
   const resolvedInputMode =
     inputMode ?? (isNumeric ? "decimal" : "text");
+
+  const submitOnce = useMemo(
+    () => createFieldEditorKeyboardSubmitDebouncer(onSubmit),
+    [onSubmit],
+  );
 
   const syncHeight = useCallback(() => {
     const input = inputRef.current;
@@ -87,14 +111,32 @@ export const FieldEditorSurface = forwardRef<
     });
   }
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyboardSubmit(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (!isFieldEditorKeyboardSubmitKey(event.nativeEvent)) return;
     event.preventDefault();
-    onSubmit();
+    submitOnce();
+  }
+
+  function handleBlur() {
+    // Defer so discard pointerdown on backdrop / back runs before blur submit.
+    requestAnimationFrame(() => {
+      const discardIntent = isDiscardIntent?.() ?? false;
+      if (!shouldFieldEditorSubmitOnBlur(discardIntent)) return;
+      submitOnce();
+    });
+  }
+
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submitOnce();
   }
 
   return (
-    <div className="flex w-full min-w-0 shrink-0 touch-auto flex-col items-center justify-center text-center">
+    <form
+      noValidate
+      className="flex w-full min-w-0 shrink-0 touch-auto flex-col items-center justify-center text-center"
+      onSubmit={handleFormSubmit}
+    >
       <div className="flex w-full min-w-0 flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
         <textarea
           ref={inputRef}
@@ -107,13 +149,23 @@ export const FieldEditorSurface = forwardRef<
           spellCheck={isNumeric ? false : undefined}
           enterKeyHint="done"
           onChange={(event) => handleChange(event.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyboardSubmit}
+          onKeyUp={handleKeyboardSubmit}
+          onBlur={handleBlur}
           className={cn(
             FIELD_EDITOR_SURFACE_INPUT_CLASS,
             isNumeric && "tabular-nums tracking-tight",
           )}
         />
+        <button
+          type="submit"
+          tabIndex={-1}
+          aria-hidden
+          className="sr-only"
+        >
+          Save
+        </button>
       </div>
-    </div>
+    </form>
   );
 });

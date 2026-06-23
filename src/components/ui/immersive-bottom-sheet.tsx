@@ -28,6 +28,8 @@ interface ImmersiveBottomSheetProps {
   sheetHeight?: string;
   /** Workspace mode locks document scroll and fixes the sheet body (Field Editor). */
   variant?: "default" | "workspace";
+  /** Fires on pointerdown for back / backdrop — before input blur (field editor discard guard). */
+  onDiscardPointerDown?: () => void;
   bodyClassName?: string;
   bodyStyle?: CSSProperties;
   children: ReactNode;
@@ -43,6 +45,7 @@ export function ImmersiveBottomSheet({
   ariaLabel,
   sheetHeight = IMMERSIVE_SHEET_HEIGHT,
   variant = "default",
+  onDiscardPointerDown,
   bodyClassName,
   bodyStyle,
   children,
@@ -66,6 +69,7 @@ export function ImmersiveBottomSheet({
         type="button"
         aria-label={t("common.back")}
         className="absolute inset-0"
+        onPointerDown={() => onDiscardPointerDown?.()}
         onClick={onDismiss}
       />
       <div
@@ -83,6 +87,7 @@ export function ImmersiveBottomSheet({
           title={title}
           leading={
             <HeaderIconButton
+              onPointerDown={() => onDiscardPointerDown?.()}
               onClick={onDismiss}
               aria-label={t("common.back")}
             />

@@ -22,7 +22,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Confirmation actions** | `ConfirmationSheetActions` via `ConfirmBottomSheet` / `DiscardDialog` |
 | **Typography & copy** | Sentence case, no trailing period on single-sentence helpers — `en.ts`, **`docs/CONTENT.md`** |
 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
-| **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — sync, typography, wrapping, sign chips, unit cleanup, keyboard submit |
+| **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — sync, typography, wrapping, sign chips, unit cleanup, keyboard submit (text + numeric + iOS Done) |
 
 ## Interaction patterns
 

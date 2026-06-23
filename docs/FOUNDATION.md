@@ -266,19 +266,29 @@ Tokens: `FIELD_EDITOR_SIGN_CHIP_GAP_PX`, `FIELD_EDITOR_KEYBOARD_CHIP_GAP_PX`.
 
 Chips remain visible above the keyboard. Sign logic unchanged — layout only.
 
-### Rule 8 — Keyboard submit
+### Rule 8 — Keyboard submit (frozen)
 
-Keyboard confirmation actions (**Done**, **Enter**, **Return**, **Go**, platform checkmark / equivalent) **must** invoke the same save path as the sheet **Save** action.
+All keyboard confirmation actions **must** invoke the same save path as the sheet **Save** action — no duplicated validation or submit logic.
 
-- `FieldEditorSurface` calls `onSubmit` → `FieldEditorBottomSheet.handleConfirm`
-- Same validation, error display, sign application, and `onSave` — no duplicated logic
-- **Shift+Enter** inserts a newline in text fields (multi-line); plain **Enter** submits
+| Action | How it is handled |
+|---|---|
+| Text keyboard **Done** / **Go** / **Enter** / **Return** | `keydown` / `keyup` + `isFieldEditorKeyboardSubmitKey` (incl. legacy `keyCode` 13) |
+| **Form submit** (hidden submit control) | `<form onSubmit>` → shared debounced submit |
+| iOS **numeric / decimal** keyboard **Done** | Blurs the field without Enter — `onBlur` → shared debounced submit |
+| Backdrop / **Back** discard | `onDiscardPointerDown` sets discard intent — blur submit suppressed |
 
-Location: `lib/field-editor/editor-display.ts` (`isFieldEditorKeyboardSubmitKey`), `FieldEditorSurface`.
+All paths call `FieldEditorBottomSheet.handleConfirm` via one debounced `onSubmit` in `FieldEditorSurface`.
+
+- **Shift+Enter** inserts a newline in text fields; plain **Enter** submits
+- Backdrop and header Back discard the draft — they must not trigger blur submit
+
+**Platform note:** iOS numeric pads have no Enter key; blur-after-Done is the required submit path. Discard intent prevents accidental save when closing the sheet.
+
+Location: `lib/field-editor/keyboard-submit.ts`, `FieldEditorSurface`, `FieldEditorBottomSheet`, `ImmersiveBottomSheet.onDiscardPointerDown`.
 
 ### Future inline-field rule
 
-Any current or future inline-field editor **must** inherit unit-suffix cleanup and keyboard-submit behavior through the shared foundation. Do not implement these in individual screens.
+Any current or future inline-field editor **must** inherit unit-suffix cleanup and keyboard-submit behavior (standard, numeric, and mobile confirmation) through the shared foundation. Do not implement these in individual screens.
 
 ### Propagation rule
 
