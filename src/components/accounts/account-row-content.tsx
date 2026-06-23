@@ -1,84 +1,70 @@
 "use client";
 
-import type { ReactNode } from "react";
-
 import {
   InstitutionBrandAsset,
-  INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE,
 } from "@/components/institutions/institution-brand-asset";
-import { ResponsiveCurrencyAmount } from "@/components/ui/responsive-currency-amount";
+import { formatAccountCardInstituteRow } from "@/lib/finance/account-card-display";
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
-import {
-  getAccountDisplayBalance,
-  isLiabilityAccountType,
-} from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import {
-  formatInstitutionEntityLabel,
+  PICKER_ROW_PRIMARY_LABEL_CLASS,
+  PICKER_ROW_SECONDARY_LABEL_CLASS,
+  PICKER_ROW_TEXT_COLUMN_CLASS,
+} from "@/lib/layout/picker-option-row";
+import {
   resolveInstitutionBrandAssetProps,
 } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 interface AccountRowContentProps {
   account: Account;
-  formatLocale: string;
+  identifierLast4?: string | null;
   t: (key: TranslationKey) => string;
-  trailing?: ReactNode;
 }
 
+/**
+ * Frozen account picker row — logo, account name, account type · last-4.
+ * Visual foundation matches Institution Picker (typography, logo size, spacing).
+ *
+ * @see docs/FOUNDATION.md — Account picker foundation
+ */
 export function AccountRowContent({
   account,
-  formatLocale,
+  identifierLast4,
   t,
-  trailing,
 }: AccountRowContentProps) {
-  const displayBalance = getAccountDisplayBalance(account);
   const typeLabel = t(getAccountTypeCardLabelKey(account.type));
-  const showSignedBalance = !isLiabilityAccountType(account.type);
+  const metadataRow = formatAccountCardInstituteRow(
+    account,
+    identifierLast4,
+    t,
+  );
   const brandAsset = resolveInstitutionBrandAssetProps(account.institution, t);
-  const institutionLabel = account.institution?.trim()
-    ? formatInstitutionEntityLabel(account.institution, t)
-    : null;
-  const metaLabel = institutionLabel
-    ? `${institutionLabel} · ${typeLabel}`
-    : typeLabel;
 
-  const leading = brandAsset ? (
+  const logo = brandAsset ? (
     <InstitutionBrandAsset
       institutionId={brandAsset.institutionId}
       fallbackLabel={brandAsset.fallbackLabel}
-      size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
     />
   ) : (
     <InstitutionBrandAsset
       institutionId={account.type}
       fallbackLabel={typeLabel}
-      size={INSTITUTION_BRAND_ASSET_ACCOUNT_SIZE}
     />
   );
 
   return (
     <>
-      <div className="shrink-0 self-center">{leading}</div>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex min-w-0 items-center gap-3">
-          <p className="min-w-0 flex-1 truncate text-[0.8125rem] text-muted-foreground">
-            {metaLabel}
-          </p>
-          <div className="flex w-auto shrink-0 items-center gap-2">
-            <ResponsiveCurrencyAmount
-              amount={displayBalance}
-              locale={formatLocale}
-              variant="row"
-              signMode={showSignedBalance ? "balance" : "unsigned"}
-            />
-            {trailing}
-          </div>
-        </div>
-        <p className="min-w-0 truncate text-[0.9375rem] font-medium">
+      {logo}
+      <span className={PICKER_ROW_TEXT_COLUMN_CLASS}>
+        <span className={cn(PICKER_ROW_PRIMARY_LABEL_CLASS, "truncate")}>
           {account.name}
-        </p>
-      </div>
+        </span>
+        <span className={cn(PICKER_ROW_SECONDARY_LABEL_CLASS, "truncate")}>
+          {metadataRow}
+        </span>
+      </span>
     </>
   );
 }

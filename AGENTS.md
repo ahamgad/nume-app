@@ -24,6 +24,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` — unified decimal sizing |
 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface` — sync, typography, wrapping, sign chips, unit cleanup, keyboard submit |
 | **Account cards** | `AccountCard`, `AccountCardsSection` — Accounts tab list; type row = account type · last-4; balance value 18px semibold |
+| **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` — no balances; Institution Picker visual parity; type · last-4 metadata |
 
 ## Interaction patterns
 
@@ -41,7 +42,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 
 ## Prohibited in screen files
 
-- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor behaviors, or account card layouts on the Accounts tab
+- Custom headers, picker list rows, account-details layouts, create-account CTA labels, confirmation button stacks, typography transforms, numeric scaling hacks, field editor behaviors, account card layouts on the Accounts tab, or account picker row layouts
 
 Read **`docs/FOUNDATION.md`** for full rules, audit table, and documented exceptions.
 

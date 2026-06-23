@@ -35,8 +35,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 7 | **Numeric typography** | `CurrencyAmount`, `ResponsiveCurrencyAmount`, `formatCurrency` | § 10 |
 | 8 | **Inline field editor** | `EditableField`, `FieldEditorBottomSheet`, `FieldEditorSurface`, `FieldSignToggle` | § 5 |
 | 9 | **Account cards** | `AccountCard`, `AccountCardsSection` | § 14 |
+| 10 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` | § 15 |
 
-**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, or account-card layouts inside individual screens.
+**Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, or account-picker row layouts inside individual screens.
 
 ---
 
@@ -558,7 +559,37 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 
 New account types on the Accounts tab **must** use `AccountCard` — no custom card layouts in screens.
 
-**Documented exception:** `AccountRowContent` in picker sheets — compact row, not an account card.
+---
+
+## 15. Account picker (frozen)
+
+All account selection lists compose through **`AccountPicker`**, **`AccountPickerOptionRow`**, and **`AccountRowContent`**.
+
+Location: `components/ui/account-picker.tsx`, `components/accounts/account-picker-option-row.tsx`, `components/accounts/account-row-content.tsx`, `lib/layout/picker-option-row.ts`.
+
+**Institution Picker is the visual source of truth** for typography, logo sizing, row structure, and spacing.
+
+### Rules
+
+1. **No balances** — picker rows never show balance labels, values, or currency amounts
+2. **Institution Picker visual parity** — same typography, logo size, row structure, alignment, and spacing rhythm
+3. **Shared typography** — `PICKER_ROW_PRIMARY_LABEL_CLASS`, `PICKER_ROW_SECONDARY_LABEL_CLASS` from `picker-option-row.ts`
+4. **Shared logo sizing** — `InstitutionBrandAsset` default picker size (32×32); not account-card logo size
+5. **Shared spacing** — `PICKER_ROW_OPTION_LAYOUT_CLASS` (`min-h-11 gap-3`)
+6. **Row structure** — `[Logo] Account Name` on first row; `Account Type · Last 4 Digits` on second row
+7. **Metadata** — localized account type via `getAccountTypeCardLabelKey`; last-4 via `resolveAccountNumberLast4` + `formatAccountCardInstituteRow`; type-only when no number
+8. **Propagation** — `InterestDestinationPicker` and all `AccountPicker` consumers inherit automatically
+9. **No custom implementations** — do not fork account-picker row markup in screens
+
+### Approved components
+
+| Component | Role |
+|---|---|
+| `AccountPicker` | Account selection trigger + picker sheet |
+| `AccountPickerOptionRow` | Single selectable account row in picker lists |
+| `AccountRowContent` | Row content — logo, name, type · last-4 |
+
+**Documented exception:** `InterestDestinationPicker` — specialized trigger copy; list rows still use `AccountPickerOptionRow`.
 
 ---
 
@@ -582,6 +613,7 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Numeric display behaviors
 - Field editor headers, placeholders, typography, wrapping, sign-chip layout, unit-suffix cleanup, or keyboard-submit handlers
 - Account card layouts on the Accounts tab
+- Account picker row layouts in selection sheets
 
 If no foundation fits → **propose a new foundation pattern before implementation** (see variant rule).
 
@@ -626,7 +658,7 @@ If a genuine exception is required:
 | System copy (EN) | Typography & copy foundation | ✅ |
 | All inline field editors | Field editor foundation | ✅ |
 | Accounts tab list cards | Account cards foundation | ✅ |
-| Account picker rows | `AccountRowContent` | ⚠️ Compact picker row — not account card |
+| Account picker rows | Account picker foundation | ✅ |
 | Confirmation / discard | Confirmation | ✅ Intentional |
 | Auth screens | — | ✅ Excluded |
 | Institution "Other" custom name | Inline input | ⚠️ Documented exception |

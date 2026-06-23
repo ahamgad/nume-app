@@ -16,6 +16,12 @@ import { preloadBrandAssets } from "@/lib/institutions/brand-asset-cache";
 import { getInstitutionBrandAssetPath } from "@/lib/institutions/brand-assets-registry";
 import { shouldShowPickerSearch } from "@/lib/layout/picker-sheet";
 import {
+  PICKER_ROW_OPTION_LAYOUT_CLASS,
+  PICKER_ROW_PRIMARY_LABEL_CLASS,
+  PICKER_ROW_SECONDARY_LABEL_CLASS,
+  PICKER_ROW_TEXT_COLUMN_CLASS,
+} from "@/lib/layout/picker-option-row";
+import {
   filterInstitutions,
   getInstitutionFullName,
   getInstitutionShortcut,
@@ -315,15 +321,15 @@ function InstitutionSection({
               key={entry.id}
               selected={selectedId === entry.id}
               onSelect={() => onSelect(entry)}
-              className="min-h-11 gap-3"
+              className={PICKER_ROW_OPTION_LAYOUT_CLASS}
             >
               <InstitutionBrandAsset
                 institutionId={entry.id}
                 fallbackLabel={shortcut}
               />
-              <span className="flex min-w-0 flex-1 flex-col justify-center">
-                <span className="text-[0.9375rem] font-medium">{shortcut}</span>
-                <span className="text-sm text-muted-foreground">{fullName}</span>
+              <span className={PICKER_ROW_TEXT_COLUMN_CLASS}>
+                <span className={PICKER_ROW_PRIMARY_LABEL_CLASS}>{shortcut}</span>
+                <span className={PICKER_ROW_SECONDARY_LABEL_CLASS}>{fullName}</span>
               </span>
             </PickerListOption>
           );
