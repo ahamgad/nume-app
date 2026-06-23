@@ -226,20 +226,18 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 void updateAccount(account.id, { includeInNetWorth: checked })
               }
             />
-            <div className="border-t border-border">
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInEmergencyFund.label")}
-                description={t(
-                  "accounts.settings.includeInEmergencyFund.description",
-                )}
-                checked={account.includeInEmergencyFund}
-                onCheckedChange={(checked) =>
-                  void updateAccount(account.id, {
-                    includeInEmergencyFund: checked,
-                  })
-                }
-              />
-            </div>
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInEmergencyFund.label")}
+              description={t(
+                "accounts.settings.includeInEmergencyFund.description",
+              )}
+              checked={account.includeInEmergencyFund}
+              onCheckedChange={(checked) =>
+                void updateAccount(account.id, {
+                  includeInEmergencyFund: checked,
+                })
+              }
+            />
           </AccountDetailsSettingsSection>
         ) : (
           <ArchivedAccountActions

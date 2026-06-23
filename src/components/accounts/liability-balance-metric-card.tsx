@@ -3,11 +3,10 @@
 import { Pencil } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { MetricHero, WidgetCard } from "@/components/patterns";
+import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { IconButton } from "@/components/ui/icon-button";
 import { toDisplayOutstandingBalance, toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
 import { validateAccountBalanceField } from "@/lib/field-editor/field-validators";
-import { getBalanceToneClassName } from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import {
   formatAmountInput,
@@ -68,29 +67,25 @@ export function LiabilityBalanceMetricCard({
   }
 
   return (
-    <WidgetCard elevated>
-      <MetricHero
-        label={label}
-        amount={outstanding}
-        locale={formatLocale}
-        meta={meta}
-        amountSignMode="unsigned"
-        amountClassName={getBalanceToneClassName(account)}
-        amountAction={
-          canEdit ? (
-            <IconButton
-              type="button"
-              size="sm"
-              aria-label={label}
-              onClick={handleEditBalance}
-            >
-              <Pencil />
-            </IconButton>
-          ) : undefined
-        }
-      />
-      {footer}
-    </WidgetCard>
+    <AccountDetailsBalanceCard
+      label={label}
+      amount={outstanding}
+      locale={formatLocale}
+      meta={meta}
+      footer={footer}
+      amountAction={
+        canEdit ? (
+          <IconButton
+            type="button"
+            size="sm"
+            aria-label={label}
+            onClick={handleEditBalance}
+          >
+            <Pencil />
+          </IconButton>
+        ) : undefined
+      }
+    />
   );
 }
 

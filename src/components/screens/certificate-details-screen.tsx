@@ -7,10 +7,11 @@ import {
   AccountDetailsContentHeader,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
+import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
-import { MetricHero, ToggleSettingRow, WidgetCard } from "@/components/patterns";
+import { ToggleSettingRow } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
@@ -233,17 +234,14 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           accountType={account.type}
         />
 
-        <WidgetCard elevated>
-          <MetricHero
-            label={t("certificates.details.principal")}
-            amount={certificate.principalAmount}
-            locale={formatLocale}
-            amountSignMode="balance"
-            meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t, formatLocale),
-            })}
-          />
-        </WidgetCard>
+        <AccountDetailsBalanceCard
+          label={t("certificates.fields.principal.label")}
+          amount={certificate.principalAmount}
+          locale={formatLocale}
+          meta={t("dashboard.netWorth.updated", {
+            time: formatRelativeTime(account.updatedAt, t, formatLocale),
+          })}
+        />
 
         {canProcessInterest ? (
           <Button
@@ -319,20 +317,18 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                 void updateAccount(account.id, { includeInNetWorth: checked })
               }
             />
-            <div className="border-t border-border">
-              <ToggleSettingRow
-                label={t("accounts.settings.includeInEmergencyFund.label")}
-                description={t(
-                  "accounts.settings.includeInEmergencyFund.description",
-                )}
-                checked={account.includeInEmergencyFund}
-                onCheckedChange={(checked) =>
-                  void updateAccount(account.id, {
-                    includeInEmergencyFund: checked,
-                  })
-                }
-              />
-            </div>
+            <ToggleSettingRow
+              label={t("accounts.settings.includeInEmergencyFund.label")}
+              description={t(
+                "accounts.settings.includeInEmergencyFund.description",
+              )}
+              checked={account.includeInEmergencyFund}
+              onCheckedChange={(checked) =>
+                void updateAccount(account.id, {
+                  includeInEmergencyFund: checked,
+                })
+              }
+            />
           </AccountDetailsSettingsSection>
         ) : (
           <ArchivedAccountActions

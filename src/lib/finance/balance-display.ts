@@ -1,5 +1,24 @@
 import type { AccountType } from "@/lib/finance/types";
+import type { CurrencySignMode } from "@/lib/format/currency-display";
 import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
+
+export const ACCOUNT_DETAILS_BALANCE_SIGN_MODE: CurrencySignMode = "balance";
+
+/** Unified balance color for account detail hero amounts — no semantic green/red. */
+export const ACCOUNT_DETAILS_BALANCE_CLASS = "text-foreground";
+
+export interface AccountDetailsBalanceDisplayProps {
+  signMode: CurrencySignMode;
+  className: string;
+}
+
+/** Sign and color rules for account detail balance heroes. */
+export function getAccountDetailsBalanceDisplayProps(): AccountDetailsBalanceDisplayProps {
+  return {
+    signMode: ACCOUNT_DETAILS_BALANCE_SIGN_MODE,
+    className: ACCOUNT_DETAILS_BALANCE_CLASS,
+  };
+}
 
 export function isLiabilityAccountType(type: AccountType): boolean {
   return type === "credit_card" || type === "loan";

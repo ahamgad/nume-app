@@ -1,9 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Children, cloneElement, isValidElement, type ReactNode } from "react";
 
 import { InputFieldRowTrigger } from "@/components/forms/input-field";
 import { Button } from "@/components/ui/button";
+import {
+  ACCOUNT_FORM_FIELD_ROW_CLASS,
+  ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+  ACCOUNT_FORM_SECTION_TITLE_CLASS,
+  ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+} from "@/lib/layout/account-form-chrome";
+import { ACCOUNT_DETAILS_SECTION_PADDING_CLASS } from "@/lib/layout/account-details-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { INPUT_FIELD_VALUE_CLASS } from "@/lib/layout/input-field-chrome";
 import { cn } from "@/lib/utils";
@@ -29,26 +36,45 @@ export function AccountDetailsSettingsSection({
   children,
   className,
 }: AccountDetailsSettingsSectionProps) {
+  const toggleRows = Children.toArray(children).filter(isValidElement);
+
   return (
-    <section className={className}>
-      <h2 className="mb-2 text-start text-lg font-semibold">{title}</h2>
-      <div className={cn(CARD_SURFACE_CLASS, "px-4")}>
-        <InputFieldRowTrigger
-          className="min-h-14 py-2"
-          onClick={onEdit}
-        >
-          <span className={INPUT_FIELD_VALUE_CLASS}>{editLabel}</span>
-        </InputFieldRowTrigger>
+    <section
+      className={cn(
+        CARD_SURFACE_CLASS,
+        ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
+        "min-w-0 w-full",
+        className,
+      )}
+    >
+      <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
+      <div
+        className={cn(
+          ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+          ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+        )}
+      >
+        <div className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
+          <InputFieldRowTrigger className="min-h-0 py-0" onClick={onEdit}>
+            <span className={INPUT_FIELD_VALUE_CLASS}>{editLabel}</span>
+          </InputFieldRowTrigger>
+        </div>
 
-        {children ? (
-          <div className="border-t border-border">{children}</div>
-        ) : null}
+        {toggleRows.map((row, index) => (
+          <div key={row.key ?? index} className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
+            {isValidElement<{ className?: string }>(row)
+              ? cloneElement(row, {
+                  className: cn("py-0", row.props.className),
+                })
+              : row}
+          </div>
+        ))}
 
-        <div className="border-t border-border">
+        <div className={ACCOUNT_FORM_FIELD_ROW_CLASS}>
           <Button
             type="button"
             variant="ghost"
-            className="h-11 w-full text-destructive hover:text-destructive"
+            className="h-auto min-h-0 w-full justify-start px-0 py-0 text-destructive hover:bg-transparent hover:text-destructive"
             disabled={archiveDisabled}
             onClick={onArchive}
           >

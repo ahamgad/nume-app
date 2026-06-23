@@ -18,9 +18,16 @@ interface WidgetCardProps {
   className?: string;
   /** When true, uses elevated card surface (shadow). Balance sections use this. */
   elevated?: boolean;
+  /** Inner padding class. Defaults to p-5; account detail sections use p-4. */
+  paddingClass?: string;
 }
 
-export function WidgetCard({ children, className, elevated = false }: WidgetCardProps) {
+export function WidgetCard({
+  children,
+  className,
+  elevated = false,
+  paddingClass = "p-5",
+}: WidgetCardProps) {
   return (
     <div
       className={cn(
@@ -29,7 +36,7 @@ export function WidgetCard({ children, className, elevated = false }: WidgetCard
         className,
       )}
     >
-      <div className="w-full min-w-0 p-5 text-start">{children}</div>
+      <div className={cn("w-full min-w-0 text-start", paddingClass)}>{children}</div>
     </div>
   );
 }
@@ -107,6 +114,8 @@ interface MetricHeroProps {
   signedAmount?: boolean;
   /** Override sign display mode for currency amounts. */
   amountSignMode?: CurrencySignMode;
+  /** Override spacing/typography for the meta row below the amount. */
+  metaClassName?: string;
 }
 
 export function MetricHero({
@@ -121,6 +130,7 @@ export function MetricHero({
   meta,
   signedAmount = false,
   amountSignMode,
+  metaClassName,
 }: MetricHeroProps) {
   const resolvedSignMode =
     amountSignMode ?? (signedAmount ? "signed" : "unsigned");
@@ -152,7 +162,12 @@ export function MetricHero({
         </p>
       ) : null}
       {meta ? (
-        <p className="mt-1.5 text-[0.8125rem] leading-normal text-muted-foreground">
+        <p
+          className={cn(
+            "mt-1.5 text-[0.8125rem] leading-normal text-muted-foreground",
+            metaClassName,
+          )}
+        >
           {meta}
         </p>
       ) : null}
@@ -220,6 +235,7 @@ interface ToggleSettingRowProps {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
+  className?: string;
 }
 
 export function ToggleSettingRow({
@@ -228,9 +244,15 @@ export function ToggleSettingRow({
   checked,
   onCheckedChange,
   disabled,
+  className,
 }: ToggleSettingRowProps) {
   return (
-    <div className="flex min-h-14 items-center justify-between gap-4 py-2">
+    <div
+      className={cn(
+        "flex min-h-14 items-center justify-between gap-4 py-2",
+        className,
+      )}
+    >
       <div className="min-w-0 flex-1">
         <p className={INPUT_FIELD_LABEL_CLASS}>{label}</p>
         <p className="mt-0.5 text-[0.8125rem] leading-relaxed text-muted-foreground">

@@ -2,15 +2,11 @@
 
 import { Pencil } from "lucide-react";
 
-import { MetricHero, WidgetCard } from "@/components/patterns";
+import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { IconButton } from "@/components/ui/icon-button";
 import { validateAccountBalanceField } from "@/lib/field-editor/field-validators";
 import { supportsQuickBalanceEdit } from "@/lib/finance/account-form";
-import {
-  getAccountDisplayBalance,
-  getBalanceToneClassName,
-  isLiabilityAccountType,
-} from "@/lib/finance/balance-display";
+import { getAccountDisplayBalance } from "@/lib/finance/balance-display";
 import type { Account } from "@/lib/finance/types";
 import {
   formatAmountInput,
@@ -65,29 +61,23 @@ export function BalanceMetricCard({
   }
 
   return (
-    <WidgetCard elevated>
-      <MetricHero
-        label={label}
-        amount={getAccountDisplayBalance(account)}
-        locale={formatLocale}
-        meta={meta}
-        amountSignMode={
-          isLiabilityAccountType(account.type) ? "unsigned" : "balance"
-        }
-        amountClassName={getBalanceToneClassName(account)}
-        amountAction={
-          canEdit ? (
-            <IconButton
-              type="button"
-              size="sm"
-              aria-label={label}
-              onClick={handleEditBalance}
-            >
-              <Pencil />
-            </IconButton>
-          ) : undefined
-        }
-      />
-    </WidgetCard>
+    <AccountDetailsBalanceCard
+      label={label}
+      amount={getAccountDisplayBalance(account)}
+      locale={formatLocale}
+      meta={meta}
+      amountAction={
+        canEdit ? (
+          <IconButton
+            type="button"
+            size="sm"
+            aria-label={label}
+            onClick={handleEditBalance}
+          >
+            <Pencil />
+          </IconButton>
+        ) : undefined
+      }
+    />
   );
 }
