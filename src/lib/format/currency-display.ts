@@ -6,9 +6,6 @@ import type { RecordType } from "@/lib/finance/types";
 
 const DEFAULT_LOCALE = "en-EG";
 
-/** Decimal suffix scale relative to the main amount (design system). */
-export const CURRENCY_DECIMAL_SCALE = 0.72;
-
 export type CurrencySignMode = "unsigned" | "signed" | "balance";
 
 export interface CurrencyDisplayParts {

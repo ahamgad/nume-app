@@ -6,8 +6,7 @@ import { useMemo, useState } from "react";
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { StickyFooter } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
 import {
   DEFAULT_CERTIFICATE_FORM_VALUES,
   resolveTermMonths,
@@ -159,15 +158,10 @@ export function AddCertificateAccountScreen() {
       </ScreenBody>
 
       <StickyFooter>
-        <Button
-          className="h-12 w-full text-base"
-          disabled={submitting}
+        <AccountCreateActionButton
+          submitting={submitting}
           onClick={handleSubmit}
-        >
-          {submitting
-            ? t("certificates.create.creating")
-            : t("certificates.create.submit")}
-        </Button>
+        />
       </StickyFooter>
     </>
   );

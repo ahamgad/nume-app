@@ -10,8 +10,7 @@ import {
 } from "@/components/accounts/lending-account-form-fields";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { StickyFooter } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
@@ -21,7 +20,6 @@ import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 
 const EMPTY_VALUES: LendingAccountFormValues = {
@@ -119,13 +117,10 @@ export function AddLendingAccountScreen() {
         ) : null}
       </ScreenBody>
       <StickyFooter>
-        <Button
-          className={cn("h-11 w-full")}
-          disabled={submitting}
+        <AccountCreateActionButton
+          submitting={submitting}
           onClick={() => void handleSubmit()}
-        >
-          {submitting ? t("accounts.creating") : t("accounts.createAccount")}
-        </Button>
+        />
       </StickyFooter>
     </>
   );

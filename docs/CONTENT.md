@@ -8,7 +8,7 @@ Capitalize only the first word (and proper nouns, brand names, acronyms).
 
 **Correct**
 
-- Add account
+- Create account
 - Add record
 - Account details
 - Recent records
@@ -16,20 +16,23 @@ Capitalize only the first word (and proper nouns, brand names, acronyms).
 - Savings account
 - Credit card
 - Coming soon
+- Interest destination
+- No accounts found
 
 **Avoid**
 
-- Add Account
+- Create Account
 - Add Record
 - Account Details
 - Recent Records
 - Current Account
+- Interest Destination
 
 ## Do not change
 
 - Brand names (NUME, institution names)
 - Acronyms (EGP, NBE, CIB)
-- User-entered values
+- User-entered values (account names, notes, descriptions, imported data)
 
 ## Where this applies
 
@@ -37,11 +40,41 @@ Capitalize only the first word (and proper nouns, brand names, acronyms).
 - Section titles
 - CTA buttons
 - Form labels
+- Helper text and descriptions
 - Empty states
 - Dialogs and bottom sheets
 - Chips and toasts
 - Navigation labels
+- Validation messages
+- Picker labels
 - All new UI copy
+
+## Description punctuation
+
+Single-sentence helper descriptions and field hints **do not** end with a period.
+
+**Correct**
+
+- Choose where interest payments will be deposited
+- Contributes to your net worth calculation
+
+**Incorrect**
+
+- Choose where interest payments will be deposited.
+- Contributes to your net worth calculation.
+
+Multi-sentence copy may use normal punctuation.
+
+## Account creation CTAs
+
+| State | English label | i18n key |
+|---|---|---|
+| Default | Create account | `accounts.createAccount` |
+| Loading | Creating account | `accounts.create.submitting` |
+
+All account creation flows use `AccountCreateActionButton` — do not add per-type create labels.
+
+**Documented exception:** First-account onboarding may use `accounts.add.firstAccount.cta` ("Continue").
 
 ## Implementation
 

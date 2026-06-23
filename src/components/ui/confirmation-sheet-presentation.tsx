@@ -7,7 +7,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { CONFIRMATION_SHEET_ACTION_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
 
 export type ConfirmationSheetIcon =
   | "archive"
@@ -35,6 +37,55 @@ export const CONFIRMATION_SHEET_TITLE_CLASS =
 
 export const CONFIRMATION_SHEET_DESCRIPTION_CLASS =
   "mt-2 text-center text-sm leading-relaxed text-muted-foreground";
+
+export {
+  CONFIRMATION_SHEET_ACTION_BUTTON_CLASS,
+  FORM_PRIMARY_ACTION_BUTTON_CLASS,
+} from "@/lib/layout/form-action-chrome";
+
+interface ConfirmationSheetActionsProps {
+  primaryLabel: string;
+  secondaryLabel: string;
+  onPrimary: () => void;
+  onSecondary: () => void;
+  primaryDisabled?: boolean;
+  primaryLoadingLabel?: string;
+  primaryVariant?: "destructive" | "default";
+}
+
+/** Shared confirmation sheet action stack — matches form primary button height. */
+export function ConfirmationSheetActions({
+  primaryLabel,
+  secondaryLabel,
+  onPrimary,
+  onSecondary,
+  primaryDisabled = false,
+  primaryLoadingLabel,
+  primaryVariant = "destructive",
+}: ConfirmationSheetActionsProps) {
+  return (
+    <div className="mt-5 flex flex-col gap-2">
+      <Button
+        variant={primaryVariant}
+        className={CONFIRMATION_SHEET_ACTION_BUTTON_CLASS}
+        disabled={primaryDisabled}
+        onClick={onPrimary}
+      >
+        {primaryDisabled && primaryLoadingLabel
+          ? primaryLoadingLabel
+          : primaryLabel}
+      </Button>
+      <Button
+        variant="ghost"
+        className={CONFIRMATION_SHEET_ACTION_BUTTON_CLASS}
+        disabled={primaryDisabled}
+        onClick={onSecondary}
+      >
+        {secondaryLabel}
+      </Button>
+    </div>
+  );
+}
 
 export function ConfirmationSheetIconBadge({
   icon,

@@ -6,8 +6,7 @@ import { useMemo, useState } from "react";
 import { CreditCardFormFields } from "@/components/accounts/credit-card-form-fields";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { StickyFooter } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
 import {
   EMPTY_CREDIT_CARD_FORM_VALUES,
   parseCreditCardStatementDueDay,
@@ -26,7 +25,6 @@ import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-import { cn } from "@/lib/utils";
 
 export function AddCreditCardAccountScreen() {
   const t = useT();
@@ -130,13 +128,10 @@ export function AddCreditCardAccountScreen() {
         ) : null}
       </ScreenBody>
       <StickyFooter>
-        <Button
-          className={cn("h-11 w-full")}
-          disabled={submitting}
+        <AccountCreateActionButton
+          submitting={submitting}
           onClick={() => void handleSubmit()}
-        >
-          {submitting ? t("creditCards.create.creating") : t("creditCards.create.submit")}
-        </Button>
+        />
       </StickyFooter>
     </>
   );

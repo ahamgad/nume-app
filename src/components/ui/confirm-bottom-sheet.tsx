@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { ConfirmationBottomSheet } from "@/components/ui/confirmation-bottom-sheet";
 import {
   CONFIRMATION_SHEET_DESCRIPTION_CLASS,
   CONFIRMATION_SHEET_TITLE_CLASS,
+  ConfirmationSheetActions,
   ConfirmationSheetIconBadge,
   type ConfirmationSheetIcon,
 } from "@/components/ui/confirmation-sheet-presentation";
@@ -49,26 +49,15 @@ export function ConfirmBottomSheet({
         {title}
       </h2>
       <p className={CONFIRMATION_SHEET_DESCRIPTION_CLASS}>{description}</p>
-      <div className="mt-5 flex flex-col gap-2">
-        <Button
-          variant={confirmVariant}
-          className="h-11 w-full"
-          disabled={confirmDisabled}
-          onClick={onConfirm}
-        >
-          {confirmDisabled && confirmLoadingLabel
-            ? confirmLoadingLabel
-            : confirmLabel}
-        </Button>
-        <Button
-          variant="ghost"
-          className="h-11 w-full"
-          disabled={confirmDisabled}
-          onClick={onCancel}
-        >
-          {cancelLabel}
-        </Button>
-      </div>
+      <ConfirmationSheetActions
+        primaryLabel={confirmLabel}
+        secondaryLabel={cancelLabel}
+        onPrimary={onConfirm}
+        onSecondary={onCancel}
+        primaryDisabled={confirmDisabled}
+        primaryLoadingLabel={confirmLoadingLabel}
+        primaryVariant={confirmVariant}
+      />
     </ConfirmationBottomSheet>
   );
 }

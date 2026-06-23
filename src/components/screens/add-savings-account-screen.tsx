@@ -6,8 +6,7 @@ import { useMemo, useState } from "react";
 import { SavingsFormFields } from "@/components/savings/savings-form-fields";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { StickyFooter } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
@@ -136,13 +135,10 @@ export function AddSavingsAccountScreen() {
       </ScreenBody>
 
       <StickyFooter>
-        <Button
-          className="h-12 w-full text-base"
-          disabled={submitting}
+        <AccountCreateActionButton
+          submitting={submitting}
           onClick={handleSubmit}
-        >
-          {submitting ? t("savings.create.creating") : t("savings.create.submit")}
-        </Button>
+        />
       </StickyFooter>
     </>
   );

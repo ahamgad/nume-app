@@ -290,3 +290,54 @@ If a future exception is required:
 5. Document any deviation in the audit table
 
 **Foundation v1 is frozen. Header Foundation is frozen.**
+
+---
+
+## 10. Form actions and copy (frozen)
+
+### Account creation CTA
+
+All account creation screens use **`AccountCreateActionButton`** (`components/patterns/account-create-action-button.tsx`).
+
+| State | Label | i18n |
+|---|---|---|
+| Submit | Create account | `accounts.createAccount` |
+| Loading | Creating account | `accounts.create.submitting` |
+
+Do not add per-type create button labels in screens or i18n.
+
+**Exception:** First-account onboarding may override with `accounts.add.firstAccount.cta`.
+
+### Form primary button sizing
+
+`FORM_PRIMARY_ACTION_BUTTON_CLASS` (`h-12 w-full text-base`) — account create/edit sticky footers.
+
+### Confirmation sheet actions
+
+`ConfirmationSheetActions` + `CONFIRMATION_SHEET_ACTION_BUTTON_CLASS` — same height as form primary actions (`h-12`).
+
+Used by `ConfirmBottomSheet`, `DiscardDialog`, and future confirmation patterns.
+
+### Sentence case
+
+System-generated copy uses **sentence case**. See **`docs/CONTENT.md`**.
+
+Never modify user-entered content.
+
+### Description copy
+
+Single-sentence helper descriptions do **not** end with a period. Multi-sentence copy uses normal punctuation.
+
+Apply in `src/lib/i18n/messages/en.ts` — not inline in screens.
+
+### Numeric typography
+
+Currency amounts render integer and decimal digits at the **same font size**.
+
+- `CurrencyAmount` — inline/tabular displays
+- `ResponsiveCurrencyAmount` — hero/metric displays
+- `getCurrencyDisplayParts` / `formatCurrency` — string formatting
+
+Do not scale decimal portions separately. Removed: `CURRENCY_DECIMAL_SCALE`.
+
+---

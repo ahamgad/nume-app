@@ -13,7 +13,7 @@ export const en = {
   connectivity: {
     offline: {
       title: "You're offline",
-      description: "Some features may not be available.",
+      description: "Some features may not be available",
     },
     online: "You're back online.",
   },
@@ -95,7 +95,7 @@ export const en = {
     },
     discardChanges: {
       title: "Discard changes?",
-      description: "Any unsaved changes will be lost.",
+      description: "Any unsaved changes will be lost",
       confirm: "Discard",
       cancel: "Keep editing",
     },
@@ -202,7 +202,10 @@ export const en = {
       addActivity: "Add activity",
     },
     createAccount: "Create account",
-    creating: "Creating…",
+    creating: "Creating account",
+    create: {
+      submitting: "Creating account",
+    },
     sections: {
       money: "Money accounts",
       savings: "Savings",
@@ -238,7 +241,7 @@ export const en = {
     empty: {
       title: "Your accounts live here",
       description:
-        "Add the account you use every day to start tracking where your money is held.",
+        "Add the account you use every day to start tracking where your money is held",
       action: "Start with your first account",
     },
     list: {
@@ -255,7 +258,7 @@ export const en = {
     archived: {
       empty: {
         title: "No archived accounts",
-        description: "Archived accounts appear here and stay out of net worth.",
+        description: "Archived accounts appear here and stay out of net worth",
       },
     },
     edit: {
@@ -268,8 +271,8 @@ export const en = {
       title: "Add account",
       createTitle: "Add {type}",
       chooseType: "Account type",
-      lead: "Enter the account details and today's balance.",
-      certificateLead: "Track a fixed-term deposit with expected returns.",
+      lead: "Enter the account details and today's balance",
+      certificateLead: "Track a fixed-term deposit with expected returns",
       balanceHint: "Use the balance you see in your bank app today.",
       comingSoon: "Coming soon",
       typeUnavailable: "This account type is not available yet.",
@@ -322,7 +325,7 @@ export const en = {
         label: "Interest destination account",
         placeholder: "Select destination account",
         description:
-          "Interest will be transferred to this account on each payout date.",
+          "Choose where interest payments will be deposited",
         notSelected: "No account selected",
         searchPlaceholder: "Search accounts",
         noResults: "No matching accounts",
@@ -376,7 +379,7 @@ export const en = {
         cancel: "Cancel",
       },
       notFound: "Account not found",
-      notFoundDescription: "This account may have been removed.",
+      notFoundDescription: "This account may have been removed",
     },
     validation: {
       nameRequired: "Account name is required",
@@ -477,9 +480,9 @@ export const en = {
   savings: {
     create: {
       title: "Add savings account",
-      lead: "Track interest earned on your savings with configurable posting schedules.",
-      submit: "Create savings account",
-      creating: "Creating…",
+      lead: "Track interest earned on your savings with configurable posting schedules",
+      submit: "Create account",
+      creating: "Creating account",
       success: "Savings account created",
     },
     edit: {
@@ -574,8 +577,8 @@ export const en = {
   certificates: {
     create: {
       title: "Add certificate",
-      submit: "Create certificate",
-      creating: "Creating…",
+      submit: "Create account",
+      creating: "Creating account",
       success: "Certificate created",
     },
     edit: {
@@ -620,7 +623,7 @@ export const en = {
       autoApplyInterest: {
         label: "Automatic transfer interest",
         description:
-          "When enabled, interest will be transferred to the destination account on each payout date.",
+          "When enabled, interest will be transferred to the destination account on each payout date",
       },
       renewal: {
         title: "Renewal",
@@ -742,8 +745,8 @@ export const en = {
   },
   creditCards: {
     create: {
-      submit: "Create credit card",
-      creating: "Creating…",
+      submit: "Create account",
+      creating: "Creating account",
       success: "Credit card created",
     },
     edit: {
@@ -769,7 +772,7 @@ export const en = {
         label: "Linked account",
         placeholder: "Select account",
         description:
-          "The existing account this credit card is tied to.",
+          "The existing account this credit card is tied to",
         searchPlaceholder: "Search accounts",
         noResults: "No matching accounts",
       },
@@ -800,7 +803,7 @@ export const en = {
     },
     purchase: {
       title: "Add purchase",
-      description: "Record a purchase on this credit card.",
+      description: "Record a purchase on this credit card",
       descriptionPlaceholder: "e.g. Groceries",
       submit: "Save purchase",
       saving: "Saving…",
@@ -808,9 +811,9 @@ export const en = {
     },
     payment: {
       title: "Make payment",
-      description: "Pay down this card from a linked account.",
+      description: "Pay down this card from a linked account",
       descriptionPlaceholder: "e.g. Monthly payment",
-      selectSourcePrompt: "Select the account this payment comes from.",
+      selectSourcePrompt: "Select the account this payment comes from",
       submit: "Save payment",
       saving: "Saving…",
       success: "Payment recorded",
@@ -928,7 +931,7 @@ export const en = {
     about: {
       title: "About NUME",
       description:
-        "NUME is your personal wealth operating system — understand, manage, and grow your financial life.",
+        "NUME is your personal wealth operating system — understand, manage, and grow your financial life",
       version: "Version {version}",
     },
     logout: "Log out",

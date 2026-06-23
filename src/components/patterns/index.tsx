@@ -396,3 +396,9 @@ export function MoreMenuRow({ title, description, onClick }: MoreMenuRowProps) {
     </button>
   );
 }
+
+export { AccountCreateActionButton } from "@/components/patterns/account-create-action-button";
+export {
+  CONFIRMATION_SHEET_ACTION_BUTTON_CLASS,
+  FORM_PRIMARY_ACTION_BUTTON_CLASS,
+} from "@/lib/layout/form-action-chrome";

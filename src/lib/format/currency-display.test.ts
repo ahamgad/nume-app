@@ -18,7 +18,7 @@ describe("currency display", () => {
     expect(formatMetricCurrency(-5000, "en-EG")).toBe("− EGP 5,000");
   });
 
-  it("formats fractional amounts with decimal typography parts", () => {
+  it("formats fractional amounts with unified decimal typography", () => {
     const parts = getCurrencyDisplayParts(999999.99, "en-EG");
     expect(parts.integerText).toBe("999,999");
     expect(parts.decimalText).toBe(".99");

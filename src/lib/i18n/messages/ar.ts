@@ -203,7 +203,10 @@ export const ar = {
       addActivity: "إضافة نشاط",
     },
     createAccount: "إنشاء حساب",
-    creating: "جارٍ الإنشاء…",
+    creating: "جارٍ إنشاء الحساب",
+    create: {
+      submitting: "جارٍ إنشاء الحساب",
+    },
     sections: {
       money: "حسابات النقد",
       savings: "التوفير",
@@ -477,8 +480,8 @@ export const ar = {
     create: {
       title: "إضافة حساب توفير",
       lead: "تتبع العائد على مدخراتك مع جداول ترحيل قابلة للتخصيص.",
-      submit: "إنشاء حساب التوفير",
-      creating: "جارٍ الإنشاء…",
+      submit: "إنشاء حساب",
+      creating: "جارٍ إنشاء الحساب",
       success: "تم إنشاء حساب التوفير",
     },
     edit: {
@@ -573,8 +576,8 @@ export const ar = {
   certificates: {
     create: {
       title: "إضافة شهادة",
-      submit: "إنشاء الشهادة",
-      creating: "جارٍ الإنشاء…",
+      submit: "إنشاء حساب",
+      creating: "جارٍ إنشاء الحساب",
       success: "تم إنشاء الشهادة",
     },
     edit: {
@@ -741,8 +744,8 @@ export const ar = {
   },
   creditCards: {
     create: {
-      submit: "إنشاء بطاقة ائتمان",
-      creating: "جارٍ الإنشاء…",
+      submit: "إنشاء حساب",
+      creating: "جارٍ إنشاء الحساب",
       success: "تم إنشاء بطاقة الائتمان",
     },
     edit: {

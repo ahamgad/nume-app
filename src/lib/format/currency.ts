@@ -4,14 +4,12 @@ import {
   formatSignedCurrency as formatSignedCurrencyDisplay,
   getCurrencyDisplayParts,
   toDisplayCurrencyAmount,
-  CURRENCY_DECIMAL_SCALE,
 } from "@/lib/format/currency-display";
 import { CURRENCY_CODE } from "@/lib/format/currency-display-settings";
 import type { RecordType } from "@/lib/finance/types";
 import { normalizeNumericInput } from "@/lib/format/numerals";
 
 export {
-  CURRENCY_DECIMAL_SCALE,
   CURRENCY_CODE,
   getCurrencyDisplayParts,
   toDisplayCurrencyAmount,

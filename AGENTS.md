@@ -30,5 +30,13 @@ Read **`docs/FOUNDATION.md`** for height rules, scrolling, search, and keyboard 
 
 Read **`docs/CONTENT.md`** for English sentence-case and copy conventions.
 
-Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only. Do not build custom picker list rows — use `PickerList`, `PickerListOption`, and `PickerListNoneOption`.
+**Form and copy foundations (frozen):**
+
+- **Account create CTA** → `AccountCreateActionButton` (`Create account` / `Creating account`)
+- **Form primary actions** → `FORM_PRIMARY_ACTION_BUTTON_CLASS` (`h-12`)
+- **Confirmation sheet actions** → `ConfirmationSheetActions` (same button height)
+- **Currency display** → `CurrencyAmount` / `ResponsiveCurrencyAmount` — unified decimal sizing
+- **Copy** → sentence case + single-sentence descriptions without trailing periods in `en.ts`
+
+Do not create custom sheet implementations. Do not inline keyboard editing on form screens. Do not implement headers directly in screen files — use the approved header components only. Do not build custom picker list rows — use `PickerList`, `PickerListOption`, and `PickerListNoneOption`. Do not add per-type account create button labels.
 <!-- END:foundation-rules -->

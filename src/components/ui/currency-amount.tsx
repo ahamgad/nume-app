@@ -3,7 +3,6 @@
 import type { CSSProperties } from "react";
 
 import {
-  CURRENCY_DECIMAL_SCALE,
   getCurrencyDisplayParts,
 } from "@/lib/format/currency";
 import type { CurrencySignMode } from "@/lib/format/currency-display";
@@ -53,11 +52,7 @@ export function CurrencyAmount({
       {parts.code}
       {" "}
       {parts.integerText}
-      {parts.hasDecimals ? (
-        <span style={{ fontSize: `${CURRENCY_DECIMAL_SCALE}em` }}>
-          {parts.decimalText}
-        </span>
-      ) : null}
+      {parts.hasDecimals ? parts.decimalText : null}
     </span>
   );
 }

@@ -9,8 +9,7 @@ import {
 } from "@/components/accounts/money-account-form-fields";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { StickyFooter } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import { AccountCreateActionButton, StickyFooter } from "@/components/patterns";
 import type { MoneyAccountType } from "@/lib/finance/types";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAddAccountScreenTitle } from "@/lib/finance/account-labels";
@@ -153,17 +152,15 @@ export function AddMoneyAccountScreen({
       </ScreenBody>
 
       <StickyFooter>
-        <Button
-          className="h-12 w-full text-base"
-          disabled={submitting}
-          onClick={handleSubmit}
-        >
-          {submitting
-            ? t("accounts.creating")
-            : isFirstAccountFlow
+        <AccountCreateActionButton
+          submitting={submitting}
+          label={
+            isFirstAccountFlow
               ? t("accounts.add.firstAccount.cta")
-              : t("accounts.createAccount")}
-        </Button>
+              : undefined
+          }
+          onClick={handleSubmit}
+        />
       </StickyFooter>
     </>
   );
