@@ -22,7 +22,21 @@ describe("account form required fields", () => {
     expect(isAccountFormFieldRequired("interestModel", base)).toBe(false);
   });
 
-  it("requires annual rate only for fixed interest model", () => {
+  it("never marks optional last-4 identifier fields as required", () => {
+    expect(isAccountFormFieldRequired("account-number-last4", base)).toBe(false);
+    expect(isAccountFormFieldRequired("savings-account-number", base)).toBe(false);
+    expect(isAccountFormFieldRequired("lending-identifier", base)).toBe(false);
+    expect(isAccountFormFieldRequired("credit-card-identifier", base)).toBe(false);
+    expect(isAccountFormFieldRequired("certificate-number", base)).toBe(false);
+    expect(
+      isAccountFormFieldRequired("account-number-last4", {
+        ...base,
+        showsIdentifier: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("requires annual rate for fixed savings and certificates", () => {
     expect(
       isAccountFormFieldRequired("savings-rate", {
         ...base,
@@ -35,6 +49,11 @@ describe("account form required fields", () => {
         interestModel: "tiered",
       }),
     ).toBe(false);
+    expect(
+      isAccountFormFieldRequired("certificate-rate", {
+        accountType: "certificate",
+      }),
+    ).toBe(true);
   });
 
   it("requires tier min and rate but not open-ended max balance", () => {
@@ -44,7 +63,7 @@ describe("account form required fields", () => {
     expect(isAccountFormFieldRequired("tier-max-0", tiered)).toBe(false);
   });
 
-  it("does not mark chip posting day fields as required", () => {
+  it("does not mark chip posting or payout day fields as required", () => {
     expect(
       isAccountFormFieldRequired("savings-posting-day", {
         ...base,
@@ -56,6 +75,9 @@ describe("account form required fields", () => {
         ...base,
         showsPayoutDay: true,
       }),
+    ).toBe(false);
+    expect(
+      isAccountFormFieldRequired("credit-card-statement-due-day", base),
     ).toBe(false);
   });
 
@@ -72,6 +94,18 @@ describe("account form required fields", () => {
         interestDestination: "same_account",
       }),
     ).toBe(false);
+    expect(
+      isAccountFormFieldRequired("certificate-interest-destination", {
+        accountType: "certificate",
+        autoApplyInterest: true,
+      }),
+    ).toBe(true);
+    expect(
+      isAccountFormFieldRequired("certificate-interest-destination", {
+        accountType: "certificate",
+        autoApplyInterest: false,
+      }),
+    ).toBe(false);
   });
 
   it("does not require cash institution", () => {
@@ -83,12 +117,18 @@ describe("account form required fields", () => {
     ).toBe(false);
   });
 
-  it("honours explicit required overrides", () => {
-    expect(resolveAccountFormFieldRequired("interestModel", base, false)).toBe(
+  it("ignores explicit required=true — validation registry is source of truth", () => {
+    expect(
+      resolveAccountFormFieldRequired("savings-account-number", base, true),
+    ).toBe(false);
+    expect(resolveAccountFormFieldRequired("interestModel", base, true)).toBe(
       false,
     );
-    expect(resolveAccountFormFieldRequired("interestModel", base, true)).toBe(
-      true,
+  });
+
+  it("honours explicit required=false override", () => {
+    expect(resolveAccountFormFieldRequired("savings-name", base, false)).toBe(
+      false,
     );
   });
 });

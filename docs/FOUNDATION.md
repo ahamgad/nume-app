@@ -659,7 +659,7 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` (title/section padding owns outer edges)
 9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
 10. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
-11. **Requirement context** — `AccountFormSections` `requirements` prop + `resolveAccountFormFieldRequired()`; `*` only when submit validation fails on empty/unset (chip defaults excluded)
+11. **Requirement context** — `AccountFormSections` `requirements` prop + `resolveAccountFormFieldRequired()`; `*` only when submit validation fails on empty/unset (optional last-4 identifiers, chip-default fields, and open-ended tier max never show `*`)
 12. **Create flows** — `AccountFormCreateContent` wraps description + fields
 13. **Edit flows** — `AccountFormEditContent` wraps fields
 14. **Propagation** — all `*-form-fields` modules consume account form wrappers + sections
@@ -693,7 +693,7 @@ Location: `components/forms/input-field.tsx`, `components/forms/account-form-fie
 
 1. **Label** — `INPUT_FIELD_LABEL_CLASS` = 13px regular (`text-[0.8125rem] font-normal`)
 2. **Label → field** — `INPUT_FIELD_LABEL_TO_CONTROL_GAP_PX` = 8px via `INPUT_FIELD_STACK_CLASS`
-3. **Required fields** — `*` only when `resolveAccountFormFieldRequired` is true (mirrors submit validation; optional/chip-default fields never show `*`)
+3. **Required fields** — `*` only when `resolveAccountFormFieldRequired` is true (mirrors submit validation in `account-form-required.ts`). Optional last-4 identifiers (account number, card number, certificate number, loan identifier) never show `*`. Chip selects with default selections never show `*`. `required={false}` may force-hide; `required={true}` cannot force-show.
 4. **Input value** — `INPUT_FIELD_VALUE_CLASS` = 15px regular (`text-[0.9375rem] font-normal`)
 5. **Input padding** — `INPUT_FIELD_ROW_TRIGGER_CLASS` includes `p-0` on row triggers
 6. **Chevron** — `InputFieldRowTrigger` uses `CardChevron` / `CARD_CHEVRON_CLASS` (card chevron foundation)

@@ -9,8 +9,14 @@ export interface AccountFormRequirements {
   postingFrequency?: string;
   payoutFrequency?: string;
   showsPayoutDay?: boolean;
+  /** Field is rendered; institution is required when shown (except cash). */
   showsInstitution?: boolean;
+  /** Field is rendered; balance is required on create when shown. */
   showsBalance?: boolean;
+  /**
+   * Field visibility only — last-4 identifiers are optional when provided.
+   * @deprecated Do not use for required-indicator logic.
+   */
   showsIdentifier?: boolean;
   termPreset?: string | number;
 }
@@ -19,6 +25,9 @@ export interface AccountFormRequirements {
  * Whether a field shows the required indicator (*).
  * Mirrors submit-time validation: only fields that fail when empty/unset.
  * Chip selects with default selections are never required indicators.
+ *
+ * @see validateMoneyAccountForm, validateSavingsForm, validateCertificateForm,
+ *   validateCreditCardForm, validateLendingAccountForm
  */
 export function isAccountFormFieldRequired(
   fieldKey: string,
@@ -37,12 +46,16 @@ export function isAccountFormFieldRequired(
     case "accountNumber":
     case "certificateNumber":
     case "identifier":
-      return requirements.showsIdentifier !== false;
+      // validateIdentifierLast4Field — optional; format-only when non-empty
+      return false;
     case "balance":
     case "outstandingBalance":
       return requirements.mode === "create" && requirements.showsBalance !== false;
     case "annualInterestRate":
-      return requirements.interestModel === "fixed";
+      return (
+        requirements.interestModel === "fixed" ||
+        requirements.accountType === "certificate"
+      );
     case "principalAmount":
     case "purchaseDate":
     case "creditLimit":
@@ -66,12 +79,15 @@ export function isAccountFormFieldRequired(
   }
 }
 
+/**
+ * Resolves whether to show `*`. Validation registry is the source of truth;
+ * callers may pass `required={false}` to force-hide the indicator only.
+ */
 export function resolveAccountFormFieldRequired(
   fieldKey: string,
   requirements: AccountFormRequirements,
   explicit?: boolean,
 ): boolean {
-  if (explicit === true) return true;
   if (explicit === false) return false;
   return isAccountFormFieldRequired(fieldKey, requirements);
 }
