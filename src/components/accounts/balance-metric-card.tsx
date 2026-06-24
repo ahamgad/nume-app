@@ -22,7 +22,6 @@ interface BalanceMetricCardProps {
   label: string;
   meta?: string;
   editable?: boolean;
-  embedded?: boolean;
   onBalanceSave: (balance: number) => Promise<void>;
 }
 
@@ -31,7 +30,6 @@ export function BalanceMetricCard({
   label,
   meta,
   editable = true,
-  embedded = false,
   onBalanceSave,
 }: BalanceMetricCardProps) {
   const t = useT();
@@ -68,7 +66,6 @@ export function BalanceMetricCard({
       amount={getAccountDisplayBalance(account)}
       locale={formatLocale}
       meta={meta}
-      embedded={embedded}
       amountAction={
         canEdit ? (
           <IconButton

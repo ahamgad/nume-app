@@ -196,20 +196,19 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
             institutionSubtitle={headerSubtitle}
             accountType={account.type}
           />
-
-          <BalanceMetricCard
-            account={account}
-            label={t("accounts.details.currentBalance")}
-            meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t, formatLocale),
-            })}
-            editable={!isArchived}
-            embedded
-            onBalanceSave={async (balance) => {
-              await updateAccount(account.id, { currentBalance: balance });
-            }}
-          />
         </AccountDetailsHeaderRegion>
+
+        <BalanceMetricCard
+          account={account}
+          label={t("accounts.details.currentBalance")}
+          meta={t("dashboard.netWorth.updated", {
+            time: formatRelativeTime(account.updatedAt, t, formatLocale),
+          })}
+          editable={!isArchived}
+          onBalanceSave={async (balance) => {
+            await updateAccount(account.id, { currentBalance: balance });
+          }}
+        />
 
         <RecentRecordsSection
           records={records}

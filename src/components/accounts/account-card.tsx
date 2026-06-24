@@ -3,6 +3,7 @@
 import {
   InstitutionBrandAsset,
 } from "@/components/institutions/institution-brand-asset";
+import { CardChevron } from "@/components/ui/card-chevron";
 import { CurrencyAmount } from "@/components/ui/currency-amount";
 import { formatAccountCardInstituteRow } from "@/lib/finance/account-card-display";
 import { getAccountTypeCardLabelKey } from "@/lib/finance/account-labels";
@@ -14,6 +15,7 @@ import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   ACCOUNT_CARD_CONTAINER_CLASS,
+  CARD_CHEVRON_ROW_CLASS,
   ACCOUNT_CARD_INSTITUTE_ROW_CLASS,
   ACCOUNT_CARD_LOGO_SIZE_PX,
   ACCOUNT_CARD_LOGO_TEXT_GAP_PX,
@@ -79,7 +81,7 @@ export function AccountCard({
       >
         {logo}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className={CARD_CHEVRON_ROW_CLASS}>
             <p className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "min-w-0 flex-1")}>
               {typeRow}
             </p>
@@ -89,6 +91,7 @@ export function AccountCard({
               variant="inline"
               className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "shrink-0")}
             />
+            <CardChevron />
           </div>
           <p className={ACCOUNT_CARD_NAME_CLASS}>{account.name}</p>
         </div>

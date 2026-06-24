@@ -15,6 +15,8 @@ import {
 import { StackPageHeader } from "@/components/layout/stack-page-chrome";
 import { useScreenTitleCollapse } from "@/components/layout/screen-title-collapse";
 import { accountDetailsHeaderRegionClassName } from "@/lib/layout/account-details-chrome";
+import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
+import { cn } from "@/lib/utils";
 
 export {
   ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX,
@@ -44,11 +46,17 @@ export function AccountDetailsStackHeader({
   onBack,
   rightAction,
 }: AccountDetailsStackHeaderProps) {
+  const collapsed = useScreenTitleCollapse()?.titleCollapsed ?? false;
+
   return (
     <StackPageHeader
       title={accountName}
       onBack={onBack}
       rightAction={rightAction}
+      className={cn(
+        "transition-colors duration-200",
+        collapsed ? "bg-background" : CARD_SURFACE_BG_CLASS,
+      )}
     />
   );
 }

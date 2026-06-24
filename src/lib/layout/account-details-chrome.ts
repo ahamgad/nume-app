@@ -23,13 +23,8 @@ export const ACCOUNT_DETAILS_TOGGLE_DESCRIPTION_CLASS =
 export const ACCOUNT_DETAILS_BALANCE_META_CLASS =
   "mt-4 text-[0.8125rem] leading-normal text-muted-foreground";
 
-/** Hero header region bottom padding (px). */
-export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_PADDING_PX = 24;
-
 /** Hero header region bottom radius (px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS = "rounded-b-2xl";
-
-export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_PADDING_CLASS = "pb-6";
 
 export function accountDetailsBalanceMetaClassName(className?: string): string {
   return cn(ACCOUNT_DETAILS_BALANCE_META_CLASS, className);
@@ -37,12 +32,7 @@ export function accountDetailsBalanceMetaClassName(className?: string): string {
 
 export function accountDetailsHeaderRegionClassName(collapsed: boolean): string {
   return cn(
-    "-mx-4 flex flex-col gap-6 px-4 transition-colors",
-    !collapsed &&
-      cn(
-        CARD_SURFACE_BG_CLASS,
-        ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
-        ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_PADDING_CLASS,
-      ),
+    "-mx-4 px-4 transition-colors",
+    !collapsed && cn(CARD_SURFACE_BG_CLASS, ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS),
   );
 }

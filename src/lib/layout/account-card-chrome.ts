@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 
 /** Category label → first account card (px). */
-export const ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX = 16;
+export const ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX = 8;
 
 /** Account card → next account card within a category (px). */
 export const ACCOUNT_CARD_GAP_PX = 8;

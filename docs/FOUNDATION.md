@@ -568,7 +568,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 
 | Rule | Token | Value |
 |---|---|---|
-| Category label → first card | `ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX` | 16px |
+| Category label → first card | `ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX` | 8px |
 | Card → card (same category) | `ACCOUNT_CARD_GAP_PX` | 8px |
 | Last card → next category label | `ACCOUNT_CARD_CATEGORY_GAP_PX` | 24px |
 | Card internal padding | `ACCOUNT_CARD_PADDING_PX` | 16px |
@@ -578,7 +578,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 ### Layout rules
 
 1. Logo **45×45** — existing institution logo / fallback behavior unchanged
-2. Top row — `[Logo] Account Type · Last-4` + trailing balance (right-aligned); balance uses type-row typography
+2. Top row — `[Logo] Account Type · Last-4` + trailing balance + chevron; balance uses type-row typography; **8px** between balance and chevron
 3. Second row — account name (**15px medium**)
 4. **No internal dividers** — single content block per card
 5. **No balance label** — amount only
@@ -797,7 +797,7 @@ Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`.
 
 ### Account details header hero
 
-`AccountDetailsHeaderRegion` wraps the content header + first balance section. At scroll top: card-surface background, `rounded-b-2xl`, **24px** bottom padding. When the large title collapses, the treatment is removed.
+`AccountDetailsHeaderRegion` wraps the content header only. `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
 
 ---
 

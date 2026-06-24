@@ -28,6 +28,7 @@ function AccountCardSkeleton() {
           <div className="flex items-center gap-2">
             <Skeleton className="h-3 w-28" />
             <Skeleton className="ms-auto h-3 w-16 shrink-0" />
+            <Skeleton className="size-5 shrink-0 rounded-full" />
           </div>
           <Skeleton className="h-4 w-40 max-w-full" />
         </div>

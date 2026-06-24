@@ -28,7 +28,7 @@ describe("card chevron foundation", () => {
       "utf8",
     );
 
-    expect(accountCard).not.toContain("CardChevron");
+    expect(accountCard).toContain("CardChevron");
     expect(typePickerCard).toContain("CardChevron");
     expect(typePickerCard).not.toContain("ChevronRight");
   });

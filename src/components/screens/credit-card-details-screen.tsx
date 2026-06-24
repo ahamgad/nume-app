@@ -194,20 +194,19 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
             institutionSubtitle={headerSubtitle}
             accountType={account.type}
           />
-
-          <LiabilityBalanceMetricCard
-            account={account}
-            label={t("creditCards.details.outstandingBalance")}
-            meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
-            editable={!isArchived}
-            embedded
-            onBalanceSave={async (outstandingBalance) => {
-              await updateAccount(account.id, {
-                currentBalance: toStoredCreditCardBalance(outstandingBalance),
-              });
-            }}
-          />
         </AccountDetailsHeaderRegion>
+
+        <LiabilityBalanceMetricCard
+          account={account}
+          label={t("creditCards.details.outstandingBalance")}
+          meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
+          editable={!isArchived}
+          onBalanceSave={async (outstandingBalance) => {
+            await updateAccount(account.id, {
+              currentBalance: toStoredCreditCardBalance(outstandingBalance),
+            });
+          }}
+        />
 
         <AccountDetailsSection title={t("creditCards.details.summary")}>
           <AccountDetailsDetailRow

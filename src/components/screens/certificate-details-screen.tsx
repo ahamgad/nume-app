@@ -222,17 +222,16 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             institutionSubtitle={headerSubtitle}
             accountType={account.type}
           />
-
-          <AccountDetailsBalanceCard
-            label={t("certificates.fields.principal.label")}
-            amount={certificate.principalAmount}
-            locale={formatLocale}
-            embedded
-            meta={t("dashboard.netWorth.updated", {
-              time: formatRelativeTime(account.updatedAt, t, formatLocale),
-            })}
-          />
         </AccountDetailsHeaderRegion>
+
+        <AccountDetailsBalanceCard
+          label={t("certificates.fields.principal.label")}
+          amount={certificate.principalAmount}
+          locale={formatLocale}
+          meta={t("dashboard.netWorth.updated", {
+            time: formatRelativeTime(account.updatedAt, t, formatLocale),
+          })}
+        />
 
         {canProcessInterest ? (
           <Button

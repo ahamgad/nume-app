@@ -1,7 +1,7 @@
 "use client";
 
 import type { BalanceSign } from "@/lib/field-editor/balance-sign";
-import { cn } from "@/lib/utils";
+import { chipButtonClassName } from "@/lib/layout/chip-chrome";
 
 interface FieldSignToggleProps {
   value: BalanceSign;
@@ -39,12 +39,7 @@ export function FieldSignToggle({
             aria-pressed={selected}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => handleSelect(sign)}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              selected
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-background text-foreground hover:bg-muted/60",
-            )}
+            className={chipButtonClassName("canvas", selected)}
           >
             {label}
           </button>
