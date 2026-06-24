@@ -14,8 +14,6 @@ import type { Account } from "@/lib/finance/types";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
 import type { TranslationKey } from "@/lib/i18n";
 import {
-  ACCOUNT_CARD_BALANCE_LABEL_CLASS,
-  ACCOUNT_CARD_BALANCE_VALUE_CLASS,
   ACCOUNT_CARD_CONTAINER_CLASS,
   CARD_CHEVRON_ROW_CLASS,
   ACCOUNT_CARD_INSTITUTE_ROW_CLASS,
@@ -23,7 +21,6 @@ import {
   ACCOUNT_CARD_LOGO_TEXT_GAP_PX,
   ACCOUNT_CARD_NAME_CLASS,
   ACCOUNT_CARD_PADDING_CLASS,
-  ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX,
 } from "@/lib/layout/account-card-chrome";
 import { cn } from "@/lib/utils";
 
@@ -85,32 +82,19 @@ export function AccountCard({
         {logo}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className={CARD_CHEVRON_ROW_CLASS}>
-            <p className={ACCOUNT_CARD_INSTITUTE_ROW_CLASS}>{typeRow}</p>
+            <p className={cn(ACCOUNT_CARD_NAME_CLASS, "min-w-0 flex-1")}>
+              {account.name}
+            </p>
+            <CurrencyAmount
+              amount={displayBalance}
+              locale={formatLocale}
+              variant="inline"
+              className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "shrink-0")}
+            />
             <CardChevron />
           </div>
-          <p className={ACCOUNT_CARD_NAME_CLASS}>{account.name}</p>
+          <p className={ACCOUNT_CARD_INSTITUTE_ROW_CLASS}>{typeRow}</p>
         </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX,
-          marginBottom: ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX,
-        }}
-      >
-        <div className="border-t border-border" role="presentation" />
-      </div>
-
-      <div className="flex flex-col gap-0.5">
-        <p className={ACCOUNT_CARD_BALANCE_LABEL_CLASS}>
-          {t("accounts.sections.balance")}
-        </p>
-        <CurrencyAmount
-          amount={displayBalance}
-          locale={formatLocale}
-          variant="inline"
-          className={ACCOUNT_CARD_BALANCE_VALUE_CLASS}
-        />
       </div>
     </button>
   );

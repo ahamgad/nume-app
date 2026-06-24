@@ -105,6 +105,7 @@ export function AddLendingAccountScreen() {
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{getAddAccountScreenTitle("loan", t)}</StackPageTitle>
         <AccountFormCreateContent
+          description={t("accounts.add.lead")}
           disabled={submitting}
           formError={errors.form}
         >

@@ -43,7 +43,7 @@ export function TabBar() {
       aria-label={t("a11y.mainNavigation")}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="grid h-14 grid-cols-5">
+      <div className="grid h-14 grid-cols-5 px-1">
         {tabs.map(({ href, labelKey, icon: Icon }) => {
           const active = isTabActive(pathname, href);
           return (

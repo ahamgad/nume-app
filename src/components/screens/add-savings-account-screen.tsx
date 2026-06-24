@@ -109,7 +109,7 @@ export function AddSavingsAccountScreen() {
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormCreateContent
-          description={t("savings.create.lead")}
+          description={t("accounts.add.lead")}
           disabled={submitting}
           formError={errors.form}
         >

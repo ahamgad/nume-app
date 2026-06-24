@@ -160,9 +160,9 @@ function EditCreditCardAccountForm({
 
   return (
     <>
-      <StackPageHeader title={t("creditCards.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <StackPageTitle>{t("creditCards.edit.title")}</StackPageTitle>
+        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CreditCardFormFields
             values={values}

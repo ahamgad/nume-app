@@ -38,8 +38,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 10 | **Account picker** | `AccountPicker`, `AccountPickerOptionRow`, `AccountRowContent` | § 15 |
 | 11 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` | § 16 |
 | 12 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — `lib/layout/card-surface.ts` | § 16 |
-| 13 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
-| 14 | **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` | § 18 |
+| 13 | **Screen canvas** | `bg-background` on `AppShell`, `ScreenHeader`, `ScreenBody` — `globals.css` `--background` | § 19 |
+| 14 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
+| 15 | **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` | § 18 |
 
 **Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, card-surface chrome, account-form section layouts, or input-field label/value/error/affix chrome inside individual screens.
 
@@ -560,7 +561,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 
 | Component | Role |
 |---|---|
-| `AccountCard` | Single account card — logo, type row, name, balance |
+| `AccountCard` | Single account card — logo, name, balance, type row |
 | `AccountCardsSection` | Category label + stacked cards with foundation spacing |
 
 ### Spacing tokens
@@ -572,19 +573,21 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 | Last card → next category label | `ACCOUNT_CARD_CATEGORY_GAP_PX` | 24px |
 | Card internal padding | `ACCOUNT_CARD_PADDING_PX` | 16px |
 | Logo → text block | `ACCOUNT_CARD_LOGO_TEXT_GAP_PX` | 8px |
-| Top section → divider / divider → balance | `ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX` | 16px |
+| Balance → chevron | `CARD_CHEVRON_ROW_CLASS` (`gap-2`) | 8px |
 
 ### Layout rules
 
 1. Logo **45×45** — existing institution logo / fallback behavior unchanged
-2. Type row — **13px regular** — localized account type · last-4 via `formatAccountCardInstituteRow` (type label from `getAccountTypeCardLabelKey`; when no account number, type label only)
-3. Account name — **15px medium**, single-line truncated
-4. Divider — `border-border` between top section and balance
-5. Balance label — **13px medium**, sentence case (`accounts.sections.balance`)
-6. Balance value — **18px semibold** via `CurrencyAmount` + `ACCOUNT_CARD_BALANCE_VALUE_CLASS` (numeric typography foundation)
-7. Subtle shadow — `CARD_SURFACE_SHADOW_CLASS` via `ACCOUNT_CARD_CONTAINER_CLASS`
-8. Corner radius — `CARD_SURFACE_BORDER_RADIUS_CLASS` on card container
-9. Trailing chevron — `CardChevron` + `CARD_CHEVRON_CLASS` / `CARD_CHEVRON_ROW_CLASS` (shared with account type picker cards)
+2. Top row — `[Logo] Account Name` + trailing balance + chevron on one line; name **15px medium**, truncated
+3. Balance — same typography as type row (**13px regular**, muted); placed before chevron with **8px** gap
+4. Second row — **13px regular** — localized account type · last-4 via `formatAccountCardInstituteRow`
+5. **No internal dividers** — single content block per card
+6. **No balance label** — amount only, no `accounts.sections.balance` row
+7. Corner radius — `CARD_SURFACE_BORDER_RADIUS_CLASS` (`rounded-2xl` / 16px) on card container
+8. Border — `CARD_SURFACE_BORDER_CLASS` via shared card-surface tokens; light theme `#EFEFEF` via `--border`
+9. Background — `bg-card`; light theme `#FFFFFF` via `--card`
+10. **No card shadows** — border + canvas contrast only
+11. Trailing chevron — `CardChevron` + `CARD_CHEVRON_CLASS` / `CARD_CHEVRON_ROW_CLASS` (shared with account type picker cards)
 
 ### Propagation rule
 
@@ -642,20 +645,23 @@ Location: `components/accounts/account-type-picker-sheet.tsx`, `account-type-pic
 8. **Type label** — `ACCOUNT_CARD_NAME_CLASS` (15px medium)
 9. **Chevron** — `CardChevron` inherits account card chevron foundation (`CARD_CHEVRON_CLASS`, `CARD_CHEVRON_ROW_CLASS`)
 10. **Card surface** — `CARD_SURFACE_CLASS` from shared card-surface foundation
-11. **Border radius / border / shadow** — shared `card-surface.ts` tokens; same as Account Cards
+11. **Border radius / border** — shared `card-surface.ts` tokens; same as Account Cards; no shadows
 12. **Propagation** — all account-type selection sheets consume `AccountTypePickerSheet` or its card/section primitives
 13. **No custom implementations** in screens
 
 ### Card surface foundation (shared)
 
-`lib/layout/card-surface.ts` centralizes border radius, border, background, and shadow:
+`lib/layout/card-surface.ts` centralizes border radius, border, and background:
 
-| Token | Use |
-|---|---|
-| `CARD_SURFACE_CLASS` | Elevated cards — account cards, account type picker cards |
-| `CARD_SURFACE_FLAT_CLASS` | Flat bordered surfaces — dashboard `WidgetCard`, form sections |
+| Token | Light theme | Use |
+|---|---|---|
+| `CARD_SURFACE_BORDER_RADIUS_CLASS` | 16px (`rounded-2xl`) | All card surfaces |
+| `CARD_SURFACE_BORDER_CLASS` | `#EFEFEF` via `--border` | All card surfaces |
+| `CARD_SURFACE_BG_CLASS` | `#FFFFFF` via `--card` | All card surfaces |
+| `CARD_SURFACE_CLASS` | Combined tokens | Account cards, type picker cards, details sections, form sections, dashboard widgets |
+| `CARD_SURFACE_FLAT_CLASS` | Same as elevated | Alias — shadows are not used |
 
-Account cards consume via `ACCOUNT_CARD_CONTAINER_CLASS`. Future cards **must** use card-surface tokens — no duplicated chrome.
+Account cards consume via `ACCOUNT_CARD_CONTAINER_CLASS`. Future cards **must** use card-surface tokens — no duplicated chrome and **no shadows**.
 
 ### Approved components
 
@@ -754,6 +760,33 @@ Location: `components/forms/input-field.tsx`, `components/forms/account-form-fie
 
 ---
 
+## 19. Screen canvas & scroll chrome (frozen)
+
+Location: `src/app/globals.css`, `components/layout/screen-header.tsx` (`ScreenBody`), `lib/layout/screen-spacing.ts`, `components/layout/tab-bar.tsx`.
+
+### Screen background
+
+| Theme | Token | Value |
+|---|---|---|
+| Light | `--background` | `#F7F7F7` |
+| Dark | `--background` | existing dark token (`oklch(0.145 0 0)`) |
+
+`AppShell`, `ScreenHeader`, `ScreenBody`, and `TabBar` use `bg-background`. Cards use `bg-card` (`#FFFFFF` light) for contrast.
+
+### Global bottom padding
+
+All `ScreenBody` scroll containers reserve **tab bar height** (`TAB_BAR_HEIGHT_CLASS` = `3.5rem`) plus safe area via `TAB_BAR_SCROLL_PADDING` / `STACK_SCREEN_BOTTOM_PADDING` from `getScreenBodyScrollPadding`. Content must never sit under the fixed tab bar.
+
+### Global pull-to-refresh
+
+`ScreenBody` wires pull-to-refresh by default through `usePullToRefresh` + `useFinance().refresh`. Screens may pass `onRefresh` to override. Do not add a second refresh pattern.
+
+### Tab bar container padding
+
+`TabBar` inner grid uses **4px** horizontal padding (`px-1`) on the container only. Tab item spacing is unchanged.
+
+---
+
 ## 12. Future screen rule (mandatory)
 
 Any new screen, flow, module, account type, dialog, bottom sheet, picker, or feature added to NUME **must**:
@@ -776,7 +809,11 @@ Any new screen, flow, module, account type, dialog, bottom sheet, picker, or fea
 - Account card layouts on the Accounts tab
 - Account picker row layouts in selection sheets
 - Account type picker card layouts
-- Card border / shadow / radius outside `card-surface.ts`
+- Card border / radius outside `card-surface.ts`
+- Card shadows on any surface
+- Custom screen background colors outside `--background`
+- Custom scroll bottom padding outside `screen-spacing.ts`
+- Per-screen pull-to-refresh implementations outside `ScreenBody`
 - Account form section layouts outside `AccountFormSection`
 - Input field label/value/error/affix/chevron styling outside `input-field.tsx` / `input-field-chrome.ts`
 

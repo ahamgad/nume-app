@@ -168,9 +168,9 @@ function EditSavingsAccountForm({
 
   return (
     <>
-      <StackPageHeader title={t("savings.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <StackPageTitle>{t("savings.edit.title")}</StackPageTitle>
+        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <SavingsFormFields
             values={values}

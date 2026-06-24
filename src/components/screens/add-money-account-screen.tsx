@@ -124,11 +124,7 @@ export function AddMoneyAccountScreen({
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormCreateContent
-          description={
-            isFirstAccountFlow
-              ? t("accounts.add.firstAccount.lead")
-              : t("accounts.add.lead")
-          }
+          description={t("accounts.add.lead")}
           disabled={submitting}
           formError={errors.form}
         >

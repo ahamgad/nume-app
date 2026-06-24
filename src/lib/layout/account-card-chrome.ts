@@ -1,8 +1,5 @@
 import { cn } from "@/lib/utils";
-import {
-  CARD_SURFACE_SHADOW_CLASS,
-  CARD_SURFACE_CLASS,
-} from "@/lib/layout/card-surface";
+import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 
 /** Category label → first account card (px). */
 export const ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX = 16;
@@ -21,12 +18,6 @@ export const ACCOUNT_CARD_LOGO_SIZE_PX = 45;
 
 /** Logo → text block gap (px). */
 export const ACCOUNT_CARD_LOGO_TEXT_GAP_PX = 8;
-
-/** Top section → divider, divider → balance section (px). */
-export const ACCOUNT_CARD_SECTION_DIVIDER_GAP_PX = 16;
-
-/** @deprecated Use `CARD_SURFACE_SHADOW_CLASS` from `card-surface.ts`. */
-export const ACCOUNT_CARD_SHADOW_CLASS = CARD_SURFACE_SHADOW_CLASS;
 
 export const ACCOUNT_CARD_CATEGORY_LABEL_CLASS =
   "text-[0.8125rem] font-medium text-muted-foreground";
@@ -51,12 +42,3 @@ export const CARD_CHEVRON_CLASS =
 
 /** Flex row spacing between label content and trailing chevron (8px). */
 export const CARD_CHEVRON_ROW_CLASS = "flex min-w-0 items-center gap-2";
-
-export const ACCOUNT_CARD_BALANCE_LABEL_CLASS =
-  "text-[0.8125rem] font-medium leading-snug text-muted-foreground";
-
-/** Balance amount on account cards — 18px semibold (numeric typography foundation). */
-export const ACCOUNT_CARD_BALANCE_VALUE_FONT_SIZE_PX = 18;
-
-export const ACCOUNT_CARD_BALANCE_VALUE_CLASS =
-  "text-[1.125rem] font-semibold";

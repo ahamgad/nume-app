@@ -276,7 +276,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         {!isArchived ? (
           <AccountDetailsSettingsSection
             title={t("accounts.details.settingsTitle")}
-            editLabel={t("certificates.details.edit")}
+            editLabel={t("accounts.edit.title")}
             archiveLabel={t("certificates.details.archive")}
             archiveDisabled={archiving}
             onEdit={() => router.push(`/accounts/${account.id}/edit`)}

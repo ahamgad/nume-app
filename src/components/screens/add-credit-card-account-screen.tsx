@@ -115,6 +115,7 @@ export function AddCreditCardAccountScreen() {
       <ScreenBody withTabBar={false} className="pb-28">
         <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormCreateContent
+          description={t("accounts.add.lead")}
           disabled={submitting}
           formError={errors.form}
         >

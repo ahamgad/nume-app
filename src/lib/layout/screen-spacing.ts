@@ -1,16 +1,16 @@
 /**
  * Shared screen layout spacing (NUME v1).
  *
- * Tab-root screens reserve double the tab bar height so content never feels
- * attached to the fixed tab bar. Stack screens use a single tab-bar-height inset.
+ * Scroll containers reserve the tab bar height so content never sits under the
+ * fixed tab bar. Stack screens use the same inset when the tab bar is hidden.
  */
 
 /** Matches TabBar `h-14` (3.5rem). */
 export const TAB_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Tab-root scroll padding — tab bar height + equal breathing room + safe area. */
+/** Tab-root scroll padding — tab bar height + safe area. */
 export const TAB_BAR_SCROLL_PADDING =
-  "pb-[calc(7rem+env(safe-area-inset-bottom))]";
+  "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";
 
 /** @deprecated Use {@link TAB_BAR_SCROLL_PADDING}. */
 export const TAB_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;

@@ -15,6 +15,7 @@ import { PullToRefreshIndicator } from "@/components/ui/pull-to-refresh-indicato
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFocusScrollIntoView } from "@/hooks/use-focus-scroll-into-view";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
+import { useFinance } from "@/lib/finance/store";
 import { isFreshCreateFlowPath } from "@/lib/navigation/create-flow-paths";
 import { KEYBOARD_SNAP_EXPERIMENT_D_FIXED_HEADER } from "@/lib/layout/keyboard-snap-investigation";
 import {
@@ -150,6 +151,7 @@ interface ScreenBodyProps {
   withStickyFooter?: boolean;
   /** When true, always opens at the top instead of restoring scroll position. */
   resetScrollOnMount?: boolean;
+  /** When omitted, uses the global finance refresh handler. */
   onRefresh?: () => Promise<void>;
 }
 
@@ -165,6 +167,8 @@ export function ScreenBody({
   const scrollRef = useRef<HTMLElement>(null);
   const { isModalOpen } = useModalLayer();
   const registerScrollRoot = useScreenTitleCollapse()?.registerScrollRoot;
+  const { refresh } = useFinance();
+  const refreshHandler = onRefresh ?? refresh;
 
   const shouldResetScroll =
     resetScrollOnMount ?? isFreshCreateFlowPath(pathname);
@@ -183,7 +187,7 @@ export function ScreenBody({
     offset,
     contentStyle,
     handleTransitionEnd,
-  } = usePullToRefresh(onRefresh);
+  } = usePullToRefresh(refreshHandler);
 
   const scrollPadding = getScreenBodyScrollPadding({
     tabBarVisible,
@@ -212,26 +216,6 @@ export function ScreenBody({
     },
     [elementRef, registerScrollRoot],
   );
-
-  const setScrollRef = useCallback(
-    (node: HTMLElement | null) => {
-      scrollRef.current = node;
-      registerScrollRoot?.(node);
-    },
-    [registerScrollRoot],
-  );
-
-  if (!onRefresh) {
-    return (
-      <main
-        ref={setScrollRef}
-        data-app-scroll
-        className={cn(scrollContainerClassName, className)}
-      >
-        {children}
-      </main>
-    );
-  }
 
   return (
     <main

@@ -49,7 +49,8 @@ describe("account type picker sheet foundation", () => {
     expect(cardSource).toContain("CardChevron");
     expect(cardSource).toContain("CARD_CHEVRON_ROW_CLASS");
     expect(cardSource).not.toContain("size-4");
-    expect(CARD_SURFACE_CLASS).toContain("rounded-lg");
+    expect(CARD_SURFACE_CLASS).toContain("rounded-2xl");
     expect(CARD_SURFACE_CLASS).toContain("border-border");
+    expect(CARD_SURFACE_CLASS).not.toContain("shadow");
   });
 });

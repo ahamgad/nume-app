@@ -22,14 +22,14 @@ describe("tab bar visibility", () => {
 });
 
 describe("screen body scroll padding", () => {
-  it("reserves double tab bar height on tab-root screens", () => {
+  it("reserves tab bar height on tab-root screens", () => {
     expect(
       getScreenBodyScrollPadding({
         tabBarVisible: true,
         withStickyFooter: false,
       }),
     ).toBe(TAB_BAR_SCROLL_PADDING);
-    expect(TAB_BAR_SCROLL_PADDING).toContain("7rem");
+    expect(TAB_BAR_SCROLL_PADDING).toContain("3.5rem");
   });
 
   it("uses a single tab-bar-height inset on stack screens", () => {

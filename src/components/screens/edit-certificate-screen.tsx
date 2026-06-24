@@ -143,9 +143,9 @@ function EditCertificateForm({
 
   return (
     <>
-      <StackPageHeader title={t("certificates.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter onRefresh={refresh}>
-        <StackPageTitle>{t("certificates.edit.title")}</StackPageTitle>
+        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CertificateFormFields
             values={values}
