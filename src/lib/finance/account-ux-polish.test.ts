@@ -54,6 +54,8 @@ describe("RecentRecordsSection", () => {
     expect(source).toContain("ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT");
     expect(source).toContain("FormSectionActionButton");
     expect(source).toContain("ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS");
+    expect(source).toContain("ACCOUNT_DETAILS_VIEW_ALL_BUTTON_MARGIN_TOP_CLASS");
+    expect(source).toContain("showViewAll ?");
     expect(source).toContain("accounts.details.records.viewAll");
   });
 });

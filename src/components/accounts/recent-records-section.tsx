@@ -8,6 +8,7 @@ import {
   ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS,
   ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS,
   ACCOUNT_DETAILS_RECORDS_LIST_WRAPPER_CLASS,
+  ACCOUNT_DETAILS_VIEW_ALL_BUTTON_MARGIN_TOP_CLASS,
 } from "@/lib/layout/account-details-chrome";
 import { FormSectionActionButton, RecordRow } from "@/components/patterns";
 import {
@@ -97,7 +98,7 @@ export function RecentRecordsSection({
           ))}
           {showViewAll ? (
             <FormSectionActionButton
-              className="mt-2"
+              className={ACCOUNT_DETAILS_VIEW_ALL_BUTTON_MARGIN_TOP_CLASS}
               label={t("accounts.details.records.viewAll")}
               onClick={() => router.push(`/accounts/${accountId}/records`)}
             />
