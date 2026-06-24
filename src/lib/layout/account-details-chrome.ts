@@ -1,5 +1,6 @@
 import { BOTTOM_SHEET_BOTTOM_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
+import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 import { cn } from "@/lib/utils";
 
 /** Account detail card sections — 16px padding on all sides. */
@@ -27,11 +28,20 @@ export const ACCOUNT_DETAILS_BALANCE_META_CLASS =
 export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS =
   BOTTOM_SHEET_BOTTOM_RADIUS_CLASS;
 
-/** Hero card visual inset (24px) — paint layer only, not layout padding. */
+/** Hero card visual inset above content (24px) — paint layer only. */
 export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX = 24;
 
-/** Tailwind classes for absolute paint-layer vertical inset. */
-export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS = "-top-6 -bottom-6";
+/** Additional in-flow top padding inside the title section (16px). */
+export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS = "pt-4";
+
+/** Layout gap between title section and balance card (24px). */
+export const ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS = "mb-6";
+
+/**
+ * Paint-layer top extension — max PTR offset + visual inset so card chrome
+ * reaches the fixed header while the title region moves with content.
+ */
+export const ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS = `-top-[calc(${PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX}px+${ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX}px)]`;
 
 export function accountDetailsBalanceMetaClassName(className?: string): string {
   return cn(ACCOUNT_DETAILS_BALANCE_META_CLASS, className);
@@ -39,15 +49,22 @@ export function accountDetailsBalanceMetaClassName(className?: string): string {
 
 /** Layout shell for the account details hero — content-sized, no card padding in flow. */
 export function accountDetailsHeaderRegionShellClassName(): string {
-  return "relative -mx-4 -mt-4 px-4";
+  return cn(
+    "relative -mx-4 -mt-4 px-4",
+    ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS,
+  );
 }
 
 /** Paint-only card chrome behind hero content — does not affect layout height. */
 export function accountDetailsHeaderRegionPaintClassName(): string {
   return cn(
-    "pointer-events-none absolute inset-x-0",
-    ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS,
+    "pointer-events-none absolute inset-x-0 bottom-0",
+    ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
     CARD_SURFACE_BG_CLASS,
     ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
   );
+}
+
+export function accountDetailsHeaderRegionContentClassName(): string {
+  return cn("relative", ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS);
 }

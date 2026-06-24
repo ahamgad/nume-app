@@ -15,13 +15,12 @@ import {
 import { StackPageHeader } from "@/components/layout/stack-page-chrome";
 import { useScreenTitleCollapse } from "@/components/layout/screen-title-collapse";
 import {
+  accountDetailsHeaderRegionContentClassName,
   accountDetailsHeaderRegionPaintClassName,
   accountDetailsHeaderRegionShellClassName,
 } from "@/lib/layout/account-details-chrome";
-import { pullToRefreshCounterTransformStyle } from "@/lib/layout/pull-to-refresh";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
-import { usePullToRefreshVisual } from "@/providers/pull-to-refresh-visual-provider";
 
 export {
   ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX,
@@ -74,27 +73,25 @@ export function AccountDetailsContentHeader(
   return <AccountDetailsSummary {...props} />;
 }
 
-/** Card-surface hero for account title; paint-only chrome + PTR counter-transform. */
+/** Card-surface hero for account title; paint-only chrome moves with PTR content. */
 export function AccountDetailsHeaderRegion({
   children,
 }: {
   children: ReactNode;
 }) {
   const collapsed = useScreenTitleCollapse()?.titleCollapsed ?? false;
-  const { offset, isAnimating } = usePullToRefreshVisual();
 
   return (
-    <div
-      className={accountDetailsHeaderRegionShellClassName()}
-      style={pullToRefreshCounterTransformStyle(offset, isAnimating)}
-    >
+    <div className={accountDetailsHeaderRegionShellClassName()}>
       {!collapsed ? (
         <div
           aria-hidden
           className={accountDetailsHeaderRegionPaintClassName()}
         />
       ) : null}
-      <div className="relative">{children}</div>
+      <div className={accountDetailsHeaderRegionContentClassName()}>
+        {children}
+      </div>
     </div>
   );
 }

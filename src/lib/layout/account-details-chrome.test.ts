@@ -5,8 +5,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
-  ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS,
+  ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS,
+  ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
+  ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX,
+  accountDetailsHeaderRegionContentClassName,
   accountDetailsHeaderRegionPaintClassName,
   accountDetailsHeaderRegionShellClassName,
 } from "@/lib/layout/account-details-chrome";
@@ -14,7 +17,7 @@ import {
   BOTTOM_SHEET_BOTTOM_RADIUS_CLASS,
   BOTTOM_SHEET_TOP_RADIUS_PX,
 } from "@/lib/layout/bottom-sheet";
-import { pullToRefreshCounterTransformStyle } from "@/lib/layout/pull-to-refresh";
+import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 
 describe("account details header region", () => {
   it("reuses bottom sheet radius token for bottom corners", () => {
@@ -27,24 +30,36 @@ describe("account details header region", () => {
     );
   });
 
-  it("uses paint-only visual inset without layout padding", () => {
+  it("uses paint-only chrome with extended top reach for PTR", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX).toBe(24);
-    expect(ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS).toBe(
-      "-top-6 -bottom-6",
+    expect(PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX).toBe(88);
+    expect(ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS).toBe(
+      "-top-[calc(88px+24px)]",
     );
     expect(accountDetailsHeaderRegionShellClassName()).not.toContain("py-6");
     expect(accountDetailsHeaderRegionPaintClassName()).toContain("absolute");
     expect(accountDetailsHeaderRegionPaintClassName()).toContain("bg-card");
     expect(accountDetailsHeaderRegionPaintClassName()).toContain(
-      ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS,
+      ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
     );
+  });
+
+  it("adds 16px internal top padding and 24px gap to the balance card", () => {
+    expect(ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS).toBe(
+      "pt-4",
+    );
+    expect(accountDetailsHeaderRegionContentClassName()).toContain("pt-4");
+    expect(ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS).toBe(
+      "mb-6",
+    );
+    expect(accountDetailsHeaderRegionShellClassName()).toContain("mb-6");
   });
 
   it("sits flush below the page header via shell negative margin", () => {
     expect(accountDetailsHeaderRegionShellClassName()).toContain("-mt-4");
   });
 
-  it("applies PTR counter-transform on the hero shell", () => {
+  it("moves with PTR content and does not use counter-transform or bridge", () => {
     const chrome = fs.readFileSync(
       path.join(
         process.cwd(),
@@ -55,11 +70,9 @@ describe("account details header region", () => {
 
     expect(chrome).not.toContain("AccountDetailsHeaderPullBridge");
     expect(chrome).not.toContain("z-[35]");
-    expect(chrome).toContain("pullToRefreshCounterTransformStyle");
-    expect(chrome).toContain("usePullToRefreshVisual");
-
-    const counter = pullToRefreshCounterTransformStyle(40, false);
-    expect(counter?.transform).toBe("translate3d(0, -40px, 0)");
+    expect(chrome).not.toContain("pullToRefreshCounterTransformStyle");
+    expect(chrome).not.toContain("usePullToRefreshVisual");
+    expect(chrome).not.toContain("fixed");
   });
 
   it("preserves collapse wiring in account details chrome", () => {

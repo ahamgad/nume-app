@@ -818,7 +818,7 @@ No screen-level background overrides for these elements.
 
 ### Account details header hero
 
-`AccountDetailsHeaderRegion` wraps the content header only. Title section sits flush below the page header (`-mt-4` offsets `ScreenBody` top padding). Card surface styling uses a **paint-only** absolute layer (`24px` visual inset, bottom radius via `BOTTOM_SHEET_BOTTOM_RADIUS_CLASS`) — not in-flow padding. During pull-to-refresh, the region applies a **counter-transform** (`translateY(-offset)`) so it stays visually connected to the fixed header; PTR gesture logic is unchanged. `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
+`AccountDetailsHeaderRegion` wraps the content header only. Title section sits flush below the page header (`-mt-4` offsets `ScreenBody` top padding), with **16px** additional in-flow top padding (`pt-4`) and **24px** layout gap to the balance card (`mb-6`). Card surface styling uses a **paint-only** absolute layer (top extension = max PTR offset + 24px visual inset, bottom radius via `BOTTOM_SHEET_BOTTOM_RADIUS_CLASS`) so the hero moves with PTR content while card chrome still reaches the fixed header. PTR gesture logic is unchanged. `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
 
 ---
 
