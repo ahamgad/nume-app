@@ -34,6 +34,9 @@ export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX = 24;
 /** Additional in-flow top padding inside the title section (16px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS = "pt-4";
 
+/** In-flow bottom padding inside the title section (24px). */
+export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-6";
+
 /** Layout gap between title section and balance card (24px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS = "mb-6";
 
@@ -66,5 +69,9 @@ export function accountDetailsHeaderRegionPaintClassName(): string {
 }
 
 export function accountDetailsHeaderRegionContentClassName(): string {
-  return cn("relative", ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS);
+  return cn(
+    "relative",
+    ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS,
+    ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS,
+  );
 }

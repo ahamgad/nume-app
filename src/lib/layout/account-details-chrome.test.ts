@@ -44,11 +44,15 @@ describe("account details header region", () => {
     );
   });
 
-  it("adds 16px internal top padding and 24px gap to the balance card", () => {
+  it("adds 16px internal top padding and 24px bottom padding in the title section", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS).toBe(
       "pt-4",
     );
     expect(accountDetailsHeaderRegionContentClassName()).toContain("pt-4");
+    expect(accountDetailsHeaderRegionContentClassName()).toContain("pb-6");
+  });
+
+  it("keeps 24px layout gap to the balance card on the title shell", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS).toBe(
       "mb-6",
     );
