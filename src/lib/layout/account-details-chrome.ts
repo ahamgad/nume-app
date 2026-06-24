@@ -12,6 +12,19 @@ export const ACCOUNT_DETAILS_RECORDS_SECTION_PADDING_CLASS = "px-4 pt-4 pb-2";
 /** 8px field row rhythm — Recent Records and Settings toggles. */
 export const ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS = "py-2 first:pt-0 last:pb-0";
 
+/** Recent Records list wrapper — no extra row padding; dividers handle rhythm. */
+export const ACCOUNT_DETAILS_RECORDS_LIST_WRAPPER_CLASS =
+  "py-0 first:pt-0 last:pb-0";
+
+/** 8px above and below record dividers in Recent Records. */
+export const ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS = "my-2";
+
+/** Records history — 24px between hero, chips, and list blocks. */
+export const ACCOUNT_RECORDS_HISTORY_SECTION_GAP_CLASS = "mb-6";
+
+/** Records history — 8px between record cards. */
+export const ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS = "gap-2";
+
 /** Toggle label — matches Savings Daily Interest toggles (13px medium). */
 export const ACCOUNT_DETAILS_TOGGLE_LABEL_CLASS =
   "text-[0.8125rem] font-medium leading-none text-foreground";

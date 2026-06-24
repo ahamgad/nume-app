@@ -14,6 +14,38 @@ import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
 import { getBalanceDisplayProps } from "@/lib/finance/balance-display";
 import { cn } from "@/lib/utils";
 
+/** Full-width bordered form section action — Add Tier, View all, etc. */
+export const FORM_SECTION_ACTION_BUTTON_CLASS =
+  "inline-flex h-11 w-full items-center justify-center gap-1 rounded-md border border-border bg-background px-1 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50";
+
+interface FormSectionActionButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  icon?: ReactNode;
+  className?: string;
+}
+
+export function FormSectionActionButton({
+  label,
+  onClick,
+  disabled,
+  icon,
+  className,
+}: FormSectionActionButtonProps) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(FORM_SECTION_ACTION_BUTTON_CLASS, className)}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+}
+
 interface WidgetCardProps {
   children: ReactNode;
   className?: string;

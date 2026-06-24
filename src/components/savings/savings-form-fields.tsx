@@ -12,6 +12,7 @@ import {
   type ScrollChipOption,
 } from "@/components/forms/account-form-section";
 import { SCREEN_HEADER_ACTION_ICON_CLASS } from "@/components/layout/screen-header";
+import { FormSectionActionButton } from "@/components/patterns";
 import { Switch } from "@/components/ui/switch";
 import type { SavingsFormValues } from "@/lib/savings/form";
 import { POSTING_DAY_FORM_LAST } from "@/lib/savings/posting-schedule";
@@ -32,9 +33,6 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
 import { Plus, Trash2 } from "lucide-react";
-
-/** Matches `FormSection` / Add Record field stack spacing (`space-y-5`). */
-const SAVINGS_FORM_STACK_GAP_CLASS = "mt-5";
 
 /** Tiered interest vertical rhythm — 16px (`p-4` / `gap-4` / `mb-4`). */
 const SAVINGS_TIER_GAP_CLASS = "gap-4";
@@ -113,18 +111,12 @@ function SavingsAddTierButton({
   onClick,
 }: SavingsAddTierButtonProps) {
   return (
-    <button
-      type="button"
+    <FormSectionActionButton
+      label={label}
       disabled={disabled}
       onClick={onClick}
-      className={cn(
-        "inline-flex h-11 w-full items-center justify-center gap-1 rounded-md border border-border bg-background px-1 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50",
-        SAVINGS_FORM_STACK_GAP_CLASS,
-      )}
-    >
-      <Plus className={cn(SCREEN_HEADER_ACTION_ICON_CLASS, "shrink-0")} />
-      <span>{label}</span>
-    </button>
+      icon={<Plus className={cn(SCREEN_HEADER_ACTION_ICON_CLASS, "shrink-0")} />}
+    />
   );
 }
 

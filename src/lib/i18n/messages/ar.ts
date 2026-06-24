@@ -387,6 +387,10 @@ export const ar = {
         thisMonth: "هذا الشهر",
         lastMonth: "الشهر الماضي",
       },
+      empty: {
+        title: "لا توجد سجلات هذا الشهر",
+        description: "جرّب شهرًا آخر أو أضف سجلًا إلى هذا الحساب.",
+      },
     },
     validation: {
       nameRequired: "اسم الحساب مطلوب",

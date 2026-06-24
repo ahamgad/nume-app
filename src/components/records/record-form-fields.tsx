@@ -217,9 +217,9 @@ export function RecordFormFields({
         </p>
       ) : null}
 
-      {preview && parsedAmount !== null && type !== "transfer" ? (
+      {preview && parsedAmount !== null && type === "adjustment" ? (
         <div className="space-y-1">
-          {type === "adjustment" && preview.current !== undefined ? (
+          {preview.current !== undefined ? (
             <>
               <div className="flex items-baseline justify-between gap-3 text-[0.8125rem] text-muted-foreground">
                 <span>{t("records.preview.currentBalance")}</span>

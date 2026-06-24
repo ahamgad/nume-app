@@ -49,9 +49,26 @@ describe("account records history foundation", () => {
     );
 
     expect(source).toContain("AccountDetailsStackHeader");
+    expect(source).toContain("AccountDetailsHeaderRegion");
+    expect(source).toContain("AccountDetailsContentHeader");
     expect(source).toContain("ScrollChipSelect");
     expect(source).toContain("CARD_SURFACE_CLASS");
     expect(source).toContain("RecordRow");
+    expect(source).toContain("EmptyState");
+    expect(source).toContain("ACCOUNT_RECORDS_HISTORY_SECTION_GAP_CLASS");
+    expect(source).toContain("ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS");
     expect(source).toContain('accounts.recordsHistory.filters.thisMonth');
+    expect(source).toContain("onRefresh={refresh}");
+  });
+
+  it("removes new balance preview from income and expense forms only", () => {
+    const source = fs.readFileSync(
+      path.join(process.cwd(), "src/components/records/record-form-fields.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain('type === "adjustment"');
+    expect(source).toContain("records.preview.newBalance");
+    expect(source).not.toContain('type !== "transfer"');
   });
 });

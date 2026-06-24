@@ -4,14 +4,18 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 import { AccountDetailsSection } from "@/components/accounts/account-details-section";
-import { ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS } from "@/lib/layout/account-details-chrome";
-import { RecordRow } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
+import {
+  ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS,
+  ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS,
+  ACCOUNT_DETAILS_RECORDS_LIST_WRAPPER_CLASS,
+} from "@/lib/layout/account-details-chrome";
+import { FormSectionActionButton, RecordRow } from "@/components/patterns";
 import {
   ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT,
   shouldShowRecentRecordsSection,
 } from "@/lib/finance/recent-records-display";
 import type { FinanceRecord } from "@/lib/finance/types";
+import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
 interface RecentRecordsSectionProps {
@@ -51,7 +55,11 @@ export function RecentRecordsSection({
   return (
     <AccountDetailsSection
       title={t("accounts.details.records.title")}
-      fieldRowClassName={ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS}
+      fieldRowClassName={
+        totalRecordCount === 0
+          ? ACCOUNT_DETAILS_COMPACT_FIELD_ROW_CLASS
+          : ACCOUNT_DETAILS_RECORDS_LIST_WRAPPER_CLASS
+      }
     >
       {totalRecordCount === 0 ? (
         <div>
@@ -63,30 +71,38 @@ export function RecentRecordsSection({
           </p>
         </div>
       ) : (
-        <>
-          {records.map((record) => (
-            <RecordRow
-              key={record.id}
-              className="min-h-0 py-0"
-              label={recordLabel(record)}
-              amount={recordAmount(record)}
-              formatLocale={formatLocale}
-              meta={recordMeta(record)}
-              icon={recordIcon(record)}
-              onClick={onRecordClick ? () => onRecordClick(record) : undefined}
-            />
+        <div>
+          {records.map((record, index) => (
+            <div key={record.id}>
+              {index > 0 ? (
+                <div
+                  role="separator"
+                  aria-hidden
+                  className={cn(
+                    "border-t border-border",
+                    ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS,
+                  )}
+                />
+              ) : null}
+              <RecordRow
+                className="min-h-0 py-0"
+                label={recordLabel(record)}
+                amount={recordAmount(record)}
+                formatLocale={formatLocale}
+                meta={recordMeta(record)}
+                icon={recordIcon(record)}
+                onClick={onRecordClick ? () => onRecordClick(record) : undefined}
+              />
+            </div>
           ))}
           {showViewAll ? (
-            <Button
-              type="button"
-              variant="secondary"
-              className="mt-2 w-full"
+            <FormSectionActionButton
+              className="mt-2"
+              label={t("accounts.details.records.viewAll")}
               onClick={() => router.push(`/accounts/${accountId}/records`)}
-            >
-              {t("accounts.details.records.viewAll")}
-            </Button>
+            />
           ) : null}
-        </>
+        </div>
       )}
     </AccountDetailsSection>
   );

@@ -388,6 +388,10 @@ export const en = {
         thisMonth: "This month",
         lastMonth: "Last month",
       },
+      empty: {
+        title: "No records this month",
+        description: "Try another month or add a record to this account.",
+      },
     },
     validation: {
       nameRequired: "Account name is required",
