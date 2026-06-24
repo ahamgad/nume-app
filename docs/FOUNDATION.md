@@ -569,7 +569,7 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 | Rule | Token | Value |
 |---|---|---|
 | Category label → first card | `ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX` | 16px |
-| Card → card (same category) | `ACCOUNT_CARD_GAP_PX` | 16px |
+| Card → card (same category) | `ACCOUNT_CARD_GAP_PX` | 8px |
 | Last card → next category label | `ACCOUNT_CARD_CATEGORY_GAP_PX` | 24px |
 | Card internal padding | `ACCOUNT_CARD_PADDING_PX` | 16px |
 | Logo → text block | `ACCOUNT_CARD_LOGO_TEXT_GAP_PX` | 8px |
@@ -578,11 +578,10 @@ Location: `components/accounts/account-card.tsx`, `components/accounts/account-c
 ### Layout rules
 
 1. Logo **45×45** — existing institution logo / fallback behavior unchanged
-2. Top row — `[Logo] Account Name` + trailing balance + chevron on one line; name **15px medium**, truncated
-3. Balance — same typography as type row (**13px regular**, muted); placed before chevron with **8px** gap
-4. Second row — **13px regular** — localized account type · last-4 via `formatAccountCardInstituteRow`
-5. **No internal dividers** — single content block per card
-6. **No balance label** — amount only, no `accounts.sections.balance` row
+2. Top row — `[Logo] Account Type · Last-4` + trailing balance (right-aligned); balance uses type-row typography
+3. Second row — account name (**15px medium**)
+4. **No internal dividers** — single content block per card
+5. **No balance label** — amount only
 7. Corner radius — `CARD_SURFACE_BORDER_RADIUS_CLASS` (`rounded-2xl` / 16px) on card container
 8. Border — `CARD_SURFACE_BORDER_CLASS` via shared card-surface tokens; light theme `#EFEFEF` via `--border`
 9. Background — `bg-card`; light theme `#FFFFFF` via `--card`
@@ -775,7 +774,7 @@ Location: `src/app/globals.css`, `components/layout/screen-header.tsx` (`ScreenB
 
 ### Global bottom padding
 
-All `ScreenBody` scroll containers reserve **tab bar height** (`TAB_BAR_HEIGHT_CLASS` = `3.5rem`) plus safe area via `TAB_BAR_SCROLL_PADDING` / `STACK_SCREEN_BOTTOM_PADDING` from `getScreenBodyScrollPadding`. Content must never sit under the fixed tab bar.
+All `ScreenBody` scroll containers with a tab bar or sticky footer reserve **two tab bar heights** (`7rem` / `9rem` sticky) plus safe area via `getScreenBodyScrollPadding`. Stack screens without either keep a single tab-bar-height inset.
 
 ### Global pull-to-refresh
 
@@ -784,6 +783,21 @@ All `ScreenBody` scroll containers reserve **tab bar height** (`TAB_BAR_HEIGHT_C
 ### Tab bar container padding
 
 `TabBar` inner grid uses **4px** horizontal padding (`px-1`) on the container only. Tab item spacing is unchanged.
+
+### Chips foundation
+
+Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`.
+
+| Context | `chipSurface` | Active chip background |
+|---|---|---|
+| App / sheet background | `canvas` (default) | Card surface (`bg-card`) |
+| Inside a card | `card` | Screen background (`bg-background`) |
+
+`AccountFormScrollChipSelect` sets `chipSurface="card"` automatically.
+
+### Account details header hero
+
+`AccountDetailsHeaderRegion` wraps the content header + first balance section. At scroll top: card-surface background, `rounded-b-2xl`, **24px** bottom padding. When the large title collapses, the treatment is removed.
 
 ---
 

@@ -1,16 +1,16 @@
 /**
  * Shared screen layout spacing (NUME v1).
  *
- * Scroll containers reserve the tab bar height so content never sits under the
- * fixed tab bar. Stack screens use the same inset when the tab bar is hidden.
+ * Tab-root screens reserve double the tab bar height when a tab bar or sticky
+ * footer is present. Stack screens without either keep a single inset.
  */
 
 /** Matches TabBar `h-14` (3.5rem). */
 export const TAB_BAR_HEIGHT_CLASS = "3.5rem";
 
-/** Tab-root scroll padding — tab bar height + safe area. */
+/** Tab-root scroll padding — double tab bar height + safe area. */
 export const TAB_BAR_SCROLL_PADDING =
-  "pb-[calc(3.5rem+env(safe-area-inset-bottom))]";
+  "pb-[calc(7rem+env(safe-area-inset-bottom))]";
 
 /** @deprecated Use {@link TAB_BAR_SCROLL_PADDING}. */
 export const TAB_SCREEN_BOTTOM_PADDING = TAB_BAR_SCROLL_PADDING;
@@ -21,11 +21,11 @@ export const STACK_SCREEN_BOTTOM_PADDING =
 
 /** Bottom inset when a sticky footer action bar is present (no tab bar). */
 export const STICKY_FOOTER_BOTTOM_PADDING =
-  "pb-[calc(5.5rem+env(safe-area-inset-bottom))]";
+  "pb-[calc(9rem+env(safe-area-inset-bottom))]";
 
 /** Sticky footer + fixed tab bar. */
 export const STICKY_FOOTER_TAB_BAR_PADDING =
-  "pb-[calc(9rem+env(safe-area-inset-bottom))]";
+  "pb-[calc(12.5rem+env(safe-area-inset-bottom))]";
 
 /** Stack header horizontal padding (16px). */
 export const SCREEN_HEADER_HORIZONTAL_PADDING_CLASS = "px-4";

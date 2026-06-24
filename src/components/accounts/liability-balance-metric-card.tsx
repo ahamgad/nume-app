@@ -24,6 +24,7 @@ interface LiabilityBalanceMetricCardProps {
   meta?: string;
   footer?: ReactNode;
   editable?: boolean;
+  embedded?: boolean;
   onBalanceSave?: (outstandingBalance: number) => Promise<void>;
 }
 
@@ -33,6 +34,7 @@ export function LiabilityBalanceMetricCard({
   meta,
   footer,
   editable = false,
+  embedded = false,
   onBalanceSave,
 }: LiabilityBalanceMetricCardProps) {
   const t = useT();
@@ -73,6 +75,7 @@ export function LiabilityBalanceMetricCard({
       locale={formatLocale}
       meta={meta}
       footer={footer}
+      embedded={embedded}
       amountAction={
         canEdit ? (
           <IconButton

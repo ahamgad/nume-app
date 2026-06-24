@@ -13,6 +13,8 @@ import {
   type AccountDetailsSummaryProps,
 } from "@/components/accounts/account-details-summary";
 import { StackPageHeader } from "@/components/layout/stack-page-chrome";
+import { useScreenTitleCollapse } from "@/components/layout/screen-title-collapse";
+import { accountDetailsHeaderRegionClassName } from "@/lib/layout/account-details-chrome";
 
 export {
   ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX,
@@ -56,4 +58,19 @@ export function AccountDetailsContentHeader(
   props: AccountDetailsSummaryProps,
 ) {
   return <AccountDetailsSummary {...props} />;
+}
+
+/** Card-surface hero for account title + first balance section; collapses on scroll. */
+export function AccountDetailsHeaderRegion({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const collapsed = useScreenTitleCollapse()?.titleCollapsed ?? false;
+
+  return (
+    <div className={accountDetailsHeaderRegionClassName(collapsed)}>
+      {children}
+    </div>
+  );
 }

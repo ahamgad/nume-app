@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import {
   AccountDetailsContentHeader,
+  AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
   AccountDetailsDetailRow,
   AccountDetailsSection,
@@ -191,24 +192,27 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsContentHeader
-          accountName={account.name}
-          institution={account.institution}
-          institutionSubtitle={headerSubtitle}
-          accountType={account.type}
-        />
+        <AccountDetailsHeaderRegion>
+          <AccountDetailsContentHeader
+            accountName={account.name}
+            institution={account.institution}
+            institutionSubtitle={headerSubtitle}
+            accountType={account.type}
+          />
 
-        <BalanceMetricCard
-          account={account}
-          label={t("accounts.details.currentBalance")}
-          meta={t("dashboard.netWorth.updated", {
-            time: formatRelativeTime(account.updatedAt, t, formatLocale),
-          })}
-          editable={!isArchived}
-          onBalanceSave={async (balance) => {
-            await updateAccount(account.id, { currentBalance: balance });
-          }}
-        />
+          <BalanceMetricCard
+            account={account}
+            label={t("accounts.details.currentBalance")}
+            meta={t("dashboard.netWorth.updated", {
+              time: formatRelativeTime(account.updatedAt, t, formatLocale),
+            })}
+            editable={!isArchived}
+            embedded
+            onBalanceSave={async (balance) => {
+              await updateAccount(account.id, { currentBalance: balance });
+            }}
+          />
+        </AccountDetailsHeaderRegion>
 
         <AccountDetailsSection title={t("savings.details.summary")}>
           <AccountDetailsDetailRow

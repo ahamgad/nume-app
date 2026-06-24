@@ -5,7 +5,7 @@ import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 export const ACCOUNT_CARD_CATEGORY_TO_FIRST_GAP_PX = 16;
 
 /** Account card → next account card within a category (px). */
-export const ACCOUNT_CARD_GAP_PX = 16;
+export const ACCOUNT_CARD_GAP_PX = 8;
 
 /** Last card in category → next category label (px). */
 export const ACCOUNT_CARD_CATEGORY_GAP_PX = 24;

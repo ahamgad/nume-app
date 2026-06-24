@@ -5,6 +5,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 import { InputField } from "@/components/forms/input-field";
+import {
+  chipButtonClassName,
+  type ChipSurface,
+} from "@/lib/layout/chip-chrome";
 
 export interface ScrollChipOption<T extends string | number> {
   value: T;
@@ -32,6 +36,8 @@ interface ScrollChipSelectProps<T extends string | number> {
   defaultToFirstOption?: boolean;
   /** Primary chips for high-emphasis decisions (e.g. Add Account type). */
   emphasis?: "primary" | "secondary";
+  /** Canvas = on screen/sheet background; card = inside a card surface. */
+  chipSurface?: ChipSurface;
 }
 
 /** Shared rule for horizontal chip selectors — first enabled chip wins when unset. */
@@ -63,6 +69,7 @@ export function ScrollChipSelect<T extends string | number>({
   className,
   defaultToFirstOption = true,
   emphasis = "secondary",
+  chipSurface = "canvas",
 }: ScrollChipSelectProps<T>) {
   const onChangeRef = useRef(onChange);
 
@@ -104,15 +111,11 @@ export function ScrollChipSelect<T extends string | number>({
               if (!disabled) onChange(option.value);
             }}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               emphasis === "primary"
                 ? selected
                   ? "border-foreground bg-foreground text-background"
                   : "border-border bg-background text-foreground"
-                : selected
-                  ? "border-foreground/25 bg-muted text-foreground"
-                  : "border-border bg-background text-foreground",
-              disabled && "cursor-not-allowed opacity-45",
+                : chipButtonClassName(chipSurface, selected, disabled),
             )}
           >
             {option.icon}

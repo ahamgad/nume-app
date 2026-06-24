@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 
 import {
   AccountDetailsContentHeader,
+  AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
   AccountDetailsDetailRow,
   AccountDetailsSection,
@@ -214,21 +215,24 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsContentHeader
-          accountName={account.name}
-          institution={account.institution}
-          institutionSubtitle={headerSubtitle}
-          accountType={account.type}
-        />
+        <AccountDetailsHeaderRegion>
+          <AccountDetailsContentHeader
+            accountName={account.name}
+            institution={account.institution}
+            institutionSubtitle={headerSubtitle}
+            accountType={account.type}
+          />
 
-        <AccountDetailsBalanceCard
-          label={t("certificates.fields.principal.label")}
-          amount={certificate.principalAmount}
-          locale={formatLocale}
-          meta={t("dashboard.netWorth.updated", {
-            time: formatRelativeTime(account.updatedAt, t, formatLocale),
-          })}
-        />
+          <AccountDetailsBalanceCard
+            label={t("certificates.fields.principal.label")}
+            amount={certificate.principalAmount}
+            locale={formatLocale}
+            embedded
+            meta={t("dashboard.netWorth.updated", {
+              time: formatRelativeTime(account.updatedAt, t, formatLocale),
+            })}
+          />
+        </AccountDetailsHeaderRegion>
 
         {canProcessInterest ? (
           <Button

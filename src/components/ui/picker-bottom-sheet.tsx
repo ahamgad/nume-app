@@ -19,6 +19,7 @@ import {
   PICKER_SHEET_MAX_HEIGHT,
   PICKER_SHEET_MIN_HEIGHT,
 } from "@/lib/layout/picker-sheet";
+import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 import { useModalLayerLock } from "@/providers/modal-layer-provider";
@@ -137,6 +138,7 @@ export function PickerBottomSheet({
                 onFocus={handleSearchFocus}
                 placeholder={search.placeholder}
                 autoComplete="off"
+                className={CARD_SURFACE_BG_CLASS}
               />
             </div>
           ) : null}

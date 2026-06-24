@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import {
   AccountDetailsContentHeader,
+  AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
   AccountDetailsDetailRow,
   AccountDetailsSection,
@@ -186,24 +187,27 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         }
       />
       <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
-        <AccountDetailsContentHeader
-          accountName={account.name}
-          institution={account.institution}
-          institutionSubtitle={headerSubtitle}
-          accountType={account.type}
-        />
+        <AccountDetailsHeaderRegion>
+          <AccountDetailsContentHeader
+            accountName={account.name}
+            institution={account.institution}
+            institutionSubtitle={headerSubtitle}
+            accountType={account.type}
+          />
 
-        <LiabilityBalanceMetricCard
-          account={account}
-          label={t("creditCards.details.outstandingBalance")}
-          meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
-          editable={!isArchived}
-          onBalanceSave={async (outstandingBalance) => {
-            await updateAccount(account.id, {
-              currentBalance: toStoredCreditCardBalance(outstandingBalance),
-            });
-          }}
-        />
+          <LiabilityBalanceMetricCard
+            account={account}
+            label={t("creditCards.details.outstandingBalance")}
+            meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
+            editable={!isArchived}
+            embedded
+            onBalanceSave={async (outstandingBalance) => {
+              await updateAccount(account.id, {
+                currentBalance: toStoredCreditCardBalance(outstandingBalance),
+              });
+            }}
+          />
+        </AccountDetailsHeaderRegion>
 
         <AccountDetailsSection title={t("creditCards.details.summary")}>
           <AccountDetailsDetailRow

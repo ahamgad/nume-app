@@ -28,9 +28,8 @@ describe("card chevron foundation", () => {
       "utf8",
     );
 
-    expect(accountCard).toContain("CardChevron");
+    expect(accountCard).not.toContain("CardChevron");
     expect(typePickerCard).toContain("CardChevron");
-    expect(accountCard).not.toContain('className="size-5 shrink-0 text-muted-foreground');
     expect(typePickerCard).not.toContain("ChevronRight");
   });
 });

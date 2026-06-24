@@ -189,6 +189,7 @@ export function AccountFormScrollChipSelect<T extends string | number>({
     <ScrollChipSelect
       fieldId={fieldId}
       required={resolvedRequired}
+      chipSurface="card"
       {...props}
     />
   );

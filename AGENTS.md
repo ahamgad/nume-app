@@ -28,6 +28,7 @@ All new screens, flows, modules, account types, dialogs, bottom sheets, pickers,
 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` — dedicated cards; inherits `CardChevron` |
 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — 16px radius, border, no shadow — `lib/layout/card-surface.ts` |
 | **Screen canvas** | `bg-background` (`#F7F7F7` light) — `globals.css`; `ScreenBody` bottom padding + pull-to-refresh |
+| **Chips** | `ScrollChipSelect` + `chip-chrome.ts` — active background follows canvas vs card surface |
 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormEditableField` — unified 16px section padding, title inside container, 16px title/field/divider rhythm |
 | **Input fields** | `InputField`, `AccountForm*` wrappers — validation-driven `*` via `account-form-required.ts` (identifiers optional; explicit `required={true}` ignored), in-flow errors, EGP/% affixes |
 

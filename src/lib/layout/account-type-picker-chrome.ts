@@ -11,4 +11,4 @@ export const ACCOUNT_TYPE_PICKER_CATEGORY_GAP_PX = 16;
 export const ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX = 40;
 
 /** Account type icon size inside the frame (px). */
-export const ACCOUNT_TYPE_PICKER_ICON_SIZE_PX = 28;
+export const ACCOUNT_TYPE_PICKER_ICON_SIZE_PX = 24;

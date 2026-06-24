@@ -16,6 +16,8 @@ interface AccountDetailsBalanceCardProps {
   meta?: string;
   amountAction?: ReactNode;
   footer?: ReactNode;
+  /** When true, omits the nested card shell inside the header hero region. */
+  embedded?: boolean;
 }
 
 /**
@@ -29,11 +31,12 @@ export function AccountDetailsBalanceCard({
   meta,
   amountAction,
   footer,
+  embedded = false,
 }: AccountDetailsBalanceCardProps) {
   const balanceDisplay = getBalanceDisplayProps();
 
-  return (
-    <WidgetCard elevated paddingClass={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>
+  const content = (
+    <>
       <MetricHero
         label={label}
         amount={amount}
@@ -45,6 +48,18 @@ export function AccountDetailsBalanceCard({
         amountAction={amountAction}
       />
       {footer}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>{content}</div>
+    );
+  }
+
+  return (
+    <WidgetCard elevated paddingClass={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>
+      {content}
     </WidgetCard>
   );
 }

@@ -51,7 +51,7 @@ export function AccountTypePickerCard({
           height: ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX,
         }}
       >
-        <AccountTypeIcon type={type} className="size-7" />
+        <AccountTypeIcon type={type} className="size-6" />
       </span>
       <div className={cn(CARD_CHEVRON_ROW_CLASS, "min-w-0 flex-1")}>
         <span className={cn(ACCOUNT_CARD_NAME_CLASS, "min-w-0 flex-1")}>

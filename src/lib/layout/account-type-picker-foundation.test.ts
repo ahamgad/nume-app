@@ -33,7 +33,7 @@ describe("account type picker sheet foundation", () => {
     expect(ACCOUNT_TYPE_PICKER_CARD_GAP_PX).toBe(8);
     expect(ACCOUNT_TYPE_PICKER_CATEGORY_GAP_PX).toBe(16);
     expect(ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX).toBe(40);
-    expect(ACCOUNT_TYPE_PICKER_ICON_SIZE_PX).toBe(28);
+    expect(ACCOUNT_TYPE_PICKER_ICON_SIZE_PX).toBe(24);
 
     const cardSource = fs.readFileSync(
       path.join(
