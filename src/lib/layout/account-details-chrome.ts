@@ -34,8 +34,12 @@ export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX = 24;
 /** Additional in-flow top padding inside the title section (16px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS = "pt-4";
 
-/** In-flow bottom padding inside the title section (24px). */
-export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-6";
+/** In-flow bottom padding inside the title section (16px). */
+export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-4";
+
+/** Account details in-content title — 18px, same weight and color as large title. */
+export const ACCOUNT_DETAILS_TITLE_CLASS =
+  "text-[1.125rem] font-semibold leading-tight tracking-tight text-foreground";
 
 /** Layout gap between title section and balance card (24px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS = "mb-6";

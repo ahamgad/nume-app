@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { AddRecordActionSheet } from "@/components/accounts/add-record-action-sheet";
 import {
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
@@ -58,6 +59,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddRecordSheet, setShowAddRecordSheet] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -186,7 +188,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           !isArchived ? (
             <ScreenHeaderActionButton
               label={t("accounts.headerActions.addRecord")}
-              onClick={() => router.push(`/accounts/${account.id}/records/new`)}
+              onClick={() => setShowAddRecordSheet(true)}
             />
           ) : undefined
         }
@@ -291,6 +293,12 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         )}
 
       </ScreenBody>
+
+      <AddRecordActionSheet
+        open={showAddRecordSheet}
+        onClose={() => setShowAddRecordSheet(false)}
+        accountId={account.id}
+      />
 
       <ConfirmBottomSheet
         open={showDeleteConfirm}

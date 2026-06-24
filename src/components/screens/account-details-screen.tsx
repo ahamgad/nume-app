@@ -6,6 +6,7 @@ import { useState } from "react";
 import { CertificateDetailsScreen } from "@/components/screens/certificate-details-screen";
 import { CreditCardDetailsScreen } from "@/components/screens/credit-card-details-screen";
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
+import { AddRecordActionSheet } from "@/components/accounts/add-record-action-sheet";
 import {
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
@@ -60,6 +61,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddRecordSheet, setShowAddRecordSheet] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -183,7 +185,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           !isArchived ? (
             <ScreenHeaderActionButton
               label={t("accounts.headerActions.addRecord")}
-              onClick={() => router.push(`/accounts/${account.id}/records/new`)}
+              onClick={() => setShowAddRecordSheet(true)}
             />
           ) : undefined
         }
@@ -265,6 +267,12 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
         )}
 
       </ScreenBody>
+
+      <AddRecordActionSheet
+        open={showAddRecordSheet}
+        onClose={() => setShowAddRecordSheet(false)}
+        accountId={account.id}
+      />
 
       <ConfirmBottomSheet
         open={showDeleteConfirm}

@@ -2,6 +2,7 @@
 
 import { InstitutionBrandAsset } from "@/components/institutions/institution-brand-asset";
 import { StackPageTitle } from "@/components/layout/stack-page-chrome";
+import { ACCOUNT_DETAILS_TITLE_CLASS } from "@/lib/layout/account-details-chrome";
 import { getAccountTypeInitial } from "@/lib/finance/account-labels";
 import type { AccountType } from "@/lib/finance/types";
 import { resolveInstitutionBrandAssetProps } from "@/lib/institutions/catalog";
@@ -9,7 +10,7 @@ import { useT } from "@/providers/i18n-provider";
 import { cn } from "@/lib/utils";
 
 /** Institution logo size in the account details summary block (px). */
-export const ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX = 56;
+export const ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX = 48;
 
 export interface AccountDetailsSummaryProps {
   accountName: string;
@@ -45,7 +46,7 @@ export function AccountDetailsSummary({
         />
       ) : (
         <span
-          className="inline-flex size-14 shrink-0 items-center justify-center self-start rounded-[8px] bg-muted text-base font-semibold text-muted-foreground"
+          className="inline-flex size-12 shrink-0 items-center justify-center self-start rounded-[8px] bg-muted text-base font-semibold text-muted-foreground"
           aria-hidden
         >
           {getAccountTypeInitial(accountType, t)}
@@ -57,7 +58,9 @@ export function AccountDetailsSummary({
             {institutionSubtitle}
           </p>
         ) : null}
-        <StackPageTitle className="mb-0 truncate">{accountName}</StackPageTitle>
+        <StackPageTitle className={cn("mb-0 truncate", ACCOUNT_DETAILS_TITLE_CLASS)}>
+          {accountName}
+        </StackPageTitle>
       </div>
     </div>
   );

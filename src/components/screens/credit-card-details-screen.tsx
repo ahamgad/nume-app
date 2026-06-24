@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { AddActivityActionSheet } from "@/components/accounts/add-activity-action-sheet";
 import {
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
@@ -63,6 +64,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddActivitySheet, setShowAddActivitySheet] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -181,7 +183,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           !isArchived ? (
             <ScreenHeaderActionButton
               label={t("accounts.headerActions.addActivity")}
-              onClick={() => router.push(`/accounts/${account.id}/activity/new`)}
+              onClick={() => setShowAddActivitySheet(true)}
             />
           ) : undefined
         }
@@ -262,6 +264,12 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           />
         )}
       </ScreenBody>
+
+      <AddActivityActionSheet
+        open={showAddActivitySheet}
+        onClose={() => setShowAddActivitySheet(false)}
+        accountId={account.id}
+      />
 
       <ConfirmBottomSheet
         open={showDeleteConfirm}

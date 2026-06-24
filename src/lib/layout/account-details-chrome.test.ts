@@ -9,6 +9,7 @@ import {
   ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX,
+  ACCOUNT_DETAILS_TITLE_CLASS,
   accountDetailsHeaderRegionContentClassName,
   accountDetailsHeaderRegionPaintClassName,
   accountDetailsHeaderRegionShellClassName,
@@ -44,12 +45,29 @@ describe("account details header region", () => {
     );
   });
 
-  it("adds 16px internal top padding and 24px bottom padding in the title section", () => {
+  it("uses 18px account details title typography", () => {
+    expect(ACCOUNT_DETAILS_TITLE_CLASS).toContain("text-[1.125rem]");
+    expect(ACCOUNT_DETAILS_TITLE_CLASS).toContain("font-semibold");
+
+    const summary = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/accounts/account-details-summary.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(summary).toContain("ACCOUNT_DETAILS_TITLE_CLASS");
+    expect(summary).toContain("ACCOUNT_DETAILS_SUMMARY_LOGO_SIZE_PX = 48");
+    expect(summary).toContain("size-12");
+  });
+
+  it("adds 16px internal top and bottom padding in the title section", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS).toBe(
       "pt-4",
     );
     expect(accountDetailsHeaderRegionContentClassName()).toContain("pt-4");
-    expect(accountDetailsHeaderRegionContentClassName()).toContain("pb-6");
+    expect(accountDetailsHeaderRegionContentClassName()).toContain("pb-4");
   });
 
   it("keeps 24px layout gap to the balance card on the title shell", () => {
