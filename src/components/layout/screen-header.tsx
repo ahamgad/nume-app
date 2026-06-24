@@ -31,6 +31,7 @@ import type { SurfaceState } from "@/lib/layout/surface-state-chrome";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
+import { PullToRefreshVisualProvider } from "@/providers/pull-to-refresh-visual-provider";
 import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 interface ScreenHeaderProps {
@@ -249,17 +250,19 @@ export function ScreenBody({
           />
         </div>
       ) : null}
-      <div
-        style={contentStyle}
-        onTransitionEnd={handleTransitionEnd}
-        className={cn(
-          "min-w-0 w-full max-w-full",
-          offset > 0 || isAnimating ? "will-change-transform" : undefined,
-          className,
-        )}
-      >
-        {children}
-      </div>
+      <PullToRefreshVisualProvider offset={offset} isAnimating={isAnimating}>
+        <div
+          style={contentStyle}
+          onTransitionEnd={handleTransitionEnd}
+          className={cn(
+            "min-w-0 w-full max-w-full",
+            offset > 0 || isAnimating ? "will-change-transform" : undefined,
+            className,
+          )}
+        >
+          {children}
+        </div>
+      </PullToRefreshVisualProvider>
     </main>
   );
 }

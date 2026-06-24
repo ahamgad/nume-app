@@ -27,21 +27,27 @@ export const ACCOUNT_DETAILS_BALANCE_META_CLASS =
 export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS =
   BOTTOM_SHEET_BOTTOM_RADIUS_CLASS;
 
-/** Hero title section vertical padding (24px top and bottom). */
-export const ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS = "py-6";
+/** Hero card visual inset (24px) — paint layer only, not layout padding. */
+export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX = 24;
+
+/** Tailwind classes for absolute paint-layer vertical inset. */
+export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS = "-top-6 -bottom-6";
 
 export function accountDetailsBalanceMetaClassName(className?: string): string {
   return cn(ACCOUNT_DETAILS_BALANCE_META_CLASS, className);
 }
 
-export function accountDetailsHeaderRegionClassName(collapsed: boolean): string {
+/** Layout shell for the account details hero — content-sized, no card padding in flow. */
+export function accountDetailsHeaderRegionShellClassName(): string {
+  return "relative -mx-4 -mt-4 px-4";
+}
+
+/** Paint-only card chrome behind hero content — does not affect layout height. */
+export function accountDetailsHeaderRegionPaintClassName(): string {
   return cn(
-    "-mx-4 -mt-4 px-4 transition-colors",
-    ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS,
-    !collapsed &&
-      cn(
-        CARD_SURFACE_BG_CLASS,
-        ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
-      ),
+    "pointer-events-none absolute inset-x-0",
+    ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_CLASS,
+    CARD_SURFACE_BG_CLASS,
+    ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
   );
 }

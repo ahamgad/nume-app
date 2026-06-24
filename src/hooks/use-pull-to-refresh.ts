@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Tran
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useConnectivity } from "@/providers/connectivity-provider";
 import { NUME_MOTION_EASE } from "@/lib/layout/motion";
-import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
+import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX, PULL_TO_REFRESH_SNAP_BACK_MS } from "@/lib/layout/pull-to-refresh";
 
 /** Visual offset required to trigger refresh after release. */
 const PULL_THRESHOLD = 56;
@@ -17,7 +17,7 @@ const MAX_OFFSET = PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX;
 const PULL_ACTIVATION = 10;
 const RESISTANCE_SCALE = 80;
 const RESISTANCE_DIM = 0.5;
-const SNAP_BACK_MS = 280;
+const SNAP_BACK_MS = PULL_TO_REFRESH_SNAP_BACK_MS;
 
 function applyResistance(rawDelta: number): number {
   if (rawDelta <= 0) return 0;
