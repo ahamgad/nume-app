@@ -21,7 +21,7 @@ describe("surface-state foundation", () => {
     expect(surfaceStateAccentBackgroundClass("card")).toBe("bg-background");
   });
 
-  it("propagates through HeaderIconButton and secondary Button", () => {
+  it("propagates through HeaderIconButton, secondary Button, and balance edit", () => {
     const headerButton = fs.readFileSync(
       path.join(process.cwd(), "src/components/layout/header-icon-button.tsx"),
       "utf8",
@@ -30,10 +30,18 @@ describe("surface-state foundation", () => {
       path.join(process.cwd(), "src/components/ui/button.tsx"),
       "utf8",
     );
+    const balanceCard = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/accounts/account-details-balance-card.tsx",
+      ),
+      "utf8",
+    );
 
     expect(headerButton).toContain("surfaceStateAccentBackgroundClass");
     expect(headerButton).toContain("useSurfaceState");
     expect(button).toContain('variant === "secondary"');
     expect(button).toContain("surfaceStateAccentBackgroundClass");
+    expect(balanceCard).toContain('SurfaceStateProvider value="card"');
   });
 });

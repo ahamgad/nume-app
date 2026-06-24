@@ -101,9 +101,17 @@ describe("balance edit icon button", () => {
       path.join(process.cwd(), "src/components/ui/icon-button.tsx"),
       "utf8",
     );
+    const balanceCard = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/accounts/account-details-balance-card.tsx",
+      ),
+      "utf8",
+    );
 
     expect(source).toContain('variant = "secondary"');
     expect(source).toContain("rounded-full");
     expect(source).toContain("icon-sm");
+    expect(balanceCard).toContain('SurfaceStateProvider value="card"');
   });
 });

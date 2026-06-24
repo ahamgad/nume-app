@@ -27,12 +27,26 @@ describe("account details header region", () => {
   it("applies 24px vertical padding when expanded", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS).toBe("py-6");
     expect(accountDetailsHeaderRegionClassName(false)).toContain("py-6");
+    expect(accountDetailsHeaderRegionClassName(true)).toContain("py-6");
   });
 
-  it("sits flush below the page header and omits padding when collapsed", () => {
+  it("sits flush below the page header and omits card chrome when collapsed", () => {
     expect(accountDetailsHeaderRegionClassName(false)).toContain("-mt-4");
-    expect(accountDetailsHeaderRegionClassName(true)).not.toContain("py-6");
     expect(accountDetailsHeaderRegionClassName(true)).not.toContain("rounded-b");
+    expect(accountDetailsHeaderRegionClassName(true)).not.toContain("bg-card");
+  });
+
+  it("fills the PTR gap with a fixed header bridge", () => {
+    const chrome = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/accounts/account-details-chrome.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(chrome).toContain("AccountDetailsHeaderPullBridge");
+    expect(chrome).toContain("PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX");
   });
 
   it("preserves collapse wiring in account details chrome", () => {

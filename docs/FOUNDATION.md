@@ -798,9 +798,9 @@ Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`. A
 
 ### Surface-state foundation
 
-Location: `lib/layout/surface-state-chrome.ts`, `providers/surface-state-provider.tsx`, `components/layout/header-icon-button.tsx`, `components/ui/button.tsx` (`variant="secondary"`), `lib/layout/chip-chrome.ts`.
+Location: `lib/layout/surface-state-chrome.ts`, `providers/surface-state-provider.tsx`, `components/layout/header-icon-button.tsx`, `components/ui/button.tsx` (`variant="secondary"`), `components/ui/icon-button.tsx` (balance edit via `AccountDetailsBalanceCard`), `lib/layout/chip-chrome.ts`.
 
-Single rule for **back button**, **close button**, **secondary buttons**, and **active chips**:
+Single rule for **back button**, **close button**, **secondary buttons**, **balance edit icon**, and **active chips**:
 
 | Placement | `SurfaceState` | Accent background |
 |---|---|---|
@@ -812,12 +812,13 @@ Single rule for **back button**, **close button**, **secondary buttons**, and **
 - `ScreenHeader` / `StackPageHeader` accept `surfaceState` (e.g. `AccountDetailsStackHeader` passes `card` when the header uses card surface at scroll top).
 - `AccountFormSection`, `AccountDetailsSection`, and other card containers wrap content in `SurfaceStateProvider value="card"`.
 - `ScrollChipSelect` uses `chipSurface`; `HeaderIconButton` and `Button variant="secondary"` read `useSurfaceState()`.
+- Balance edit actions use `IconButton` (`variant="secondary"`) inside `AccountDetailsBalanceCard`, which provides `SurfaceStateProvider value="card"`.
 
 No screen-level background overrides for these elements.
 
 ### Account details header hero
 
-`AccountDetailsHeaderRegion` wraps the content header only. Title section sits flush below the page header (`-mt-4` offsets `ScreenBody` top padding), uses **24px** top/bottom padding when expanded, and **bottom corner radius** reuses `BOTTOM_SHEET_BOTTOM_RADIUS_CLASS` (36px — same token as bottom sheets). `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
+`AccountDetailsHeaderRegion` wraps the content header only. Title section sits flush below the page header (`-mt-4` offsets `ScreenBody` top padding), uses **24px** top/bottom padding (reserved during collapse to prevent layout jump), and **bottom corner radius** reuses `BOTTOM_SHEET_BOTTOM_RADIUS_CLASS` (36px — same token as bottom sheets). `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region) and renders a fixed card-colored pull bridge below the header during PTR so the header and title area stay visually connected; both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
 
 ---
 

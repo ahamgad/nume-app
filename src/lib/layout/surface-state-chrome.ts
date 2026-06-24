@@ -1,7 +1,7 @@
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 
 /**
- * Surface context for accent chrome (back/close, secondary buttons, active chips).
+ * Surface context for accent chrome (back/close, secondary buttons, balance edit icon, active chips).
  *
  * Rule A — on app / sheet background (`canvas`): accent uses card surface (`bg-card`).
  * Rule B — inside a card surface (`card`): accent uses app background (`bg-background`).

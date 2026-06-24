@@ -8,6 +8,7 @@ import {
   accountDetailsBalanceMetaClassName,
   ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
 } from "@/lib/layout/account-details-chrome";
+import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 interface AccountDetailsBalanceCardProps {
   label: string;
@@ -33,18 +34,20 @@ export function AccountDetailsBalanceCard({
   const balanceDisplay = getBalanceDisplayProps();
 
   return (
-    <WidgetCard elevated paddingClass={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>
-      <MetricHero
-        label={label}
-        amount={amount}
-        locale={locale}
-        meta={meta}
-        metaClassName={accountDetailsBalanceMetaClassName()}
-        amountSignMode={balanceDisplay.signMode}
-        amountClassName={balanceDisplay.className}
-        amountAction={amountAction}
-      />
-      {footer}
-    </WidgetCard>
+    <SurfaceStateProvider value="card">
+      <WidgetCard elevated paddingClass={ACCOUNT_DETAILS_SECTION_PADDING_CLASS}>
+        <MetricHero
+          label={label}
+          amount={amount}
+          locale={locale}
+          meta={meta}
+          metaClassName={accountDetailsBalanceMetaClassName()}
+          amountSignMode={balanceDisplay.signMode}
+          amountClassName={balanceDisplay.className}
+          amountAction={amountAction}
+        />
+        {footer}
+      </WidgetCard>
+    </SurfaceStateProvider>
   );
 }

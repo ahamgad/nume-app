@@ -37,11 +37,11 @@ export function accountDetailsBalanceMetaClassName(className?: string): string {
 export function accountDetailsHeaderRegionClassName(collapsed: boolean): string {
   return cn(
     "-mx-4 -mt-4 px-4 transition-colors",
+    ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS,
     !collapsed &&
       cn(
         CARD_SURFACE_BG_CLASS,
         ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
-        ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS,
       ),
   );
 }

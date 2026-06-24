@@ -5,13 +5,14 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Tran
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useConnectivity } from "@/providers/connectivity-provider";
 import { NUME_MOTION_EASE } from "@/lib/layout/motion";
+import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 
 /** Visual offset required to trigger refresh after release. */
 const PULL_THRESHOLD = 56;
 /** Offset held while refresh runs and during snap-back start. */
 const HOLD_OFFSET = 52;
 /** Maximum visual pull distance. */
-const MAX_OFFSET = 88;
+const MAX_OFFSET = PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX;
 /** Downward finger travel before committing to a pull gesture. */
 const PULL_ACTIVATION = 10;
 const RESISTANCE_SCALE = 80;
