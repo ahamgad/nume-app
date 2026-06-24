@@ -351,6 +351,7 @@ export const ar = {
         title: "السجلات الأخيرة",
         emptyTitle: "لا توجد سجلات بعد",
         emptyDescription: "أضف سجلًا لتتبع تغيّرات الرصيد.",
+        viewAll: "عرض الكل",
       },
       addRecord: "إضافة سجل",
       edit: "تعديل الحساب",
@@ -379,6 +380,13 @@ export const ar = {
       },
       notFound: "الحساب غير موجود",
       notFoundDescription: "ربما أُزيل هذا الحساب.",
+    },
+    recordsHistory: {
+      filters: {
+        label: "فترة السجلات",
+        thisMonth: "هذا الشهر",
+        lastMonth: "الشهر الماضي",
+      },
     },
     validation: {
       nameRequired: "اسم الحساب مطلوب",

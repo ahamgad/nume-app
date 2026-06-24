@@ -16,6 +16,7 @@ import { AccountDetailsSettingsSection } from "@/components/accounts/account-det
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
+import { ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT } from "@/lib/finance/recent-records-display";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
@@ -66,7 +67,8 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
 
   const account = getAccount(accountId);
   const savings = getSavingsByAccountId(accountId);
-  const records = getAccountRecords(accountId).slice(0, 5);
+  const allRecords = getAccountRecords(accountId);
+  const records = allRecords.slice(0, ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT);
   const isArchived = account?.status === "archived";
 
   const destinationLabel = useMemo(() => {
@@ -243,7 +245,9 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         </AccountDetailsSection>
 
         <RecentRecordsSection
+          accountId={account.id}
           records={records}
+          totalRecordCount={allRecords.length}
           isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}

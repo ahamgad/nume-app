@@ -18,6 +18,7 @@ import {
   liabilityBalanceMeta,
 } from "@/components/accounts/liability-balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
+import { ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT } from "@/lib/finance/recent-records-display";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components/layout/screen-header";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
@@ -71,7 +72,8 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
 
   const account = getAccount(accountId);
   const creditCard = getCreditCardByAccountId(accountId);
-  const records = getAccountRecords(accountId).slice(0, 5);
+  const allRecords = getAccountRecords(accountId);
+  const records = allRecords.slice(0, ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT);
   const isArchived = account?.status === "archived";
 
   const linkedAccountLabel = useMemo(() => {
@@ -234,7 +236,9 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         </AccountDetailsSection>
 
         <RecentRecordsSection
+          accountId={account.id}
           records={records}
+          totalRecordCount={allRecords.length}
           isArchived={isArchived}
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}

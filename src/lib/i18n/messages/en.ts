@@ -352,6 +352,7 @@ export const en = {
         title: "Recent records",
         emptyTitle: "No records yet",
         emptyDescription: "Add a record to track balance changes.",
+        viewAll: "View all",
       },
       addRecord: "Add record",
       edit: "Edit account",
@@ -380,6 +381,13 @@ export const en = {
       },
       notFound: "Account not found",
       notFoundDescription: "This account may have been removed",
+    },
+    recordsHistory: {
+      filters: {
+        label: "Record period",
+        thisMonth: "This month",
+        lastMonth: "Last month",
+      },
     },
     validation: {
       nameRequired: "Account name is required",

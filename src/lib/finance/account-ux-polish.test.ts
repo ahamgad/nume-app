@@ -51,6 +51,9 @@ describe("RecentRecordsSection", () => {
 
     expect(source).toContain("shouldShowRecentRecordsSection");
     expect(source).toContain("return null");
+    expect(source).toContain("ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT");
+    expect(source).toContain('variant="secondary"');
+    expect(source).toContain("accounts.details.records.viewAll");
   });
 });
 

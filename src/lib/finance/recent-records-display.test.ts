@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { shouldShowRecentRecordsSection } from "@/lib/finance/recent-records-display";
+import {
+  ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT,
+  shouldShowRecentRecordsSection,
+} from "@/lib/finance/recent-records-display";
 
 describe("shouldShowRecentRecordsSection", () => {
+  it("freezes recent record preview limit at three", () => {
+    expect(ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT).toBe(3);
+  });
+
   it("shows empty state for active accounts with no records", () => {
     expect(shouldShowRecentRecordsSection(false, 0)).toBe(true);
   });
