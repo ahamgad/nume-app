@@ -18,6 +18,7 @@ import {
   BOTTOM_SHEET_TOP_RADIUS_PX,
 } from "@/lib/layout/bottom-sheet";
 import { cn } from "@/lib/utils";
+import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 export {
   BOTTOM_SHEET_HEADER_BAR_CLASS,
@@ -37,6 +38,24 @@ const BOTTOM_SHEET_PANEL_BASE = cn(
 
 /** Shared bottom sheet panel chrome — borderless, native-style surface. */
 export const BOTTOM_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
+
+/**
+ * Bottom sheet panel with canvas surface context — back/close icons on sheet
+ * background use card-surface accent chrome regardless of parent card context.
+ */
+export function BottomSheetPanel({
+  className,
+  children,
+  ...props
+}: ComponentProps<"div">) {
+  return (
+    <SurfaceStateProvider value="canvas">
+      <div className={cn(BOTTOM_SHEET_PANEL_CLASS, className)} {...props}>
+        {children}
+      </div>
+    </SurfaceStateProvider>
+  );
+}
 
 /** @deprecated Use BOTTOM_SHEET_PANEL_CLASS — kept for import compatibility. */
 export const CONFIRMATION_SHEET_PANEL_CLASS = BOTTOM_SHEET_PANEL_BASE;
@@ -68,17 +87,19 @@ export function BottomSheetHeader({
   className,
 }: BottomSheetHeaderProps) {
   return (
-    <header className={cn("shrink-0 bg-background", className)}>
-      <div className={BOTTOM_SHEET_HEADER_BAR_CLASS}>
-        {leading}
-        <span id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
-          {title}
-        </span>
-        {trailing ? (
-          <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{trailing}</div>
-        ) : null}
-      </div>
-    </header>
+    <SurfaceStateProvider value="canvas">
+      <header className={cn("shrink-0 bg-background", className)}>
+        <div className={BOTTOM_SHEET_HEADER_BAR_CLASS}>
+          {leading}
+          <span id={titleId} className={SCREEN_HEADER_TITLE_CLASS}>
+            {title}
+          </span>
+          {trailing ? (
+            <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{trailing}</div>
+          ) : null}
+        </div>
+      </header>
+    </SurfaceStateProvider>
   );
 }
 

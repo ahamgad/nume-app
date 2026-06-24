@@ -9,8 +9,8 @@ import { useVisualViewportKeyboardInset } from "@/hooks/use-visual-viewport-keyb
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  BOTTOM_SHEET_PANEL_CLASS,
   BottomSheetHeader,
+  BottomSheetPanel,
 } from "@/components/ui/bottom-sheet-chrome";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { Input } from "@/components/ui/input";
@@ -104,7 +104,7 @@ export function PickerBottomSheet({
         className="absolute inset-0 touch-none"
         onClick={onClose}
       />
-      <div
+      <BottomSheetPanel
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel ?? title}
@@ -114,7 +114,7 @@ export function PickerBottomSheet({
           minHeight: PICKER_SHEET_MIN_HEIGHT,
           maxHeight: PICKER_SHEET_MAX_HEIGHT,
         }}
-        className={cn(BOTTOM_SHEET_PANEL_CLASS, BOTTOM_SHEET_ENTER_CLASS)}
+        className={BOTTOM_SHEET_ENTER_CLASS}
       >
         <div ref={chromeRef} className="shrink-0 bg-background">
           <BottomSheetHeader
@@ -158,7 +158,7 @@ export function PickerBottomSheet({
         >
           <div ref={contentMeasureRef}>{children}</div>
         </div>
-      </div>
+      </BottomSheetPanel>
     </div>
   );
 }

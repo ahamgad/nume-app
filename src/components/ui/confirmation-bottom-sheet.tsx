@@ -5,8 +5,8 @@ import { type ReactNode } from "react";
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  BOTTOM_SHEET_PANEL_CLASS,
   BottomSheetHeaderlessContent,
+  BottomSheetPanel,
 } from "@/components/ui/bottom-sheet-chrome";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
 import { useT } from "@/providers/i18n-provider";
@@ -56,19 +56,15 @@ export function ConfirmationBottomSheet({
         className="absolute inset-0"
         onClick={onClose}
       />
-      <div
+      <BottomSheetPanel
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
-        className={cn(
-          BOTTOM_SHEET_PANEL_CLASS,
-          BOTTOM_SHEET_ENTER_CLASS,
-          panelClassName,
-        )}
+        className={cn(BOTTOM_SHEET_ENTER_CLASS, panelClassName)}
       >
         <BottomSheetHeaderlessContent>{children}</BottomSheetHeaderlessContent>
-      </div>
+      </BottomSheetPanel>
     </div>
   );
 }

@@ -43,5 +43,12 @@ describe("surface-state foundation", () => {
     expect(button).toContain('variant === "secondary"');
     expect(button).toContain("surfaceStateAccentBackgroundClass");
     expect(balanceCard).toContain('SurfaceStateProvider value="card"');
+
+    const bottomSheetChrome = fs.readFileSync(
+      path.join(process.cwd(), "src/components/ui/bottom-sheet-chrome.tsx"),
+      "utf8",
+    );
+    expect(bottomSheetChrome).toContain('SurfaceStateProvider value="canvas"');
+    expect(bottomSheetChrome).toContain("BottomSheetPanel");
   });
 });

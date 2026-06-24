@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -53,5 +56,29 @@ describe("bottom sheet foundation", () => {
     expect(SCREEN_HEADER_TRAILING_SLOT_CLASS).toContain("shrink-0");
     expect(SCREEN_HEADER_TRAILING_SLOT_CLASS).toContain("justify-end");
     expect(SCREEN_HEADER_TEXT_ACTION_CLASS).toContain("h-11");
+  });
+
+  it("propagates canvas surface context through shared bottom sheet panel and header", () => {
+    const chrome = fs.readFileSync(
+      path.join(process.cwd(), "src/components/ui/bottom-sheet-chrome.tsx"),
+      "utf8",
+    );
+
+    expect(chrome).toContain("export function BottomSheetPanel");
+    expect(chrome).toContain('SurfaceStateProvider value="canvas"');
+    expect(chrome).toContain("export function BottomSheetHeader");
+
+    for (const sheet of [
+      "picker-bottom-sheet.tsx",
+      "immersive-bottom-sheet.tsx",
+      "confirmation-bottom-sheet.tsx",
+    ]) {
+      const source = fs.readFileSync(
+        path.join(process.cwd(), "src/components/ui", sheet),
+        "utf8",
+      );
+      expect(source).toContain("BottomSheetPanel");
+      expect(source).not.toContain("BOTTOM_SHEET_PANEL_CLASS");
+    }
   });
 });

@@ -7,8 +7,8 @@ import { useImmersiveWorkspaceLock } from "@/hooks/use-immersive-workspace-lock"
 import {
   BOTTOM_SHEET_BACKDROP_CLASS,
   BOTTOM_SHEET_ENTER_CLASS,
-  BOTTOM_SHEET_PANEL_CLASS,
   BottomSheetHeader,
+  BottomSheetPanel,
 } from "@/components/ui/bottom-sheet-chrome";
 import { SCREEN_HEADER_TEXT_ACTION_CLASS } from "@/components/layout/screen-header";
 import { NUME_MODAL_OVERLAY_ENTER_CLASS } from "@/lib/layout/motion";
@@ -72,13 +72,12 @@ export function ImmersiveBottomSheet({
         onPointerDown={() => onDiscardPointerDown?.()}
         onClick={onDismiss}
       />
-      <div
+      <BottomSheetPanel
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel ?? title}
         style={{ height: sheetHeight, maxHeight: sheetHeight }}
         className={cn(
-          BOTTOM_SHEET_PANEL_CLASS,
           BOTTOM_SHEET_ENTER_CLASS,
           isWorkspace && "touch-none overscroll-none",
         )}
@@ -115,7 +114,7 @@ export function ImmersiveBottomSheet({
         >
           {children}
         </div>
-      </div>
+      </BottomSheetPanel>
     </div>
   );
 }
