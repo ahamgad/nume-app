@@ -117,12 +117,12 @@ describe("account form required fields", () => {
     ).toBe(false);
   });
 
-  it("ignores explicit required=true — validation registry is source of truth", () => {
+  it("honours explicit required=true override", () => {
     expect(
       resolveAccountFormFieldRequired("savings-account-number", base, true),
-    ).toBe(false);
+    ).toBe(true);
     expect(resolveAccountFormFieldRequired("interestModel", base, true)).toBe(
-      false,
+      true,
     );
   });
 

@@ -797,7 +797,7 @@ export const ar = {
         description: "سجّل مشترى على هذه البطاقة",
       },
       payment: {
-        title: "سداد",
+        title: "إضافة سداد",
         description: "سدّد البطاقة من الحساب المرتبط",
       },
     },
@@ -814,7 +814,7 @@ export const ar = {
       success: "تم تسجيل المشترى",
     },
     payment: {
-      title: "سداد",
+      title: "إضافة سداد",
       description: "سدّد البطاقة من حساب مرتبط.",
       descriptionPlaceholder: "مثال: سداد شهري",
       selectSourcePrompt: "اختر الحساب الذي سيُسدد منه.",
@@ -848,8 +848,11 @@ export const ar = {
         title: "تعديل",
         description: "تصحيح رصيد الحساب",
       },
-      save: "حفظ السجل",
+      save: "حفظ",
       saving: "جارٍ الحفظ…",
+    },
+    formSections: {
+      details: "التفاصيل",
     },
     fields: {
       amount: "المبلغ",

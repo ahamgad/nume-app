@@ -2,10 +2,13 @@
 
 import { useMemo } from "react";
 
-import { EditableField } from "@/components/field-editor";
-import { AccountPicker } from "@/components/ui/account-picker";
-import { DateField } from "@/components/ui/date-field";
-import { Label } from "@/components/ui/label";
+import {
+  AccountFormAccountPicker,
+  AccountFormDateField,
+  AccountFormEditableField,
+  AccountFormSection,
+  AccountFormSections,
+} from "@/components/forms/account-form-section";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import type { RecordFormValues } from "@/lib/finance/record-form";
@@ -31,38 +34,6 @@ interface RecordFormFieldsProps {
   fixedSourceAccountId?: string | null;
   onChange: (patch: Partial<RecordFormValues>) => void;
   onClearError: (field: string) => void;
-}
-
-function RecordDateField({
-  value,
-  error,
-  disabled,
-  formatLocale,
-  onChange,
-}: {
-  value: string;
-  error?: string;
-  disabled?: boolean;
-  formatLocale: string;
-  onChange: (date: string) => void;
-}) {
-  const t = useT();
-
-  return (
-    <div className="min-w-0 w-full max-w-full space-y-2">
-      <Label htmlFor="record-date">{t("records.fields.date")}</Label>
-      <DateField
-        id="record-date"
-        value={value}
-        locale={formatLocale}
-        label={t("records.fields.date")}
-        disabled={disabled}
-        onChange={onChange}
-        aria-invalid={Boolean(error)}
-      />
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
-    </div>
-  );
 }
 
 export function RecordFormFields({
@@ -145,102 +116,106 @@ export function RecordFormFields({
 
   return (
     <>
-      <EditableField
-        id="record-amount"
-        label={amountLabel}
-        mode="numeric"
-        inputMode="decimal"
-        value={values.amount}
-        disabled={disabled}
-        error={errors.amount}
-        prefixLabel={t("common.currency.code")}
-        sanitizeInput={sanitizeAmountInput}
-        formatDisplay={(value) => formatAmountInput(value, amountInputLocale)}
-        triggerClassName="tabular-nums"
-        validate={(value) =>
-          validateRecordAmountField(type, value, t, account?.currentBalance)
-        }
-        onSave={(amount) => {
-          onChange({ amount });
-          onClearError("amount");
-        }}
-      />
+      <AccountFormSections>
+        <AccountFormSection title={t("records.formSections.details")}>
+          <AccountFormEditableField
+            id="record-amount"
+            label={amountLabel}
+            mode="numeric"
+            inputMode="decimal"
+            value={values.amount}
+            disabled={disabled}
+            error={errors.amount}
+            required
+            prefixLabel={t("common.currency.code")}
+            placeholder={t("common.currency.zeroPlaceholder")}
+            sanitizeInput={sanitizeAmountInput}
+            formatDisplay={(value) => formatAmountInput(value, amountInputLocale)}
+            triggerClassName="tabular-nums"
+            validate={(value) =>
+              validateRecordAmountField(type, value, t, account?.currentBalance)
+            }
+            onSave={(amount) => {
+              onChange({ amount });
+              onClearError("amount");
+            }}
+          />
 
-      {showInsufficientBalance ? (
-        <p className="-mt-3 text-sm text-muted-foreground">
-          {t("records.insufficientBalance")}
-        </p>
-      ) : null}
+          <AccountFormDateField
+            id="record-date"
+            label={t("records.fields.date")}
+            value={values.date}
+            locale={formatLocale}
+            disabled={disabled}
+            error={errors.date}
+            required
+            onChange={(date) => {
+              onChange({ date });
+              onClearError("date");
+            }}
+          />
 
-      <RecordDateField
-        value={values.date}
-        error={errors.date}
-        disabled={disabled}
-        formatLocale={formatLocale}
-        onChange={(date) => {
-          onChange({ date });
-          onClearError("date");
-        }}
-      />
-
-      {type === "transfer" ? (
-        <>
-          {!fixedSourceAccountId ? (
+          {type === "transfer" ? (
             <>
-              <AccountPicker
-                id="transfer-from-account"
-                label={t("records.fields.transfer.fromAccount")}
-                placeholder={t("records.fields.transfer.fromPlaceholder")}
-                value={values.fromAccountId}
-                accounts={fromAccounts}
+              {!fixedSourceAccountId ? (
+                <AccountFormAccountPicker
+                  id="transfer-from-account"
+                  label={t("records.fields.transfer.fromAccount")}
+                  placeholder={t("records.fields.transfer.fromPlaceholder")}
+                  value={values.fromAccountId}
+                  accounts={fromAccounts}
+                  disabled={disabled}
+                  required
+                  error={errors.fromAccountId}
+                  onChange={(fromAccountId) => {
+                    onChange({ fromAccountId });
+                    onClearError("fromAccountId");
+                  }}
+                />
+              ) : null}
+
+              <AccountFormAccountPicker
+                id="transfer-to-account"
+                label={t("records.fields.transfer.toAccount")}
+                placeholder={t(
+                  "accounts.fields.interestDestinationAccount.placeholder",
+                )}
+                searchPlaceholder={t(
+                  "accounts.fields.interestDestinationAccount.searchPlaceholder",
+                )}
+                noResultsMessage={t(
+                  "accounts.fields.interestDestinationAccount.noResults",
+                )}
+                value={values.toAccountId}
+                accounts={toAccounts}
                 disabled={disabled}
-                onChange={(fromAccountId) => {
-                  onChange({ fromAccountId });
-                  onClearError("fromAccountId");
+                required
+                error={errors.toAccountId}
+                onChange={(toAccountId) => {
+                  onChange({ toAccountId });
+                  onClearError("toAccountId");
                 }}
               />
-              {errors.fromAccountId ? (
-                <p className="-mt-3 text-sm text-destructive">
-                  {errors.fromAccountId}
-                </p>
-              ) : null}
             </>
           ) : null}
 
-          <AccountPicker
-            id="transfer-to-account"
-            label={t("records.fields.transfer.toAccount")}
-            placeholder={t(
-              "accounts.fields.interestDestinationAccount.placeholder",
-            )}
-            searchPlaceholder={t(
-              "accounts.fields.interestDestinationAccount.searchPlaceholder",
-            )}
-            noResultsMessage={t(
-              "accounts.fields.interestDestinationAccount.noResults",
-            )}
-            value={values.toAccountId}
-            accounts={toAccounts}
+          <AccountFormEditableField
+            id={type !== "adjustment" ? "description" : "reason"}
+            label={descriptionLabel}
+            value={values.description}
+            placeholder={descriptionPlaceholder}
             disabled={disabled}
-            onChange={(toAccountId) => {
-              onChange({ toAccountId });
-              onClearError("toAccountId");
-            }}
+            required={false}
+            onSave={(description) => onChange({ description })}
           />
-          {errors.toAccountId ? (
-            <p className="-mt-3 text-sm text-destructive">{errors.toAccountId}</p>
-          ) : null}
-        </>
-      ) : null}
+        </AccountFormSection>
+      </AccountFormSections>
 
-      <EditableField
-        id={type !== "adjustment" ? "description" : "reason"}
-        label={`${descriptionLabel} (${t("common.optional")})`}
-        value={values.description}
-        placeholder={descriptionPlaceholder}
-        disabled={disabled}
-        onSave={(description) => onChange({ description })}
-      />
+      {showInsufficientBalance ? (
+        <p className="text-sm text-muted-foreground">
+          {t("records.insufficientBalance")}
+        </p>
+      ) : null}
 
       {preview && parsedAmount !== null && type !== "transfer" ? (
         <div className="space-y-1">

@@ -45,7 +45,7 @@ export function AccountTypePickerCard({
       )}
     >
       <span
-        className="inline-flex shrink-0 items-center justify-center rounded-lg bg-muted"
+        className="inline-flex shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
         style={{
           width: ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX,
           height: ACCOUNT_TYPE_PICKER_ICON_FRAME_SIZE_PX,

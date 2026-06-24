@@ -799,7 +799,7 @@ export const en = {
         description: "Record a purchase on this credit card",
       },
       payment: {
-        title: "Make payment",
+        title: "Add payment",
         description: "Pay down this card from the linked account",
       },
     },
@@ -816,7 +816,7 @@ export const en = {
       success: "Purchase recorded",
     },
     payment: {
-      title: "Make payment",
+      title: "Add payment",
       description: "Pay down this card from a linked account",
       descriptionPlaceholder: "e.g. Monthly payment",
       selectSourcePrompt: "Select the account this payment comes from",
@@ -850,8 +850,11 @@ export const en = {
         title: "Adjustment",
         description: "Correct account balance",
       },
-      save: "Save record",
+      save: "Save",
       saving: "Saving…",
+    },
+    formSections: {
+      details: "Details",
     },
     fields: {
       amount: "Amount",

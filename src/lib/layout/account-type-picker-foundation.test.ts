@@ -46,6 +46,7 @@ describe("account type picker sheet foundation", () => {
     expect(cardSource).toContain("CARD_SURFACE_CLASS");
     expect(cardSource).toContain("ACCOUNT_CARD_NAME_CLASS");
     expect(cardSource).toContain("bg-muted");
+    expect(cardSource).toContain("text-muted-foreground");
     expect(cardSource).toContain("CardChevron");
     expect(cardSource).toContain("CARD_CHEVRON_ROW_CLASS");
     expect(cardSource).not.toContain("size-4");

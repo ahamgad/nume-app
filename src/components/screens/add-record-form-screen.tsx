@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { RecordFormFields } from "@/components/records/record-form-fields";
+import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
 import { StickyFooter } from "@/components/patterns";
@@ -20,6 +21,7 @@ import {
 import type { RecordType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
+import { FORM_PRIMARY_ACTION_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
@@ -136,53 +138,40 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
         ? "records.types.interest"
         : (`records.add.${type}.title` as TranslationKey);
 
-  const canSubmit =
-    type === "transfer"
-      ? Boolean((fixedSourceAccountId ?? values.fromAccountId) && values.toAccountId)
-      : Boolean(account);
-
   return (
     <>
       <StackPageHeader title={t(titleKey)} onBack={handleBack} />
-      <ScreenBody withTabBar={false} withStickyFooter className="space-y-5">
+      <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{t(titleKey)}</StackPageTitle>
-        {account ? (
-          <p className="text-[0.8125rem] text-muted-foreground">
-            {account.name}
-          </p>
-        ) : null}
+        <AccountFormEditContent disabled={submitting} formError={errors.form}>
+          <RecordFormFields
+            type={type}
+            values={values}
+            errors={errors}
+            amountInputLocale={amountInputLocale}
+            disabled={submitting}
+            account={account}
+            accounts={accounts}
+            fixedSourceAccountId={fixedSourceAccountId}
+            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onClearError={clearFieldError}
+          />
 
-        <RecordFormFields
-          type={type}
-          values={values}
-          errors={errors}
-          amountInputLocale={amountInputLocale}
-          disabled={submitting}
-          account={account}
-          accounts={accounts}
-          fixedSourceAccountId={fixedSourceAccountId}
-          onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
-          onClearError={clearFieldError}
-        />
-
-        {showInsufficientTransferBalance ? (
-          <p className="text-sm text-muted-foreground">
-            {t("records.insufficientBalance")}
-          </p>
-        ) : null}
-
-        {errors.form ? (
-          <p className="text-sm text-destructive">{errors.form}</p>
-        ) : null}
+          {showInsufficientTransferBalance ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              {t("records.insufficientBalance")}
+            </p>
+          ) : null}
+        </AccountFormEditContent>
       </ScreenBody>
 
       <StickyFooter>
         <Button
-          className="h-12 w-full"
-          disabled={submitting || !canSubmit}
+          className={FORM_PRIMARY_ACTION_BUTTON_CLASS}
+          disabled={submitting}
           onClick={handleSubmit}
         >
-          {submitting ? t("records.add.saving") : t("records.add.save")}
+          {submitting ? t("records.add.saving") : t("common.save")}
         </Button>
       </StickyFooter>
     </>

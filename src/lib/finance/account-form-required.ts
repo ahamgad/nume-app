@@ -89,6 +89,7 @@ export function resolveAccountFormFieldRequired(
   explicit?: boolean,
 ): boolean {
   if (explicit === false) return false;
+  if (explicit === true) return true;
   return isAccountFormFieldRequired(fieldKey, requirements);
 }
 
