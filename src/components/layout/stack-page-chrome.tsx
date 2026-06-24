@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 
 import { ScreenHeader } from "@/components/layout/screen-header";
 import { ScreenPageTitle } from "@/components/layout/screen-title-collapse";
+import type { SurfaceState } from "@/lib/layout/surface-state-chrome";
 
 interface StackPageHeaderProps {
   title: string;
@@ -18,6 +19,7 @@ interface StackPageHeaderProps {
   onBack?: () => void;
   rightAction?: ReactNode;
   className?: string;
+  surfaceState?: SurfaceState;
   /** When false, title stays in the header (loading/error states). Default true. */
   collapsible?: boolean;
 }

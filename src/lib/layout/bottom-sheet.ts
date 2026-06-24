@@ -16,6 +16,9 @@ export const BOTTOM_SHEET_TOP_RADIUS_PX = 36;
 /** Top-left and top-right corner radius for bottom sheet panels. */
 export const BOTTOM_SHEET_TOP_RADIUS_CLASS = "rounded-t-[36px]";
 
+/** Bottom-left and bottom-right corner radius — same token as sheet top radius. */
+export const BOTTOM_SHEET_BOTTOM_RADIUS_CLASS = `rounded-b-[${BOTTOM_SHEET_TOP_RADIUS_PX}px]`;
+
 /** Sheet header vertical padding (16px top/bottom). */
 export const BOTTOM_SHEET_HEADER_VERTICAL_PADDING_CLASS = "py-4";
 

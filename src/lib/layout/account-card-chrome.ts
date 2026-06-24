@@ -42,3 +42,7 @@ export const CARD_CHEVRON_CLASS =
 
 /** Flex row spacing between label content and trailing chevron (8px). */
 export const CARD_CHEVRON_ROW_CLASS = "flex min-w-0 items-center gap-2";
+
+/** Trailing balance + chevron cluster — 8px between balance and chevron. */
+export const ACCOUNT_CARD_TRAILING_CLUSTER_CLASS =
+  "flex shrink-0 items-center gap-2";

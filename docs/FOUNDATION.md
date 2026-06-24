@@ -39,8 +39,9 @@ All foundations below are **mandatory building blocks**. Future screens, flows, 
 | 11 | **Account type picker sheet** | `AccountTypePickerSheet`, `AccountTypePickerCard`, `AccountTypePickerSection` | § 16 |
 | 12 | **Card surface** | `CARD_SURFACE_CLASS`, `CARD_SURFACE_FLAT_CLASS` — `lib/layout/card-surface.ts` | § 16 |
 | 13 | **Screen canvas** | `bg-background` on `AppShell`, `ScreenHeader`, `ScreenBody` — `globals.css` `--background` | § 19 |
-| 14 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
-| 15 | **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` | § 18 |
+| 14 | **Surface-state chrome** | `surface-state-chrome.ts`, `SurfaceStateProvider`, `HeaderIconButton`, `Button` (`secondary`), `chip-chrome.ts` | § 19 |
+| 15 | **Account forms** | `AccountFormSection`, `AccountFormSections`, `AccountFormCreateContent`, `AccountFormEditContent` | § 17 |
+| 16 | **Input fields** | `InputField`, `InputFieldLabel`, `InputFieldRowTrigger`, `InputFieldValue`, `InputFieldAffix` | § 18 |
 
 **Do not recreate** headers, picker lists, account-details layouts, create-account CTAs, confirmation actions, typography behaviors, numeric display behaviors, field-editor behaviors, account-card layouts, account-picker row layouts, account-type picker cards, card-surface chrome, account-form section layouts, or input-field label/value/error/affix chrome inside individual screens.
 
@@ -786,7 +787,7 @@ All `ScreenBody` scroll containers with a tab bar or sticky footer reserve **two
 
 ### Chips foundation
 
-Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`.
+Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`. Active chip backgrounds follow the **surface-state foundation** (below).
 
 | Context | `chipSurface` | Active chip background |
 |---|---|---|
@@ -795,9 +796,28 @@ Location: `lib/layout/chip-chrome.ts`, `components/ui/scroll-chip-select.tsx`.
 
 `AccountFormScrollChipSelect` sets `chipSurface="card"` automatically.
 
+### Surface-state foundation
+
+Location: `lib/layout/surface-state-chrome.ts`, `providers/surface-state-provider.tsx`, `components/layout/header-icon-button.tsx`, `components/ui/button.tsx` (`variant="secondary"`), `lib/layout/chip-chrome.ts`.
+
+Single rule for **back button**, **close button**, **secondary buttons**, and **active chips**:
+
+| Placement | `SurfaceState` | Accent background |
+|---|---|---|
+| Directly on app / sheet background | `canvas` (default) | Card surface (`bg-card`) |
+| Inside a card surface | `card` | App background (`bg-background`) |
+
+**Propagation:**
+
+- `ScreenHeader` / `StackPageHeader` accept `surfaceState` (e.g. `AccountDetailsStackHeader` passes `card` when the header uses card surface at scroll top).
+- `AccountFormSection`, `AccountDetailsSection`, and other card containers wrap content in `SurfaceStateProvider value="card"`.
+- `ScrollChipSelect` uses `chipSurface`; `HeaderIconButton` and `Button variant="secondary"` read `useSurfaceState()`.
+
+No screen-level background overrides for these elements.
+
 ### Account details header hero
 
-`AccountDetailsHeaderRegion` wraps the content header only. `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
+`AccountDetailsHeaderRegion` wraps the content header only. Title section sits flush below the page header (`-mt-4` offsets `ScreenBody` top padding), uses **24px** top/bottom padding when expanded, and **bottom corner radius** reuses `BOTTOM_SHEET_BOTTOM_RADIUS_CLASS` (36px — same token as bottom sheets). `AccountDetailsStackHeader` uses card-surface background at scroll top (matches the title region); both revert to screen background when the large title collapses. Balance card remains a separate `AccountDetailsBalanceCard` below the hero region.
 
 ---
 

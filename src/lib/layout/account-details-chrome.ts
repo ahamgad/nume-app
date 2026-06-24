@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
-
+import { BOTTOM_SHEET_BOTTOM_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
+import { cn } from "@/lib/utils";
 
 /** Account detail card sections — 16px padding on all sides. */
 export const ACCOUNT_DETAILS_SECTION_PADDING_CLASS = "p-4";
@@ -23,8 +23,12 @@ export const ACCOUNT_DETAILS_TOGGLE_DESCRIPTION_CLASS =
 export const ACCOUNT_DETAILS_BALANCE_META_CLASS =
   "mt-4 text-[0.8125rem] leading-normal text-muted-foreground";
 
-/** Hero header region bottom radius (px). */
-export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS = "rounded-b-2xl";
+/** Hero header region bottom radius — reuses bottom sheet corner token. */
+export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS =
+  BOTTOM_SHEET_BOTTOM_RADIUS_CLASS;
+
+/** Hero title section vertical padding (24px top and bottom). */
+export const ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS = "py-6";
 
 export function accountDetailsBalanceMetaClassName(className?: string): string {
   return cn(ACCOUNT_DETAILS_BALANCE_META_CLASS, className);
@@ -32,7 +36,12 @@ export function accountDetailsBalanceMetaClassName(className?: string): string {
 
 export function accountDetailsHeaderRegionClassName(collapsed: boolean): string {
   return cn(
-    "-mx-4 px-4 transition-colors",
-    !collapsed && cn(CARD_SURFACE_BG_CLASS, ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS),
+    "-mx-4 -mt-4 px-4 transition-colors",
+    !collapsed &&
+      cn(
+        CARD_SURFACE_BG_CLASS,
+        ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
+        ACCOUNT_DETAILS_HEADER_REGION_PADDING_CLASS,
+      ),
   );
 }

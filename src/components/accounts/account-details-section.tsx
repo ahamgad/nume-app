@@ -11,6 +11,7 @@ import {
 import { ACCOUNT_DETAILS_SECTION_PADDING_CLASS } from "@/lib/layout/account-details-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
+import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 interface AccountDetailsSectionProps {
   title: string;
@@ -37,28 +38,30 @@ export function AccountDetailsSection({
   const rows = Children.toArray(children).filter(isValidElement);
 
   return (
-    <section
-      className={cn(
-        CARD_SURFACE_CLASS,
-        paddingClassName,
-        "min-w-0 w-full",
-        className,
-      )}
-    >
-      <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
-      <div
+    <SurfaceStateProvider value="card">
+      <section
         className={cn(
-          ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
-          ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+          CARD_SURFACE_CLASS,
+          paddingClassName,
+          "min-w-0 w-full",
+          className,
         )}
       >
-        {rows.map((row, index) => (
-          <div key={row.key ?? index} className={fieldRowClassName}>
-            {row}
-          </div>
-        ))}
-      </div>
-    </section>
+        <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
+        <div
+          className={cn(
+            ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+            ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+          )}
+        >
+          {rows.map((row, index) => (
+            <div key={row.key ?? index} className={fieldRowClassName}>
+              {row}
+            </div>
+          ))}
+        </div>
+      </section>
+    </SurfaceStateProvider>
   );
 }
 

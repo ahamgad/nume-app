@@ -53,6 +53,7 @@ export function AccountDetailsStackHeader({
       title={accountName}
       onBack={onBack}
       rightAction={rightAction}
+      surfaceState={collapsed ? "canvas" : "card"}
       className={cn(
         "transition-colors duration-200",
         collapsed ? "bg-background" : CARD_SURFACE_BG_CLASS,

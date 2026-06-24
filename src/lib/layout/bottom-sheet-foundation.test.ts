@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  BOTTOM_SHEET_BOTTOM_RADIUS_CLASS,
   BOTTOM_SHEET_HEADER_BAR_CLASS,
   BOTTOM_SHEET_HEADER_BAR_HEIGHT_CLASS,
   BOTTOM_SHEET_HEADERLESS_TOP_PADDING_CLASS,
@@ -21,6 +22,7 @@ describe("bottom sheet foundation", () => {
   it("uses a unified 36px top corner radius on all panels", () => {
     expect(BOTTOM_SHEET_TOP_RADIUS_PX).toBe(36);
     expect(BOTTOM_SHEET_TOP_RADIUS_CLASS).toBe("rounded-t-[36px]");
+    expect(BOTTOM_SHEET_BOTTOM_RADIUS_CLASS).toBe("rounded-b-[36px]");
   });
 
   it("uses separate vertical sizing from page headers", () => {

@@ -9,6 +9,7 @@ import {
 } from "@/lib/layout/account-form-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
+import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 export {
   AccountFormAccountPicker,
@@ -55,25 +56,27 @@ export function AccountFormSection({
   const fields = Children.toArray(children).filter(isValidElement);
 
   return (
-    <section
-      className={cn(
-        CARD_SURFACE_CLASS,
-        ACCOUNT_FORM_SECTION_PADDING_CLASS,
-        "min-w-0 w-full overflow-hidden",
-        className,
-      )}
-    >
-      <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
-      <div
+    <SurfaceStateProvider value="card">
+      <section
         className={cn(
-          ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
-          ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+          CARD_SURFACE_CLASS,
+          ACCOUNT_FORM_SECTION_PADDING_CLASS,
+          "min-w-0 w-full overflow-hidden",
+          className,
         )}
       >
-        {fields.map((field, index) => (
-          <AccountFormField key={field.key ?? index}>{field}</AccountFormField>
-        ))}
-      </div>
-    </section>
+        <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
+        <div
+          className={cn(
+            ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+            ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+          )}
+        >
+          {fields.map((field, index) => (
+            <AccountFormField key={field.key ?? index}>{field}</AccountFormField>
+          ))}
+        </div>
+      </section>
+    </SurfaceStateProvider>
   );
 }

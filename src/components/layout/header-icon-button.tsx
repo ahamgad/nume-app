@@ -3,8 +3,10 @@
 import { ChevronLeft, X } from "lucide-react";
 import type { PointerEventHandler, ReactNode } from "react";
 
+import { surfaceStateAccentBackgroundClass } from "@/lib/layout/surface-state-chrome";
 import { SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS } from "@/lib/layout/screen-spacing";
 import { cn } from "@/lib/utils";
+import { useSurfaceState } from "@/providers/surface-state-provider";
 
 interface HeaderIconButtonProps {
   onClick: () => void;
@@ -21,6 +23,7 @@ export function HeaderIconButton({
   icon = "back",
   className,
 }: HeaderIconButtonProps) {
+  const surfaceState = useSurfaceState();
   const iconNode =
     icon === "back" ? (
       <ChevronLeft className={cn("size-6", "rtl:rotate-180")} />
@@ -37,7 +40,8 @@ export function HeaderIconButton({
       onPointerDown={onPointerDown}
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-muted text-foreground",
+        "inline-flex items-center justify-center rounded-full text-foreground",
+        surfaceStateAccentBackgroundClass(surfaceState),
         SCREEN_HEADER_ICON_BUTTON_SIZE_CLASS,
         className,
       )}

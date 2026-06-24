@@ -27,9 +27,11 @@ import {
   SCREEN_HEADER_ZONE_TOP,
 } from "@/lib/layout/screen-spacing";
 import { isTabBarVisible } from "@/lib/layout/tab-bar-visibility";
+import type { SurfaceState } from "@/lib/layout/surface-state-chrome";
 import { cn } from "@/lib/utils";
 import { useModalLayer } from "@/providers/modal-layer-provider";
 import { useT } from "@/providers/i18n-provider";
+import { SurfaceStateProvider } from "@/providers/surface-state-provider";
 
 interface ScreenHeaderProps {
   title: string;
@@ -41,6 +43,8 @@ interface ScreenHeaderProps {
   onBack?: () => void;
   rightAction?: ReactNode;
   className?: string;
+  /** Accent chrome surface — canvas on app background, card when header uses card surface. */
+  surfaceState?: SurfaceState;
 }
 
 /** Re-export for sheet chrome and legacy imports. */
@@ -87,6 +91,7 @@ export function ScreenHeader({
   onBack,
   rightAction,
   className,
+  surfaceState = "canvas",
 }: ScreenHeaderProps) {
   const router = useRouter();
   const t = useT();
@@ -107,29 +112,31 @@ export function ScreenHeader({
         className,
       )}
     >
-      <div className={SCREEN_HEADER_BAR_CLASS}>
-        {mode === "stack" ? (
-          <HeaderIconButton
-            onClick={onBack ?? (() => router.back())}
-            aria-label={t("common.back")}
-          />
-        ) : null}
-        {collapsibleTitle ? (
-          collapsedTitle ? (
-            <DualCollapsingHeaderTitle
-              pageTitle={title}
-              collapsedTitle={collapsedTitle}
+      <SurfaceStateProvider value={surfaceState}>
+        <div className={SCREEN_HEADER_BAR_CLASS}>
+          {mode === "stack" ? (
+            <HeaderIconButton
+              onClick={onBack ?? (() => router.back())}
+              aria-label={t("common.back")}
             />
+          ) : null}
+          {collapsibleTitle ? (
+            collapsedTitle ? (
+              <DualCollapsingHeaderTitle
+                pageTitle={title}
+                collapsedTitle={collapsedTitle}
+              />
+            ) : (
+              <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
+            )
           ) : (
-            <CollapsingHeaderTitle>{title}</CollapsingHeaderTitle>
-          )
-        ) : (
-          <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
-        )}
-        {rightAction ? (
-          <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{rightAction}</div>
-        ) : null}
-      </div>
+            <h1 className={SCREEN_HEADER_TITLE_CLASS}>{title}</h1>
+          )}
+          {rightAction ? (
+            <div className={SCREEN_HEADER_TRAILING_SLOT_CLASS}>{rightAction}</div>
+          ) : null}
+        </div>
+      </SurfaceStateProvider>
     </header>
   );
 }

@@ -21,6 +21,7 @@ import {
   ACCOUNT_CARD_LOGO_TEXT_GAP_PX,
   ACCOUNT_CARD_NAME_CLASS,
   ACCOUNT_CARD_PADDING_CLASS,
+  ACCOUNT_CARD_TRAILING_CLUSTER_CLASS,
 } from "@/lib/layout/account-card-chrome";
 import { cn } from "@/lib/utils";
 
@@ -85,13 +86,15 @@ export function AccountCard({
             <p className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "min-w-0 flex-1")}>
               {typeRow}
             </p>
-            <CurrencyAmount
-              amount={displayBalance}
-              locale={formatLocale}
-              variant="inline"
-              className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "shrink-0")}
-            />
-            <CardChevron />
+            <div className={ACCOUNT_CARD_TRAILING_CLUSTER_CLASS}>
+              <CurrencyAmount
+                amount={displayBalance}
+                locale={formatLocale}
+                variant="inline"
+                className={cn(ACCOUNT_CARD_INSTITUTE_ROW_CLASS, "shrink-0")}
+              />
+              <CardChevron />
+            </div>
           </div>
           <p className={ACCOUNT_CARD_NAME_CLASS}>{account.name}</p>
         </div>

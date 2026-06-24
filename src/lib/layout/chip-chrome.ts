@@ -1,13 +1,19 @@
-import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
+import {
+  surfaceStateAccentBackgroundClass,
+  surfaceStateInactiveBackgroundClass,
+  type SurfaceCanvasState,
+  type SurfaceCardState,
+  type SurfaceState,
+} from "@/lib/layout/surface-state-chrome";
 import { cn } from "@/lib/utils";
 
 /** Chips on app canvas, sheet background, or any non-card surface. */
-export type ChipCanvasSurface = "canvas";
+export type ChipCanvasSurface = SurfaceCanvasState;
 
 /** Chips inside a card surface container. */
-export type ChipCardSurface = "card";
+export type ChipCardSurface = SurfaceCardState;
 
-export type ChipSurface = ChipCanvasSurface | ChipCardSurface;
+export type ChipSurface = SurfaceState;
 
 const CHIP_BASE_CLASS =
   "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors";
@@ -19,10 +25,8 @@ export function chipButtonClassName(
   selected: boolean,
   disabled = false,
 ): string {
-  const activeClass =
-    surface === "card" ? "bg-background" : CARD_SURFACE_BG_CLASS;
-  const inactiveClass =
-    surface === "card" ? CARD_SURFACE_BG_CLASS : "bg-background";
+  const activeClass = surfaceStateAccentBackgroundClass(surface);
+  const inactiveClass = surfaceStateInactiveBackgroundClass(surface);
 
   return cn(
     CHIP_BASE_CLASS,
