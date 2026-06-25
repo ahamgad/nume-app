@@ -19,8 +19,8 @@ export const ACCOUNT_DETAILS_RECORDS_LIST_WRAPPER_CLASS =
 /** 8px above and below record dividers in Recent Records. */
 export const ACCOUNT_DETAILS_RECORD_SEPARATOR_MARGIN_CLASS = "my-2";
 
-/** 8px between the last recent record and the View all button. */
-export const ACCOUNT_DETAILS_VIEW_ALL_BUTTON_MARGIN_TOP_CLASS = "mt-2";
+/** 16px between the last recent record and the View all button. */
+export const ACCOUNT_DETAILS_VIEW_ALL_BUTTON_MARGIN_TOP_CLASS = "mt-4";
 
 /** Records history — 24px between hero, chips, and list blocks. */
 export const ACCOUNT_RECORDS_HISTORY_SECTION_GAP_CLASS = "mb-6";

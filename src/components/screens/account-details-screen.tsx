@@ -25,20 +25,14 @@ import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
-import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
+import { formatRecordLabel, formatRecordSubline } from "@/lib/finance/record-display";
 import { resolveAccountNumberLast4 } from "@/lib/finance/account-identity-validation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { FinanceRecord } from "@/lib/finance/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
-
-function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
-  if (record.description) return record.description;
-  return t(`records.types.${record.type}`);
-}
 
 interface AccountDetailsScreenProps {
   accountId: string;
@@ -61,6 +55,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
     loans,
     accounts,
     records: allFinanceRecords,
+    savingsAccounts,
     isFinanceReady,
   } = useFinance();
 
@@ -225,16 +220,17 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           totalRecordCount={allRecords.length}
           isArchived={isArchived}
           formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
+          recordLabel={(record) => formatRecordLabel(record, t)}
           recordAmount={(record) => record.amount}
           recordSubline={(record) =>
-            formatAccountContextRecordSubline(
-              record,
-              account.id,
-              allFinanceRecords,
+            formatRecordSubline(record, {
+              contextAccountId: account.id,
+              allRecords: allFinanceRecords,
               accounts,
+              savingsAccounts,
+              certificates,
               t,
-            )
+            })
           }
           recordDate={(record) =>
             formatDisplayDate(record.date, formatLocale)

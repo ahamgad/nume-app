@@ -921,8 +921,12 @@ export const ar = {
       credit_card_payment: "سداد",
     },
     display: {
-      transferOutgoing: "من {account}",
-      transferIncoming: "إلى {account}",
+      fromAccount: "من {account}",
+      toAccount: "إلى {account}",
+      savingsInterest: "عائد التوفير",
+      certificateInterest: "عائد الشهادة",
+      transferOutgoing: "إلى {account}",
+      transferIncoming: "من {account}",
     },
   },
   more: {

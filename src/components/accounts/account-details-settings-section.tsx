@@ -57,7 +57,7 @@ export function AccountDetailsSettingsSection({
           ACCOUNT_FORM_SECTION_FIELDS_CLASS,
         )}
       >
-        <div className={cn(ACCOUNT_FORM_FIELD_ROW_CLASS, "mt-1")}>
+        <div className={cn(ACCOUNT_FORM_FIELD_ROW_CLASS, "mt-2")}>
           <InputFieldRowTrigger className="min-h-0 py-0" onClick={onEdit}>
             <span className={INPUT_FIELD_VALUE_CLASS}>{editLabel}</span>
           </InputFieldRowTrigger>

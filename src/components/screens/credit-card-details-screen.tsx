@@ -27,12 +27,11 @@ import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts
 import { toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
 import { calculateAvailableCredit } from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
-import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
+import { formatRecordLabel, formatRecordSubline } from "@/lib/finance/record-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
-import type { FinanceRecord } from "@/lib/finance/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -40,11 +39,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface CreditCardDetailsScreenProps {
   accountId: string;
-}
-
-function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
-  if (record.description) return record.description;
-  return t(`records.types.${record.type}`);
 }
 
 export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenProps) {
@@ -58,6 +52,8 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     getAccountRecords,
     accounts,
     records: allFinanceRecords,
+    savingsAccounts,
+    certificates,
     archiveAccount,
     restoreAccount,
     deleteAccount,
@@ -245,16 +241,17 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           totalRecordCount={allRecords.length}
           isArchived={isArchived}
           formatLocale={formatLocale}
-          recordLabel={(record) => recordLabel(record, t)}
+          recordLabel={(record) => formatRecordLabel(record, t)}
           recordAmount={(record) => record.amount}
           recordSubline={(record) =>
-            formatAccountContextRecordSubline(
-              record,
-              account.id,
-              allFinanceRecords,
+            formatRecordSubline(record, {
+              contextAccountId: account.id,
+              allRecords: allFinanceRecords,
               accounts,
+              savingsAccounts,
+              certificates,
               t,
-            )
+            })
           }
           recordDate={(record) =>
             formatDisplayDate(record.date, formatLocale)

@@ -3,8 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   findTransferCounterpartyRecord,
   formatAccountContextRecordSubline,
+  formatRecordLabel,
+  formatRecordSubline,
 } from "@/lib/finance/record-display";
 import type { Account, FinanceRecord } from "@/lib/finance/types";
+import type { SavingsAccount } from "@/lib/savings/types";
+import type { Certificate } from "@/lib/certificates/types";
 
 const accounts: Account[] = [
   {
@@ -33,7 +37,34 @@ const accounts: Account[] = [
     createdAt: "",
     updatedAt: "",
   },
+  {
+    id: "a3",
+    type: "current_account",
+    name: "Cash",
+    institution: null,
+    accountNumberLast4: null,
+    currentBalance: 0,
+    includeInNetWorth: true,
+    includeInEmergencyFund: false,
+    status: "active",
+    createdAt: "",
+    updatedAt: "",
+  },
 ];
+
+const savingsAccounts = [
+  {
+    id: "s1",
+    accountId: "a2",
+  },
+] as SavingsAccount[];
+
+const certificates = [
+  {
+    id: "c1",
+    accountId: "a3",
+  },
+] as Certificate[];
 
 function transferRecord(
   partial: Pick<FinanceRecord, "id" | "accountId" | "amount">,
@@ -52,6 +83,25 @@ function transferRecord(
   };
 }
 
+function baseRecord(
+  partial: Partial<FinanceRecord> & Pick<FinanceRecord, "id" | "type" | "accountId" | "amount">,
+): FinanceRecord {
+  return {
+    certificateId: null,
+    scheduleEntryId: null,
+    savingsAccountId: null,
+    creditCardId: null,
+    paymentSourceAccountId: null,
+    description: "",
+    date: "2026-06-01",
+    createdAt: "",
+    ...partial,
+  };
+}
+
+const t = (key: string, params?: Record<string, string>) =>
+  params?.account ? `${key}:${params.account}` : key;
+
 describe("record display", () => {
   it("pairs transfer records by date, description, and opposite amount", () => {
     const outgoing = transferRecord({ id: "r1", accountId: "a1", amount: -100 });
@@ -62,26 +112,25 @@ describe("record display", () => {
     );
   });
 
-  it("hides account subline for non-transfer records in account context", () => {
-    const income: FinanceRecord = {
+  it("shows account name for income and expense in account context", () => {
+    const income = baseRecord({
       id: "r3",
       accountId: "a1",
       type: "income",
       amount: 50,
       description: "Salary",
-      date: "2026-06-01",
-      certificateId: null,
-      scheduleEntryId: null,
-      savingsAccountId: null,
-      creditCardId: null,
-      paymentSourceAccountId: null,
-      createdAt: "",
-    };
+    });
 
-    const t = (key: string) => key;
     expect(
-      formatAccountContextRecordSubline(income, "a1", [income], accounts, t),
-    ).toBeNull();
+      formatRecordSubline(income, {
+        contextAccountId: "a1",
+        allRecords: [income],
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("Checking");
   });
 
   it("labels outgoing and incoming transfers for account context", () => {
@@ -89,14 +138,103 @@ describe("record display", () => {
     const incoming = transferRecord({ id: "r2", accountId: "a2", amount: 100 });
     const allRecords = [outgoing, incoming];
 
-    const t = (key: string, params?: Record<string, string>) =>
-      `${key}:${params?.account ?? ""}`;
+    expect(
+      formatRecordSubline(outgoing, {
+        contextAccountId: "a1",
+        allRecords,
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("records.display.toAccount:Savings");
+    expect(
+      formatRecordSubline(incoming, {
+        contextAccountId: "a2",
+        allRecords,
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("records.display.fromAccount:Checking");
+  });
+
+  it("uses savings interest title and from-account subline", () => {
+    const interest = baseRecord({
+      id: "r4",
+      accountId: "a3",
+      type: "interest",
+      amount: 12,
+      savingsAccountId: "s1",
+      description: "Interest Credit",
+    });
+
+    expect(formatRecordLabel(interest, t)).toBe("records.display.savingsInterest");
+    expect(
+      formatRecordSubline(interest, {
+        allRecords: [interest],
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("records.display.fromAccount:Savings");
+  });
+
+  it("uses certificate interest title and from-account subline", () => {
+    const interest = baseRecord({
+      id: "r5",
+      accountId: "a1",
+      type: "interest",
+      amount: 50,
+      certificateId: "c1",
+      description: "Certificate Interest",
+    });
+
+    expect(formatRecordLabel(interest, t)).toBe("records.display.certificateInterest");
+    expect(
+      formatRecordSubline(interest, {
+        allRecords: [interest],
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("records.display.fromAccount:Cash");
+  });
+
+  it("shows payment source account on credit card payments", () => {
+    const payment = baseRecord({
+      id: "r6",
+      accountId: "a2",
+      type: "credit_card_payment",
+      amount: -200,
+      paymentSourceAccountId: "a1",
+      description: "Payment",
+    });
+
+    expect(
+      formatRecordSubline(payment, {
+        allRecords: [payment],
+        accounts,
+        savingsAccounts,
+        certificates,
+        t,
+      }),
+    ).toBe("records.display.fromAccount:Checking");
+  });
+
+  it("keeps deprecated account-context helper compatible for transfers", () => {
+    const outgoing = transferRecord({ id: "r1", accountId: "a1", amount: -100 });
+    const incoming = transferRecord({ id: "r2", accountId: "a2", amount: 100 });
+    const allRecords = [outgoing, incoming];
 
     expect(
       formatAccountContextRecordSubline(outgoing, "a1", allRecords, accounts, t),
-    ).toBe("records.display.transferOutgoing:Savings");
+    ).toBe("records.display.toAccount:Savings");
     expect(
       formatAccountContextRecordSubline(incoming, "a2", allRecords, accounts, t),
-    ).toBe("records.display.transferIncoming:Checking");
+    ).toBe("records.display.fromAccount:Checking");
   });
 });

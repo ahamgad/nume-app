@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import {
+  AccountDetailsBodySurface,
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
@@ -16,29 +18,25 @@ import {
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDisplayDate } from "@/lib/format/date";
+import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
+import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
-import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
+import { getAccountDisplayBalance } from "@/lib/finance/balance-display";
+import {
+  formatRecordLabel,
+  formatRecordSubline,
+} from "@/lib/finance/record-display";
 import { resolveAccountNumberLast4 } from "@/lib/finance/account-identity-validation";
 import {
   filterRecordsByMonth,
   type RecordMonthFilter,
 } from "@/lib/finance/record-month-filter";
-import type { FinanceRecord } from "@/lib/finance/types";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { ACCOUNT_FORM_SECTION_PADDING_CLASS } from "@/lib/layout/account-form-chrome";
-import {
-  ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS,
-  ACCOUNT_RECORDS_HISTORY_SECTION_GAP_CLASS,
-} from "@/lib/layout/account-details-chrome";
+import { ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS } from "@/lib/layout/account-details-chrome";
 import { useFinance } from "@/lib/finance/store";
 import { cn } from "@/lib/utils";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
-
-function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
-  if (record.description) return record.description;
-  return t(`records.types.${record.type}`);
-}
 
 interface AccountRecordsHistoryScreenProps {
   accountId: string;
@@ -53,10 +51,13 @@ export function AccountRecordsHistoryScreen({
   const {
     getAccount,
     getAccountRecords,
+    getCertificateByAccountId,
+    getCreditCardByAccountId,
     certificates,
     creditCards,
     loans,
     accounts,
+    savingsAccounts,
     records: allFinanceRecords,
     isFinanceReady,
     refresh,
@@ -65,6 +66,8 @@ export function AccountRecordsHistoryScreen({
 
   const account = getAccount(accountId);
   const allRecords = getAccountRecords(accountId);
+  const certificate = getCertificateByAccountId(accountId);
+  const creditCard = getCreditCardByAccountId(accountId);
 
   const headerSubtitle = account
     ? formatAccountDetailsHeaderSubtitle(
@@ -77,6 +80,24 @@ export function AccountRecordsHistoryScreen({
         t,
       )
     : null;
+
+  const balanceMeta = account
+    ? t("dashboard.netWorth.updated", {
+        time: formatRelativeTime(account.updatedAt, t, formatLocale),
+      })
+    : undefined;
+
+  const recordSublineParams = useMemo(
+    () => ({
+      contextAccountId: accountId,
+      allRecords: allFinanceRecords,
+      accounts,
+      savingsAccounts,
+      certificates,
+      t,
+    }),
+    [accountId, allFinanceRecords, accounts, savingsAccounts, certificates],
+  );
 
   const filterOptions = useMemo(
     (): ScrollChipOption<RecordMonthFilter>[] => [
@@ -136,7 +157,30 @@ export function AccountRecordsHistoryScreen({
           />
         </AccountDetailsHeaderRegion>
 
-        <div className={ACCOUNT_RECORDS_HISTORY_SECTION_GAP_CLASS}>
+        <AccountDetailsBodySurface className="space-y-6">
+          {account.type === "certificate" && certificate ? (
+            <AccountDetailsBalanceCard
+              label={t("certificates.fields.principal.label")}
+              amount={certificate.principalAmount}
+              locale={formatLocale}
+              meta={balanceMeta}
+            />
+          ) : account.type === "credit_card" && creditCard ? (
+            <AccountDetailsBalanceCard
+              label={t("creditCards.details.outstandingBalance")}
+              amount={toDisplayOutstandingBalance(account.currentBalance)}
+              locale={formatLocale}
+              meta={balanceMeta}
+            />
+          ) : (
+            <AccountDetailsBalanceCard
+              label={t("accounts.details.currentBalance")}
+              amount={getAccountDisplayBalance(account)}
+              locale={formatLocale}
+              meta={balanceMeta}
+            />
+          )}
+
           <ScrollChipSelect
             value={monthFilter}
             options={filterOptions}
@@ -145,41 +189,35 @@ export function AccountRecordsHistoryScreen({
             emphasis="secondary"
             chipSurface="canvas"
           />
-        </div>
 
-        {filteredRecords.length === 0 ? (
-          <EmptyState
-            title={t("accounts.recordsHistory.empty.title")}
-            description={t("accounts.recordsHistory.empty.description")}
-          />
-        ) : (
-          <div
-            className={cn("flex flex-col", ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS)}
-          >
-            {filteredRecords.map((record) => (
-              <div
-                key={record.id}
-                className={cn(CARD_SURFACE_CLASS, ACCOUNT_FORM_SECTION_PADDING_CLASS)}
-              >
-                <RecordRow
-                  className="min-h-0 py-0"
-                  label={recordLabel(record, t)}
-                  amount={record.amount}
-                  formatLocale={formatLocale}
-                  subline={formatAccountContextRecordSubline(
-                    record,
-                    accountId,
-                    allFinanceRecords,
-                    accounts,
-                    t,
-                  )}
-                  date={formatDisplayDate(record.date, formatLocale)}
-                  icon={<RecordTypeIcon type={record.type} />}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+          {filteredRecords.length === 0 ? (
+            <EmptyState
+              title={t("accounts.recordsHistory.empty.title")}
+              description={t("accounts.recordsHistory.empty.description")}
+            />
+          ) : (
+            <div
+              className={cn("flex flex-col", ACCOUNT_RECORDS_HISTORY_CARD_GAP_CLASS)}
+            >
+              {filteredRecords.map((record) => (
+                <div
+                  key={record.id}
+                  className={cn(CARD_SURFACE_CLASS, ACCOUNT_FORM_SECTION_PADDING_CLASS)}
+                >
+                  <RecordRow
+                    className="min-h-0 py-0"
+                    label={formatRecordLabel(record, t)}
+                    amount={record.amount}
+                    formatLocale={formatLocale}
+                    subline={formatRecordSubline(record, recordSublineParams)}
+                    date={formatDisplayDate(record.date, formatLocale)}
+                    icon={<RecordTypeIcon type={record.type} />}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </AccountDetailsBodySurface>
       </ScreenBody>
     </>
   );

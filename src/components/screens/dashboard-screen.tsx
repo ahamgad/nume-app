@@ -17,19 +17,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
 import { useFinance } from "@/lib/finance/store";
+import { formatRecordLabel, formatRecordSubline } from "@/lib/finance/record-display";
 import type { FinanceRecord } from "@/lib/finance/types";
 import { useT, useFormatLocale } from "@/providers/i18n-provider";
 
 function recordLabel(record: FinanceRecord, t: ReturnType<typeof useT>) {
-  if (record.description) return record.description;
-  return t(`records.types.${record.type}`);
+  return formatRecordLabel(record, t);
 }
 
 export function DashboardScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, certificateInsights, isFinanceReady, isFinanceLoading, refresh } =
+  const { accounts, netWorth, recentRecords, certificateInsights, savingsAccounts, certificates, records: allFinanceRecords, isFinanceReady, isFinanceLoading, refresh } =
     useFinance();
 
   const hasAccounts = accounts.length > 0;
@@ -158,23 +158,26 @@ export function DashboardScreen() {
               {t("dashboard.activity.title")}
             </h2>
             <div className="mt-2 divide-y divide-border">
-              {activity.map((record) => {
-                const account = accounts.find((a) => a.id === record.accountId);
-                return (
+              {activity.map((record) => (
                   <RecordRow
                     key={record.id}
                     label={recordLabel(record, t)}
                     amount={record.amount}
                     formatLocale={formatLocale}
-                    subline={account?.name ?? ""}
+                    subline={formatRecordSubline(record, {
+                      allRecords: allFinanceRecords,
+                      accounts,
+                      savingsAccounts,
+                      certificates,
+                      t,
+                    })}
                     date={formatDisplayDate(record.date, formatLocale)}
                     icon={<RecordTypeIcon type={record.type} />}
                     onClick={() =>
                       router.push(`/accounts/${record.accountId}`)
                     }
                   />
-                );
-              })}
+              ))}
             </div>
           </WidgetCard>
         ) : null}
