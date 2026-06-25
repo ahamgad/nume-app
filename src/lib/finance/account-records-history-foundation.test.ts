@@ -61,14 +61,58 @@ describe("account records history foundation", () => {
     expect(source).toContain("onRefresh={refresh}");
   });
 
-  it("removes new balance preview from income and expense forms only", () => {
-    const source = fs.readFileSync(
+  it("removes informational amount feedback from record creation forms", () => {
+    const recordFields = fs.readFileSync(
       path.join(process.cwd(), "src/components/records/record-form-fields.tsx"),
       "utf8",
     );
+    const addRecordScreen = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/screens/add-record-form-screen.tsx",
+      ),
+      "utf8",
+    );
 
-    expect(source).toContain('type === "adjustment"');
-    expect(source).toContain("records.preview.newBalance");
-    expect(source).not.toContain('type !== "transfer"');
+    expect(recordFields).not.toContain("records.insufficientBalance");
+    expect(addRecordScreen).not.toContain("records.insufficientBalance");
+    expect(recordFields).toContain('type !== "adjustment"');
+    expect(recordFields).toContain("records.preview.newBalance");
+  });
+
+  it("uses shared record row typography foundation", () => {
+    const recordRow = fs.readFileSync(
+      path.join(process.cwd(), "src/components/patterns/index.tsx"),
+      "utf8",
+    );
+
+    expect(recordRow).toContain("RECORD_ROW_LABEL_CLASS");
+    expect(recordRow).toContain("RECORD_ROW_META_CLASS");
+    expect(recordRow).toContain('variant="detail"');
+  });
+
+  it("uses overlapping account details body surface on all detail screens", () => {
+    for (const screen of [
+      "account-details-screen.tsx",
+      "savings-details-screen.tsx",
+      "credit-card-details-screen.tsx",
+      "certificate-details-screen.tsx",
+    ]) {
+      const source = fs.readFileSync(
+        path.join(process.cwd(), "src/components/screens", screen),
+        "utf8",
+      );
+      expect(source).toContain("AccountDetailsBodySurface");
+    }
+
+    const chrome = fs.readFileSync(
+      path.join(process.cwd(), "src/lib/layout/account-details-chrome.ts"),
+      "utf8",
+    );
+    expect(chrome).toContain("ACCOUNT_DETAILS_BODY_SURFACE_CLASS");
+    expect(chrome).toContain("-mt-8");
+    expect(chrome).toContain("rounded-t-[24px]");
+    expect(chrome).toContain("pb-12");
+    expect(chrome).not.toContain("ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS");
   });
 });

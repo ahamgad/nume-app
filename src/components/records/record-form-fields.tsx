@@ -71,29 +71,14 @@ export function RecordFormFields({
   );
 
   const preview = useMemo(() => {
-    if (!account || parsedAmount === null) return null;
-    if (type === "adjustment") {
-      const delta = parsedAmount - account.currentBalance;
-      return {
-        current: account.currentBalance,
-        delta,
-        next: parsedAmount,
-      };
-    }
-    if (type === "income") {
-      return { next: account.currentBalance + parsedAmount };
-    }
-    if (type === "expense") {
-      return { next: account.currentBalance - parsedAmount };
-    }
-    return null;
+    if (!account || parsedAmount === null || type !== "adjustment") return null;
+    const delta = parsedAmount - account.currentBalance;
+    return {
+      current: account.currentBalance,
+      delta,
+      next: parsedAmount,
+    };
   }, [account, parsedAmount, type]);
-
-  const showInsufficientBalance =
-    type === "expense" &&
-    account &&
-    parsedAmount !== null &&
-    parsedAmount > account.currentBalance;
 
   const amountLabel =
     type === "adjustment"
@@ -211,13 +196,7 @@ export function RecordFormFields({
         </AccountFormSection>
       </AccountFormSections>
 
-      {showInsufficientBalance ? (
-        <p className="text-sm text-muted-foreground">
-          {t("records.insufficientBalance")}
-        </p>
-      ) : null}
-
-      {preview && parsedAmount !== null && type === "adjustment" ? (
+      {preview && parsedAmount !== null ? (
         <div className="space-y-1">
           {preview.current !== undefined ? (
             <>

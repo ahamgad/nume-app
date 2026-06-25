@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { RecordFormFields } from "@/components/records/record-form-fields";
 import { AccountFormEditContent } from "@/components/forms/account-form-layout";
@@ -60,18 +60,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     (type === "transfer" &&
       (values.fromAccountId !== accountId || values.toAccountId !== null));
 
-  const fromAccount = useMemo(() => {
-    const id = fixedSourceAccountId ?? values.fromAccountId;
-    return id ? accounts.find((item) => item.id === id) : undefined;
-  }, [accounts, fixedSourceAccountId, values.fromAccountId]);
-
-  const parsedAmount = parseAmount(values.amount);
-  const showInsufficientTransferBalance =
-    type === "transfer" &&
-    fromAccount &&
-    parsedAmount !== null &&
-    parsedAmount > fromAccount.currentBalance;
-
   function clearFieldError(field: string) {
     setErrors((prev) => {
       if (!prev[field]) return prev;
@@ -80,6 +68,8 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
       return next;
     });
   }
+
+  const { handleBack } = useNavigationGuard(isDirty);
 
   async function handleSubmit() {
     const nextErrors = validateRecordForm(type, values, t, {
@@ -129,8 +119,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
     }
   }
 
-  const { handleBack } = useNavigationGuard(isDirty);
-
   const titleKey: TranslationKey =
     type === "adjustment"
       ? "records.add.adjustment.title"
@@ -157,11 +145,6 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
             onClearError={clearFieldError}
           />
 
-          {showInsufficientTransferBalance ? (
-            <p className="mt-4 text-sm text-muted-foreground">
-              {t("records.insufficientBalance")}
-            </p>
-          ) : null}
         </AccountFormEditContent>
       </ScreenBody>
 

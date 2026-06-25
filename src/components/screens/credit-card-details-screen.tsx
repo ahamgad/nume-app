@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { AddActivityActionSheet } from "@/components/accounts/add-activity-action-sheet";
 import {
+  AccountDetailsBodySurface,
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
@@ -190,7 +191,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           ) : undefined
         }
       />
-      <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+      <ScreenBody withTabBar={false} onRefresh={refresh}>
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -200,6 +201,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           />
         </AccountDetailsHeaderRegion>
 
+        <AccountDetailsBodySurface className="space-y-6">
         <LiabilityBalanceMetricCard
           account={account}
           label={t("creditCards.details.outstandingBalance")}
@@ -267,6 +269,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
             onDelete={() => setShowDeleteConfirm(true)}
           />
         )}
+        </AccountDetailsBodySurface>
       </ScreenBody>
 
       <AddActivityActionSheet

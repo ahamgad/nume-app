@@ -4,30 +4,21 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
-  ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
+  ACCOUNT_DETAILS_BODY_SURFACE_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
-  ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS,
   ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX,
   ACCOUNT_DETAILS_TITLE_CLASS,
   accountDetailsHeaderRegionContentClassName,
   accountDetailsHeaderRegionPaintClassName,
   accountDetailsHeaderRegionShellClassName,
 } from "@/lib/layout/account-details-chrome";
-import {
-  BOTTOM_SHEET_BOTTOM_RADIUS_CLASS,
-  BOTTOM_SHEET_TOP_RADIUS_PX,
-} from "@/lib/layout/bottom-sheet";
 import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 
 describe("account details header region", () => {
-  it("reuses bottom sheet radius token for bottom corners", () => {
-    expect(BOTTOM_SHEET_TOP_RADIUS_PX).toBe(36);
-    expect(ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS).toBe(
-      BOTTOM_SHEET_BOTTOM_RADIUS_CLASS,
-    );
-    expect(ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS).toBe(
-      "rounded-b-[36px]",
+  it("omits bottom corner radius on the hero paint layer", () => {
+    expect(accountDetailsHeaderRegionPaintClassName()).not.toContain(
+      "rounded-b-",
     );
   });
 
@@ -62,19 +53,20 @@ describe("account details header region", () => {
     expect(summary).toContain("size-12");
   });
 
-  it("adds 16px internal top and bottom padding in the title section", () => {
+  it("adds 16px top and 48px bottom padding in the title section", () => {
     expect(ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS).toBe(
       "pt-4",
     );
     expect(accountDetailsHeaderRegionContentClassName()).toContain("pt-4");
-    expect(accountDetailsHeaderRegionContentClassName()).toContain("pb-4");
+    expect(accountDetailsHeaderRegionContentClassName()).toContain("pb-12");
   });
 
-  it("keeps 24px layout gap to the balance card on the title shell", () => {
-    expect(ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS).toBe(
-      "mb-6",
-    );
-    expect(accountDetailsHeaderRegionShellClassName()).toContain("mb-6");
+  it("overlaps balance content with app-background body surface", () => {
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("-mt-8");
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("rounded-t-[24px]");
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("bg-background");
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("z-[1]");
+    expect(accountDetailsHeaderRegionShellClassName()).not.toContain("mb-6");
   });
 
   it("sits flush below the page header via shell negative margin", () => {

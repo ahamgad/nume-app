@@ -1,4 +1,3 @@
-import { BOTTOM_SHEET_BOTTOM_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 import { cn } from "@/lib/utils";
@@ -40,25 +39,26 @@ export const ACCOUNT_DETAILS_TOGGLE_DESCRIPTION_CLASS =
 export const ACCOUNT_DETAILS_BALANCE_META_CLASS =
   "mt-4 text-[0.8125rem] leading-normal text-muted-foreground";
 
-/** Hero header region bottom radius — reuses bottom sheet corner token. */
-export const ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS =
-  BOTTOM_SHEET_BOTTOM_RADIUS_CLASS;
-
 /** Hero card visual inset above content (24px) — paint layer only. */
 export const ACCOUNT_DETAILS_HEADER_REGION_VISUAL_INSET_PX = 24;
 
 /** Additional in-flow top padding inside the title section (16px). */
 export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_TOP_PADDING_CLASS = "pt-4";
 
-/** In-flow bottom padding inside the title section (16px). */
-export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-4";
+/** In-flow bottom padding inside the title section (16px + 32px overlap). */
+export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-12";
+
+/** Interest-detail label typography — shared with record row titles. */
+export const ACCOUNT_DETAILS_DETAIL_LABEL_CLASS =
+  "text-[0.9375rem] leading-snug text-muted-foreground";
+
+/** Body surface below hero — overlaps title, app background, rounded top. */
+export const ACCOUNT_DETAILS_BODY_SURFACE_CLASS =
+  "relative z-[1] -mx-4 -mt-8 rounded-t-[24px] bg-background px-4";
 
 /** Account details in-content title — 18px, same weight and color as large title. */
 export const ACCOUNT_DETAILS_TITLE_CLASS =
   "text-[1.125rem] font-semibold leading-tight tracking-tight text-foreground";
-
-/** Layout gap between title section and balance card (24px). */
-export const ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS = "mb-6";
 
 /**
  * Paint-layer top extension — max PTR offset + visual inset so card chrome
@@ -72,10 +72,7 @@ export function accountDetailsBalanceMetaClassName(className?: string): string {
 
 /** Layout shell for the account details hero — content-sized, no card padding in flow. */
 export function accountDetailsHeaderRegionShellClassName(): string {
-  return cn(
-    "relative -mx-4 -mt-4 px-4",
-    ACCOUNT_DETAILS_HEADER_REGION_TITLE_TO_BALANCE_GAP_CLASS,
-  );
+  return cn("relative -mx-4 -mt-4 px-4");
 }
 
 /** Paint-only card chrome behind hero content — does not affect layout height. */
@@ -84,7 +81,6 @@ export function accountDetailsHeaderRegionPaintClassName(): string {
     "pointer-events-none absolute inset-x-0 bottom-0",
     ACCOUNT_DETAILS_HEADER_REGION_PAINT_TOP_EXTENSION_CLASS,
     CARD_SURFACE_BG_CLASS,
-    ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS,
   );
 }
 

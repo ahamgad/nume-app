@@ -18,6 +18,7 @@ import {
   accountDetailsHeaderRegionContentClassName,
   accountDetailsHeaderRegionPaintClassName,
   accountDetailsHeaderRegionShellClassName,
+  ACCOUNT_DETAILS_BODY_SURFACE_CLASS,
 } from "@/lib/layout/account-details-chrome";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,21 @@ export function AccountDetailsHeaderRegion({
       <div className={accountDetailsHeaderRegionContentClassName()}>
         {children}
       </div>
+    </div>
+  );
+}
+
+/** Overlapping app-background surface for balance and content below the hero. */
+export function AccountDetailsBodySurface({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn(ACCOUNT_DETAILS_BODY_SURFACE_CLASS, className)}>
+      {children}
     </div>
   );
 }

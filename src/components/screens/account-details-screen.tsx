@@ -8,6 +8,7 @@ import { CreditCardDetailsScreen } from "@/components/screens/credit-card-detail
 import { SavingsDetailsScreen } from "@/components/screens/savings-details-screen";
 import { AddRecordActionSheet } from "@/components/accounts/add-record-action-sheet";
 import {
+  AccountDetailsBodySurface,
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
@@ -192,7 +193,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           ) : undefined
         }
       />
-      <ScreenBody withTabBar={false} className="space-y-6">
+      <ScreenBody withTabBar={false}>
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -202,6 +203,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           />
         </AccountDetailsHeaderRegion>
 
+        <AccountDetailsBodySurface className="space-y-6">
         <BalanceMetricCard
           account={account}
           label={t("accounts.details.currentBalance")}
@@ -269,6 +271,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
             onDelete={() => setShowDeleteConfirm(true)}
           />
         )}
+        </AccountDetailsBodySurface>
 
       </ScreenBody>
 

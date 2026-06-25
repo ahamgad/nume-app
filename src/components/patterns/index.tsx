@@ -12,6 +12,10 @@ import type { ResponsiveCurrencyVariant } from "@/lib/format/responsive-currency
 import { CARD_SURFACE_FLAT_CLASS, CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
 import { getBalanceDisplayProps } from "@/lib/finance/balance-display";
+import {
+  RECORD_ROW_LABEL_CLASS,
+  RECORD_ROW_META_CLASS,
+} from "@/lib/layout/record-row-chrome";
 import { cn } from "@/lib/utils";
 
 /** Full-width bordered form section action — Add Tier, View all, etc. */
@@ -425,15 +429,15 @@ export function RecordRow({
       <div className="mt-0.5 shrink-0">{icon}</div>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[0.9375rem] font-medium">{label}</p>
+          <p className={RECORD_ROW_LABEL_CLASS}>{label}</p>
           <CurrencyAmount
             amount={amount}
             locale={formatLocale}
-            variant="inline"
+            variant="detail"
             className={cn(getBalanceDisplayProps().className, amountClassName)}
           />
         </div>
-        <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{meta}</p>
+        <p className={RECORD_ROW_META_CLASS}>{meta}</p>
       </div>
     </Comp>
   );

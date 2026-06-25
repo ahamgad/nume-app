@@ -8,7 +8,10 @@ import {
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
 } from "@/lib/layout/account-form-chrome";
-import { ACCOUNT_DETAILS_SECTION_PADDING_CLASS } from "@/lib/layout/account-details-chrome";
+import {
+  ACCOUNT_DETAILS_DETAIL_LABEL_CLASS,
+  ACCOUNT_DETAILS_SECTION_PADDING_CLASS,
+} from "@/lib/layout/account-details-chrome";
 import { CARD_SURFACE_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
 import { SurfaceStateProvider } from "@/providers/surface-state-provider";
@@ -77,7 +80,7 @@ export function AccountDetailsDetailRow({
 }: AccountDetailsDetailRowProps) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <span className="text-[0.9375rem] text-muted-foreground">{label}</span>
+      <span className={ACCOUNT_DETAILS_DETAIL_LABEL_CLASS}>{label}</span>
       <span className="text-end text-[0.9375rem] font-medium tabular-nums">{value}</span>
     </div>
   );

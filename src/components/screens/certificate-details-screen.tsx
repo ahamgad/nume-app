@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import {
+  AccountDetailsBodySurface,
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
@@ -214,7 +215,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         accountName={account.name}
         onBack={() => router.back()}
       />
-      <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+      <ScreenBody withTabBar={false} onRefresh={refresh}>
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -224,6 +225,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
           />
         </AccountDetailsHeaderRegion>
 
+        <AccountDetailsBodySurface className="space-y-6">
         <AccountDetailsBalanceCard
           label={t("certificates.fields.principal.label")}
           amount={certificate.principalAmount}
@@ -317,6 +319,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
             onDelete={() => setShowDeleteConfirm(true)}
           />
         )}
+        </AccountDetailsBodySurface>
       </ScreenBody>
 
       <ConfirmBottomSheet

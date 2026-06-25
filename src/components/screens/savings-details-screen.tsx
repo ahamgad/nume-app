@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { AddRecordActionSheet } from "@/components/accounts/add-record-action-sheet";
 import {
+  AccountDetailsBodySurface,
   AccountDetailsContentHeader,
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
@@ -195,7 +196,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           ) : undefined
         }
       />
-      <ScreenBody withTabBar={false} className="space-y-6" onRefresh={refresh}>
+      <ScreenBody withTabBar={false} onRefresh={refresh}>
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -205,6 +206,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           />
         </AccountDetailsHeaderRegion>
 
+        <AccountDetailsBodySurface className="space-y-6">
         <BalanceMetricCard
           account={account}
           label={t("accounts.details.currentBalance")}
@@ -295,6 +297,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
             onDelete={() => setShowDeleteConfirm(true)}
           />
         )}
+        </AccountDetailsBodySurface>
 
       </ScreenBody>
 
