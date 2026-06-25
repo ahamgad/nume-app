@@ -63,9 +63,10 @@ describe("account details header region", () => {
 
   it("overlaps balance content with app-background body surface", () => {
     expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("-mt-8");
-    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("rounded-t-[24px]");
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("rounded-t-[36px]");
     expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("bg-background");
     expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("z-[1]");
+    expect(ACCOUNT_DETAILS_BODY_SURFACE_CLASS).toContain("pt-6");
     expect(accountDetailsHeaderRegionShellClassName()).not.toContain("mb-6");
   });
 

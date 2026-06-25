@@ -922,6 +922,10 @@ export const en = {
       credit_card_purchase: "Purchase",
       credit_card_payment: "Payment",
     },
+    display: {
+      transferOutgoing: "From {account}",
+      transferIncoming: "To {account}",
+    },
   },
   more: {
     title: "More",

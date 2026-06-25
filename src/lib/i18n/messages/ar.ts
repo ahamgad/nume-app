@@ -920,6 +920,10 @@ export const ar = {
       credit_card_purchase: "مشترى",
       credit_card_payment: "سداد",
     },
+    display: {
+      transferOutgoing: "من {account}",
+      transferIncoming: "إلى {account}",
+    },
   },
   more: {
     title: "المزيد",

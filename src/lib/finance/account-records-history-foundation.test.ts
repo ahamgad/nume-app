@@ -87,8 +87,25 @@ describe("account records history foundation", () => {
     );
 
     expect(recordRow).toContain("RECORD_ROW_LABEL_CLASS");
-    expect(recordRow).toContain("RECORD_ROW_META_CLASS");
+    expect(recordRow).toContain("RECORD_ROW_SUBLINE_CLASS");
+    expect(recordRow).toContain("RECORD_ROW_DATE_CLASS");
     expect(recordRow).toContain('variant="detail"');
+    expect(recordRow).toContain("text-foreground");
+  });
+
+  it("uses account-context record subline helpers on detail screens", () => {
+    for (const screen of [
+      "account-details-screen.tsx",
+      "savings-details-screen.tsx",
+      "credit-card-details-screen.tsx",
+      "account-records-history-screen.tsx",
+    ]) {
+      const source = fs.readFileSync(
+        path.join(process.cwd(), "src/components/screens", screen),
+        "utf8",
+      );
+      expect(source).toContain("formatAccountContextRecordSubline");
+    }
   });
 
   it("uses overlapping account details body surface on all detail screens", () => {
@@ -111,7 +128,8 @@ describe("account records history foundation", () => {
     );
     expect(chrome).toContain("ACCOUNT_DETAILS_BODY_SURFACE_CLASS");
     expect(chrome).toContain("-mt-8");
-    expect(chrome).toContain("rounded-t-[24px]");
+    expect(chrome).toContain("BOTTOM_SHEET_TOP_RADIUS_CLASS");
+    expect(chrome).toContain("ACCOUNT_DETAILS_BODY_SURFACE_TOP_PADDING_CLASS");
     expect(chrome).toContain("pb-12");
     expect(chrome).not.toContain("ACCOUNT_DETAILS_HEADER_REGION_BOTTOM_RADIUS_CLASS");
   });

@@ -23,6 +23,7 @@ import { ScreenBody, ScreenHeader, ScreenHeaderActionButton } from "@/components
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
+import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
 import { resolveEffectiveAnnualRate } from "@/lib/savings/interest-engine";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -55,6 +56,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     restoreAccount,
     deleteAccount,
     accounts,
+    records: allFinanceRecords,
     isFinanceReady,
     refresh,
   } = useFinance();
@@ -254,7 +256,18 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
           recordAmount={(record) => record.amount}
-          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
+          recordSubline={(record) =>
+            formatAccountContextRecordSubline(
+              record,
+              account.id,
+              allFinanceRecords,
+              accounts,
+              t,
+            )
+          }
+          recordDate={(record) =>
+            formatDisplayDate(record.date, formatLocale)
+          }
           recordIcon={(record) => <RecordTypeIcon type={record.type} />}
         />
 

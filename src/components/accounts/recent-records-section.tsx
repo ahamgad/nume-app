@@ -27,7 +27,8 @@ interface RecentRecordsSectionProps {
   formatLocale: string;
   recordLabel: (record: FinanceRecord) => string;
   recordAmount: (record: FinanceRecord) => number;
-  recordMeta: (record: FinanceRecord) => string;
+  recordSubline?: (record: FinanceRecord) => string | null;
+  recordDate: (record: FinanceRecord) => string;
   recordIcon: (record: FinanceRecord) => ReactNode;
   onRecordClick?: (record: FinanceRecord) => void;
 }
@@ -40,7 +41,8 @@ export function RecentRecordsSection({
   formatLocale,
   recordLabel,
   recordAmount,
-  recordMeta,
+  recordSubline,
+  recordDate,
   recordIcon,
   onRecordClick,
 }: RecentRecordsSectionProps) {
@@ -90,7 +92,8 @@ export function RecentRecordsSection({
                 label={recordLabel(record)}
                 amount={recordAmount(record)}
                 formatLocale={formatLocale}
-                meta={recordMeta(record)}
+                subline={recordSubline?.(record)}
+                date={recordDate(record)}
                 icon={recordIcon(record)}
                 onClick={onRecordClick ? () => onRecordClick(record) : undefined}
               />

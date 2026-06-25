@@ -166,10 +166,8 @@ export function DashboardScreen() {
                     label={recordLabel(record, t)}
                     amount={record.amount}
                     formatLocale={formatLocale}
-                    meta={t("dashboard.activity.recordMeta", {
-                      account: account?.name ?? "",
-                      date: formatDisplayDate(record.date, formatLocale),
-                    })}
+                    subline={account?.name ?? ""}
+                    date={formatDisplayDate(record.date, formatLocale)}
                     icon={<RecordTypeIcon type={record.type} />}
                     onClick={() =>
                       router.push(`/accounts/${record.accountId}`)

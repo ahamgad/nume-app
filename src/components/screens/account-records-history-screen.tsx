@@ -18,6 +18,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate } from "@/lib/format/date";
 import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
+import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
 import { resolveAccountNumberLast4 } from "@/lib/finance/account-identity-validation";
 import {
   filterRecordsByMonth,
@@ -55,6 +56,8 @@ export function AccountRecordsHistoryScreen({
     certificates,
     creditCards,
     loans,
+    accounts,
+    records: allFinanceRecords,
     isFinanceReady,
     refresh,
   } = useFinance();
@@ -163,7 +166,14 @@ export function AccountRecordsHistoryScreen({
                   label={recordLabel(record, t)}
                   amount={record.amount}
                   formatLocale={formatLocale}
-                  meta={formatDisplayDate(record.date, formatLocale)}
+                  subline={formatAccountContextRecordSubline(
+                    record,
+                    accountId,
+                    allFinanceRecords,
+                    accounts,
+                    t,
+                  )}
+                  date={formatDisplayDate(record.date, formatLocale)}
                   icon={<RecordTypeIcon type={record.type} />}
                 />
               </div>

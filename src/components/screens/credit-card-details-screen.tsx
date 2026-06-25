@@ -27,6 +27,7 @@ import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts
 import { toStoredCreditCardBalance } from "@/lib/credit-cards/balance";
 import { calculateAvailableCredit } from "@/lib/credit-cards/utilization";
 import { formatAccountDestinationDisplay, formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
+import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
 import { formatPostingDayLabel } from "@/lib/savings/posting-schedule";
 import { formatCurrency } from "@/lib/format/currency";
 import { formatDisplayDate } from "@/lib/format/date";
@@ -56,6 +57,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     getCreditCardByAccountId,
     getAccountRecords,
     accounts,
+    records: allFinanceRecords,
     archiveAccount,
     restoreAccount,
     deleteAccount,
@@ -245,7 +247,18 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
           recordAmount={(record) => record.amount}
-          recordMeta={(record) => formatDisplayDate(record.date, formatLocale)}
+          recordSubline={(record) =>
+            formatAccountContextRecordSubline(
+              record,
+              account.id,
+              allFinanceRecords,
+              accounts,
+              t,
+            )
+          }
+          recordDate={(record) =>
+            formatDisplayDate(record.date, formatLocale)
+          }
           recordIcon={(record) => <RecordTypeIcon type={record.type} />}
         />
 

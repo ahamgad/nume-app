@@ -1,3 +1,4 @@
+import { BOTTOM_SHEET_TOP_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { PULL_TO_REFRESH_MAX_VISUAL_OFFSET_PX } from "@/lib/layout/pull-to-refresh";
 import { cn } from "@/lib/utils";
@@ -52,9 +53,14 @@ export const ACCOUNT_DETAILS_HEADER_REGION_CONTENT_BOTTOM_PADDING_CLASS = "pb-12
 export const ACCOUNT_DETAILS_DETAIL_LABEL_CLASS =
   "text-[0.9375rem] leading-snug text-muted-foreground";
 
-/** Body surface below hero — overlaps title, app background, rounded top. */
-export const ACCOUNT_DETAILS_BODY_SURFACE_CLASS =
-  "relative z-[1] -mx-4 -mt-8 rounded-t-[24px] bg-background px-4";
+/** Body surface below hero — overlaps title, app background, sheet top radius. */
+export const ACCOUNT_DETAILS_BODY_SURFACE_TOP_PADDING_CLASS = "pt-6";
+
+export const ACCOUNT_DETAILS_BODY_SURFACE_CLASS = cn(
+  "relative z-[1] -mx-4 -mt-8 bg-background px-4",
+  BOTTOM_SHEET_TOP_RADIUS_CLASS,
+  ACCOUNT_DETAILS_BODY_SURFACE_TOP_PADDING_CLASS,
+);
 
 /** Account details in-content title — 18px, same weight and color as large title. */
 export const ACCOUNT_DETAILS_TITLE_CLASS =

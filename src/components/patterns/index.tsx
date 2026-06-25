@@ -13,8 +13,9 @@ import { CARD_SURFACE_FLAT_CLASS, CARD_SURFACE_CLASS } from "@/lib/layout/card-s
 import { INPUT_FIELD_LABEL_CLASS } from "@/lib/layout/input-field-chrome";
 import { getBalanceDisplayProps } from "@/lib/finance/balance-display";
 import {
+  RECORD_ROW_DATE_CLASS,
   RECORD_ROW_LABEL_CLASS,
-  RECORD_ROW_META_CLASS,
+  RECORD_ROW_SUBLINE_CLASS,
 } from "@/lib/layout/record-row-chrome";
 import { cn } from "@/lib/utils";
 
@@ -397,7 +398,10 @@ interface RecordRowProps {
   label: string;
   amount: number;
   formatLocale: string;
-  meta: string;
+  /** Left column on the second row — account name or transfer label. */
+  subline?: string | null;
+  /** Right column on the second row — formatted date. */
+  date: string;
   icon: ReactNode;
   amountClassName?: string;
   className?: string;
@@ -408,7 +412,8 @@ export function RecordRow({
   label,
   amount,
   formatLocale,
-  meta,
+  subline,
+  date,
   icon,
   amountClassName,
   className,
@@ -430,14 +435,23 @@ export function RecordRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <p className={RECORD_ROW_LABEL_CLASS}>{label}</p>
-          <CurrencyAmount
-            amount={amount}
-            locale={formatLocale}
-            variant="detail"
-            className={cn(getBalanceDisplayProps().className, amountClassName)}
-          />
+          <div className="shrink-0">
+            <CurrencyAmount
+              amount={amount}
+              locale={formatLocale}
+              variant="detail"
+              className={cn(getBalanceDisplayProps().className, amountClassName)}
+            />
+          </div>
         </div>
-        <p className={RECORD_ROW_META_CLASS}>{meta}</p>
+        <div className="mt-0.5 flex items-start justify-between gap-3">
+          {subline ? (
+            <p className={RECORD_ROW_SUBLINE_CLASS}>{subline}</p>
+          ) : (
+            <span className="min-w-0 flex-1" aria-hidden />
+          )}
+          <p className={RECORD_ROW_DATE_CLASS}>{date}</p>
+        </div>
       </div>
     </Comp>
   );

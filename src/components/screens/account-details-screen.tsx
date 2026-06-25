@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { accountsListHref, getPersistedAccountsListFilter } from "@/lib/accounts/accounts-list-filter";
 import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
+import { formatAccountContextRecordSubline } from "@/lib/finance/record-display";
 import { resolveAccountNumberLast4 } from "@/lib/finance/account-identity-validation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
@@ -58,6 +59,8 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
     certificates,
     creditCards,
     loans,
+    accounts,
+    records: allFinanceRecords,
     isFinanceReady,
   } = useFinance();
 
@@ -224,7 +227,16 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           formatLocale={formatLocale}
           recordLabel={(record) => recordLabel(record, t)}
           recordAmount={(record) => record.amount}
-          recordMeta={(record) =>
+          recordSubline={(record) =>
+            formatAccountContextRecordSubline(
+              record,
+              account.id,
+              allFinanceRecords,
+              accounts,
+              t,
+            )
+          }
+          recordDate={(record) =>
             formatDisplayDate(record.date, formatLocale)
           }
           recordIcon={(record) => <RecordTypeIcon type={record.type} />}
