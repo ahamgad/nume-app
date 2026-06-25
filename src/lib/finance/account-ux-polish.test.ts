@@ -61,14 +61,16 @@ describe("RecentRecordsSection", () => {
 });
 
 describe("splash screen spacing", () => {
-  it("uses reduced spacing between logo and wordmark", () => {
+  it("uses the rebuilt splash wordmark typography and spacing", () => {
     const source = fs.readFileSync(
-      path.join(process.cwd(), "src/components/screens/splash-screen.tsx"),
+      path.join(process.cwd(), "src/components/screens/splash-animation.tsx"),
       "utf8",
     );
 
-    expect(source).toContain("mt-1");
-    expect(source).not.toContain("mt-2.5");
-    expect(source).not.toContain("mt-4 text-xl font-semibold tracking-[0.24em]");
+    expect(source).toContain("WORDMARK_GAP_PX = 8");
+    expect(source).toContain("WORDMARK_SIZE_PX = 42");
+    expect(source).toContain("NUME_SPLASH_LOGO_SIZE_PX");
+    expect(source).toContain("tracking-[0.1em]");
+    expect(source).toContain("text-[2.625rem] font-bold");
   });
 });

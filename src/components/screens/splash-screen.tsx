@@ -1,91 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { SplashAnimation } from "@/components/screens/splash-animation";
 import {
   getSplashExitDelayMs,
   isSplashInitializationReady,
   markSplashComplete,
-  SPLASH_EXIT_ANIMATION_MS,
 } from "@/lib/app/splash-session";
 import { readStoredLocale } from "@/lib/i18n/locale-restart";
 import { getLocaleAttributes } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
-
-/** Left leg — bottom-left to top-left (first-letter N inner edge). */
-const NUME_N_STROKE_LEFT = "M16.13 75 L32.2 25";
-
-/** N diagonal — bottom-left to top-right. */
-const NUME_N_STROKE_DIAGONAL = "M16.13 75 L46.37 25";
-
-/** Right leg — top-right to bottom-right (first-letter N inner edge). */
-const NUME_N_STROKE_RIGHT = "M46.37 25 L30.29 75";
-
-function SplashRevealVisual({ isExiting }: { isExiting: boolean }) {
-  return (
-    <div
-      className={cn(
-        "nume-splash-stage flex flex-col items-center",
-        isExiting && "nume-splash-stage-exiting",
-      )}
-    >
-      <div className="relative flex size-[5.5rem] items-center justify-center">
-        <svg
-          aria-hidden
-          viewBox="0 0 100 100"
-          className="nume-splash-n-stroke pointer-events-none absolute inset-0 size-full text-foreground"
-        >
-          <path
-            d={NUME_N_STROKE_LEFT}
-            pathLength="100"
-            className="nume-splash-n-stroke-path"
-          />
-          <path
-            d={NUME_N_STROKE_DIAGONAL}
-            pathLength="100"
-            className="nume-splash-n-stroke-path"
-          />
-          <path
-            d={NUME_N_STROKE_RIGHT}
-            pathLength="100"
-            className="nume-splash-n-stroke-path"
-          />
-        </svg>
-
-        <div className="nume-splash-logo-full relative size-full">
-          <Image
-            src="/brand-flatten-black.svg"
-            alt="NUME"
-            width={88}
-            height={88}
-            priority
-            className="relative z-0 size-full dark:hidden"
-          />
-          <Image
-            src="/brand-flatten-white.svg"
-            alt=""
-            width={88}
-            height={88}
-            priority
-            aria-hidden
-            className="relative z-0 hidden size-full dark:block"
-          />
-        </div>
-      </div>
-
-      <p
-        aria-hidden
-        className="nume-splash-wordmark mt-1 text-xl font-semibold tracking-[0.24em] text-foreground"
-      >
-        NUME
-      </p>
-    </div>
-  );
-}
 
 export function SplashScreen() {
   const router = useRouter();
@@ -93,7 +20,13 @@ export function SplashScreen() {
   const { isFinanceReady } = useFinance();
   const startedAtRef = useRef(0);
   const navigatedRef = useRef(false);
-  const [isExiting, setIsExiting] = useState(false);
+  const [reducedMotion] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [logoFadeComplete, setLogoFadeComplete] = useState(reducedMotion);
+  const [initGateOpen, setInitGateOpen] = useState(false);
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -105,7 +38,7 @@ export function SplashScreen() {
   }, []);
 
   useEffect(() => {
-    if (navigatedRef.current || isExiting) return;
+    if (!logoFadeComplete) return;
     if (
       !isSplashInitializationReady({
         authLoading,
@@ -116,35 +49,29 @@ export function SplashScreen() {
       return;
     }
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
     const elapsed = Date.now() - startedAtRef.current;
-    const remaining = getSplashExitDelayMs(elapsed, prefersReducedMotion);
+    const remaining = getSplashExitDelayMs(elapsed, reducedMotion);
 
     const timer = window.setTimeout(() => {
-      setIsExiting(true);
+      setInitGateOpen(true);
     }, remaining);
 
     return () => window.clearTimeout(timer);
-  }, [authLoading, isExiting, isFinanceReady, user]);
+  }, [authLoading, isFinanceReady, logoFadeComplete, reducedMotion, user]);
 
-  useEffect(() => {
-    if (!isExiting || navigatedRef.current) return;
-
-    const timer = window.setTimeout(() => {
-      if (navigatedRef.current) return;
-      navigatedRef.current = true;
-      markSplashComplete();
-      router.replace("/");
-    }, SPLASH_EXIT_ANIMATION_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [isExiting, router]);
+  const handleCurtainComplete = useCallback(() => {
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+    markSplashComplete();
+    router.replace("/");
+  }, [router]);
 
   return (
-    <div className="flex h-dvh flex-col items-center justify-center bg-background px-6">
-      <SplashRevealVisual isExiting={isExiting} />
-    </div>
+    <SplashAnimation
+      canStartCurtain={initGateOpen}
+      reducedMotion={reducedMotion}
+      onLogoFadeComplete={() => setLogoFadeComplete(true)}
+      onCurtainComplete={handleCurtainComplete}
+    />
   );
 }

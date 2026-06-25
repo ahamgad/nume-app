@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Splash-aligned deceleration curve — smooth arrival with no overshoot.
- * @see globals.css `.nume-splash-n-stroke-path`
+ * @see src/lib/app/splash-animation-timings.ts
  */
 export const NUME_MOTION_EASE = "cubic-bezier(0.45, 0.05, 0.2, 1)" as const;
 

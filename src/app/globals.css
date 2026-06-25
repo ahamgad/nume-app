@@ -199,65 +199,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .nume-splash-n-stroke-path {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    animation: nume-splash-n-draw 400ms cubic-bezier(0.45, 0.05, 0.2, 1) forwards;
-  }
-
-  .nume-splash-n-stroke {
-    z-index: 1;
-    opacity: 1;
-    animation: nume-splash-n-fade 280ms ease-out 340ms forwards;
-  }
-
-  .nume-splash-logo-full {
-    z-index: 0;
-    opacity: 0;
-    transform: scale(0.97);
-    animation: nume-splash-logo-reveal 320ms cubic-bezier(0.25, 0.1, 0.2, 1) 360ms
-      forwards;
-  }
-
-  .nume-splash-wordmark {
-    opacity: 0;
-    animation: nume-splash-wordmark-reveal 280ms ease-out 560ms forwards;
-  }
-
-  .nume-splash-stage-exiting {
-    animation: nume-splash-dissolve 280ms ease-in forwards;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .nume-splash-n-stroke-path {
-      animation: none;
-      stroke-dashoffset: 0;
-    }
-
-    .nume-splash-n-stroke {
-      animation: none;
-      opacity: 0;
-    }
-
-    .nume-splash-logo-full {
-      animation: nume-splash-fade-in 420ms ease-out forwards;
-      transform: none;
-    }
-
-    .nume-splash-wordmark {
-      animation: nume-splash-fade-in 280ms ease-out 140ms forwards;
-    }
-
-    .nume-splash-stage-exiting {
-      animation: nume-splash-dissolve 220ms ease-in forwards;
-    }
-  }
-
   html[data-modal-open="true"] [data-app-scroll] {
     overflow: hidden !important;
     overscroll-behavior: none;
@@ -274,58 +215,6 @@
   html[data-search-sheet-open="true"] body {
     overflow: hidden;
     overscroll-behavior: none;
-  }
-}
-
-@keyframes nume-splash-n-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes nume-splash-n-fade {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes nume-splash-logo-reveal {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes nume-splash-wordmark-reveal {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes nume-splash-dissolve {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-}
-
-@keyframes nume-splash-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
