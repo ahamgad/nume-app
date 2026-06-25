@@ -9,17 +9,20 @@ interface ViewportSize {
   height: number;
 }
 
-interface LogoLayout {
+export interface SplashLogoLayout {
   centerX: number;
   centerY: number;
   scale: number;
 }
 
-export function getSplashLogoLayout(viewport: ViewportSize): LogoLayout {
+export function getSplashLogoLayout(
+  viewport: ViewportSize,
+  logoCenter?: { x: number; y: number },
+): SplashLogoLayout {
   const scale = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
   return {
-    centerX: viewport.width / 2,
-    centerY: viewport.height / 2,
+    centerX: logoCenter?.x ?? viewport.width / 2,
+    centerY: logoCenter?.y ?? viewport.height / 2,
     scale,
   };
 }
@@ -27,7 +30,7 @@ export function getSplashLogoLayout(viewport: ViewportSize): LogoLayout {
 function toScreenPoint(
   localX: number,
   localY: number,
-  layout: LogoLayout,
+  layout: SplashLogoLayout,
   translateX = 0,
 ): { x: number; y: number } {
   return {
@@ -46,7 +49,7 @@ function lineAtViewportEdges(
   y1: number,
   x2: number,
   y2: number,
-  layout: LogoLayout,
+  layout: SplashLogoLayout,
   translateX: number,
   viewport: ViewportSize,
 ): [{ x: number; y: number }, { x: number; y: number }] {
@@ -77,7 +80,7 @@ export function buildCurtainRevealPolygon(
   path3TranslateX: number,
   path4TranslateX: number,
   viewport: ViewportSize,
-  layout: LogoLayout,
+  layout: SplashLogoLayout,
 ): string {
   const left = NUME_SPLASH_CURTAIN_DIAGONALS.path3;
   const right = NUME_SPLASH_CURTAIN_DIAGONALS.path4;
@@ -103,55 +106,6 @@ export function buildCurtainRevealPolygon(
 
   const points = [leftTop, rightTop, rightBottom, leftBottom];
   return points.map((point) => `${point.x},${point.y}`).join(" ");
-}
-
-/** Clip-path polygon keeping splash visible outside the reveal corridor. */
-export function buildSplashCurtainClipPath(
-  path3TranslateX: number,
-  path4TranslateX: number,
-  viewport: ViewportSize,
-  layout: LogoLayout,
-): string {
-  const left = NUME_SPLASH_CURTAIN_DIAGONALS.path3;
-  const right = NUME_SPLASH_CURTAIN_DIAGONALS.path4;
-
-  const [leftTop, leftBottom] = lineAtViewportEdges(
-    left.x1,
-    left.y1,
-    left.x2,
-    left.y2,
-    layout,
-    path3TranslateX,
-    viewport,
-  );
-  const [rightTop, rightBottom] = lineAtViewportEdges(
-    right.x1,
-    right.y1,
-    right.x2,
-    right.y2,
-    layout,
-    path4TranslateX,
-    viewport,
-  );
-
-  const w = viewport.width;
-  const h = viewport.height;
-
-  const leftRegion = [
-    `0,0`,
-    `${leftTop.x},0`,
-    `${leftBottom.x},${h}`,
-    `0,${h}`,
-  ].join(" ");
-
-  const rightRegion = [
-    `${rightTop.x},0`,
-    `${w},0`,
-    `${w},${h}`,
-    `${rightBottom.x},${h}`,
-  ].join(" ");
-
-  return `polygon(${leftRegion}, ${rightRegion})`;
 }
 
 export function getCurtainTravelDistance(viewport: ViewportSize): number {

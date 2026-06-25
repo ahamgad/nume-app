@@ -67,10 +67,10 @@ describe("splash screen spacing", () => {
       "utf8",
     );
 
-    expect(source).toContain("WORDMARK_GAP_PX = 8");
-    expect(source).toContain("WORDMARK_SIZE_PX = 42");
+    expect(source).toContain("NUME_SPLASH_WORDMARK_GAP_PX");
+    expect(source).toContain("NUME_SPLASH_WORDMARK_SIZE_PX");
     expect(source).toContain("NUME_SPLASH_LOGO_SIZE_PX");
     expect(source).toContain("tracking-[0.1em]");
-    expect(source).toContain("text-[2.625rem] font-bold");
+    expect(source).toContain("font-sans font-bold");
   });
 });

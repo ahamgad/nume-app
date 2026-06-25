@@ -33,7 +33,10 @@ describe("splash stroke paths", () => {
 describe("splash curtain geometry", () => {
   it("widens the reveal corridor as curtain progress increases", () => {
     const viewport = { width: 400, height: 800 };
-    const layout = getSplashLogoLayout(viewport);
+    const layout = getSplashLogoLayout(viewport, {
+      x: viewport.width / 2,
+      y: viewport.height / 2 - 13,
+    });
     const closed = buildCurtainRevealPolygon(0, 0, viewport, layout);
     const open = buildCurtainRevealPolygon(-120, 120, viewport, layout);
 

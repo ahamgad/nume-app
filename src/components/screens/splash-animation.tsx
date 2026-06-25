@@ -22,18 +22,17 @@ import {
 import {
   NUME_SPLASH_LOGO_FILLS,
   NUME_SPLASH_LOGO_SIZE_PX,
+  NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX,
   NUME_SPLASH_STROKE_ORDER,
   NUME_SPLASH_STROKE_PATHS,
   NUME_SPLASH_STROKE_WIDTH_PX,
   NUME_SPLASH_VIEWBOX_SIZE,
+  NUME_SPLASH_WORDMARK_GAP_PX,
+  NUME_SPLASH_WORDMARK_SIZE_PX,
 } from "@/lib/app/splash-stroke-paths";
 import { DashboardScreen } from "@/components/screens/dashboard-screen";
 
 const WORDMARK = "NUME";
-const WORDMARK_GAP_PX = 8;
-const WORDMARK_SIZE_PX = 42;
-const STAGE_BLOCK_HEIGHT_PX =
-  NUME_SPLASH_LOGO_SIZE_PX + WORDMARK_GAP_PX + WORDMARK_SIZE_PX;
 
 const strokeDrawTransition = {
   duration: SPLASH_STROKE_DRAW_MS / 1000,
@@ -77,8 +76,22 @@ export function SplashAnimation({
   const path4X = useMotionValue(0);
   const curtainProgress = useMotionValue(0);
   const letterProgress = useMotionValue(0);
+  const innerStrokeOpacity = useMotionValue(reducedMotion ? 0 : 1);
 
-  const layout = useMemo(() => getSplashLogoLayout(viewport), [viewport]);
+  const logoCenter = useMemo(
+    () => ({
+      x: viewport.width / 2,
+      y:
+        viewport.height / 2 -
+        (NUME_SPLASH_WORDMARK_SIZE_PX + NUME_SPLASH_WORDMARK_GAP_PX) / 2,
+    }),
+    [viewport.height, viewport.width],
+  );
+
+  const layout = useMemo(
+    () => getSplashLogoLayout(viewport, logoCenter),
+    [logoCenter, viewport],
+  );
 
   const corridorPoints = useTransform(curtainProgress, (progress) => {
     if (progress <= 0) {
@@ -89,10 +102,11 @@ export function SplashAnimation({
     return buildCurtainRevealPolygon(-travel, travel, viewport, layout);
   });
 
-  const logoBlockTop = viewport.height / 2 - STAGE_BLOCK_HEIGHT_PX / 2;
-  const logoBlockLeft = viewport.width / 2 - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoScale = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
+  const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
+  const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
+
   const splashMaskStyle = curtainStarted
     ? {
         mask: `url(#${safeMaskId})`,
@@ -139,6 +153,19 @@ export function SplashAnimation({
 
   useEffect(() => {
     if (reducedMotion) return;
+    if (!logoFadeStarted) return;
+
+    const controls = animate([
+      [innerStrokeOpacity, 0, logoFadeTransition],
+    ]);
+
+    return () => {
+      controls.stop();
+    };
+  }, [innerStrokeOpacity, logoFadeStarted, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
     if (!canStartCurtain || !logoFadeComplete || curtainStarted) return;
 
     let animationPromise: Promise<void> | undefined;
@@ -165,12 +192,12 @@ export function SplashAnimation({
     curtainProgress,
     curtainStarted,
     logoFadeComplete,
+    logoScale,
     onCurtainComplete,
     path3X,
     path4X,
     reducedMotion,
     viewport,
-    logoScale,
   ]);
 
   useEffect(() => {
@@ -181,7 +208,9 @@ export function SplashAnimation({
       onCurtainComplete();
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [canStartCurtain, curtainStarted, onCurtainComplete, reducedMotion]);
 
   function handleStrokePathComplete() {
@@ -261,15 +290,20 @@ export function SplashAnimation({
       </svg>
 
       <div
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background text-foreground"
-        style={splashMaskStyle}
+        className="absolute inset-0 z-10 flex flex-col items-center bg-background text-foreground"
+        style={{
+          ...splashMaskStyle,
+          paddingTop:
+            viewport.height / 2 - NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX / 2,
+          gap: NUME_SPLASH_WORDMARK_GAP_PX,
+        }}
       >
         <svg
           aria-hidden
           width={NUME_SPLASH_LOGO_SIZE_PX}
           height={NUME_SPLASH_LOGO_SIZE_PX}
           viewBox={`0 0 ${NUME_SPLASH_VIEWBOX_SIZE} ${NUME_SPLASH_VIEWBOX_SIZE}`}
-          className="overflow-visible"
+          className="shrink-0 overflow-visible"
         >
           {NUME_SPLASH_STROKE_ORDER.map((key) => {
             if (key === "path3" || key === "path4") return null;
@@ -284,6 +318,7 @@ export function SplashAnimation({
                 vectorEffect="non-scaling-stroke"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ strokeOpacity: innerStrokeOpacity }}
                 initial={{ pathLength: reducedMotion ? 1 : 0 }}
                 animate={{ pathLength: 1 }}
                 transition={strokeDrawTransition}
@@ -299,14 +334,20 @@ export function SplashAnimation({
             onAnimationComplete={handleLogoFadeComplete}
           >
             {NUME_SPLASH_LOGO_FILLS.map((d) => (
-              <path key={d.slice(0, 16)} d={d} fill="currentColor" />
+              <path
+                key={d.slice(0, 16)}
+                d={d}
+                fill="currentColor"
+                fillRule="evenodd"
+              />
             ))}
           </motion.g>
         </svg>
 
         <p
           aria-hidden
-          className="mt-2 text-[2.625rem] font-bold tracking-[0.1em]"
+          className="font-sans font-bold tracking-[0.1em]"
+          style={{ fontSize: NUME_SPLASH_WORDMARK_SIZE_PX }}
         >
           {WORDMARK.split("").map((letter, index) => (
             <span
