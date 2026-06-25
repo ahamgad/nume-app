@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import {
   AccountDetailsBodySurface,
   AccountDetailsContentHeader,
@@ -18,10 +17,8 @@ import {
   type ScrollChipOption,
 } from "@/components/ui/scroll-chip-select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toDisplayOutstandingBalance } from "@/lib/credit-cards/balance";
-import { formatDisplayDate, formatRelativeTime } from "@/lib/format/date";
+import { formatDisplayDate } from "@/lib/format/date";
 import { formatAccountDetailsHeaderSubtitle } from "@/lib/finance/account-display";
-import { getAccountDisplayBalance } from "@/lib/finance/balance-display";
 import {
   formatRecordLabel,
   formatRecordSubline,
@@ -51,8 +48,6 @@ export function AccountRecordsHistoryScreen({
   const {
     getAccount,
     getAccountRecords,
-    getCertificateByAccountId,
-    getCreditCardByAccountId,
     certificates,
     creditCards,
     loans,
@@ -66,8 +61,6 @@ export function AccountRecordsHistoryScreen({
 
   const account = getAccount(accountId);
   const allRecords = getAccountRecords(accountId);
-  const certificate = getCertificateByAccountId(accountId);
-  const creditCard = getCreditCardByAccountId(accountId);
 
   const headerSubtitle = account
     ? formatAccountDetailsHeaderSubtitle(
@@ -81,12 +74,6 @@ export function AccountRecordsHistoryScreen({
       )
     : null;
 
-  const balanceMeta = account
-    ? t("dashboard.netWorth.updated", {
-        time: formatRelativeTime(account.updatedAt, t, formatLocale),
-      })
-    : undefined;
-
   const recordSublineParams = useMemo(
     () => ({
       contextAccountId: accountId,
@@ -94,9 +81,10 @@ export function AccountRecordsHistoryScreen({
       accounts,
       savingsAccounts,
       certificates,
+      creditCards,
       t,
     }),
-    [accountId, allFinanceRecords, accounts, savingsAccounts, certificates],
+    [accountId, allFinanceRecords, accounts, savingsAccounts, certificates, creditCards],
   );
 
   const filterOptions = useMemo(
@@ -158,29 +146,6 @@ export function AccountRecordsHistoryScreen({
         </AccountDetailsHeaderRegion>
 
         <AccountDetailsBodySurface className="space-y-6">
-          {account.type === "certificate" && certificate ? (
-            <AccountDetailsBalanceCard
-              label={t("certificates.fields.principal.label")}
-              amount={certificate.principalAmount}
-              locale={formatLocale}
-              meta={balanceMeta}
-            />
-          ) : account.type === "credit_card" && creditCard ? (
-            <AccountDetailsBalanceCard
-              label={t("creditCards.details.outstandingBalance")}
-              amount={toDisplayOutstandingBalance(account.currentBalance)}
-              locale={formatLocale}
-              meta={balanceMeta}
-            />
-          ) : (
-            <AccountDetailsBalanceCard
-              label={t("accounts.details.currentBalance")}
-              amount={getAccountDisplayBalance(account)}
-              locale={formatLocale}
-              meta={balanceMeta}
-            />
-          )}
-
           <ScrollChipSelect
             value={monthFilter}
             options={filterOptions}

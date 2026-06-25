@@ -54,6 +54,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     records: allFinanceRecords,
     savingsAccounts,
     certificates,
+    creditCards,
     archiveAccount,
     restoreAccount,
     deleteAccount,
@@ -250,6 +251,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
               accounts,
               savingsAccounts,
               certificates,
+              creditCards,
               t,
             })
           }

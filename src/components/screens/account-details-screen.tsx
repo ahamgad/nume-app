@@ -229,6 +229,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               accounts,
               savingsAccounts,
               certificates,
+              creditCards,
               t,
             })
           }

@@ -52,7 +52,7 @@ describe("account records history foundation", () => {
     expect(source).toContain("AccountDetailsHeaderRegion");
     expect(source).toContain("AccountDetailsContentHeader");
     expect(source).toContain("AccountDetailsBodySurface");
-    expect(source).toContain("AccountDetailsBalanceCard");
+    expect(source).not.toContain("AccountDetailsBalanceCard");
     expect(source).toContain("ScrollChipSelect");
     expect(source).toContain("CARD_SURFACE_CLASS");
     expect(source).toContain("RecordRow");

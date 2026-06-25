@@ -1,4 +1,5 @@
 import type { Certificate } from "@/lib/certificates/types";
+import type { CreditCard } from "@/lib/credit-cards/types";
 import type { SavingsAccount } from "@/lib/savings/types";
 import type { Account, FinanceRecord } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
@@ -52,6 +53,14 @@ function resolveInterestSourceAccountId(
   return null;
 }
 
+function resolveCreditCardAccountId(
+  creditCardId: string | null | undefined,
+  creditCards: CreditCard[],
+): string | null {
+  if (!creditCardId) return null;
+  return creditCards.find((card) => card.id === creditCardId)?.accountId ?? null;
+}
+
 export function formatRecordLabel(
   record: FinanceRecord,
   t: (key: TranslationKey, params?: Record<string, string>) => string,
@@ -80,6 +89,7 @@ export interface FormatRecordSublineParams {
   accounts: Account[];
   savingsAccounts: SavingsAccount[];
   certificates: Certificate[];
+  creditCards: CreditCard[];
   t: (key: TranslationKey, params?: Record<string, string>) => string;
 }
 
@@ -93,6 +103,7 @@ export function formatRecordSubline(
     accounts,
     savingsAccounts,
     certificates,
+    creditCards,
     t,
   } = params;
 
@@ -114,6 +125,10 @@ export function formatRecordSubline(
     return fromAccount(accountName(sourceAccountId, accounts, t));
   }
 
+  if (record.type === "credit_card_purchase") {
+    return accountName(record.accountId, accounts, t);
+  }
+
   if (record.type === "credit_card_payment") {
     return fromAccount(
       accountName(record.paymentSourceAccountId, accounts, t),
@@ -121,17 +136,32 @@ export function formatRecordSubline(
   }
 
   if (record.type === "transfer") {
+    const viewingAccountId = contextAccountId ?? record.accountId;
+
+    if (record.accountId !== viewingAccountId) {
+      return null;
+    }
+
+    if (record.creditCardId) {
+      const cardName = accountName(
+        resolveCreditCardAccountId(record.creditCardId, creditCards),
+        accounts,
+        t,
+      );
+
+      if (record.amount < 0) {
+        return toAccount(cardName);
+      }
+
+      return fromAccount(cardName);
+    }
+
     const counterpartyRecord = findTransferCounterpartyRecord(record, allRecords);
     const counterpartyName = accountName(
       counterpartyRecord?.accountId,
       accounts,
       t,
     );
-    const viewingAccountId = contextAccountId ?? record.accountId;
-
-    if (record.accountId !== viewingAccountId) {
-      return null;
-    }
 
     if (record.amount < 0) {
       return toAccount(counterpartyName);
@@ -157,6 +187,7 @@ export function formatAccountContextRecordSubline(
     accounts,
     savingsAccounts: [],
     certificates: [],
+    creditCards: [],
     t,
   });
 }

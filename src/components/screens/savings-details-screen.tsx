@@ -53,6 +53,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     records: allFinanceRecords,
     savingsAccounts,
     certificates,
+    creditCards,
     isFinanceReady,
     refresh,
   } = useFinance();
@@ -259,6 +260,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
               accounts,
               savingsAccounts,
               certificates,
+              creditCards,
               t,
             })
           }

@@ -9,6 +9,7 @@ import {
 import type { Account, FinanceRecord } from "@/lib/finance/types";
 import type { SavingsAccount } from "@/lib/savings/types";
 import type { Certificate } from "@/lib/certificates/types";
+import type { CreditCard } from "@/lib/credit-cards/types";
 
 const accounts: Account[] = [
   {
@@ -50,6 +51,19 @@ const accounts: Account[] = [
     createdAt: "",
     updatedAt: "",
   },
+  {
+    id: "cc1",
+    type: "credit_card",
+    name: "Platinum Card",
+    institution: null,
+    accountNumberLast4: null,
+    currentBalance: -500,
+    includeInNetWorth: true,
+    includeInEmergencyFund: false,
+    status: "active",
+    createdAt: "",
+    updatedAt: "",
+  },
 ];
 
 const savingsAccounts = [
@@ -65,6 +79,13 @@ const certificates = [
     accountId: "a3",
   },
 ] as Certificate[];
+
+const creditCards = [
+  {
+    id: "cc-row",
+    accountId: "cc1",
+  },
+] as CreditCard[];
 
 function transferRecord(
   partial: Pick<FinanceRecord, "id" | "accountId" | "amount">,
@@ -102,6 +123,14 @@ function baseRecord(
 const t = (key: string, params?: Record<string, string>) =>
   params?.account ? `${key}:${params.account}` : key;
 
+const sublineParams = {
+  accounts,
+  savingsAccounts,
+  certificates,
+  creditCards,
+  t,
+};
+
 describe("record display", () => {
   it("pairs transfer records by date, description, and opposite amount", () => {
     const outgoing = transferRecord({ id: "r1", accountId: "a1", amount: -100 });
@@ -125,10 +154,7 @@ describe("record display", () => {
       formatRecordSubline(income, {
         contextAccountId: "a1",
         allRecords: [income],
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("Checking");
   });
@@ -142,20 +168,14 @@ describe("record display", () => {
       formatRecordSubline(outgoing, {
         contextAccountId: "a1",
         allRecords,
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("records.display.toAccount:Savings");
     expect(
       formatRecordSubline(incoming, {
         contextAccountId: "a2",
         allRecords,
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("records.display.fromAccount:Checking");
   });
@@ -174,10 +194,7 @@ describe("record display", () => {
     expect(
       formatRecordSubline(interest, {
         allRecords: [interest],
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("records.display.fromAccount:Savings");
   });
@@ -196,10 +213,7 @@ describe("record display", () => {
     expect(
       formatRecordSubline(interest, {
         allRecords: [interest],
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("records.display.fromAccount:Cash");
   });
@@ -217,12 +231,47 @@ describe("record display", () => {
     expect(
       formatRecordSubline(payment, {
         allRecords: [payment],
-        accounts,
-        savingsAccounts,
-        certificates,
-        t,
+        ...sublineParams,
       }),
     ).toBe("records.display.fromAccount:Checking");
+  });
+
+  it("shows credit card account name on purchases", () => {
+    const purchase = baseRecord({
+      id: "r7",
+      accountId: "cc1",
+      type: "credit_card_purchase",
+      amount: 150,
+      creditCardId: "cc-row",
+      description: "Groceries",
+    });
+
+    expect(
+      formatRecordSubline(purchase, {
+        contextAccountId: "cc1",
+        allRecords: [purchase],
+        ...sublineParams,
+      }),
+    ).toBe("Platinum Card");
+  });
+
+  it("shows credit card destination on source-account payment transfers", () => {
+    const paymentTransfer = baseRecord({
+      id: "r8",
+      accountId: "a1",
+      type: "transfer",
+      amount: -200,
+      creditCardId: "cc-row",
+      description: "Payment",
+    });
+
+    expect(
+      formatRecordSubline(paymentTransfer, {
+        contextAccountId: "a1",
+        allRecords: [paymentTransfer],
+        ...sublineParams,
+      }),
+    ).toBe("records.display.toAccount:Platinum Card");
   });
 
   it("keeps deprecated account-context helper compatible for transfers", () => {

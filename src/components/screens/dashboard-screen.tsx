@@ -29,7 +29,7 @@ export function DashboardScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, certificateInsights, savingsAccounts, certificates, records: allFinanceRecords, isFinanceReady, isFinanceLoading, refresh } =
+  const { accounts, netWorth, recentRecords, certificateInsights, savingsAccounts, certificates, creditCards, records: allFinanceRecords, isFinanceReady, isFinanceLoading, refresh } =
     useFinance();
 
   const hasAccounts = accounts.length > 0;
@@ -169,6 +169,7 @@ export function DashboardScreen() {
                       accounts,
                       savingsAccounts,
                       certificates,
+                      creditCards,
                       t,
                     })}
                     date={formatDisplayDate(record.date, formatLocale)}
