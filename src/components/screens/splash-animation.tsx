@@ -31,6 +31,7 @@ import {
 import { isSplashInitializationReady } from "@/lib/app/splash-session";
 import {
   NUME_SPLASH_CURTAIN_STROKE_PATHS,
+  NUME_SPLASH_CURTAIN_STROKE_WIDTH_PX,
   NUME_SPLASH_LOGO_FILLS,
   NUME_SPLASH_LOGO_SIZE_PX,
   NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX,
@@ -111,6 +112,7 @@ export function SplashAnimation({
   });
   const initReadyRef = useRef(initReady);
   const eraseHandledRef = useRef(false);
+  const curtainTriggeredRef = useRef(false);
 
   useEffect(() => {
     initReadyRef.current = initReady;
@@ -257,33 +259,31 @@ export function SplashAnimation({
 
   useEffect(() => {
     if (reducedMotion) return;
-    if (!canStartCurtain || !logoFadeComplete || curtainStarted) return;
+    if (!canStartCurtain || !logoFadeComplete) return;
+    if (curtainTriggeredRef.current) return;
 
-    let animationControls: ReturnType<typeof animate> | undefined;
-    let startFrame = 0;
-    let curtainFrame = 0;
+    curtainTriggeredRef.current = true;
 
-    startFrame = window.requestAnimationFrame(() => {
-      curtainFrame = window.requestAnimationFrame(() => {
-        curtainProgress.set(0);
-        setCurtainStarted(true);
+    let animationPromise: Promise<void> | undefined;
 
-        animationControls = animate(curtainProgress, 1, curtainTransition);
-        void animationControls.then(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setCurtainStarted(true);
+      curtainProgress.set(0);
+
+      animationPromise = animate(curtainProgress, 1, curtainTransition).then(
+        () => {
           onCurtainComplete();
-        });
-      });
+        },
+      );
     });
 
     return () => {
-      window.cancelAnimationFrame(startFrame);
-      window.cancelAnimationFrame(curtainFrame);
-      animationControls?.stop();
+      window.cancelAnimationFrame(frame);
+      void animationPromise;
     };
   }, [
     canStartCurtain,
     curtainProgress,
-    curtainStarted,
     logoFadeComplete,
     onCurtainComplete,
     reducedMotion,
@@ -329,11 +329,9 @@ export function SplashAnimation({
       ? introStrokeDrawTransition
       : introStrokeEraseTransition;
 
-  const dashboardReady = canStartCurtain && logoFadeComplete;
-
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-background">
-      {dashboardReady ? (
+      {curtainStarted ? (
         <div className="absolute inset-0 z-0">
           <DashboardScreen />
         </div>
@@ -367,7 +365,7 @@ export function SplashAnimation({
               d={NUME_SPLASH_CURTAIN_STROKE_PATHS.path3}
               fill="none"
               stroke="currentColor"
-              strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
+              strokeWidth={NUME_SPLASH_CURTAIN_STROKE_WIDTH_PX}
               vectorEffect="non-scaling-stroke"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -377,7 +375,7 @@ export function SplashAnimation({
               d={NUME_SPLASH_CURTAIN_STROKE_PATHS.path4}
               fill="none"
               stroke="currentColor"
-              strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
+              strokeWidth={NUME_SPLASH_CURTAIN_STROKE_WIDTH_PX}
               vectorEffect="non-scaling-stroke"
               strokeLinecap="round"
               strokeLinejoin="round"
