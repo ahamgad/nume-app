@@ -10,8 +10,8 @@ export const SPLASH_WORDMARK_LETTER_FADE_MS = 220;
 /** Subtle upward settle while each letter fades in (px). */
 export const SPLASH_WORDMARK_LETTER_RISE_PX = 3;
 
-/** Faster reverse erase between intro loops while initialization continues. */
-export const SPLASH_STROKE_ERASE_MS = 400;
+/** Reverse erase between intro loops — faster than draw, but not dramatically so. */
+export const SPLASH_STROKE_ERASE_MS = 600;
 
 export const SPLASH_LOGO_FADE_MS = 480;
 

@@ -306,6 +306,7 @@ export function SplashAnimation({
     onLogoFadeComplete();
   }
 
+  const introStrokeHidden = { pathLength: 1, pathOffset: 1 };
   const introStrokeDrawTarget = { pathLength: 1, pathOffset: 0 };
   const introStrokeEraseTarget = { pathLength: 0, pathOffset: 1 };
   const introStrokeAnimate =
@@ -401,7 +402,7 @@ export function SplashAnimation({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 style={{ strokeOpacity: innerStrokeOpacity }}
-                initial={{ pathLength: 0, pathOffset: 0 }}
+                initial={introStrokeHidden}
                 animate={introStrokeAnimate}
                 transition={introStrokeTransition}
                 onAnimationComplete={
