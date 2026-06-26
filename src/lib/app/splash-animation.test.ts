@@ -6,7 +6,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildCurtainRevealPolygon,
   getCurtainTravelDistance,
+  getCurtainTranslations,
   getSplashLogoLayout,
+  parseCurtainCorridorPoints,
 } from "@/lib/app/splash-curtain-geometry";
 import {
   NUME_SPLASH_CURTAIN_SVG_PATHS,
@@ -14,6 +16,8 @@ import {
   NUME_SPLASH_STROKE_ORDER,
   NUME_SPLASH_STROKE_PATHS,
   NUME_SPLASH_STROKE_SVG_PATHS,
+  NUME_SPLASH_LOGO_SIZE_PX,
+  NUME_SPLASH_VIEWBOX_SIZE,
 } from "@/lib/app/splash-stroke-paths";
 import {
   SPLASH_CURTAIN_PATH_KEYS,
@@ -63,17 +67,49 @@ describe("splash stroke paths", () => {
 });
 
 describe("splash curtain geometry", () => {
+  const viewport = { width: 390, height: 844 };
+  const logoScale = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
+  const layout = getSplashLogoLayout(viewport, {
+    x: viewport.width / 2,
+    y: viewport.height / 2 - 13,
+  });
+
   it("widens the reveal corridor as curtain progress increases", () => {
-    const viewport = { width: 400, height: 800 };
-    const layout = getSplashLogoLayout(viewport, {
-      x: viewport.width / 2,
-      y: viewport.height / 2 - 13,
-    });
     const closed = buildCurtainRevealPolygon(0, 0, viewport, layout);
     const open = buildCurtainRevealPolygon(-120, 120, viewport, layout);
 
     expect(closed).not.toBe(open);
     expect(getCurtainTravelDistance(viewport)).toBeGreaterThan(200);
+  });
+
+  it("spans the full viewport height at every travel step", () => {
+    for (const progress of [0, 0.35, 0.7, 1]) {
+      const { screenTravel } = getCurtainTranslations(progress, viewport, logoScale);
+      const polygon = buildCurtainRevealPolygon(
+        -screenTravel,
+        screenTravel,
+        viewport,
+        layout,
+      );
+      const points = parseCurtainCorridorPoints(polygon);
+
+      expect(points).toHaveLength(4);
+      expect(points[0]?.y).toBe(0);
+      expect(points[1]?.y).toBe(0);
+      expect(points[2]?.y).toBe(viewport.height);
+      expect(points[3]?.y).toBe(viewport.height);
+    }
+  });
+
+  it("keeps stroke translations aligned with corridor travel", () => {
+    for (const progress of [0, 0.5, 1]) {
+      const { screenTravel, path3TranslateX, path4TranslateX } =
+        getCurtainTranslations(progress, viewport, logoScale);
+
+      expect(path3TranslateX).toBe(-screenTravel / logoScale);
+      expect(path4TranslateX).toBe(screenTravel / logoScale);
+      expect(path3TranslateX).toBe(-path4TranslateX);
+    }
   });
 });
 

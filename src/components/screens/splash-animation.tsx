@@ -9,6 +9,7 @@ import {
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
+  SPLASH_CURTAIN_EASE,
   SPLASH_CURTAIN_MS,
   SPLASH_LETTER_STEP_MS,
   SPLASH_LOGO_FADE_MS,
@@ -46,6 +47,8 @@ import { useAuth } from "@/providers/auth-provider";
 
 const WORDMARK = "NUME";
 
+const LOGO_SCALE = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
+
 type IntroStrokePhase = "drawing" | "erasing";
 
 const introStrokeDrawTransition = {
@@ -65,7 +68,7 @@ const logoFadeTransition = {
 
 const curtainTransition = {
   duration: SPLASH_CURTAIN_MS / 1000,
-  ease: SPLASH_MOTION_EASE,
+  ease: SPLASH_CURTAIN_EASE,
 };
 
 function getWordmarkLetterTransition(isVisible: boolean) {
@@ -124,10 +127,20 @@ export function SplashAnimation({
   const [logoFadeComplete, setLogoFadeComplete] = useState(reducedMotion);
   const [curtainStarted, setCurtainStarted] = useState(false);
 
-  const path3X = useMotionValue(0);
-  const path4X = useMotionValue(0);
   const curtainProgress = useMotionValue(0);
   const innerStrokeOpacity = useMotionValue(reducedMotion ? 0 : 1);
+
+  const curtainTravel = useMemo(
+    () => getCurtainTravelDistance(viewport),
+    [viewport],
+  );
+
+  const path3X = useTransform(curtainProgress, (progress) => {
+    return (-curtainTravel * progress) / LOGO_SCALE;
+  });
+  const path4X = useTransform(curtainProgress, (progress) => {
+    return (curtainTravel * progress) / LOGO_SCALE;
+  });
 
   const logoCenter = useMemo(
     () => ({
@@ -149,11 +162,11 @@ export function SplashAnimation({
       const center = layout.centerX;
       return `${center},${layout.centerY} ${center},${layout.centerY} ${center},${layout.centerY}`;
     }
-    const travel = getCurtainTravelDistance(viewport) * progress;
+    const travel = curtainTravel * progress;
     return buildCurtainRevealPolygon(-travel, travel, viewport, layout);
   });
 
-  const logoScale = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
+  const logoScale = LOGO_SCALE;
   const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
@@ -246,36 +259,34 @@ export function SplashAnimation({
     if (reducedMotion) return;
     if (!canStartCurtain || !logoFadeComplete || curtainStarted) return;
 
-    let animationPromise: Promise<void> | undefined;
+    let animationControls: ReturnType<typeof animate> | undefined;
+    let startFrame = 0;
+    let curtainFrame = 0;
 
-    const frame = window.requestAnimationFrame(() => {
-      setCurtainStarted(true);
+    startFrame = window.requestAnimationFrame(() => {
+      curtainFrame = window.requestAnimationFrame(() => {
+        curtainProgress.set(0);
+        setCurtainStarted(true);
 
-      const travel = getCurtainTravelDistance(viewport);
-      animationPromise = animate([
-        [curtainProgress, 1, curtainTransition],
-        [path3X, -travel / logoScale, curtainTransition],
-        [path4X, travel / logoScale, curtainTransition],
-      ]).then(() => {
-        onCurtainComplete();
+        animationControls = animate(curtainProgress, 1, curtainTransition);
+        void animationControls.then(() => {
+          onCurtainComplete();
+        });
       });
     });
 
     return () => {
-      window.cancelAnimationFrame(frame);
-      void animationPromise;
+      window.cancelAnimationFrame(startFrame);
+      window.cancelAnimationFrame(curtainFrame);
+      animationControls?.stop();
     };
   }, [
     canStartCurtain,
     curtainProgress,
     curtainStarted,
     logoFadeComplete,
-    logoScale,
     onCurtainComplete,
-    path3X,
-    path4X,
     reducedMotion,
-    viewport,
   ]);
 
   useEffect(() => {
@@ -318,9 +329,11 @@ export function SplashAnimation({
       ? introStrokeDrawTransition
       : introStrokeEraseTransition;
 
+  const dashboardReady = canStartCurtain && logoFadeComplete;
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-background">
-      {curtainStarted ? (
+      {dashboardReady ? (
         <div className="absolute inset-0 z-0">
           <DashboardScreen />
         </div>

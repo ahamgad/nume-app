@@ -111,3 +111,28 @@ export function buildCurtainRevealPolygon(
 export function getCurtainTravelDistance(viewport: ViewportSize): number {
   return viewport.width * 0.62;
 }
+
+/** Screen-space travel and logo-space stroke translations for a progress value 0–1. */
+export function getCurtainTranslations(
+  progress: number,
+  viewport: ViewportSize,
+  logoScale: number,
+): {
+  screenTravel: number;
+  path3TranslateX: number;
+  path4TranslateX: number;
+} {
+  const screenTravel = getCurtainTravelDistance(viewport) * progress;
+  return {
+    screenTravel,
+    path3TranslateX: -screenTravel / logoScale,
+    path4TranslateX: screenTravel / logoScale,
+  };
+}
+
+export function parseCurtainCorridorPoints(polygon: string): { x: number; y: number }[] {
+  return polygon.split(" ").map((pair) => {
+    const [x, y] = pair.split(",").map(Number);
+    return { x, y };
+  });
+}
