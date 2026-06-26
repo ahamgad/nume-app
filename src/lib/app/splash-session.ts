@@ -51,6 +51,19 @@ export function shouldSkipSplashOnLoad(options: {
   return options.splashComplete && options.bgResumeEligible;
 }
 
+/** Skip ScreenTransition enter animation on the first app route after splash. */
+export const SPLASH_HANDOFF_KEY = "nume-splash-handoff";
+
+export function markSplashHandoff() {
+  window.sessionStorage.setItem(SPLASH_HANDOFF_KEY, "1");
+}
+
+export function consumeSplashHandoff(): boolean {
+  if (window.sessionStorage.getItem(SPLASH_HANDOFF_KEY) !== "1") return false;
+  window.sessionStorage.removeItem(SPLASH_HANDOFF_KEY);
+  return true;
+}
+
 export function markSplashComplete() {
   window.sessionStorage.setItem(SPLASH_COMPLETE_KEY, "1");
   window.sessionStorage.removeItem(BG_RESUME_ELIGIBLE_KEY);

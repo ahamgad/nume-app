@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ScreenTitleCollapseProvider } from "@/components/layout/screen-title-collapse";
+import { consumeSplashHandoff } from "@/lib/app/splash-session";
 import { numeMotionSafeScreenEnterClass } from "@/lib/layout/motion";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,13 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const fromPathname = previousPathnameRef.current;
-    setShouldAnimate(fromPathname !== null && fromPathname !== pathname);
+    const skipForSplashHandoff =
+      pathname === "/" && fromPathname === "/splash" && consumeSplashHandoff();
+    setShouldAnimate(
+      !skipForSplashHandoff &&
+        fromPathname !== null &&
+        fromPathname !== pathname,
+    );
     previousPathnameRef.current = pathname;
   }, [pathname]);
 

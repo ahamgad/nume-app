@@ -82,9 +82,14 @@ import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
   applyAccountPatch,
   isNonBalanceAccountPatch,
-  preserveBalanceTimestamps,
   type AccountUpdatableFields,
 } from "@/lib/finance/account-settings-cache";
+import {
+  financeQueryKey,
+  shareFinanceCacheSnapshot,
+  writeFinanceCache,
+  type FinanceCacheSnapshot,
+} from "@/lib/finance/finance-cache";
 import {
   archiveAccount as archiveAccountService,
   deleteAccount as deleteAccountService,
@@ -108,17 +113,7 @@ import { logSupabaseError } from "@/lib/supabase/errors";
 import { useAuth } from "@/providers/auth-provider";
 import { useConnectivity } from "@/providers/connectivity-provider";
 
-const FINANCE_QUERY_KEY = "finance";
-
-interface FinanceData {
-  accounts: Account[];
-  records: FinanceRecord[];
-  certificates: Certificate[];
-  certificateSchedules: CertificateScheduleEntry[];
-  savingsAccounts: SavingsAccount[];
-  loans: Loan[];
-  creditCards: CreditCard[];
-}
+type FinanceData = FinanceCacheSnapshot;
 
 interface FinanceContextValue {
   accounts: Account[];
@@ -301,10 +296,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const { data, isLoading: financeLoading, isFetched } = useQuery({
-    queryKey: [FINANCE_QUERY_KEY, userId],
+    queryKey: financeQueryKey(userId!),
     queryFn: () => loadFinanceData(userId!),
     enabled: Boolean(userId),
     placeholderData: (previous) => previous,
+    structuralSharing: shareFinanceCacheSnapshot,
     retry: isOnline ? 2 : false,
   });
 
@@ -355,22 +351,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const invalidate = useCallback(async () => {
     if (!userId) return;
-    const queryKey = [FINANCE_QUERY_KEY, userId];
-    const previous = queryClient.getQueryData<FinanceData>(queryKey);
-    await queryClient.invalidateQueries({ queryKey });
-    await queryClient.refetchQueries({ queryKey });
-    const current = queryClient.getQueryData<FinanceData>(queryKey);
-    if (previous && current) {
-      queryClient.setQueryData(
-        queryKey,
-        preserveBalanceTimestamps(previous, current),
-      );
-    }
+    await queryClient.invalidateQueries({ queryKey: financeQueryKey(userId) });
+    await queryClient.refetchQueries({ queryKey: financeQueryKey(userId) });
   }, [queryClient, userId]);
 
   const refresh = useCallback(async () => {
     if (!userId) return;
-    await queryClient.refetchQueries({ queryKey: [FINANCE_QUERY_KEY, userId] });
+    await queryClient.refetchQueries({ queryKey: financeQueryKey(userId) });
   }, [queryClient, userId]);
 
   const createAccount = useCallback(
@@ -378,18 +365,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (!userId) throw new Error("Not authenticated");
       const supabase = createClient();
       const account = await insertAccount(supabase, userId, input);
-      queryClient.setQueryData(
-        [FINANCE_QUERY_KEY, userId],
-        (current: FinanceData | undefined) => ({
-          accounts: [...(current?.accounts ?? []), account],
-          records: current?.records ?? [],
-          certificates: current?.certificates ?? [],
-          certificateSchedules: current?.certificateSchedules ?? [],
-          savingsAccounts: current?.savingsAccounts ?? [],
-          loans: current?.loans ?? [],
-          creditCards: current?.creditCards ?? [],
-        }),
-      );
+      writeFinanceCache(queryClient, userId, (current) => ({
+        accounts: [...(current?.accounts ?? []), account],
+        records: current?.records ?? [],
+        certificates: current?.certificates ?? [],
+        certificateSchedules: current?.certificateSchedules ?? [],
+        savingsAccounts: current?.savingsAccounts ?? [],
+        loans: current?.loans ?? [],
+        creditCards: current?.creditCards ?? [],
+      }));
       return account;
     },
     [userId, invalidate],
@@ -446,11 +430,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     async (id: string, patch: AccountUpdatableFields) => {
       if (!userId) throw new Error("Not authenticated");
 
-      const queryKey = [FINANCE_QUERY_KEY, userId];
+      const queryKey = financeQueryKey(userId);
       const previous = queryClient.getQueryData<FinanceData>(queryKey);
       const settingsOnly = isNonBalanceAccountPatch(patch);
 
-      queryClient.setQueryData<FinanceData>(queryKey, (current) =>
+      writeFinanceCache(queryClient, userId, (current) =>
         applyAccountPatch(current, id, patch),
       );
 
