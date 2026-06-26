@@ -131,18 +131,6 @@ export function SplashAnimation({
   const curtainProgress = useMotionValue(0);
   const innerStrokeOpacity = useMotionValue(reducedMotion ? 0 : 1);
 
-  const curtainTravel = useMemo(
-    () => getCurtainTravelDistance(viewport),
-    [viewport],
-  );
-
-  const path3X = useTransform(curtainProgress, (progress) => {
-    return (-curtainTravel * progress) / LOGO_SCALE;
-  });
-  const path4X = useTransform(curtainProgress, (progress) => {
-    return (curtainTravel * progress) / LOGO_SCALE;
-  });
-
   const logoCenter = useMemo(
     () => ({
       x: viewport.width / 2,
@@ -157,6 +145,18 @@ export function SplashAnimation({
     () => getSplashLogoLayout(viewport, logoCenter),
     [logoCenter, viewport],
   );
+
+  const curtainTravel = useMemo(
+    () => getCurtainTravelDistance(viewport, layout),
+    [layout, viewport],
+  );
+
+  const path3X = useTransform(curtainProgress, (progress) => {
+    return (-curtainTravel * progress) / LOGO_SCALE;
+  });
+  const path4X = useTransform(curtainProgress, (progress) => {
+    return (curtainTravel * progress) / LOGO_SCALE;
+  });
 
   const corridorPoints = useTransform(curtainProgress, (progress) => {
     if (progress <= 0) {

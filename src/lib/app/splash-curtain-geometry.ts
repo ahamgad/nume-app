@@ -108,21 +108,88 @@ export function buildCurtainRevealPolygon(
   return points.map((point) => `${point.x},${point.y}`).join(" ");
 }
 
-export function getCurtainTravelDistance(viewport: ViewportSize): number {
-  return viewport.width * 0.62;
+/**
+ * Minimum screen-space travel so both corridor edges clear all viewport corners
+ * at curtainProgress = 1. Path3 shifts left and path4 shifts right, each by
+ * this distance.
+ */
+export function getCurtainTravelDistance(
+  viewport: ViewportSize,
+  layout: SplashLogoLayout,
+): number {
+  const left = NUME_SPLASH_CURTAIN_DIAGONALS.path3;
+  const right = NUME_SPLASH_CURTAIN_DIAGONALS.path4;
+
+  const [leftTop, leftBottom] = lineAtViewportEdges(
+    left.x1,
+    left.y1,
+    left.x2,
+    left.y2,
+    layout,
+    0,
+    viewport,
+  );
+  const [rightTop, rightBottom] = lineAtViewportEdges(
+    right.x1,
+    right.y1,
+    right.x2,
+    right.y2,
+    layout,
+    0,
+    viewport,
+  );
+
+  // Left splash remains while the left edge sits inside the viewport (x > 0).
+  const minTravelLeft = Math.max(leftTop.x, leftBottom.x, 0);
+
+  // Right splash remains while the right edge falls short of the viewport width.
+  const minTravelRight = Math.max(
+    viewport.width - rightTop.x,
+    viewport.width - rightBottom.x,
+    0,
+  );
+
+  return Math.max(minTravelLeft, minTravelRight);
+}
+
+/** Max splash strip width (px) remaining outside the corridor at a given travel. */
+export function getMaxSplashRemainderWidth(
+  viewport: ViewportSize,
+  layout: SplashLogoLayout,
+  travel: number,
+): number {
+  const polygon = buildCurtainRevealPolygon(-travel, travel, viewport, layout);
+  const [leftTop, rightTop, rightBottom, leftBottom] =
+    parseCurtainCorridorPoints(polygon);
+
+  let maxRemainder = 0;
+
+  for (let y = 0; y <= viewport.height; y += 1) {
+    const t = y / viewport.height;
+    const leftX = leftTop.x + t * (leftBottom.x - leftTop.x);
+    const rightX = rightTop.x + t * (rightBottom.x - rightTop.x);
+    maxRemainder = Math.max(
+      maxRemainder,
+      Math.max(0, leftX),
+      Math.max(0, viewport.width - rightX),
+    );
+  }
+
+  return maxRemainder;
 }
 
 /** Screen-space travel and logo-space stroke translations for a progress value 0–1. */
 export function getCurtainTranslations(
   progress: number,
   viewport: ViewportSize,
+  layout: SplashLogoLayout,
   logoScale: number,
 ): {
   screenTravel: number;
   path3TranslateX: number;
   path4TranslateX: number;
 } {
-  const screenTravel = getCurtainTravelDistance(viewport) * progress;
+  const screenTravel = getCurtainTravelDistance(viewport, layout) * progress;
   return {
     screenTravel,
     path3TranslateX: -screenTravel / logoScale,

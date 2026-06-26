@@ -7,6 +7,7 @@ import {
   buildCurtainRevealPolygon,
   getCurtainTravelDistance,
   getCurtainTranslations,
+  getMaxSplashRemainderWidth,
   getSplashLogoLayout,
   parseCurtainCorridorPoints,
 } from "@/lib/app/splash-curtain-geometry";
@@ -18,6 +19,8 @@ import {
   NUME_SPLASH_STROKE_SVG_PATHS,
   NUME_SPLASH_LOGO_SIZE_PX,
   NUME_SPLASH_VIEWBOX_SIZE,
+  NUME_SPLASH_WORDMARK_GAP_PX,
+  NUME_SPLASH_WORDMARK_SIZE_PX,
 } from "@/lib/app/splash-stroke-paths";
 import {
   SPLASH_CURTAIN_PATH_KEYS,
@@ -69,22 +72,30 @@ describe("splash stroke paths", () => {
 describe("splash curtain geometry", () => {
   const viewport = { width: 390, height: 844 };
   const logoScale = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
-  const layout = getSplashLogoLayout(viewport, {
+  const logoCenter = {
     x: viewport.width / 2,
-    y: viewport.height / 2 - 13,
-  });
+    y:
+      viewport.height / 2 -
+      (NUME_SPLASH_WORDMARK_SIZE_PX + NUME_SPLASH_WORDMARK_GAP_PX) / 2,
+  };
+  const layout = getSplashLogoLayout(viewport, logoCenter);
 
   it("widens the reveal corridor as curtain progress increases", () => {
     const closed = buildCurtainRevealPolygon(0, 0, viewport, layout);
     const open = buildCurtainRevealPolygon(-120, 120, viewport, layout);
 
     expect(closed).not.toBe(open);
-    expect(getCurtainTravelDistance(viewport)).toBeGreaterThan(200);
+    expect(getCurtainTravelDistance(viewport, layout)).toBeGreaterThan(200);
   });
 
   it("spans the full viewport height at every travel step", () => {
     for (const progress of [0, 0.35, 0.7, 1]) {
-      const { screenTravel } = getCurtainTranslations(progress, viewport, logoScale);
+      const { screenTravel } = getCurtainTranslations(
+        progress,
+        viewport,
+        layout,
+        logoScale,
+      );
       const polygon = buildCurtainRevealPolygon(
         -screenTravel,
         screenTravel,
@@ -104,11 +115,37 @@ describe("splash curtain geometry", () => {
   it("keeps stroke translations aligned with corridor travel", () => {
     for (const progress of [0, 0.5, 1]) {
       const { screenTravel, path3TranslateX, path4TranslateX } =
-        getCurtainTranslations(progress, viewport, logoScale);
+        getCurtainTranslations(progress, viewport, layout, logoScale);
 
       expect(path3TranslateX).toBe(-screenTravel / logoScale);
       expect(path4TranslateX).toBe(screenTravel / logoScale);
       expect(path3TranslateX).toBe(-path4TranslateX);
+    }
+  });
+
+  it("clears all viewport corners at curtainProgress = 1", () => {
+    const viewports = [
+      { width: 320, height: 568 },
+      { width: 390, height: 844 },
+      { width: 393, height: 852 },
+      { width: 430, height: 932 },
+      { width: 768, height: 1024 },
+      { width: 844, height: 390 },
+    ];
+
+    for (const size of viewports) {
+      const center = {
+        x: size.width / 2,
+        y:
+          size.height / 2 -
+          (NUME_SPLASH_WORDMARK_SIZE_PX + NUME_SPLASH_WORDMARK_GAP_PX) / 2,
+      };
+      const screenLayout = getSplashLogoLayout(size, center);
+      const travel = getCurtainTravelDistance(size, screenLayout);
+
+      expect(
+        getMaxSplashRemainderWidth(size, screenLayout, travel),
+      ).toBeLessThan(0.01);
     }
   });
 });
