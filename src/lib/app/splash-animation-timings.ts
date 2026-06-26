@@ -1,8 +1,8 @@
-/** Linear letter cadence — one letter every 180ms. */
-export const SPLASH_LETTER_STEP_MS = 180;
+/** Linear letter cadence — one step every 200ms within a 1200ms intro loop. */
+export const SPLASH_LETTER_STEP_MS = 200;
 
-/** One full intro loop: stroke draw + N → U → M → E (4 × 180ms). */
-export const SPLASH_STROKE_DRAW_MS = SPLASH_LETTER_STEP_MS * 4;
+/** One full intro loop: blank → N → NU → NUM → NUME → hold (6 × 200ms). */
+export const SPLASH_STROKE_DRAW_MS = SPLASH_LETTER_STEP_MS * 6;
 
 /** Stage 3 — full logo opacity fade (once, after the final intro loop). */
 export const SPLASH_LOGO_FADE_MS = 480;

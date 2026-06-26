@@ -51,8 +51,8 @@ describe("splash animation timings", () => {
     expect(SPLASH_STROKE_DRAW_MS).toBeGreaterThan(500);
   });
 
-  it("uses linear 180ms letter steps across each intro loop", () => {
-    expect(SPLASH_LETTER_STEP_MS).toBe(180);
-    expect(SPLASH_STROKE_DRAW_MS).toBe(SPLASH_LETTER_STEP_MS * 4);
+  it("uses linear 200ms letter steps across each 1200ms intro loop", () => {
+    expect(SPLASH_LETTER_STEP_MS).toBe(200);
+    expect(SPLASH_STROKE_DRAW_MS).toBe(SPLASH_LETTER_STEP_MS * 6);
   });
 });

@@ -1,17 +1,54 @@
 /**
  * Stroke paths traced from brand-flatten inner cutout geometry (viewBox 0 0 100 100).
+ * Each path traces two edges of one inner hole (quadrilateral with bends).
  * @see public/brand-flatten-black.svg
  */
 
-/** Stage 1 stroke paths — shared production splash + debug tooling. */
+/** Left N inner hole: M32.2021 25 L46.3664 25 L30.2938 75 H16.1296 Z */
+const LEFT_INNER_HOLE = {
+  bottomLeft: { x: 16.1296, y: 75 },
+  topLeft: { x: 32.2021, y: 25 },
+  topRight: { x: 46.3664, y: 25 },
+  bottomRight: { x: 30.2938, y: 75 },
+} as const;
+
+const RIGHT_INNER_HOLE = {
+  bottomLeft: { x: 53.6296, y: 75 },
+  topLeft: { x: 69.7021, y: 25 },
+  topRight: { x: 83.8664, y: 25 },
+  bottomRight: { x: 67.7938, y: 75 },
+} as const;
+
+type InnerHole = {
+  readonly bottomLeft: { readonly x: number; readonly y: number };
+  readonly topLeft: { readonly x: number; readonly y: number };
+  readonly topRight: { readonly x: number; readonly y: number };
+  readonly bottomRight: { readonly x: number; readonly y: number };
+};
+
+function holePath(hole: InnerHole, segment: "opening" | "closing"): string {
+  if (segment === "opening") {
+    return `M${hole.bottomLeft.x} ${hole.bottomLeft.y} L${hole.topLeft.x} ${hole.topLeft.y} L${hole.topRight.x} ${hole.topRight.y}`;
+  }
+
+  return `M${hole.topRight.x} ${hole.topRight.y} L${hole.bottomRight.x} ${hole.bottomRight.y} L${hole.bottomLeft.x} ${hole.bottomLeft.y}`;
+}
+
+/** Stage 1 intro paths — full inner cutout geometry (both holes, four bends each). */
 export const NUME_SPLASH_STROKE_PATHS = {
-  /** Left N inner cutout — lower-left to upper-right opening. */
-  path1: "M16.1296 75 L32.2021 25 L46.3664 25",
-  /** Right N inner cutout — lower-left to upper-right opening. */
-  path2: "M53.6296 75 L69.7021 25 L83.8664 25",
-  /** Left N inner right diagonal (curtain left edge). */
+  /** Left inner cutout — outer leg and top edge. */
+  path1: holePath(LEFT_INNER_HOLE, "opening"),
+  /** Left inner cutout — inner diagonal and bottom edge. */
+  path2: holePath(LEFT_INNER_HOLE, "closing"),
+  /** Right inner cutout — outer leg and top edge. */
+  path3: holePath(RIGHT_INNER_HOLE, "opening"),
+  /** Right inner cutout — inner diagonal and bottom edge. */
+  path4: holePath(RIGHT_INNER_HOLE, "closing"),
+} as const;
+
+/** Curtain edge paths — inner parallel diagonals only (used during exit wipe). */
+export const NUME_SPLASH_CURTAIN_STROKE_PATHS = {
   path3: "M46.3664 25 L30.2938 75",
-  /** Right N inner left diagonal (curtain right edge). */
   path4: "M69.7021 25 L53.6296 75",
 } as const;
 
