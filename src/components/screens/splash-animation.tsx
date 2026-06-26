@@ -308,7 +308,7 @@ export function SplashAnimation({
 
   const introStrokeHidden = { pathLength: 1, pathOffset: 1 };
   const introStrokeDrawTarget = { pathLength: 1, pathOffset: 0 };
-  const introStrokeEraseTarget = { pathLength: 0, pathOffset: 1 };
+  const introStrokeEraseTarget = introStrokeHidden;
   const introStrokeAnimate =
     introStrokePhase === "drawing"
       ? introStrokeDrawTarget
