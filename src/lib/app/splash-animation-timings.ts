@@ -4,7 +4,9 @@ export const SPLASH_LETTER_STEP_MS = 200;
 /** One full intro loop: blank → N → NU → NUM → NUME → hold (6 × 200ms). */
 export const SPLASH_STROKE_DRAW_MS = SPLASH_LETTER_STEP_MS * 6;
 
-/** Stage 3 — full logo opacity fade (once, after the final intro loop). */
+/** Subtle eased fade when each wordmark letter appears or clears. */
+export const SPLASH_WORDMARK_LETTER_FADE_MS = 140;
+
 export const SPLASH_LOGO_FADE_MS = 480;
 
 /** Stage 4 — curtain paths translate outward. */

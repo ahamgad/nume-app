@@ -1,55 +1,15 @@
 /**
- * Stroke paths traced from brand-flatten inner cutout geometry (viewBox 0 0 100 100).
- * Each path traces two edges of one inner hole (quadrilateral with bends).
- * @see public/brand-flatten-black.svg
+ * Splash geometry extracted from brand SVG assets in `docs/`.
+ * @see docs/brand-sublime-stroke.svg
+ * @see docs/brand-sublime-curtin.svg
+ * @see docs/brand-flatten-black.svg (logo fills)
  */
 
-/** Left N inner hole: M32.2021 25 L46.3664 25 L30.2938 75 H16.1296 Z */
-const LEFT_INNER_HOLE = {
-  bottomLeft: { x: 16.1296, y: 75 },
-  topLeft: { x: 32.2021, y: 25 },
-  topRight: { x: 46.3664, y: 25 },
-  bottomRight: { x: 30.2938, y: 75 },
-} as const;
-
-const RIGHT_INNER_HOLE = {
-  bottomLeft: { x: 53.6296, y: 75 },
-  topLeft: { x: 69.7021, y: 25 },
-  topRight: { x: 83.8664, y: 25 },
-  bottomRight: { x: 67.7938, y: 75 },
-} as const;
-
-type InnerHole = {
-  readonly bottomLeft: { readonly x: number; readonly y: number };
-  readonly topLeft: { readonly x: number; readonly y: number };
-  readonly topRight: { readonly x: number; readonly y: number };
-  readonly bottomRight: { readonly x: number; readonly y: number };
-};
-
-function holePath(hole: InnerHole, segment: "opening" | "closing"): string {
-  if (segment === "opening") {
-    return `M${hole.bottomLeft.x} ${hole.bottomLeft.y} L${hole.topLeft.x} ${hole.topLeft.y} L${hole.topRight.x} ${hole.topRight.y}`;
-  }
-
-  return `M${hole.topRight.x} ${hole.topRight.y} L${hole.bottomRight.x} ${hole.bottomRight.y} L${hole.bottomLeft.x} ${hole.bottomLeft.y}`;
-}
-
-/** Stage 1 intro paths — full inner cutout geometry (both holes, four bends each). */
+/** Intro stroke paths — docs/brand-sublime-stroke.svg (path order preserved). */
 export const NUME_SPLASH_STROKE_PATHS = {
-  /** Left inner cutout — outer leg and top edge. */
-  path1: holePath(LEFT_INNER_HOLE, "opening"),
-  /** Left inner cutout — inner diagonal and bottom edge. */
-  path2: holePath(LEFT_INNER_HOLE, "closing"),
-  /** Right inner cutout — outer leg and top edge. */
-  path3: holePath(RIGHT_INNER_HOLE, "opening"),
-  /** Right inner cutout — inner diagonal and bottom edge. */
-  path4: holePath(RIGHT_INNER_HOLE, "closing"),
-} as const;
-
-/** Curtain edge paths — inner parallel diagonals only (used during exit wipe). */
-export const NUME_SPLASH_CURTAIN_STROKE_PATHS = {
-  path3: "M46.3664 25 L30.2938 75",
-  path4: "M69.7021 25 L53.6296 75",
+  path1: "M10.4167 79.1667L29.1667 20.8333L38.5417 50",
+  path2: "M70.8333 79.1667L89.5833 20.8333",
+  path3: "M70.8333 79.1667L61.4583 50",
 } as const;
 
 export type SplashStrokePathKey = keyof typeof NUME_SPLASH_STROKE_PATHS;
@@ -58,10 +18,24 @@ export const NUME_SPLASH_STROKE_ORDER: SplashStrokePathKey[] = [
   "path1",
   "path2",
   "path3",
-  "path4",
 ];
 
-/** Full logo compound paths from brand-flatten (evenodd holes). */
+/**
+ * Curtain stroke paths — parallel diagonals from docs/brand-sublime-curtin.svg
+ * (second path element, subpaths left → right).
+ */
+export const NUME_SPLASH_CURTAIN_STROKE_PATHS = {
+  path3: "M29.1667 20.8333L47.9167 79.1667",
+  path4: "M52.0833 20.8333L70.8333 79.1667",
+} as const;
+
+/** Full path `d` values from docs/brand-sublime-curtin.svg (verification). */
+export const NUME_SPLASH_CURTAIN_SVG_PATHS = [
+  "M70.8333 79.1667L61.4583 50",
+  "M52.0833 20.8333L70.8333 79.1667M29.1667 20.8333L47.9167 79.1667",
+] as const;
+
+/** Logo compound paths — docs/brand-flatten-black.svg (evenodd holes). */
 export const NUME_SPLASH_LOGO_FILLS = [
   "M6.44938 77.8931C6.04258 79.1603 6.26759 80.5448 7.0516 81.6203C7.83592 82.696 9.08538 83.3333 10.4167 83.3333H33.3333C35.1433 83.3333 36.7468 82.1634 37.3006 80.4403L56.0506 22.1069C56.4574 20.8398 56.2324 19.4552 55.4484 18.3797C54.6641 17.304 53.4146 16.6667 52.0833 16.6667L29.1667 16.6667C27.3567 16.6667 25.7532 17.8366 25.1994 19.5597L6.44938 77.8931ZM32.2021 25L46.3664 25L30.2938 75H16.1296L32.2021 25Z",
   "M43.9494 77.8931C43.5426 79.1603 43.7676 80.5448 44.5516 81.6203C45.3359 82.696 46.5854 83.3333 47.9167 83.3333H70.8333C72.6433 83.3333 74.2468 82.1634 74.8006 80.4403L93.5506 22.1069C93.9574 20.8398 93.7324 19.4552 92.9484 18.3797C92.1641 17.304 90.9146 16.6667 89.5833 16.6667L66.6667 16.6667C64.8567 16.6667 63.2532 17.8366 62.6994 19.5597L43.9494 77.8931ZM69.7021 25L83.8664 25L67.7938 75H53.6296L69.7021 25Z",
@@ -73,15 +47,15 @@ export const NUME_SPLASH_LOGO_SIZE_PX = 90;
 export const NUME_SPLASH_WORDMARK_SIZE_PX = 22;
 export const NUME_SPLASH_WORDMARK_GAP_PX = 4;
 export const NUME_SPLASH_VIEWBOX_SIZE = 100;
-export const NUME_SPLASH_STROKE_WIDTH_PX = 1.5;
+export const NUME_SPLASH_STROKE_WIDTH_PX = 8;
 
 export const NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX =
   NUME_SPLASH_LOGO_SIZE_PX +
   NUME_SPLASH_WORDMARK_GAP_PX +
   NUME_SPLASH_WORDMARK_SIZE_PX;
 
-/** Inner diagonal segments used for curtain edge geometry (path 3 & 4). */
+/** Curtain corridor edges aligned to NUME_SPLASH_CURTAIN_STROKE_PATHS. */
 export const NUME_SPLASH_CURTAIN_DIAGONALS = {
-  path3: { x1: 46.3664, y1: 25, x2: 30.2938, y2: 75 },
-  path4: { x1: 69.7021, y1: 25, x2: 53.6296, y2: 75 },
+  path3: { x1: 29.1667, y1: 20.8333, x2: 47.9167, y2: 79.1667 },
+  path4: { x1: 52.0833, y1: 20.8333, x2: 70.8333, y2: 79.1667 },
 } as const;

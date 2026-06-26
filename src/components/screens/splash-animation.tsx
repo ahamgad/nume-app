@@ -14,6 +14,7 @@ import {
   SPLASH_LOGO_FADE_MS,
   SPLASH_MOTION_EASE,
   SPLASH_STROKE_DRAW_MS,
+  SPLASH_WORDMARK_LETTER_FADE_MS,
 } from "@/lib/app/splash-animation-timings";
 import {
   buildCurtainRevealPolygon,
@@ -51,6 +52,11 @@ const logoFadeTransition = {
 
 const curtainTransition = {
   duration: SPLASH_CURTAIN_MS / 1000,
+  ease: SPLASH_MOTION_EASE,
+};
+
+const wordmarkLetterTransition = {
+  duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
   ease: SPLASH_MOTION_EASE,
 };
 
@@ -376,13 +382,15 @@ export function SplashAnimation({
           style={{ fontSize: NUME_SPLASH_WORDMARK_SIZE_PX }}
         >
           {WORDMARK.split("").map((letter, index) => (
-            <span
+            <motion.span
               key={`${strokeLoopKey}-${letter}-${index}`}
               className="inline-block"
-              style={{ opacity: index < visibleLetters ? 1 : 0 }}
+              initial={false}
+              animate={{ opacity: index < visibleLetters ? 1 : 0 }}
+              transition={wordmarkLetterTransition}
             >
               {letter}
-            </span>
+            </motion.span>
           ))}
         </p>
       </div>
