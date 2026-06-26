@@ -5,11 +5,21 @@
  * @see docs/brand-flatten-black.svg (logo fills)
  */
 
-/** Intro stroke paths — docs/brand-sublime-stroke.svg (path order preserved). */
+/** Exact path `d` values from docs/brand-sublime-stroke.svg (verification). */
+export const NUME_SPLASH_STROKE_SVG_PATHS = [
+  "M10.4167 79.1667L29.1667 20.8333L38.5417 50",
+  "M70.8333 79.1667L89.5833 20.8333",
+  "M70.8333 79.1667L61.4583 50",
+] as const;
+
+/**
+ * Intro stroke draw paths — same geometry as the SVG assets with draw direction
+ * adjusted so each stroke reveals from its intended origin (top on the right).
+ */
 export const NUME_SPLASH_STROKE_PATHS = {
-  path1: "M10.4167 79.1667L29.1667 20.8333L38.5417 50",
-  path2: "M70.8333 79.1667L89.5833 20.8333",
-  path3: "M70.8333 79.1667L61.4583 50",
+  path1: NUME_SPLASH_STROKE_SVG_PATHS[0],
+  path2: "M89.5833 20.8333L70.8333 79.1667",
+  path3: "M61.4583 50L70.8333 79.1667",
 } as const;
 
 export type SplashStrokePathKey = keyof typeof NUME_SPLASH_STROKE_PATHS;
@@ -47,7 +57,7 @@ export const NUME_SPLASH_LOGO_SIZE_PX = 90;
 export const NUME_SPLASH_WORDMARK_SIZE_PX = 22;
 export const NUME_SPLASH_WORDMARK_GAP_PX = 4;
 export const NUME_SPLASH_VIEWBOX_SIZE = 100;
-export const NUME_SPLASH_STROKE_WIDTH_PX = 8;
+export const NUME_SPLASH_STROKE_WIDTH_PX = 7;
 
 export const NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX =
   NUME_SPLASH_LOGO_SIZE_PX +

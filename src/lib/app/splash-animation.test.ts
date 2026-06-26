@@ -13,6 +13,7 @@ import {
   NUME_SPLASH_CURTAIN_STROKE_PATHS,
   NUME_SPLASH_STROKE_ORDER,
   NUME_SPLASH_STROKE_PATHS,
+  NUME_SPLASH_STROKE_SVG_PATHS,
 } from "@/lib/app/splash-stroke-paths";
 import {
   SPLASH_CURTAIN_PATH_KEYS,
@@ -40,11 +41,15 @@ describe("splash stroke paths", () => {
 
   it("matches docs/brand-sublime-stroke.svg path data exactly", () => {
     const sourcePaths = readSvgPathData("docs/brand-sublime-stroke.svg");
-    const introPaths = NUME_SPLASH_STROKE_ORDER.map(
-      (key) => NUME_SPLASH_STROKE_PATHS[key],
-    );
 
-    expect(introPaths).toEqual(sourcePaths);
+    expect(NUME_SPLASH_STROKE_SVG_PATHS).toEqual(sourcePaths);
+    expect(NUME_SPLASH_STROKE_PATHS.path1).toBe(sourcePaths[0]);
+    expect(NUME_SPLASH_STROKE_PATHS.path2).toBe(
+      "M89.5833 20.8333L70.8333 79.1667",
+    );
+    expect(NUME_SPLASH_STROKE_PATHS.path3).toBe(
+      "M61.4583 50L70.8333 79.1667",
+    );
   });
 
   it("matches docs/brand-sublime-curtin.svg curtain path data exactly", () => {

@@ -14,6 +14,8 @@ import {
   SPLASH_LOGO_FADE_MS,
   SPLASH_MOTION_EASE,
   SPLASH_STROKE_DRAW_MS,
+  SPLASH_STROKE_ERASE_MS,
+  SPLASH_WORDMARK_LETTER_EASE,
   SPLASH_WORDMARK_LETTER_FADE_MS,
 } from "@/lib/app/splash-animation-timings";
 import {
@@ -40,8 +42,15 @@ import { useAuth } from "@/providers/auth-provider";
 
 const WORDMARK = "NUME";
 
-const introStrokeTransition = {
+type IntroStrokePhase = "drawing" | "erasing";
+
+const introStrokeDrawTransition = {
   duration: SPLASH_STROKE_DRAW_MS / 1000,
+  ease: "linear" as const,
+};
+
+const introStrokeEraseTransition = {
+  duration: SPLASH_STROKE_ERASE_MS / 1000,
   ease: "linear" as const,
 };
 
@@ -57,7 +66,7 @@ const curtainTransition = {
 
 const wordmarkLetterTransition = {
   duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
-  ease: SPLASH_MOTION_EASE,
+  ease: SPLASH_WORDMARK_LETTER_EASE,
 };
 
 interface SplashAnimationProps {
@@ -83,6 +92,7 @@ export function SplashAnimation({
     isFinanceReady,
   });
   const initReadyRef = useRef(initReady);
+  const eraseHandledRef = useRef(false);
 
   useEffect(() => {
     initReadyRef.current = initReady;
@@ -90,6 +100,8 @@ export function SplashAnimation({
 
   const [viewport, setViewport] = useState({ width: 390, height: 844 });
   const [introLoopIndex, setIntroLoopIndex] = useState(0);
+  const [introStrokePhase, setIntroStrokePhase] =
+    useState<IntroStrokePhase>("drawing");
   const [introLooping, setIntroLooping] = useState(!reducedMotion);
   const [visibleLetters, setVisibleLetters] = useState(reducedMotion ? 4 : 0);
   const [strokeDrawComplete, setStrokeDrawComplete] = useState(reducedMotion);
@@ -151,6 +163,7 @@ export function SplashAnimation({
   useEffect(() => {
     if (reducedMotion) return;
     if (!introLooping) return;
+    if (introStrokePhase !== "drawing") return;
 
     let cancelled = false;
     const letterTimers: number[] = [];
@@ -169,13 +182,6 @@ export function SplashAnimation({
       );
     }
 
-    letterTimers.push(
-      window.setTimeout(() => {
-        if (cancelled) return;
-        setVisibleLetters(0);
-      }, SPLASH_LETTER_STEP_MS * 5),
-    );
-
     const loopTimer = window.setTimeout(() => {
       if (cancelled) return;
       setStrokeDrawComplete(true);
@@ -188,7 +194,14 @@ export function SplashAnimation({
       }
 
       setVisibleLetters(0);
-      setIntroLoopIndex((current) => current + 1);
+
+      const eraseTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        eraseHandledRef.current = false;
+        setIntroStrokePhase("erasing");
+      }, SPLASH_WORDMARK_LETTER_FADE_MS);
+
+      letterTimers.push(eraseTimer);
     }, SPLASH_STROKE_DRAW_MS);
 
     return () => {
@@ -199,7 +212,7 @@ export function SplashAnimation({
       }
       window.clearTimeout(loopTimer);
     };
-  }, [introLoopIndex, introLooping, reducedMotion]);
+  }, [introLoopIndex, introLooping, introStrokePhase, reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -263,11 +276,26 @@ export function SplashAnimation({
     };
   }, [canStartCurtain, curtainStarted, onCurtainComplete, reducedMotion]);
 
+  function handleIntroStrokeAnimationComplete() {
+    if (reducedMotion || introStrokePhase !== "erasing") return;
+    if (eraseHandledRef.current) return;
+
+    eraseHandledRef.current = true;
+    setIntroStrokePhase("drawing");
+    setIntroLoopIndex((current) => current + 1);
+  }
+
   function handleLogoFadeComplete() {
     if (!logoFadeStarted || logoFadeComplete) return;
     setLogoFadeComplete(true);
     onLogoFadeComplete();
   }
+
+  const introStrokePathLength = introStrokePhase === "drawing" ? 1 : 0;
+  const introStrokeTransition =
+    introStrokePhase === "drawing"
+      ? introStrokeDrawTransition
+      : introStrokeEraseTransition;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-background">
@@ -342,22 +370,25 @@ export function SplashAnimation({
           className="shrink-0 overflow-visible"
         >
           {(introLooping || !curtainStarted) &&
-            NUME_SPLASH_STROKE_ORDER.map((key) => (
-                <motion.path
-                  key={`${strokeLoopKey}-${key}`}
-                  d={NUME_SPLASH_STROKE_PATHS[key]}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
-                  vectorEffect="non-scaling-stroke"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ strokeOpacity: innerStrokeOpacity }}
-                  initial={{ pathLength: reducedMotion ? 1 : 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={introStrokeTransition}
-                />
-              ))}
+            NUME_SPLASH_STROKE_ORDER.map((key, index) => (
+              <motion.path
+                key={`${strokeLoopKey}-${key}`}
+                d={NUME_SPLASH_STROKE_PATHS[key]}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
+                vectorEffect="non-scaling-stroke"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ strokeOpacity: innerStrokeOpacity }}
+                initial={{ pathLength: introStrokePhase === "drawing" ? 0 : 1 }}
+                animate={{ pathLength: introStrokePathLength }}
+                transition={introStrokeTransition}
+                onAnimationComplete={
+                  index === 0 ? handleIntroStrokeAnimationComplete : undefined
+                }
+              />
+            ))}
 
           <motion.g
             initial={{ opacity: reducedMotion ? 1 : 0 }}
