@@ -35,13 +35,16 @@ export function SplashOverlayLayer() {
     dismissAfterAppPaint();
   }, [dismissAfterAppPaint, pathname]);
 
-  const handleCurtainStart = useCallback(() => {
-    if (handoffStartedRef.current) return;
+  useEffect(() => {
+    if (!state.active || !state.canStartCurtain || handoffStartedRef.current) {
+      return;
+    }
+
     handoffStartedRef.current = true;
     markSplashHandoff();
     markSplashComplete();
     router.replace("/");
-  }, [router]);
+  }, [router, state.active, state.canStartCurtain]);
 
   const handleCurtainComplete = useCallback(() => {
     curtainCompletePendingRef.current = true;
@@ -56,10 +59,9 @@ export function SplashOverlayLayer() {
 
   return (
     <SplashAnimation
-      canStartCurtain={state.canStartCurtain}
+      canStartCurtain={state.canStartCurtain && pathname === "/"}
       reducedMotion={state.reducedMotion}
       onLogoFadeComplete={() => setLogoFadeComplete(true)}
-      onCurtainStart={handleCurtainStart}
       onCurtainComplete={handleCurtainComplete}
     />
   );

@@ -6,7 +6,7 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
   SPLASH_CURTAIN_EASE,
@@ -84,7 +84,6 @@ interface SplashAnimationProps {
   canStartCurtain: boolean;
   reducedMotion: boolean;
   onLogoFadeComplete: () => void;
-  onCurtainStart: () => void;
   onCurtainComplete: () => void;
 }
 
@@ -92,7 +91,6 @@ export function SplashAnimation({
   canStartCurtain,
   reducedMotion,
   onLogoFadeComplete,
-  onCurtainStart,
   onCurtainComplete,
 }: SplashAnimationProps) {
   const maskId = useId();
@@ -251,7 +249,6 @@ export function SplashAnimation({
 
     const frame = window.requestAnimationFrame(() => {
       setCurtainStarted(true);
-      onCurtainStart();
       curtainProgress.set(0);
 
       animationPromise = animate(curtainProgress, 1, curtainTransition).then(
@@ -270,7 +267,6 @@ export function SplashAnimation({
     curtainProgress,
     logoFadeComplete,
     onCurtainComplete,
-    onCurtainStart,
     reducedMotion,
   ]);
 
@@ -279,20 +275,13 @@ export function SplashAnimation({
 
     const frame = window.requestAnimationFrame(() => {
       setCurtainStarted(true);
-      onCurtainStart();
       onCurtainComplete();
     });
 
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [
-    canStartCurtain,
-    curtainStarted,
-    onCurtainComplete,
-    onCurtainStart,
-    reducedMotion,
-  ]);
+  }, [canStartCurtain, curtainStarted, onCurtainComplete, reducedMotion]);
 
   function handleIntroStrokeAnimationComplete() {
     if (reducedMotion || introStrokePhase !== "erasing") return;
@@ -333,20 +322,12 @@ export function SplashAnimation({
     return { fontSize, tracking, letterAdvance, baselineY, startX };
   }, [logoBlockTop, logoCenter.x]);
 
-  const overlayMaskStyle = curtainStarted
-    ? ({
-        maskImage: `url(#${safeMaskId})`,
-        WebkitMaskImage: `url(#${safeMaskId})`,
-      } as CSSProperties)
-    : undefined;
-
   return (
     <div
       className={cn(
         "pointer-events-none fixed inset-0 z-50 overflow-hidden",
         !curtainStarted && "bg-background",
       )}
-      style={overlayMaskStyle}
     >
       <svg
         aria-hidden
