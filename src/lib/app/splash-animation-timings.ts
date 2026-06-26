@@ -16,7 +16,7 @@ export const SPLASH_STROKE_ERASE_MS = 600;
 export const SPLASH_LOGO_FADE_MS = 480;
 
 /** Stage 4 — curtain paths translate outward. */
-export const SPLASH_CURTAIN_MS = 760;
+export const SPLASH_CURTAIN_MS = 680;
 
 export const SPLASH_MOTION_EASE = [0.45, 0.05, 0.2, 1] as const;
 

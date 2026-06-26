@@ -130,6 +130,26 @@ describe("account-settings-cache", () => {
     expect(next?.accounts[0]?.updatedAt).toBe("2026-01-15T10:00:00.000Z");
   });
 
+  it("sets updatedAt immediately when balance changes optimistically", () => {
+    const before = Date.now();
+    const snapshot = {
+      accounts: [
+        account({
+          currentBalance: 1000,
+          updatedAt: "2026-01-15T10:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+
+    const next = applyAccountPatch(snapshot, "acct-1", { currentBalance: 1500 });
+
+    expect(next?.accounts[0]?.currentBalance).toBe(1500);
+    expect(
+      new Date(next!.accounts[0]!.updatedAt).getTime(),
+    ).toBeGreaterThanOrEqual(before);
+  });
+
   it("preserves balance timestamps after refetch when balance is unchanged", () => {
     const previous = {
       accounts: [

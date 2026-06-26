@@ -324,7 +324,7 @@ export function SplashAnimation({
   }, [logoBlockTop, logoCenter.x]);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-background">
       {curtainStarted ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <AppShell>

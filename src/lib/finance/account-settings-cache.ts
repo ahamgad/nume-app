@@ -37,6 +37,10 @@ export function applyAccountPatch<T extends { accounts: Account[] }>(
       const next = { ...account, ...patch };
       if (patch.currentBalance === undefined) {
         next.updatedAt = account.updatedAt;
+      } else if (patch.currentBalance !== account.currentBalance) {
+        next.updatedAt = new Date().toISOString();
+      } else {
+        next.updatedAt = account.updatedAt;
       }
       return next;
     }),
