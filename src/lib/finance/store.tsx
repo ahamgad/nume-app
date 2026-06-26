@@ -81,7 +81,8 @@ import type {
 import { calculateNetWorth } from "@/lib/finance/net-worth";
 import {
   applyAccountPatch,
-  isAccountSettingsOnlyPatch,
+  isNonBalanceAccountPatch,
+  preserveBalanceTimestamps,
   type AccountUpdatableFields,
 } from "@/lib/finance/account-settings-cache";
 import {
@@ -354,7 +355,17 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const invalidate = useCallback(async () => {
     if (!userId) return;
-    await queryClient.invalidateQueries({ queryKey: [FINANCE_QUERY_KEY, userId] });
+    const queryKey = [FINANCE_QUERY_KEY, userId];
+    const previous = queryClient.getQueryData<FinanceData>(queryKey);
+    await queryClient.invalidateQueries({ queryKey });
+    await queryClient.refetchQueries({ queryKey });
+    const current = queryClient.getQueryData<FinanceData>(queryKey);
+    if (previous && current) {
+      queryClient.setQueryData(
+        queryKey,
+        preserveBalanceTimestamps(previous, current),
+      );
+    }
   }, [queryClient, userId]);
 
   const refresh = useCallback(async () => {
@@ -437,7 +448,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
       const queryKey = [FINANCE_QUERY_KEY, userId];
       const previous = queryClient.getQueryData<FinanceData>(queryKey);
-      const settingsOnly = isAccountSettingsOnlyPatch(patch);
+      const settingsOnly = isNonBalanceAccountPatch(patch);
 
       queryClient.setQueryData<FinanceData>(queryKey, (current) =>
         applyAccountPatch(current, id, patch),

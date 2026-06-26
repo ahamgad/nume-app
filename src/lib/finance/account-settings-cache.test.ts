@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   applyAccountPatch,
-  isAccountSettingsOnlyPatch,
+  isNonBalanceAccountPatch,
+  preserveBalanceTimestamps,
 } from "@/lib/finance/account-settings-cache";
 import type { Account } from "@/lib/finance/types";
 
@@ -25,21 +26,19 @@ function account(overrides: Partial<Account> = {}): Account {
 }
 
 describe("account-settings-cache", () => {
-  it("detects settings-only patches", () => {
+  it("detects non-balance patches", () => {
+    expect(isNonBalanceAccountPatch({ includeInNetWorth: false })).toBe(true);
     expect(
-      isAccountSettingsOnlyPatch({ includeInNetWorth: false }),
-    ).toBe(true);
-    expect(
-      isAccountSettingsOnlyPatch({
+      isNonBalanceAccountPatch({
         includeInNetWorth: true,
         includeInEmergencyFund: true,
       }),
     ).toBe(true);
-    expect(isAccountSettingsOnlyPatch({ name: "Updated" })).toBe(false);
+    expect(isNonBalanceAccountPatch({ name: "Updated" })).toBe(true);
     expect(
-      isAccountSettingsOnlyPatch({
+      isNonBalanceAccountPatch({
         includeInNetWorth: false,
-        name: "Updated",
+        currentBalance: 500,
       }),
     ).toBe(false);
   });
@@ -111,12 +110,78 @@ describe("account-settings-cache", () => {
       });
     }
   });
-});
 
-describe("certificate settings persistence guard", () => {
-  it("requires account patch when only settings fields are provided", () => {
-    const input = { includeInNetWorth: false };
-    expect(isAccountSettingsOnlyPatch(input)).toBe(true);
-    expect(Object.keys(input)).not.toContain("renewalType");
+  it("preserves updatedAt for non-balance optimistic patches", () => {
+    const snapshot = {
+      accounts: [
+        account({
+          updatedAt: "2026-01-15T10:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+
+    const next = applyAccountPatch(snapshot, "acct-1", {
+      name: "Renamed",
+      includeInNetWorth: false,
+    });
+
+    expect(next?.accounts[0]?.name).toBe("Renamed");
+    expect(next?.accounts[0]?.updatedAt).toBe("2026-01-15T10:00:00.000Z");
+  });
+
+  it("preserves balance timestamps after refetch when balance is unchanged", () => {
+    const previous = {
+      accounts: [
+        account({
+          id: "acct-1",
+          currentBalance: 1000,
+          updatedAt: "2026-01-15T10:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+    const next = {
+      accounts: [
+        account({
+          id: "acct-1",
+          name: "Renamed",
+          currentBalance: 1000,
+          updatedAt: "2026-06-26T12:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+
+    expect(preserveBalanceTimestamps(previous, next).accounts[0]?.updatedAt).toBe(
+      "2026-01-15T10:00:00.000Z",
+    );
+  });
+
+  it("accepts new balance timestamps when balance changes", () => {
+    const previous = {
+      accounts: [
+        account({
+          id: "acct-1",
+          currentBalance: 1000,
+          updatedAt: "2026-01-15T10:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+    const next = {
+      accounts: [
+        account({
+          id: "acct-1",
+          currentBalance: 1200,
+          updatedAt: "2026-06-26T12:00:00.000Z",
+        }),
+      ],
+      records: [],
+    };
+
+    expect(preserveBalanceTimestamps(previous, next).accounts[0]?.updatedAt).toBe(
+      "2026-06-26T12:00:00.000Z",
+    );
   });
 });

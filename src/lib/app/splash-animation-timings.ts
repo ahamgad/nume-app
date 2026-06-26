@@ -20,8 +20,8 @@ export const SPLASH_CURTAIN_MS = 760;
 
 export const SPLASH_MOTION_EASE = [0.45, 0.05, 0.2, 1] as const;
 
-/** Premium ease for curtain panel translation — smooth open with soft settle. */
-export const SPLASH_CURTAIN_EASE = [0.18, 0.72, 0.28, 1] as const;
+/** Premium ease for curtain panel translation — weighted open with soft settle. */
+export const SPLASH_CURTAIN_EASE = [0.14, 0.68, 0.22, 1] as const;
 
 /** Organic ease-out for wordmark letter rise on entrance. */
 export const SPLASH_WORDMARK_LETTER_EASE = [0.22, 1, 0.36, 1] as const;

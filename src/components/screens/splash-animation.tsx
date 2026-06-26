@@ -47,7 +47,6 @@ import {
   NUME_SPLASH_WORDMARK_SIZE_PX,
 } from "@/lib/app/splash-stroke-paths";
 import { useFinance } from "@/lib/finance/store";
-import { DashboardScreen } from "@/components/screens/dashboard-screen";
 import { useAuth } from "@/providers/auth-provider";
 
 const WORDMARK = "NUME";
@@ -84,6 +83,7 @@ interface SplashAnimationProps {
   canStartCurtain: boolean;
   reducedMotion: boolean;
   onLogoFadeComplete: () => void;
+  onCurtainStart: () => void;
   onCurtainComplete: () => void;
 }
 
@@ -91,6 +91,7 @@ export function SplashAnimation({
   canStartCurtain,
   reducedMotion,
   onLogoFadeComplete,
+  onCurtainStart,
   onCurtainComplete,
 }: SplashAnimationProps) {
   const maskId = useId();
@@ -250,6 +251,7 @@ export function SplashAnimation({
     const frame = window.requestAnimationFrame(() => {
       setCurtainStarted(true);
       curtainProgress.set(0);
+      onCurtainStart();
 
       animationPromise = animate(curtainProgress, 1, curtainTransition).then(
         () => {
@@ -267,6 +269,7 @@ export function SplashAnimation({
     curtainProgress,
     logoFadeComplete,
     onCurtainComplete,
+    onCurtainStart,
     reducedMotion,
   ]);
 
@@ -275,13 +278,14 @@ export function SplashAnimation({
 
     const frame = window.requestAnimationFrame(() => {
       setCurtainStarted(true);
+      onCurtainStart();
       onCurtainComplete();
     });
 
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [canStartCurtain, curtainStarted, onCurtainComplete, reducedMotion]);
+  }, [canStartCurtain, curtainStarted, onCurtainComplete, onCurtainStart, reducedMotion]);
 
   function handleIntroStrokeAnimationComplete() {
     if (reducedMotion || introStrokePhase !== "erasing") return;
@@ -324,12 +328,6 @@ export function SplashAnimation({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      {curtainStarted ? (
-        <div className="absolute inset-0 z-0">
-          <DashboardScreen />
-        </div>
-      ) : null}
-
       <svg
         aria-hidden
         className="pointer-events-none absolute inset-0 z-10 size-full overflow-visible text-foreground"

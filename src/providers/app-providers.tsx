@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { FinanceProvider } from "@/lib/finance/store";
 import { AppBootstrap } from "@/components/app/app-bootstrap";
+import { SplashOverlayLayer } from "@/components/app/splash-overlay-layer";
 import { ConnectivityToasts } from "@/components/connectivity/connectivity-toasts";
 import { NavigationEdgeGuard } from "@/components/platform/navigation-edge-guard";
 import { AuthProvider } from "@/providers/auth-provider";
@@ -15,6 +16,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { ModalLayerProvider } from "@/providers/modal-layer-provider";
 import { FieldEditorProvider } from "@/providers/field-editor-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { SplashOverlayProvider } from "@/providers/splash-overlay-provider";
 import { ToastProvider } from "@/providers/toast-provider";
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -30,10 +32,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
                   <ModalLayerProvider>
                     <FieldEditorProvider>
                       <FinanceProvider>
-                        <NavigationGuardProvider>
-                          <NavigationEdgeGuard />
-                          <AppBootstrap>{children}</AppBootstrap>
-                        </NavigationGuardProvider>
+                        <SplashOverlayProvider>
+                          <NavigationGuardProvider>
+                            <NavigationEdgeGuard />
+                            <AppBootstrap>{children}</AppBootstrap>
+                            <SplashOverlayLayer />
+                          </NavigationGuardProvider>
+                        </SplashOverlayProvider>
                       </FinanceProvider>
                     </FieldEditorProvider>
                   </ModalLayerProvider>

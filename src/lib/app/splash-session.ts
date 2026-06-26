@@ -54,6 +54,7 @@ export function shouldSkipSplashOnLoad(options: {
 export function markSplashComplete() {
   window.sessionStorage.setItem(SPLASH_COMPLETE_KEY, "1");
   window.sessionStorage.removeItem(BG_RESUME_ELIGIBLE_KEY);
+  window.dispatchEvent(new Event("nume-splash-gate"));
 }
 
 export function clearSplashComplete() {

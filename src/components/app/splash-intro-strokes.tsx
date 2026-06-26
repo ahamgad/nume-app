@@ -8,6 +8,7 @@ import {
   getIntroStrokeTransition,
   introStrokeDrawTarget,
   introStrokeHidden,
+  SPLASH_INTRO_STROKE_HOLD_BEFORE_ERASE_MS,
   type IntroStrokePhase,
 } from "@/lib/app/splash-intro-stroke-motion";
 import {
@@ -30,7 +31,7 @@ interface SplashIntroStrokesProps {
 
 export function SplashIntroStrokes({
   size = 24,
-  strokeWidth = 2,
+  strokeWidth = 2.5,
   className,
   loop = true,
   reducedMotion = false,
@@ -38,6 +39,7 @@ export function SplashIntroStrokes({
   const [phase, setPhase] = useState<IntroStrokePhase>("drawing");
   const [loopIndex, setLoopIndex] = useState(0);
   const eraseHandledRef = useRef(false);
+  const holdTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (reducedMotion || !loop) return;
@@ -46,12 +48,23 @@ export function SplashIntroStrokes({
     eraseHandledRef.current = false;
   }, [loop, loopIndex, phase, reducedMotion]);
 
+  useEffect(() => {
+    return () => {
+      if (holdTimerRef.current !== null) {
+        window.clearTimeout(holdTimerRef.current);
+      }
+    };
+  }, []);
+
   function handleAnimationComplete(index: number) {
     if (reducedMotion || !loop) return;
     if (index !== NUME_SPLASH_STROKE_ORDER.length - 1) return;
 
     if (phase === "drawing") {
-      setPhase("erasing");
+      holdTimerRef.current = window.setTimeout(() => {
+        holdTimerRef.current = null;
+        setPhase("erasing");
+      }, SPLASH_INTRO_STROKE_HOLD_BEFORE_ERASE_MS);
       return;
     }
 

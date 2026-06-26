@@ -1,32 +1,36 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { SplashAnimation } from "@/components/screens/splash-animation";
 import {
   getSplashExitDelayMs,
   isSplashInitializationReady,
-  markSplashComplete,
 } from "@/lib/app/splash-session";
 import { readStoredLocale } from "@/lib/i18n/locale-restart";
 import { getLocaleAttributes } from "@/lib/fonts";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
+import { useSplashOverlay } from "@/providers/splash-overlay-provider";
 
 export function SplashScreen() {
-  const router = useRouter();
+  const { beginSplash, setCanStartCurtain, state } = useSplashOverlay();
   const { isLoading: authLoading, user } = useAuth();
   const { isFinanceReady } = useFinance();
   const startedAtRef = useRef(0);
-  const navigatedRef = useRef(false);
+  const splashStartedRef = useRef(false);
+  const [initGateOpen, setInitGateOpen] = useState(false);
   const [reducedMotion] = useState(
     () =>
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
-  const [logoFadeComplete, setLogoFadeComplete] = useState(reducedMotion);
-  const [initGateOpen, setInitGateOpen] = useState(false);
+  const logoFadeComplete = state.active ? state.logoFadeComplete : reducedMotion;
+
+  useEffect(() => {
+    if (splashStartedRef.current) return;
+    splashStartedRef.current = true;
+    beginSplash({ reducedMotion });
+  }, [beginSplash, reducedMotion]);
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -59,19 +63,9 @@ export function SplashScreen() {
     return () => window.clearTimeout(timer);
   }, [authLoading, isFinanceReady, logoFadeComplete, reducedMotion, user]);
 
-  const handleCurtainComplete = useCallback(() => {
-    if (navigatedRef.current) return;
-    navigatedRef.current = true;
-    markSplashComplete();
-    router.replace("/");
-  }, [router]);
+  useEffect(() => {
+    setCanStartCurtain(initGateOpen);
+  }, [initGateOpen, setCanStartCurtain]);
 
-  return (
-    <SplashAnimation
-      canStartCurtain={initGateOpen}
-      reducedMotion={reducedMotion}
-      onLogoFadeComplete={() => setLogoFadeComplete(true)}
-      onCurtainComplete={handleCurtainComplete}
-    />
-  );
+  return null;
 }

@@ -1,9 +1,14 @@
 import {
   SPLASH_STROKE_DRAW_MS,
   SPLASH_STROKE_ERASE_MS,
+  SPLASH_WORDMARK_LETTER_FADE_MS,
 } from "@/lib/app/splash-animation-timings";
 
 export type IntroStrokePhase = "drawing" | "erasing";
+
+/** Pause after draw before erase — matches splash intro loop wordmark hold. */
+export const SPLASH_INTRO_STROKE_HOLD_BEFORE_ERASE_MS =
+  SPLASH_WORDMARK_LETTER_FADE_MS;
 
 /** Symmetric offset-only intro stroke visibility — hidden when pathOffset = 1. */
 export const introStrokeHidden = { pathLength: 1, pathOffset: 1 };

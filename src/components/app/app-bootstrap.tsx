@@ -8,9 +8,11 @@ import { isSplashComplete } from "@/lib/app/splash-session";
 function subscribeSplashGate(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
   window.addEventListener("pageshow", onStoreChange);
+  window.addEventListener("nume-splash-gate", onStoreChange);
   return () => {
     window.removeEventListener("storage", onStoreChange);
     window.removeEventListener("pageshow", onStoreChange);
+    window.removeEventListener("nume-splash-gate", onStoreChange);
   };
 }
 

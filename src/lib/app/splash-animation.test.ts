@@ -33,6 +33,7 @@ import {
   introStrokeDrawTarget,
   introStrokeEraseTarget,
   introStrokeHidden,
+  SPLASH_INTRO_STROKE_HOLD_BEFORE_ERASE_MS,
 } from "@/lib/app/splash-intro-stroke-motion";
 
 function readSvgPathData(relativePath: string): string[] {
@@ -166,8 +167,12 @@ describe("splash intro stroke motion", () => {
     expect(getIntroStrokeAnimate("erasing")).toEqual(introStrokeEraseTarget);
   });
 
-  it("defines a 2px loader stroke width for app indicators", () => {
-    expect(NUME_SPLASH_LOADER_STROKE_WIDTH_PX).toBe(2);
+  it("defines a 2.5px loader stroke width for app indicators", () => {
+    expect(NUME_SPLASH_LOADER_STROKE_WIDTH_PX).toBe(2.5);
+  });
+
+  it("holds before erase to match splash intro loop pacing", () => {
+    expect(SPLASH_INTRO_STROKE_HOLD_BEFORE_ERASE_MS).toBe(220);
   });
 });
 
