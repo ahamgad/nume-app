@@ -14,29 +14,43 @@ export function SplashOverlayLayer() {
   const router = useRouter();
   const pathname = usePathname();
   const { state, dismissSplash, setLogoFadeComplete } = useSplashOverlay();
-  const handoffPendingRef = useRef(false);
+  const handoffStartedRef = useRef(false);
+  const curtainCompletePendingRef = useRef(false);
 
   const dismissAfterAppPaint = useCallback(() => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         dismissSplash();
-        handoffPendingRef.current = false;
+        handoffStartedRef.current = false;
+        curtainCompletePendingRef.current = false;
       });
     });
   }, [dismissSplash]);
 
-  const handleCurtainComplete = useCallback(() => {
-    if (handoffPendingRef.current) return;
-    handoffPendingRef.current = true;
+  const tryDismiss = useCallback(() => {
+    if (!handoffStartedRef.current || !curtainCompletePendingRef.current) {
+      return;
+    }
+    if (pathname !== "/") return;
+    dismissAfterAppPaint();
+  }, [dismissAfterAppPaint, pathname]);
+
+  const handleCurtainStart = useCallback(() => {
+    if (handoffStartedRef.current) return;
+    handoffStartedRef.current = true;
     markSplashHandoff();
     markSplashComplete();
     router.replace("/");
   }, [router]);
 
+  const handleCurtainComplete = useCallback(() => {
+    curtainCompletePendingRef.current = true;
+    tryDismiss();
+  }, [tryDismiss]);
+
   useEffect(() => {
-    if (!handoffPendingRef.current || pathname !== "/") return;
-    dismissAfterAppPaint();
-  }, [dismissAfterAppPaint, pathname]);
+    tryDismiss();
+  }, [tryDismiss]);
 
   if (!state.active) return null;
 
@@ -45,6 +59,7 @@ export function SplashOverlayLayer() {
       canStartCurtain={state.canStartCurtain}
       reducedMotion={state.reducedMotion}
       onLogoFadeComplete={() => setLogoFadeComplete(true)}
+      onCurtainStart={handleCurtainStart}
       onCurtainComplete={handleCurtainComplete}
     />
   );
