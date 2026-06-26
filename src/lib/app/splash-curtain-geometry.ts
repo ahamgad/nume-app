@@ -152,6 +152,44 @@ export function getCurtainTravelDistance(
   return Math.max(minTravelLeft, minTravelRight);
 }
 
+/** Resting horizontal gap between path3 and path4 in screen pixels. */
+export function getCurtainRestSeparationScreenPx(
+  layout: SplashLogoLayout,
+): number {
+  return (
+    (NUME_SPLASH_CURTAIN_DIAGONALS.path4.x1 -
+      NUME_SPLASH_CURTAIN_DIAGONALS.path3.x1) *
+    layout.scale
+  );
+}
+
+/**
+ * Screen-space edge translations for path3/path4 and the corridor mask.
+ * At progress 0 both edges coincide at logo center; at progress 1 this matches
+ * the legacy `-travel / +travel` envelope.
+ */
+export function getCurtainEdgeScreenTranslates(
+  progress: number,
+  viewport: ViewportSize,
+  layout: SplashLogoLayout,
+): {
+  screenTravel: number;
+  path3ScreenTranslateX: number;
+  path4ScreenTranslateX: number;
+} {
+  const screenTravel = getCurtainTravelDistance(viewport, layout) * progress;
+  const halfRestSeparationScreen = getCurtainRestSeparationScreenPx(layout) / 2;
+  const separationClose = 1 - progress;
+
+  return {
+    screenTravel,
+    path3ScreenTranslateX:
+      -screenTravel + halfRestSeparationScreen * separationClose,
+    path4ScreenTranslateX:
+      screenTravel - halfRestSeparationScreen * separationClose,
+  };
+}
+
 /** Max splash strip width (px) remaining outside the corridor at a given travel. */
 export function getMaxSplashRemainderWidth(
   viewport: ViewportSize,
@@ -189,11 +227,13 @@ export function getCurtainTranslations(
   path3TranslateX: number;
   path4TranslateX: number;
 } {
-  const screenTravel = getCurtainTravelDistance(viewport, layout) * progress;
+  const { screenTravel, path3ScreenTranslateX, path4ScreenTranslateX } =
+    getCurtainEdgeScreenTranslates(progress, viewport, layout);
+
   return {
     screenTravel,
-    path3TranslateX: -screenTravel / logoScale,
-    path4TranslateX: screenTravel / logoScale,
+    path3TranslateX: path3ScreenTranslateX / logoScale,
+    path4TranslateX: path4ScreenTranslateX / logoScale,
   };
 }
 

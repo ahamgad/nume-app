@@ -30,7 +30,7 @@ import {
 } from "@/lib/app/splash-intro-stroke-motion";
 import {
   buildCurtainRevealPolygon,
-  getCurtainTravelDistance,
+  getCurtainEdgeScreenTranslates,
   getSplashLogoLayout,
 } from "@/lib/app/splash-curtain-geometry";
 import { isSplashInitializationReady } from "@/lib/app/splash-session";
@@ -150,16 +150,21 @@ export function SplashAnimation({
     [logoCenter, viewport],
   );
 
-  const curtainTravel = useMemo(
-    () => getCurtainTravelDistance(viewport, layout),
-    [layout, viewport],
-  );
-
   const path3X = useTransform(curtainProgress, (progress) => {
-    return (-curtainTravel * progress) / LOGO_SCALE;
+    const { path3ScreenTranslateX } = getCurtainEdgeScreenTranslates(
+      progress,
+      viewport,
+      layout,
+    );
+    return path3ScreenTranslateX / LOGO_SCALE;
   });
   const path4X = useTransform(curtainProgress, (progress) => {
-    return (curtainTravel * progress) / LOGO_SCALE;
+    const { path4ScreenTranslateX } = getCurtainEdgeScreenTranslates(
+      progress,
+      viewport,
+      layout,
+    );
+    return path4ScreenTranslateX / LOGO_SCALE;
   });
 
   const corridorPoints = useTransform(curtainProgress, (progress) => {
@@ -167,8 +172,14 @@ export function SplashAnimation({
       const center = layout.centerX;
       return `${center},${layout.centerY} ${center},${layout.centerY} ${center},${layout.centerY}`;
     }
-    const travel = curtainTravel * progress;
-    return buildCurtainRevealPolygon(-travel, travel, viewport, layout);
+    const { path3ScreenTranslateX, path4ScreenTranslateX } =
+      getCurtainEdgeScreenTranslates(progress, viewport, layout);
+    return buildCurtainRevealPolygon(
+      path3ScreenTranslateX,
+      path4ScreenTranslateX,
+      viewport,
+      layout,
+    );
   });
 
   const splashSvgMask = curtainStarted ? `url(#${safeMaskId})` : undefined;

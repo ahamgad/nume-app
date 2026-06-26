@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildCurtainRevealPolygon,
+  getCurtainEdgeScreenTranslates,
+  getCurtainRestSeparationScreenPx,
   getCurtainTravelDistance,
   getCurtainTranslations,
   getMaxSplashRemainderWidth,
@@ -97,16 +99,12 @@ describe("splash curtain geometry", () => {
   });
 
   it("spans the full viewport height at every travel step", () => {
-    for (const progress of [0, 0.35, 0.7, 1]) {
-      const { screenTravel } = getCurtainTranslations(
-        progress,
-        viewport,
-        layout,
-        logoScale,
-      );
+    for (const progress of [0.35, 0.7, 1]) {
+      const { path3ScreenTranslateX, path4ScreenTranslateX } =
+        getCurtainEdgeScreenTranslates(progress, viewport, layout);
       const polygon = buildCurtainRevealPolygon(
-        -screenTravel,
-        screenTravel,
+        path3ScreenTranslateX,
+        path4ScreenTranslateX,
         viewport,
         layout,
       );
@@ -120,14 +118,38 @@ describe("splash curtain geometry", () => {
     }
   });
 
+  it("starts with closed curtain edges and ends at legacy travel positions", () => {
+    const restSeparation = getCurtainRestSeparationScreenPx(layout);
+
+    const closed = getCurtainEdgeScreenTranslates(0, viewport, layout);
+    expect(closed.path3ScreenTranslateX).toBeCloseTo(restSeparation / 2, 5);
+    expect(closed.path4ScreenTranslateX).toBeCloseTo(-restSeparation / 2, 5);
+    expect(
+      closed.path4ScreenTranslateX - closed.path3ScreenTranslateX,
+    ).toBeCloseTo(-restSeparation, 5);
+
+    const open = getCurtainEdgeScreenTranslates(1, viewport, layout);
+    const travel = getCurtainTravelDistance(viewport, layout);
+    expect(open.path3ScreenTranslateX).toBe(-travel);
+    expect(open.path4ScreenTranslateX).toBe(travel);
+  });
+
   it("keeps stroke translations aligned with corridor travel", () => {
     for (const progress of [0, 0.5, 1]) {
-      const { screenTravel, path3TranslateX, path4TranslateX } =
-        getCurtainTranslations(progress, viewport, layout, logoScale);
+      const {
+        path3ScreenTranslateX,
+        path4ScreenTranslateX,
+      } = getCurtainEdgeScreenTranslates(progress, viewport, layout);
+      const { path3TranslateX, path4TranslateX } = getCurtainTranslations(
+        progress,
+        viewport,
+        layout,
+        logoScale,
+      );
 
-      expect(path3TranslateX).toBe(-screenTravel / logoScale);
-      expect(path4TranslateX).toBe(screenTravel / logoScale);
-      expect(path3TranslateX).toBe(-path4TranslateX);
+      expect(path3TranslateX).toBe(path3ScreenTranslateX / logoScale);
+      expect(path4TranslateX).toBe(path4ScreenTranslateX / logoScale);
+      expect(path3ScreenTranslateX).toBe(-path4ScreenTranslateX);
     }
   });
 
