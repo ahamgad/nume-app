@@ -30,13 +30,9 @@ function readSvgPathData(relativePath: string): string[] {
 }
 
 describe("splash stroke paths", () => {
-  it("defines three synchronized intro draw paths", () => {
-    expect(NUME_SPLASH_STROKE_ORDER).toHaveLength(3);
-    expect(Object.keys(NUME_SPLASH_STROKE_PATHS)).toEqual([
-      "path1",
-      "path2",
-      "path3",
-    ]);
+  it("defines two synchronized intro draw paths", () => {
+    expect(NUME_SPLASH_STROKE_ORDER).toHaveLength(2);
+    expect(Object.keys(NUME_SPLASH_STROKE_PATHS)).toEqual(["path1", "path2"]);
   });
 
   it("matches docs/brand-sublime-stroke.svg path data exactly", () => {
@@ -45,10 +41,7 @@ describe("splash stroke paths", () => {
     expect(NUME_SPLASH_STROKE_SVG_PATHS).toEqual(sourcePaths);
     expect(NUME_SPLASH_STROKE_PATHS.path1).toBe(sourcePaths[0]);
     expect(NUME_SPLASH_STROKE_PATHS.path2).toBe(
-      "M89.5833 20.8333L70.8333 79.1667",
-    );
-    expect(NUME_SPLASH_STROKE_PATHS.path3).toBe(
-      "M61.4583 50L70.8333 79.1667",
+      "M89.5833 20.8333L70.8333 79.1667L61.4583 50",
     );
   });
 

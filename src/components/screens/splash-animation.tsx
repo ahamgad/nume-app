@@ -17,6 +17,7 @@ import {
   SPLASH_STROKE_ERASE_MS,
   SPLASH_WORDMARK_LETTER_EASE,
   SPLASH_WORDMARK_LETTER_FADE_MS,
+  SPLASH_WORDMARK_LETTER_RISE_PX,
 } from "@/lib/app/splash-animation-timings";
 import {
   buildCurtainRevealPolygon,
@@ -66,7 +67,8 @@ const curtainTransition = {
 
 const wordmarkLetterTransition = {
   duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
-  ease: SPLASH_WORDMARK_LETTER_EASE,
+  opacity: { ease: [0.16, 1, 0.3, 1] as const },
+  y: { ease: SPLASH_WORDMARK_LETTER_EASE },
 };
 
 interface SplashAnimationProps {
@@ -103,6 +105,7 @@ export function SplashAnimation({
   const [introStrokePhase, setIntroStrokePhase] =
     useState<IntroStrokePhase>("drawing");
   const [introLooping, setIntroLooping] = useState(!reducedMotion);
+  const [showIntroStrokes, setShowIntroStrokes] = useState(!reducedMotion);
   const [visibleLetters, setVisibleLetters] = useState(reducedMotion ? 4 : 0);
   const [strokeDrawComplete, setStrokeDrawComplete] = useState(reducedMotion);
   const [logoFadeStarted, setLogoFadeStarted] = useState(reducedMotion);
@@ -281,8 +284,16 @@ export function SplashAnimation({
     if (eraseHandledRef.current) return;
 
     eraseHandledRef.current = true;
-    setIntroStrokePhase("drawing");
-    setIntroLoopIndex((current) => current + 1);
+    setShowIntroStrokes(false);
+
+    window.requestAnimationFrame(() => {
+      setIntroStrokePhase("drawing");
+      setIntroLoopIndex((current) => current + 1);
+
+      window.requestAnimationFrame(() => {
+        setShowIntroStrokes(true);
+      });
+    });
   }
 
   function handleLogoFadeComplete() {
@@ -369,7 +380,8 @@ export function SplashAnimation({
           viewBox={`0 0 ${NUME_SPLASH_VIEWBOX_SIZE} ${NUME_SPLASH_VIEWBOX_SIZE}`}
           className="shrink-0 overflow-visible"
         >
-          {(introLooping || !curtainStarted) &&
+          {showIntroStrokes &&
+            (introLooping || !curtainStarted) &&
             NUME_SPLASH_STROKE_ORDER.map((key, index) => (
               <motion.path
                 key={`${strokeLoopKey}-${key}`}
@@ -385,7 +397,9 @@ export function SplashAnimation({
                 animate={{ pathLength: introStrokePathLength }}
                 transition={introStrokeTransition}
                 onAnimationComplete={
-                  index === 0 ? handleIntroStrokeAnimationComplete : undefined
+                  index === NUME_SPLASH_STROKE_ORDER.length - 1
+                    ? handleIntroStrokeAnimationComplete
+                    : undefined
                 }
               />
             ))}
@@ -412,17 +426,24 @@ export function SplashAnimation({
           className="font-sans font-bold tracking-[0.1em]"
           style={{ fontSize: NUME_SPLASH_WORDMARK_SIZE_PX }}
         >
-          {WORDMARK.split("").map((letter, index) => (
-            <motion.span
-              key={`${strokeLoopKey}-${letter}-${index}`}
-              className="inline-block"
-              initial={false}
-              animate={{ opacity: index < visibleLetters ? 1 : 0 }}
-              transition={wordmarkLetterTransition}
-            >
-              {letter}
-            </motion.span>
-          ))}
+          {WORDMARK.split("").map((letter, index) => {
+            const isVisible = index < visibleLetters;
+
+            return (
+              <motion.span
+                key={`${strokeLoopKey}-${letter}-${index}`}
+                className="inline-block"
+                initial={false}
+                animate={{
+                  opacity: isVisible ? 1 : 0,
+                  y: isVisible ? 0 : SPLASH_WORDMARK_LETTER_RISE_PX,
+                }}
+                transition={wordmarkLetterTransition}
+              >
+                {letter}
+              </motion.span>
+            );
+          })}
         </p>
       </div>
 
