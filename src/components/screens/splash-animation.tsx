@@ -16,6 +16,9 @@ import {
   SPLASH_STROKE_DRAW_MS,
   SPLASH_STROKE_ERASE_MS,
   SPLASH_WORDMARK_LETTER_EASE,
+  SPLASH_WORDMARK_LETTER_ENTER_OPACITY_EASE,
+  SPLASH_WORDMARK_LETTER_EXIT_EASE,
+  SPLASH_WORDMARK_LETTER_EXIT_OPACITY_EASE,
   SPLASH_WORDMARK_LETTER_FADE_MS,
   SPLASH_WORDMARK_LETTER_RISE_PX,
 } from "@/lib/app/splash-animation-timings";
@@ -65,11 +68,21 @@ const curtainTransition = {
   ease: SPLASH_MOTION_EASE,
 };
 
-const wordmarkLetterTransition = {
-  duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
-  opacity: { ease: [0.16, 1, 0.3, 1] as const },
-  y: { ease: SPLASH_WORDMARK_LETTER_EASE },
-};
+function getWordmarkLetterTransition(isVisible: boolean) {
+  return {
+    duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
+    opacity: {
+      ease: isVisible
+        ? SPLASH_WORDMARK_LETTER_ENTER_OPACITY_EASE
+        : SPLASH_WORDMARK_LETTER_EXIT_OPACITY_EASE,
+    },
+    y: {
+      ease: isVisible
+        ? SPLASH_WORDMARK_LETTER_EASE
+        : SPLASH_WORDMARK_LETTER_EXIT_EASE,
+    },
+  };
+}
 
 interface SplashAnimationProps {
   canStartCurtain: boolean;
@@ -105,7 +118,6 @@ export function SplashAnimation({
   const [introStrokePhase, setIntroStrokePhase] =
     useState<IntroStrokePhase>("drawing");
   const [introLooping, setIntroLooping] = useState(!reducedMotion);
-  const [showIntroStrokes, setShowIntroStrokes] = useState(!reducedMotion);
   const [visibleLetters, setVisibleLetters] = useState(reducedMotion ? 4 : 0);
   const [strokeDrawComplete, setStrokeDrawComplete] = useState(reducedMotion);
   const [logoFadeStarted, setLogoFadeStarted] = useState(reducedMotion);
@@ -284,16 +296,8 @@ export function SplashAnimation({
     if (eraseHandledRef.current) return;
 
     eraseHandledRef.current = true;
-    setShowIntroStrokes(false);
-
-    window.requestAnimationFrame(() => {
-      setIntroStrokePhase("drawing");
-      setIntroLoopIndex((current) => current + 1);
-
-      window.requestAnimationFrame(() => {
-        setShowIntroStrokes(true);
-      });
-    });
+    setIntroStrokePhase("drawing");
+    setIntroLoopIndex((current) => current + 1);
   }
 
   function handleLogoFadeComplete() {
@@ -302,7 +306,12 @@ export function SplashAnimation({
     onLogoFadeComplete();
   }
 
-  const introStrokePathLength = introStrokePhase === "drawing" ? 1 : 0;
+  const introStrokeDrawTarget = { pathLength: 1, pathOffset: 0 };
+  const introStrokeEraseTarget = { pathLength: 0, pathOffset: 1 };
+  const introStrokeAnimate =
+    introStrokePhase === "drawing"
+      ? introStrokeDrawTarget
+      : introStrokeEraseTarget;
   const introStrokeTransition =
     introStrokePhase === "drawing"
       ? introStrokeDrawTransition
@@ -380,8 +389,7 @@ export function SplashAnimation({
           viewBox={`0 0 ${NUME_SPLASH_VIEWBOX_SIZE} ${NUME_SPLASH_VIEWBOX_SIZE}`}
           className="shrink-0 overflow-visible"
         >
-          {showIntroStrokes &&
-            (introLooping || !curtainStarted) &&
+          {(introLooping || !curtainStarted) &&
             NUME_SPLASH_STROKE_ORDER.map((key, index) => (
               <motion.path
                 key={`${strokeLoopKey}-${key}`}
@@ -393,8 +401,8 @@ export function SplashAnimation({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 style={{ strokeOpacity: innerStrokeOpacity }}
-                initial={{ pathLength: introStrokePhase === "drawing" ? 0 : 1 }}
-                animate={{ pathLength: introStrokePathLength }}
+                initial={{ pathLength: 0, pathOffset: 0 }}
+                animate={introStrokeAnimate}
                 transition={introStrokeTransition}
                 onAnimationComplete={
                   index === NUME_SPLASH_STROKE_ORDER.length - 1
@@ -438,7 +446,7 @@ export function SplashAnimation({
                   opacity: isVisible ? 1 : 0,
                   y: isVisible ? 0 : SPLASH_WORDMARK_LETTER_RISE_PX,
                 }}
-                transition={wordmarkLetterTransition}
+                transition={getWordmarkLetterTransition(isVisible)}
               >
                 {letter}
               </motion.span>

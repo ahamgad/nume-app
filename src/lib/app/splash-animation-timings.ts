@@ -20,7 +20,16 @@ export const SPLASH_CURTAIN_MS = 760;
 
 export const SPLASH_MOTION_EASE = [0.45, 0.05, 0.2, 1] as const;
 
-/** Organic ease-out for wordmark letter opacity and rise. */
+/** Organic ease-out for wordmark letter rise on entrance. */
 export const SPLASH_WORDMARK_LETTER_EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Time-reversed ease for wordmark letter rise on exit. */
+export const SPLASH_WORDMARK_LETTER_EXIT_EASE = [0.64, 0, 0.78, 0] as const;
+
+/** Opacity ease-out on wordmark letter entrance. */
+export const SPLASH_WORDMARK_LETTER_ENTER_OPACITY_EASE = [0.16, 1, 0.3, 1] as const;
+
+/** Time-reversed opacity ease for wordmark letter exit. */
+export const SPLASH_WORDMARK_LETTER_EXIT_OPACITY_EASE = [0.7, 0, 0.84, 0] as const;
 
 export const SPLASH_CURTAIN_PATH_KEYS = ["path3", "path4"] as const;
