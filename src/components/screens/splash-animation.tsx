@@ -64,6 +64,9 @@ const curtainTransition = {
   ease: SPLASH_CURTAIN_EASE,
 };
 
+/** Logo hands off to the curtain on the first curtain frame. */
+const SPLASH_LOGO_CURTAIN_EXIT_SCALE = 1.05;
+
 function getWordmarkLetterTransition(isVisible: boolean) {
   return {
     duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
@@ -384,9 +387,22 @@ export function SplashAnimation({
               ))}
 
             <motion.g
-              initial={{ opacity: reducedMotion ? 1 : 0 }}
-              animate={{ opacity: logoFadeStarted ? 1 : 0 }}
-              transition={logoFadeTransition}
+              initial={{ opacity: reducedMotion ? 1 : 0, scale: 1 }}
+              animate={
+                curtainStarted
+                  ? { opacity: 0, scale: SPLASH_LOGO_CURTAIN_EXIT_SCALE }
+                  : { opacity: logoFadeStarted ? 1 : 0, scale: 1 }
+              }
+              transition={
+                curtainStarted
+                  ? reducedMotion
+                    ? { duration: 0 }
+                    : curtainTransition
+                  : logoFadeTransition
+              }
+              style={{
+                transformOrigin: `${NUME_SPLASH_VIEWBOX_SIZE / 2}px ${NUME_SPLASH_VIEWBOX_SIZE / 2}px`,
+              }}
               onAnimationComplete={handleLogoFadeComplete}
             >
               {NUME_SPLASH_LOGO_FILLS.map((d) => (
