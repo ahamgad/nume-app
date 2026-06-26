@@ -48,7 +48,7 @@ describe("splash stroke paths", () => {
     expect(NUME_SPLASH_STROKE_SVG_PATHS).toEqual(sourcePaths);
     expect(NUME_SPLASH_STROKE_PATHS.path1).toBe(sourcePaths[0]);
     expect(NUME_SPLASH_STROKE_PATHS.path2).toBe(
-      "M89.5833 20.8333L70.8333 79.1667L61.4583 50",
+      "M89.5833 79.1667L70.8333 20.8333L61.4583 50",
     );
   });
 
