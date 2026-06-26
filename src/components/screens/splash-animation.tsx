@@ -70,6 +70,9 @@ const SPLASH_LOGO_CURTAIN_EXIT_SCALE = 1.05;
 /** Curtain strokes fade in on the first curtain frames — no pop-in. */
 const SPLASH_CURTAIN_STROKE_FADE_MS = 90;
 
+/** Curtain begins this far into the logo exit timeline (50% overlap). */
+const SPLASH_CURTAIN_START_OFFSET_MS = SPLASH_CURTAIN_MS / 2;
+
 const curtainStrokeFadeTransition = {
   duration: SPLASH_CURTAIN_STROKE_FADE_MS / 1000,
   ease: SPLASH_CURTAIN_EASE,
@@ -130,6 +133,7 @@ export function SplashAnimation({
   const [strokeDrawComplete, setStrokeDrawComplete] = useState(reducedMotion);
   const [logoFadeStarted, setLogoFadeStarted] = useState(reducedMotion);
   const [logoFadeComplete, setLogoFadeComplete] = useState(reducedMotion);
+  const [logoExitStarted, setLogoExitStarted] = useState(false);
   const [curtainStarted, setCurtainStarted] = useState(false);
 
   const curtainProgress = useMotionValue(0);
@@ -268,20 +272,28 @@ export function SplashAnimation({
     curtainTriggeredRef.current = true;
 
     let animationPromise: Promise<void> | undefined;
+    let curtainDelayTimer: number | undefined;
 
     const frame = window.requestAnimationFrame(() => {
-      setCurtainStarted(true);
-      curtainProgress.set(0);
+      setLogoExitStarted(true);
 
-      animationPromise = animate(curtainProgress, 1, curtainTransition).then(
-        () => {
-          onCurtainComplete();
-        },
-      );
+      curtainDelayTimer = window.setTimeout(() => {
+        setCurtainStarted(true);
+        curtainProgress.set(0);
+
+        animationPromise = animate(curtainProgress, 1, curtainTransition).then(
+          () => {
+            onCurtainComplete();
+          },
+        );
+      }, SPLASH_CURTAIN_START_OFFSET_MS);
     });
 
     return () => {
       window.cancelAnimationFrame(frame);
+      if (curtainDelayTimer !== undefined) {
+        window.clearTimeout(curtainDelayTimer);
+      }
       void animationPromise;
     };
   }, [
@@ -296,6 +308,7 @@ export function SplashAnimation({
     if (!reducedMotion || !canStartCurtain || curtainStarted) return;
 
     const frame = window.requestAnimationFrame(() => {
+      setLogoExitStarted(true);
       setCurtainStarted(true);
       onCurtainComplete();
     });
@@ -408,12 +421,12 @@ export function SplashAnimation({
             <motion.g
               initial={{ opacity: reducedMotion ? 1 : 0, scale: 1 }}
               animate={
-                curtainStarted
+                logoExitStarted
                   ? { opacity: 0, scale: SPLASH_LOGO_CURTAIN_EXIT_SCALE }
                   : { opacity: logoFadeStarted ? 1 : 0, scale: 1 }
               }
               transition={
-                curtainStarted
+                logoExitStarted
                   ? reducedMotion
                     ? { duration: 0 }
                     : curtainTransition
