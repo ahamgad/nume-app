@@ -15,7 +15,6 @@ import {
   SPLASH_LOGO_FADE_MS,
   SPLASH_MOTION_EASE,
   SPLASH_STROKE_DRAW_MS,
-  SPLASH_STROKE_ERASE_MS,
   SPLASH_WORDMARK_LETTER_EASE,
   SPLASH_WORDMARK_LETTER_ENTER_OPACITY_EASE,
   SPLASH_WORDMARK_LETTER_EXIT_EASE,
@@ -23,6 +22,12 @@ import {
   SPLASH_WORDMARK_LETTER_FADE_MS,
   SPLASH_WORDMARK_LETTER_RISE_PX,
 } from "@/lib/app/splash-animation-timings";
+import {
+  getIntroStrokeAnimate,
+  getIntroStrokeTransition,
+  introStrokeHidden,
+  type IntroStrokePhase,
+} from "@/lib/app/splash-intro-stroke-motion";
 import {
   buildCurtainRevealPolygon,
   getCurtainTravelDistance,
@@ -49,29 +54,6 @@ const WORDMARK = "NUME";
 
 const LOGO_SCALE = NUME_SPLASH_LOGO_SIZE_PX / NUME_SPLASH_VIEWBOX_SIZE;
 
-type IntroStrokePhase = "drawing" | "erasing";
-
-const INTRO_STROKE_OPACITY_FADE_S = 0.08;
-
-const introStrokeDrawTransition = {
-  duration: SPLASH_STROKE_DRAW_MS / 1000,
-  ease: "linear" as const,
-  opacity: {
-    duration: INTRO_STROKE_OPACITY_FADE_S,
-    ease: [0.4, 0, 0.2, 1] as const,
-  },
-};
-
-const introStrokeEraseTransition = {
-  duration: SPLASH_STROKE_ERASE_MS / 1000,
-  ease: "linear" as const,
-  opacity: {
-    duration: INTRO_STROKE_OPACITY_FADE_S,
-    delay: SPLASH_STROKE_ERASE_MS / 1000 - INTRO_STROKE_OPACITY_FADE_S,
-    ease: [0.4, 0, 1, 1] as const,
-  },
-};
-
 const logoFadeTransition = {
   duration: SPLASH_LOGO_FADE_MS / 1000,
   ease: SPLASH_MOTION_EASE,
@@ -86,13 +68,11 @@ function getWordmarkLetterTransition(isVisible: boolean) {
   return {
     duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
     opacity: {
-      duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
       ease: isVisible
         ? SPLASH_WORDMARK_LETTER_ENTER_OPACITY_EASE
         : SPLASH_WORDMARK_LETTER_EXIT_OPACITY_EASE,
     },
     y: {
-      duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
       ease: isVisible
         ? SPLASH_WORDMARK_LETTER_EASE
         : SPLASH_WORDMARK_LETTER_EXIT_EASE,
@@ -318,17 +298,8 @@ export function SplashAnimation({
     onLogoFadeComplete();
   }
 
-  const introStrokeHidden = { pathLength: 0, pathOffset: 0, opacity: 0 };
-  const introStrokeDrawTarget = { pathLength: 1, pathOffset: 0, opacity: 1 };
-  const introStrokeEraseTarget = introStrokeHidden;
-  const introStrokeAnimate =
-    introStrokePhase === "drawing"
-      ? introStrokeDrawTarget
-      : introStrokeEraseTarget;
-  const introStrokeTransition =
-    introStrokePhase === "drawing"
-      ? introStrokeDrawTransition
-      : introStrokeEraseTransition;
+  const introStrokeAnimate = getIntroStrokeAnimate(introStrokePhase);
+  const introStrokeTransition = getIntroStrokeTransition(introStrokePhase);
 
   const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;

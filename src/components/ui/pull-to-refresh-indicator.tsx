@@ -1,5 +1,7 @@
 "use client";
 
+import { SplashIntroStrokes } from "@/components/app/splash-intro-strokes";
+import { NUME_SPLASH_LOADER_STROKE_WIDTH_PX } from "@/lib/app/splash-stroke-paths";
 import { cn } from "@/lib/utils";
 
 interface PullToRefreshIndicatorProps {
@@ -9,42 +11,19 @@ interface PullToRefreshIndicatorProps {
 }
 
 export function PullToRefreshIndicator({
-  isRefreshing,
   opacity,
   className,
 }: PullToRefreshIndicatorProps) {
   return (
     <div
       aria-hidden
-      className={cn(
-        "nume-refresh-indicator",
-        isRefreshing && "nume-refresh-indicator-active",
-        className,
-      )}
+      className={cn("nume-refresh-indicator", className)}
       style={{ opacity }}
     >
-      <svg viewBox="0 0 24 24" className="size-6" aria-hidden>
-        <circle
-          cx="12"
-          cy="12"
-          r="9"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          className="nume-refresh-indicator-track"
-        />
-        <circle
-          cx="12"
-          cy="12"
-          r="9"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          pathLength="100"
-          className="nume-refresh-indicator-arc"
-        />
-      </svg>
+      <SplashIntroStrokes
+        size={24}
+        strokeWidth={NUME_SPLASH_LOADER_STROKE_WIDTH_PX}
+      />
     </div>
   );
 }

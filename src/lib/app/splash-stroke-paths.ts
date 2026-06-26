@@ -13,12 +13,12 @@ export const NUME_SPLASH_STROKE_SVG_PATHS = [
 ] as const;
 
 /**
- * Intro stroke draw paths — left path matches the SVG; right path mirrors path1 as
- * one continuous bottom → top → branch stroke (single draw/erase animation).
+ * Intro stroke draw paths — left path matches the SVG; right path merges the two
+ * SVG segments into one continuous stroke drawn from the top.
  */
 export const NUME_SPLASH_STROKE_PATHS = {
   path1: NUME_SPLASH_STROKE_SVG_PATHS[0],
-  path2: "M89.5833 79.1667L70.8333 20.8333L61.4583 50",
+  path2: "M89.5833 20.8333L70.8333 79.1667L61.4583 50",
 } as const;
 
 export type SplashStrokePathKey = keyof typeof NUME_SPLASH_STROKE_PATHS;
@@ -56,6 +56,7 @@ export const NUME_SPLASH_WORDMARK_SIZE_PX = 22;
 export const NUME_SPLASH_WORDMARK_GAP_PX = 4;
 export const NUME_SPLASH_VIEWBOX_SIZE = 100;
 export const NUME_SPLASH_STROKE_WIDTH_PX = 6;
+export const NUME_SPLASH_LOADER_STROKE_WIDTH_PX = 2;
 export const NUME_SPLASH_CURTAIN_STROKE_WIDTH_PX = 1;
 
 export const NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX =

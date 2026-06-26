@@ -223,36 +223,8 @@
   opacity: 0.72;
 }
 
-.nume-refresh-indicator-track {
-  opacity: 0.12;
-}
-
-.nume-refresh-indicator-arc {
-  stroke-dasharray: 28 72;
-  stroke-dashoffset: 28;
-  transform-origin: 50% 50%;
-  transform: rotate(-90deg);
-}
-
-.nume-refresh-indicator-active .nume-refresh-indicator-arc {
-  animation: nume-refresh-orbit 900ms cubic-bezier(0.45, 0.05, 0.2, 1) infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .nume-refresh-indicator-active .nume-refresh-indicator-arc {
-    animation: none;
-    stroke-dashoffset: 0;
+  .nume-refresh-indicator {
     opacity: 0.85;
-  }
-}
-
-@keyframes nume-refresh-orbit {
-  from {
-    stroke-dashoffset: 28;
-    transform: rotate(-90deg);
-  }
-  to {
-    stroke-dashoffset: -28;
-    transform: rotate(210deg);
   }
 }

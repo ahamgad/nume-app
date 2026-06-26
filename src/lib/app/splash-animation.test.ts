@@ -18,6 +18,7 @@ import {
   NUME_SPLASH_STROKE_PATHS,
   NUME_SPLASH_STROKE_SVG_PATHS,
   NUME_SPLASH_LOGO_SIZE_PX,
+  NUME_SPLASH_LOADER_STROKE_WIDTH_PX,
   NUME_SPLASH_VIEWBOX_SIZE,
   NUME_SPLASH_WORDMARK_GAP_PX,
   NUME_SPLASH_WORDMARK_SIZE_PX,
@@ -27,6 +28,12 @@ import {
   SPLASH_LETTER_STEP_MS,
   SPLASH_STROKE_DRAW_MS,
 } from "@/lib/app/splash-animation-timings";
+import {
+  getIntroStrokeAnimate,
+  introStrokeDrawTarget,
+  introStrokeEraseTarget,
+  introStrokeHidden,
+} from "@/lib/app/splash-intro-stroke-motion";
 
 function readSvgPathData(relativePath: string): string[] {
   const svg = fs.readFileSync(
@@ -48,7 +55,7 @@ describe("splash stroke paths", () => {
     expect(NUME_SPLASH_STROKE_SVG_PATHS).toEqual(sourcePaths);
     expect(NUME_SPLASH_STROKE_PATHS.path1).toBe(sourcePaths[0]);
     expect(NUME_SPLASH_STROKE_PATHS.path2).toBe(
-      "M89.5833 79.1667L70.8333 20.8333L61.4583 50",
+      "M89.5833 20.8333L70.8333 79.1667L61.4583 50",
     );
   });
 
@@ -147,6 +154,20 @@ describe("splash curtain geometry", () => {
         getMaxSplashRemainderWidth(size, screenLayout, travel),
       ).toBeLessThan(0.01);
     }
+  });
+});
+
+describe("splash intro stroke motion", () => {
+  it("uses symmetric offset-only draw and erase targets", () => {
+    expect(introStrokeHidden).toEqual({ pathLength: 1, pathOffset: 1 });
+    expect(introStrokeDrawTarget).toEqual({ pathLength: 1, pathOffset: 0 });
+    expect(introStrokeEraseTarget).toEqual(introStrokeHidden);
+    expect(getIntroStrokeAnimate("drawing")).toEqual(introStrokeDrawTarget);
+    expect(getIntroStrokeAnimate("erasing")).toEqual(introStrokeEraseTarget);
+  });
+
+  it("defines a 2px loader stroke width for app indicators", () => {
+    expect(NUME_SPLASH_LOADER_STROKE_WIDTH_PX).toBe(2);
   });
 });
 
