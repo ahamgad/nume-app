@@ -10,6 +10,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
   SPLASH_CURTAIN_MS,
+  SPLASH_LETTER_STEP_MS,
   SPLASH_LOGO_FADE_MS,
   SPLASH_MOTION_EASE,
   SPLASH_STROKE_DRAW_MS,
@@ -19,6 +20,7 @@ import {
   getCurtainTravelDistance,
   getSplashLogoLayout,
 } from "@/lib/app/splash-curtain-geometry";
+import { isSplashInitializationReady } from "@/lib/app/splash-session";
 import {
   NUME_SPLASH_LOGO_FILLS,
   NUME_SPLASH_LOGO_SIZE_PX,
@@ -30,13 +32,15 @@ import {
   NUME_SPLASH_WORDMARK_GAP_PX,
   NUME_SPLASH_WORDMARK_SIZE_PX,
 } from "@/lib/app/splash-stroke-paths";
+import { useFinance } from "@/lib/finance/store";
 import { DashboardScreen } from "@/components/screens/dashboard-screen";
+import { useAuth } from "@/providers/auth-provider";
 
 const WORDMARK = "NUME";
 
-const strokeDrawTransition = {
+const introStrokeTransition = {
   duration: SPLASH_STROKE_DRAW_MS / 1000,
-  ease: SPLASH_MOTION_EASE,
+  ease: "linear" as const,
 };
 
 const logoFadeTransition = {
@@ -64,8 +68,19 @@ export function SplashAnimation({
 }: SplashAnimationProps) {
   const maskId = useId();
   const safeMaskId = maskId.replace(/:/g, "");
-  const strokePathsDrawnRef = useRef(0);
+  const { isLoading: authLoading, user } = useAuth();
+  const { isFinanceReady } = useFinance();
+  const initReady = isSplashInitializationReady({
+    authLoading,
+    user,
+    isFinanceReady,
+  });
+  const initReadyRef = useRef(initReady);
+  initReadyRef.current = initReady;
+
   const [viewport, setViewport] = useState({ width: 390, height: 844 });
+  const [introLoopIndex, setIntroLoopIndex] = useState(0);
+  const [introLooping, setIntroLooping] = useState(!reducedMotion);
   const [visibleLetters, setVisibleLetters] = useState(reducedMotion ? 4 : 0);
   const [strokeDrawComplete, setStrokeDrawComplete] = useState(reducedMotion);
   const [logoFadeStarted, setLogoFadeStarted] = useState(reducedMotion);
@@ -75,7 +90,6 @@ export function SplashAnimation({
   const path3X = useMotionValue(0);
   const path4X = useMotionValue(0);
   const curtainProgress = useMotionValue(0);
-  const letterProgress = useMotionValue(0);
   const innerStrokeOpacity = useMotionValue(reducedMotion ? 0 : 1);
 
   const logoCenter = useMemo(
@@ -106,6 +120,7 @@ export function SplashAnimation({
   const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
+  const strokeLoopKey = `intro-${introLoopIndex}`;
 
   const splashMaskStyle = curtainStarted
     ? {
@@ -125,31 +140,43 @@ export function SplashAnimation({
 
   useEffect(() => {
     if (reducedMotion) return;
+    if (!introLooping) return;
 
-    const unsubscribe = letterProgress.on("change", (value) => {
-      const next = Math.min(4, Math.max(0, Math.ceil(value)));
-      setVisibleLetters(next);
-      if (next >= 4) {
+    let cancelled = false;
+    const letterTimers: number[] = [];
+
+    setVisibleLetters(0);
+
+    for (let index = 0; index < 4; index += 1) {
+      letterTimers.push(
+        window.setTimeout(() => {
+          if (cancelled) return;
+          setVisibleLetters(index + 1);
+        }, SPLASH_LETTER_STEP_MS * index),
+      );
+    }
+
+    const loopTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      setStrokeDrawComplete(true);
+
+      if (initReadyRef.current) {
+        setIntroLooping(false);
         setLogoFadeStarted(true);
+        return;
       }
-    });
 
-    const controls = animate([
-      [
-        letterProgress,
-        4,
-        {
-          duration: SPLASH_STROKE_DRAW_MS / 1000,
-          ease: SPLASH_MOTION_EASE,
-        },
-      ],
-    ]);
+      setIntroLoopIndex((current) => current + 1);
+    }, SPLASH_STROKE_DRAW_MS);
 
     return () => {
-      unsubscribe();
-      controls.stop();
+      cancelled = true;
+      for (const timer of letterTimers) {
+        window.clearTimeout(timer);
+      }
+      window.clearTimeout(loopTimer);
     };
-  }, [letterProgress, reducedMotion]);
+  }, [introLoopIndex, introLooping, reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -213,14 +240,6 @@ export function SplashAnimation({
     };
   }, [canStartCurtain, curtainStarted, onCurtainComplete, reducedMotion]);
 
-  function handleStrokePathComplete() {
-    if (reducedMotion) return;
-    strokePathsDrawnRef.current += 1;
-    if (strokePathsDrawnRef.current >= 4) {
-      setStrokeDrawComplete(true);
-    }
-  }
-
   function handleLogoFadeComplete() {
     if (!logoFadeStarted || logoFadeComplete) return;
     setLogoFadeComplete(true);
@@ -259,6 +278,7 @@ export function SplashAnimation({
 
         <g transform={logoTransform}>
           <motion.path
+            key={`${strokeLoopKey}-path3`}
             d={NUME_SPLASH_STROKE_PATHS.path3}
             fill="none"
             stroke="currentColor"
@@ -269,10 +289,10 @@ export function SplashAnimation({
             style={{ x: path3X }}
             initial={{ pathLength: reducedMotion ? 1 : 0 }}
             animate={{ pathLength: 1 }}
-            transition={strokeDrawTransition}
-            onAnimationComplete={handleStrokePathComplete}
+            transition={introStrokeTransition}
           />
           <motion.path
+            key={`${strokeLoopKey}-path4`}
             d={NUME_SPLASH_STROKE_PATHS.path4}
             fill="none"
             stroke="currentColor"
@@ -283,8 +303,7 @@ export function SplashAnimation({
             style={{ x: path4X }}
             initial={{ pathLength: reducedMotion ? 1 : 0 }}
             animate={{ pathLength: 1 }}
-            transition={strokeDrawTransition}
-            onAnimationComplete={handleStrokePathComplete}
+            transition={introStrokeTransition}
           />
         </g>
       </svg>
@@ -310,7 +329,7 @@ export function SplashAnimation({
 
             return (
               <motion.path
-                key={key}
+                key={`${strokeLoopKey}-${key}`}
                 d={NUME_SPLASH_STROKE_PATHS[key]}
                 fill="none"
                 stroke="currentColor"
@@ -321,8 +340,7 @@ export function SplashAnimation({
                 style={{ strokeOpacity: innerStrokeOpacity }}
                 initial={{ pathLength: reducedMotion ? 1 : 0 }}
                 animate={{ pathLength: 1 }}
-                transition={strokeDrawTransition}
-                onAnimationComplete={handleStrokePathComplete}
+                transition={introStrokeTransition}
               />
             );
           })}

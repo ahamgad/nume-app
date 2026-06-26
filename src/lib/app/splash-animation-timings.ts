@@ -1,10 +1,10 @@
-/** Stage 1 — simultaneous stroke draw for all four paths. */
-export const SPLASH_STROKE_DRAW_MS = 720;
+/** Linear letter cadence — one letter every 180ms. */
+export const SPLASH_LETTER_STEP_MS = 180;
 
-/** Stage 2 — letter cadence while strokes draw (N → NU → NUM → NUME). */
-export const SPLASH_LETTER_STEP_MS = SPLASH_STROKE_DRAW_MS / 4;
+/** One full intro loop: stroke draw + N → U → M → E (4 × 180ms). */
+export const SPLASH_STROKE_DRAW_MS = SPLASH_LETTER_STEP_MS * 4;
 
-/** Stage 3 — full logo opacity fade (starts with letter E). */
+/** Stage 3 — full logo opacity fade (once, after the final intro loop). */
 export const SPLASH_LOGO_FADE_MS = 480;
 
 /** Stage 4 — curtain paths translate outward. */

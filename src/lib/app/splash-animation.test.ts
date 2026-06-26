@@ -11,6 +11,7 @@ import {
 } from "@/lib/app/splash-stroke-paths";
 import {
   SPLASH_CURTAIN_PATH_KEYS,
+  SPLASH_LETTER_STEP_MS,
   SPLASH_STROKE_DRAW_MS,
 } from "@/lib/app/splash-animation-timings";
 
@@ -48,5 +49,10 @@ describe("splash curtain geometry", () => {
 describe("splash animation timings", () => {
   it("keeps stroke draw duration stable for tuning", () => {
     expect(SPLASH_STROKE_DRAW_MS).toBeGreaterThan(500);
+  });
+
+  it("uses linear 180ms letter steps across each intro loop", () => {
+    expect(SPLASH_LETTER_STEP_MS).toBe(180);
+    expect(SPLASH_STROKE_DRAW_MS).toBe(SPLASH_LETTER_STEP_MS * 4);
   });
 });
