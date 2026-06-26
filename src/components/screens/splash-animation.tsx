@@ -34,7 +34,6 @@ import {
   NUME_SPLASH_CURTAIN_STROKE_WIDTH_PX,
   NUME_SPLASH_LOGO_FILLS,
   NUME_SPLASH_LOGO_SIZE_PX,
-  NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX,
   NUME_SPLASH_STROKE_ORDER,
   NUME_SPLASH_STROKE_PATHS,
   NUME_SPLASH_STROKE_WIDTH_PX,
@@ -168,30 +167,7 @@ export function SplashAnimation({
     return buildCurtainRevealPolygon(-travel, travel, viewport, layout);
   });
 
-  const dashboardClipPath = useTransform(corridorPoints, (points) => {
-    const pairs = points.trim().split(/\s+/).filter(Boolean);
-    if (pairs.length < 3) {
-      return "none";
-    }
-
-    const coords = pairs
-      .map((pair) => {
-        const [x, y] = pair.split(",").map(Number);
-        return `${x}px ${y}px`;
-      })
-      .join(", ");
-
-    return `polygon(${coords})`;
-  });
-
-  const splashMaskStyle = curtainStarted
-    ? {
-        mask: `url(#${safeMaskId})`,
-        WebkitMask: `url(#${safeMaskId})`,
-        maskSize: "100% 100%",
-        WebkitMaskSize: "100% 100%",
-      }
-    : undefined;
+  const splashSvgMask = curtainStarted ? `url(#${safeMaskId})` : undefined;
 
   useEffect(() => {
     const updateViewport = () => {
@@ -341,17 +317,40 @@ export function SplashAnimation({
       ? introStrokeDrawTransition
       : introStrokeEraseTransition;
 
-  const logoScale = LOGO_SCALE;
   const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
   const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
-  const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
+  const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${LOGO_SCALE})`;
   const strokeLoopKey = `intro-${introLoopIndex}`;
+
+  const wordmarkLayout = useMemo(() => {
+    const fontSize = NUME_SPLASH_WORDMARK_SIZE_PX;
+    const tracking = fontSize * 0.1;
+    const letterAdvance = fontSize * 0.72;
+    const baselineY =
+      logoBlockTop +
+      NUME_SPLASH_LOGO_SIZE_PX +
+      NUME_SPLASH_WORDMARK_GAP_PX +
+      fontSize;
+    const totalWidth =
+      WORDMARK.length * letterAdvance + (WORDMARK.length - 1) * tracking;
+    const startX = logoCenter.x - totalWidth / 2 + letterAdvance / 2;
+
+    return { fontSize, tracking, letterAdvance, baselineY, startX };
+  }, [logoBlockTop, logoCenter.x]);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
+      {curtainStarted ? (
+        <div className="absolute inset-0 z-0">
+          <DashboardScreen />
+        </div>
+      ) : null}
+
       <svg
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 h-0 w-0 overflow-hidden"
+        className="pointer-events-none absolute inset-0 z-10 size-full overflow-visible text-foreground"
+        width={viewport.width}
+        height={viewport.height}
       >
         <defs>
           <mask
@@ -369,23 +368,85 @@ export function SplashAnimation({
             ) : null}
           </mask>
         </defs>
-      </svg>
 
-      {curtainStarted ? (
-        <motion.div
-          className="absolute inset-0 z-0"
-          style={{ clipPath: dashboardClipPath }}
-        >
-          <DashboardScreen />
-        </motion.div>
-      ) : null}
+        <g mask={splashSvgMask}>
+          <rect
+            width={viewport.width}
+            height={viewport.height}
+            className="fill-background"
+          />
 
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-20 size-full overflow-visible text-foreground"
-        width={viewport.width}
-        height={viewport.height}
-      >
+          <g transform={logoTransform}>
+            {(introLooping || curtainStarted) &&
+              NUME_SPLASH_STROKE_ORDER.map((key, index) => (
+                <motion.path
+                  key={`${strokeLoopKey}-${key}`}
+                  d={NUME_SPLASH_STROKE_PATHS[key]}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
+                  vectorEffect="non-scaling-stroke"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ strokeOpacity: innerStrokeOpacity }}
+                  initial={introStrokeHidden}
+                  animate={introStrokeAnimate}
+                  transition={introStrokeTransition}
+                  onAnimationComplete={
+                    index === NUME_SPLASH_STROKE_ORDER.length - 1
+                      ? handleIntroStrokeAnimationComplete
+                      : undefined
+                  }
+                />
+              ))}
+
+            <motion.g
+              initial={{ opacity: reducedMotion ? 1 : 0 }}
+              animate={{ opacity: logoFadeStarted ? 1 : 0 }}
+              transition={logoFadeTransition}
+              onAnimationComplete={handleLogoFadeComplete}
+            >
+              {NUME_SPLASH_LOGO_FILLS.map((d) => (
+                <path
+                  key={d.slice(0, 16)}
+                  d={d}
+                  fill="currentColor"
+                  fillRule="evenodd"
+                />
+              ))}
+            </motion.g>
+          </g>
+
+          <g aria-hidden>
+            {WORDMARK.split("").map((letter, index) => {
+              const isVisible = index < visibleLetters;
+              const x =
+                wordmarkLayout.startX +
+                index *
+                  (wordmarkLayout.letterAdvance + wordmarkLayout.tracking);
+
+              return (
+                <motion.text
+                  key={`${strokeLoopKey}-${letter}-${index}`}
+                  x={x}
+                  y={wordmarkLayout.baselineY}
+                  textAnchor="middle"
+                  className="fill-foreground font-sans font-bold"
+                  style={{ fontSize: wordmarkLayout.fontSize }}
+                  initial={false}
+                  animate={{
+                    opacity: isVisible ? 1 : 0,
+                    y: isVisible ? 0 : SPLASH_WORDMARK_LETTER_RISE_PX,
+                  }}
+                  transition={getWordmarkLetterTransition(isVisible)}
+                >
+                  {letter}
+                </motion.text>
+              );
+            })}
+          </g>
+        </g>
+
         {curtainStarted ? (
           <g transform={logoTransform}>
             <motion.path
@@ -411,92 +472,6 @@ export function SplashAnimation({
           </g>
         ) : null}
       </svg>
-
-      <div
-        className="absolute inset-0 z-10 bg-background text-foreground"
-        style={splashMaskStyle}
-      >
-        <div
-          className="flex h-full flex-col items-center"
-          style={{
-            paddingTop:
-              viewport.height / 2 - NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX / 2,
-            gap: NUME_SPLASH_WORDMARK_GAP_PX,
-          }}
-        >
-        <svg
-          aria-hidden
-          width={NUME_SPLASH_LOGO_SIZE_PX}
-          height={NUME_SPLASH_LOGO_SIZE_PX}
-          viewBox={`0 0 ${NUME_SPLASH_VIEWBOX_SIZE} ${NUME_SPLASH_VIEWBOX_SIZE}`}
-          className="shrink-0 overflow-visible"
-        >
-          {(introLooping || curtainStarted) &&
-            NUME_SPLASH_STROKE_ORDER.map((key, index) => (
-              <motion.path
-                key={`${strokeLoopKey}-${key}`}
-                d={NUME_SPLASH_STROKE_PATHS[key]}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={NUME_SPLASH_STROKE_WIDTH_PX}
-                vectorEffect="non-scaling-stroke"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ strokeOpacity: innerStrokeOpacity }}
-                initial={introStrokeHidden}
-                animate={introStrokeAnimate}
-                transition={introStrokeTransition}
-                onAnimationComplete={
-                  index === NUME_SPLASH_STROKE_ORDER.length - 1
-                    ? handleIntroStrokeAnimationComplete
-                    : undefined
-                }
-              />
-            ))}
-
-          <motion.g
-            initial={{ opacity: reducedMotion ? 1 : 0 }}
-            animate={{ opacity: logoFadeStarted ? 1 : 0 }}
-            transition={logoFadeTransition}
-            onAnimationComplete={handleLogoFadeComplete}
-          >
-            {NUME_SPLASH_LOGO_FILLS.map((d) => (
-              <path
-                key={d.slice(0, 16)}
-                d={d}
-                fill="currentColor"
-                fillRule="evenodd"
-              />
-            ))}
-          </motion.g>
-        </svg>
-
-        <p
-          aria-hidden
-          className="font-sans font-bold tracking-[0.1em]"
-          style={{ fontSize: NUME_SPLASH_WORDMARK_SIZE_PX }}
-        >
-          {WORDMARK.split("").map((letter, index) => {
-            const isVisible = index < visibleLetters;
-
-            return (
-              <motion.span
-                key={`${strokeLoopKey}-${letter}-${index}`}
-                className="inline-block"
-                initial={false}
-                animate={{
-                  opacity: isVisible ? 1 : 0,
-                  y: isVisible ? 0 : SPLASH_WORDMARK_LETTER_RISE_PX,
-                }}
-                transition={getWordmarkLetterTransition(isVisible)}
-              >
-                {letter}
-              </motion.span>
-            );
-          })}
-        </p>
-        </div>
-      </div>
 
       <span className="sr-only">
         {strokeDrawComplete && !curtainStarted ? "Loading NUME" : null}

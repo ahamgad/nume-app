@@ -70,7 +70,7 @@ describe("splash screen spacing", () => {
     expect(source).toContain("NUME_SPLASH_WORDMARK_GAP_PX");
     expect(source).toContain("NUME_SPLASH_WORDMARK_SIZE_PX");
     expect(source).toContain("NUME_SPLASH_LOGO_SIZE_PX");
-    expect(source).toContain("tracking-[0.1em]");
+    expect(source).toContain("fontSize * 0.1");
     expect(source).toContain("font-sans font-bold");
   });
 });
