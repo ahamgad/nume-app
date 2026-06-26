@@ -168,16 +168,28 @@ export function SplashAnimation({
     return buildCurtainRevealPolygon(-travel, travel, viewport, layout);
   });
 
-  const logoScale = LOGO_SCALE;
-  const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
-  const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
-  const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
-  const strokeLoopKey = `intro-${introLoopIndex}`;
+  const dashboardClipPath = useTransform(corridorPoints, (points) => {
+    const pairs = points.trim().split(/\s+/).filter(Boolean);
+    if (pairs.length < 3) {
+      return "none";
+    }
+
+    const coords = pairs
+      .map((pair) => {
+        const [x, y] = pair.split(",").map(Number);
+        return `${x}px ${y}px`;
+      })
+      .join(", ");
+
+    return `polygon(${coords})`;
+  });
 
   const splashMaskStyle = curtainStarted
     ? {
         mask: `url(#${safeMaskId})`,
         WebkitMask: `url(#${safeMaskId})`,
+        maskSize: "100% 100%",
+        WebkitMaskSize: "100% 100%",
       }
     : undefined;
 
@@ -329,24 +341,23 @@ export function SplashAnimation({
       ? introStrokeDrawTransition
       : introStrokeEraseTransition;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-background">
-      {curtainStarted ? (
-        <div className="absolute inset-0 z-0">
-          <DashboardScreen />
-        </div>
-      ) : null}
+  const logoScale = LOGO_SCALE;
+  const logoBlockTop = logoCenter.y - NUME_SPLASH_LOGO_SIZE_PX / 2;
+  const logoBlockLeft = logoCenter.x - NUME_SPLASH_LOGO_SIZE_PX / 2;
+  const logoTransform = `translate(${logoBlockLeft} ${logoBlockTop}) scale(${logoScale})`;
+  const strokeLoopKey = `intro-${introLoopIndex}`;
 
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
       <svg
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-20 size-full overflow-visible text-foreground"
-        width={viewport.width}
-        height={viewport.height}
+        className="pointer-events-none fixed left-0 top-0 h-0 w-0 overflow-hidden"
       >
         <defs>
           <mask
             id={safeMaskId}
             maskUnits="userSpaceOnUse"
+            maskContentUnits="userSpaceOnUse"
             x={0}
             y={0}
             width={viewport.width}
@@ -358,7 +369,23 @@ export function SplashAnimation({
             ) : null}
           </mask>
         </defs>
+      </svg>
 
+      {curtainStarted ? (
+        <motion.div
+          className="absolute inset-0 z-0"
+          style={{ clipPath: dashboardClipPath }}
+        >
+          <DashboardScreen />
+        </motion.div>
+      ) : null}
+
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-20 size-full overflow-visible text-foreground"
+        width={viewport.width}
+        height={viewport.height}
+      >
         {curtainStarted ? (
           <g transform={logoTransform}>
             <motion.path
@@ -386,14 +413,17 @@ export function SplashAnimation({
       </svg>
 
       <div
-        className="absolute inset-0 z-10 flex flex-col items-center bg-background text-foreground"
-        style={{
-          ...splashMaskStyle,
-          paddingTop:
-            viewport.height / 2 - NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX / 2,
-          gap: NUME_SPLASH_WORDMARK_GAP_PX,
-        }}
+        className="absolute inset-0 z-10 bg-background text-foreground"
+        style={splashMaskStyle}
       >
+        <div
+          className="flex h-full flex-col items-center"
+          style={{
+            paddingTop:
+              viewport.height / 2 - NUME_SPLASH_STAGE_BLOCK_HEIGHT_PX / 2,
+            gap: NUME_SPLASH_WORDMARK_GAP_PX,
+          }}
+        >
         <svg
           aria-hidden
           width={NUME_SPLASH_LOGO_SIZE_PX}
@@ -401,7 +431,7 @@ export function SplashAnimation({
           viewBox={`0 0 ${NUME_SPLASH_VIEWBOX_SIZE} ${NUME_SPLASH_VIEWBOX_SIZE}`}
           className="shrink-0 overflow-visible"
         >
-          {(introLooping || !curtainStarted) &&
+          {(introLooping || curtainStarted) &&
             NUME_SPLASH_STROKE_ORDER.map((key, index) => (
               <motion.path
                 key={`${strokeLoopKey}-${key}`}
@@ -465,6 +495,7 @@ export function SplashAnimation({
             );
           })}
         </p>
+        </div>
       </div>
 
       <span className="sr-only">
