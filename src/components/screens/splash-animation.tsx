@@ -67,6 +67,14 @@ const curtainTransition = {
 /** Logo hands off to the curtain on the first curtain frame. */
 const SPLASH_LOGO_CURTAIN_EXIT_SCALE = 1.05;
 
+/** Curtain strokes fade in on the first curtain frames — no pop-in. */
+const SPLASH_CURTAIN_STROKE_FADE_MS = 90;
+
+const curtainStrokeFadeTransition = {
+  duration: SPLASH_CURTAIN_STROKE_FADE_MS / 1000,
+  ease: SPLASH_CURTAIN_EASE,
+};
+
 function getWordmarkLetterTransition(isVisible: boolean) {
   return {
     duration: SPLASH_WORDMARK_LETTER_FADE_MS / 1000,
@@ -446,7 +454,7 @@ export function SplashAnimation({
           </g>
         </g>
 
-        {curtainStarted ? (
+        {logoFadeStarted ? (
           <g transform={logoTransform}>
             <motion.path
               d={NUME_SPLASH_CURTAIN_STROKE_PATHS.path3}
@@ -456,6 +464,15 @@ export function SplashAnimation({
               vectorEffect="non-scaling-stroke"
               strokeLinecap="round"
               strokeLinejoin="round"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: curtainStarted ? 1 : 0 }}
+              transition={
+                curtainStarted
+                  ? reducedMotion
+                    ? { duration: 0 }
+                    : curtainStrokeFadeTransition
+                  : { duration: 0 }
+              }
               style={{ x: path3X, pathLength: 1 }}
             />
             <motion.path
@@ -466,6 +483,15 @@ export function SplashAnimation({
               vectorEffect="non-scaling-stroke"
               strokeLinecap="round"
               strokeLinejoin="round"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: curtainStarted ? 1 : 0 }}
+              transition={
+                curtainStarted
+                  ? reducedMotion
+                    ? { duration: 0 }
+                    : curtainStrokeFadeTransition
+                  : { duration: 0 }
+              }
               style={{ x: path4X, pathLength: 1 }}
             />
           </g>
