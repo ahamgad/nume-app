@@ -92,4 +92,28 @@ User-facing English strings live in `src/lib/i18n/messages/en.ts`. Add and updat
 
 Arabic copy follows natural Arabic conventions in `src/lib/i18n/messages/ar.ts`.
 
+These translation files are the **runtime source of truth**. The application never reads copy from Excel or any other export format.
+
 Future screens must follow these standards automatically — do not inline copy rules in screen files.
+
+## Content Matrix (review artifact)
+
+`NUME Content Matrix.xlsx` is a **review and collaboration artifact only**. It is not part of the application runtime and must not be committed to the repository.
+
+Workflow:
+
+```
+en.ts + ar.ts
+        ↓
+Generate Content Matrix.xlsx   (npm run content-matrix:generate)
+        ↓
+Human review & copy editing
+        ↓
+Updated Excel
+        ↓
+Synchronize changes back into en.ts + ar.ts
+```
+
+Generator: `scripts/generate-content-matrix.ts`
+
+The workbook export lives at the repo root when generated locally (`/NUME Content Matrix.xlsx`, gitignored). After review, approved changes are applied to the translation files — not loaded from Excel at runtime.

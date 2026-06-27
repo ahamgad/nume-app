@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "icons:generate": "node scripts/generate-pwa-icons.mjs",
     "brand-assets:collect": "node scripts/collect-institution-brand-assets.mjs && node scripts/generate-brand-assets-registry.mjs",
-    "logos:collect": "npm run brand-assets:collect"
+    "logos:collect": "npm run brand-assets:collect",
+    "content-matrix:generate": "tsx scripts/generate-content-matrix.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
@@ -41,7 +42,9 @@
     "eslint-config-next": "16.2.7",
     "sharp": "^0.35.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "xlsx": "^0.18.5"
   }
 }
