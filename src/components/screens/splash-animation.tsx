@@ -65,14 +65,13 @@ const curtainTransition = {
 };
 
 /** Logo expands into the curtain during the overlapping exit phase. */
-const SPLASH_LOGO_CURTAIN_EXIT_SCALE = 1.18;
-const SPLASH_LOGO_CURTAIN_EXIT_OPACITY = 0.75;
+const SPLASH_LOGO_CURTAIN_EXIT_SCALE = 1.5;
 
 /** Curtain strokes fade in on the first curtain frames — no pop-in. */
 const SPLASH_CURTAIN_STROKE_FADE_MS = 90;
 
-/** Curtain begins this far into the logo exit timeline (50% overlap). */
-const SPLASH_CURTAIN_START_OFFSET_MS = SPLASH_CURTAIN_MS / 2;
+/** Curtain begins shortly after logo exit so both motions feel continuous. */
+const SPLASH_CURTAIN_START_OFFSET_MS = 80;
 
 const curtainStrokeFadeTransition = {
   duration: SPLASH_CURTAIN_STROKE_FADE_MS / 1000,
@@ -423,7 +422,7 @@ export function SplashAnimation({
               initial={{ opacity: reducedMotion ? 1 : 0, scale: 1 }}
               animate={
                 logoExitStarted
-                  ? { opacity: SPLASH_LOGO_CURTAIN_EXIT_OPACITY, scale: SPLASH_LOGO_CURTAIN_EXIT_SCALE }
+                  ? { opacity: 1, scale: SPLASH_LOGO_CURTAIN_EXIT_SCALE }
                   : { opacity: logoFadeStarted ? 1 : 0, scale: 1 }
               }
               transition={
