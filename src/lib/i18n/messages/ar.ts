@@ -45,9 +45,11 @@ export const ar = {
     },
     verify: {
       title: "تحقق من بريدك الإلكتروني",
-      lead: "أرسلنا رابط تأكيد إلى بريدك. تحقق من بريدك للمتابعة.",
+      lead: "أرسلنا رابط تأكيد إلى بريدك. افتح الرابط للمتابعة.",
       continue: "لقد تحققت من بريدي",
+      continuing: "جارٍ التحقق…",
       resend: "إعادة إرسال رسالة التأكيد",
+      resending: "جارٍ إعادة الإرسال…",
       resendSuccess: "تم إرسال رسالة التأكيد.",
       notVerifiedYet: "لم يتم التحقق من البريد بعد. راجع بريدك وحاول مرة أخرى.",
       noEmail: "لا يوجد بريد إلكتروني مسجّل",
@@ -58,7 +60,7 @@ export const ar = {
       lead: "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.",
       sent: "إذا وُجد حساب لهذا البريد، فقد أُرسل رابط إعادة التعيين.",
       submit: "إرسال رابط إعادة التعيين",
-      submitting: "جارٍ الإرسال…",
+      submitting: "جارٍ إرسال رابط إعادة التعيين…",
       remembered: "تذكرت كلمة المرور؟",
       backToLogin: "العودة لتسجيل الدخول",
     },
@@ -66,7 +68,16 @@ export const ar = {
       title: "تعيين كلمة مرور جديدة",
       lead: "اختر كلمة مرور جديدة لحسابك.",
       submit: "تحديث كلمة المرور",
-      submitting: "جارٍ التحديث…",
+      submitting: "جارٍ تحديث كلمة المرور…",
+      success: "تم تحديث كلمة المرور",
+    },
+    errors: {
+      invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+      emailInUse: "يوجد حساب مسجّل بهذا البريد بالفعل",
+      weakPassword: "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      generic: "حدث خطأ. حاول مرة أخرى.",
+      callbackFailed: "هذا الرابط غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا.",
+      notConfigured: "تسجيل الدخول غير متاح. تحقق من إعدادات البيئة.",
     },
     sessionExpired: "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
   },
@@ -131,13 +142,13 @@ export const ar = {
       liabilities: "الالتزامات",
       updated: "آخر تحديث {time}",
       justNow: "الآن",
-      addFirstAccount: "أضف حسابك الأول",
+      addFirstAccount: "إضافة حساب",
       error: "تعذّر تحميل صافي الثروة",
       subline: "{assetsLabel} {assets} · {liabilitiesLabel} {liabilities}",
     },
     setup: {
       title: "أضف حسابك الأول",
-      description: "ابدأ تتبع ثروتك من هنا",
+      description: "أضف حسابًا تستخدمه يوميًا لترى صافي ثروتك هنا",
       action: "إضافة",
     },
     certificates: {
@@ -147,6 +158,7 @@ export const ar = {
       },
       maturingSoon: {
         title: "شهادات تستحق قريبًا",
+        day: "يوم واحد",
         days: "{count} يومًا",
       },
       autoRenewalIndicator: "تجديد تلقائي",
@@ -154,7 +166,7 @@ export const ar = {
     widgets: {
       financialHealth: {
         title: "الصحة المالية",
-        body: "مؤشر بسيط يعتمد على صندوق الطوارئ ومعدل الادخار والتعرّض للديون.",
+        body: "نظرة بسيطة على صندوق الطوارئ ومعدل الادخار والتعرّض للديون.",
         hint: "يصبح متاحًا مع متابعة إعداد NUME.",
       },
       emergencyFund: {
@@ -180,22 +192,27 @@ export const ar = {
   },
   planning: {
     title: "التخطيط",
+    error: "تعذّر التحديث",
     empty: {
       title: "خطّط لأموالك بثقة.",
       body: "يساعدك التخطيط على فهم كيف يشكّل دخلك ومصروفاتك الشهرية قراراتك القادمة.",
-      linkAccounts: "ابدأ بحساباتك",
+      linkAccounts: "ابدأ بحسابك الأول",
     },
   },
   goals: {
     title: "الأهداف",
+    error: "تعذّر التحديث",
     empty: {
       title: "حوّل أهدافك المالية إلى خطة.",
       body: "تصبح الأهداف أكثر معنى بعد فهم وضعك الحالي وقدرتك الشهرية.",
-      linkAccounts: "أعدّ حساباتك أولًا",
+      linkAccounts: "ابدأ بحسابك الأول",
     },
   },
   accounts: {
     title: "الحسابات",
+    navigation: {
+      backToList: "العودة إلى الحسابات",
+    },
     addAccount: "إضافة حساب",
     headerActions: {
       addAccount: "إضافة حساب",
@@ -236,7 +253,7 @@ export const ar = {
       certificate: "شهادة",
       gold: "ذهب",
       stocks: "أسهم",
-      loan: "قروض",
+      loan: "قرض",
       creditCard: "ائتمان",
     },
     empty: {
@@ -252,6 +269,7 @@ export const ar = {
       active: "نشطة",
       archived: "مؤرشفة",
     },
+    refreshError: "تعذّر تحميل الحسابات",
     status: {
       archived: "مؤرشف",
     },
@@ -263,6 +281,7 @@ export const ar = {
     },
     edit: {
       title: "تعديل الحساب",
+      createTitle: "تعديل {type}",
       submit: "حفظ التغييرات",
       saving: "جارٍ الحفظ…",
       success: "تم تحديث الحساب",
@@ -350,7 +369,7 @@ export const ar = {
       records: {
         title: "السجلات الأخيرة",
         emptyTitle: "لا توجد سجلات بعد",
-        emptyDescription: "أضف سجلًا لتتبع تغيّرات الرصيد.",
+        emptyDescription: "أضف سجلًا لتتبع تغيّرات الرصيد",
         viewAll: "عرض الكل",
       },
       addRecord: "إضافة سجل",
@@ -389,15 +408,15 @@ export const ar = {
       },
       empty: {
         title: "لا توجد سجلات هذا الشهر",
-        description: "جرّب شهرًا آخر أو أضف سجلًا إلى هذا الحساب.",
+        description: "جرّب شهرًا آخر أو أضف سجلًا إلى هذا الحساب",
       },
     },
     validation: {
-      nameRequired: "اسم الحساب مطلوب",
-      balanceRequired: "الرصيد الحالي مطلوب",
+      nameRequired: "أدخل اسمًا للحساب",
+      balanceRequired: "أدخل الرصيد الحالي",
       balanceInvalid: "أدخل مبلغًا صالحًا",
       balanceNegative: "لا يمكن أن يكون الرصيد سالبًا",
-      institutionRequired: "المؤسسة مطلوبة",
+      institutionRequired: "اختر مؤسسة",
       identifierLast4Invalid: "أدخل 4 أرقام بالضبط",
       interestDestinationAccountRequired: "اختر حساب الوجهة",
       duplicateAccount:
@@ -734,7 +753,7 @@ export const ar = {
       archiveConfirm: {
         title: "أرشفة هذه الشهادة؟",
         description:
-          "سيُزال هذا من حساباتك النشطة وصافي ثروتك.",
+          "سيُزال هذا من حساباتك النشطة وصافي ثروتك. تُحفظ السجلات.",
         confirm: "أرشفة الشهادة",
         archiving: "جارٍ الأرشفة…",
         cancel: "إلغاء",
@@ -743,13 +762,13 @@ export const ar = {
       notFoundDescription: "ربما أُرشفت هذه الشهادة أو أُزيلت.",
     },
     validation: {
-      nameRequired: "اسم الشهادة مطلوب",
-      principalRequired: "المبلغ الأساسي مطلوب",
+      nameRequired: "أدخل اسمًا للشهادة",
+      principalRequired: "أدخل المبلغ الأساسي",
       principalPositive: "يجب أن يكون المبلغ الأساسي أكبر من صفر",
-      rateRequired: "معدل الفائدة السنوي مطلوب",
+      rateRequired: "أدخل معدل فائدة سنويًا صالحًا",
       rateNegative: "لا يمكن أن يكون المعدل سالبًا",
       rateMax: "لا يمكن أن يتجاوز المعدل 9999%",
-      purchaseDateRequired: "تاريخ الشراء مطلوب",
+      purchaseDateRequired: "اختر تاريخ الشراء",
       purchaseDateFuture: "لا يمكن أن يكون تاريخ الشراء في المستقبل",
       termRequired: "أدخل مدة صالحة بالسنوات",
       termMin: "يجب أن تكون المدة شهرًا واحدًا على الأقل",
@@ -777,7 +796,7 @@ export const ar = {
     },
     fields: {
       outstandingBalance: {
-        label: "الرصيد المستحق الحالي",
+        label: "الرصيد المستحق",
       },
       creditLimit: {
         label: "حد الائتمان",
@@ -857,9 +876,11 @@ export const ar = {
         description: "نقل أموال بين الحسابات",
       },
       adjustment: {
-        title: "تعديل",
+        title: "إضافة تعديل",
         description: "تصحيح رصيد الحساب",
       },
+      unsupportedAccountType:
+        "لا يمكن إضافة سجلات يدوية لهذا النوع من الحسابات",
       save: "حفظ",
       saving: "جارٍ الحفظ…",
     },
@@ -901,11 +922,11 @@ export const ar = {
       "هذا المصروف يتجاوز رصيدك الحالي. يمكنك حفظ السجل على أي حال.",
     adjustmentNoChange: "الرصيد الصحيح يطابق الرصيد الحالي.",
     validation: {
-      amountRequired: "المبلغ مطلوب",
+      amountRequired: "أدخل مبلغًا",
       amountInvalid: "أدخل مبلغًا صالحًا",
       amountZero: "يجب أن يكون المبلغ أكبر من صفر",
-      correctBalanceRequired: "الرصيد الصحيح مطلوب",
-      dateRequired: "التاريخ مطلوب",
+      correctBalanceRequired: "أدخل الرصيد الصحيح",
+      dateRequired: "اختر تاريخًا",
       dateFuture: "لا يمكن أن يكون التاريخ في المستقبل",
       fromAccountRequired: "اختر حساب المصدر",
       toAccountRequired: "اختر حساب الوجهة",

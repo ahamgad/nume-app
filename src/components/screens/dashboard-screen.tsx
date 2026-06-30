@@ -29,7 +29,7 @@ export function DashboardScreen() {
   const t = useT();
   const formatLocale = useFormatLocale();
   const router = useRouter();
-  const { accounts, netWorth, recentRecords, certificateInsights, savingsAccounts, certificates, creditCards, records: allFinanceRecords, isFinanceReady, isFinanceLoading, refresh } =
+  const { accounts, netWorth, recentRecords, certificateInsights, savingsAccounts, certificates, creditCards, records: allFinanceRecords, isFinanceReady, isFinanceLoading, isFinanceLoadError, refresh } =
     useFinance();
 
   const hasAccounts = accounts.length > 0;
@@ -60,6 +60,8 @@ export function DashboardScreen() {
               <Skeleton className="h-10 w-40" />
               <Skeleton className="h-4 w-56" />
             </div>
+          ) : isFinanceLoadError ? (
+            <p className="text-sm text-destructive">{t("dashboard.netWorth.error")}</p>
           ) : (
             <>
               <MetricHero
@@ -121,9 +123,14 @@ export function DashboardScreen() {
                     </p>
                   </div>
                   <span className="shrink-0 text-[0.8125rem] tabular-nums text-muted-foreground">
-                    {t("dashboard.certificates.maturingSoon.days", {
-                      count: item.daysUntilMaturity,
-                    })}
+                    {t(
+                      item.daysUntilMaturity === 1
+                        ? "dashboard.certificates.maturingSoon.day"
+                        : "dashboard.certificates.maturingSoon.days",
+                      item.daysUntilMaturity === 1
+                        ? undefined
+                        : { count: item.daysUntilMaturity },
+                    )}
                   </span>
                 </button>
               ))}

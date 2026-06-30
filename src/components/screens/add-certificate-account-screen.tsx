@@ -132,7 +132,7 @@ export function AddCertificateAccountScreen() {
       <ScreenBody withTabBar={false} withStickyFooter>
         <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormCreateContent
-          description={t("accounts.add.lead")}
+          description={t("accounts.add.certificateLead")}
           disabled={submitting}
           formError={errors.form}
         >

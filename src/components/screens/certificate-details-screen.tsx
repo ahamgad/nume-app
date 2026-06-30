@@ -12,6 +12,7 @@ import {
   AccountDetailsSection,
   AccountDetailsToggleSettingRow,
 } from "@/components/accounts/account-details-chrome";
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import { AccountDetailsBalanceCard } from "@/components/accounts/account-details-balance-card";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
@@ -53,6 +54,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
     processCertificateInterest,
     accounts,
     isFinanceReady,
+    isFinanceLoadError,
     isProcessingCertificateInterest,
     refresh,
   } = useFinance();
@@ -91,6 +93,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
       await processCertificateInterest(certificate.id);
     } catch (error) {
       logSupabaseError("processCertificateInterest", error);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
     } finally {
       processingInterestRef.current = false;
     }
@@ -171,7 +174,7 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               router.push(accountsListHref(getPersistedAccountsListFilter()))
             }
           >
-            {t("accounts.title")}
+            {t("accounts.navigation.backToList")}
           </Button>
         </ScreenBody>
       </>
@@ -216,6 +219,9 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
         onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} onRefresh={refresh}>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -291,9 +297,14 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
               label={t("accounts.settings.includeInNetWorth.label")}
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
-              onCheckedChange={(checked) =>
-                void updateAccount(account.id, { includeInNetWorth: checked })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, { includeInNetWorth: checked });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInNetWorth", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
             <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInEmergencyFund.label")}
@@ -301,11 +312,16 @@ export function CertificateDetailsScreen({ accountId }: CertificateDetailsScreen
                 "accounts.settings.includeInEmergencyFund.description",
               )}
               checked={account.includeInEmergencyFund}
-              onCheckedChange={(checked) =>
-                void updateAccount(account.id, {
-                  includeInEmergencyFund: checked,
-                })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, {
+                    includeInEmergencyFund: checked,
+                  });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInEmergencyFund", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
           </AccountDetailsSettingsSection>
         ) : (

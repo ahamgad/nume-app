@@ -79,6 +79,7 @@ export function FieldEditorBottomSheet({
   return (
     <ImmersiveBottomSheet
       title={headerLabel}
+      confirmLabel={t("fieldEditor.confirm")}
       onDismiss={onDismiss}
       onConfirm={handleConfirm}
       onDiscardPointerDown={() => {

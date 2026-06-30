@@ -128,6 +128,7 @@ interface FinanceContextValue {
   isHydrated: boolean;
   isFinanceReady: boolean;
   isFinanceLoading: boolean;
+  isFinanceLoadError: boolean;
   isProcessingInterest: boolean;
   isProcessingCertificateInterest: (certificateId: string) => boolean;
   netWorth: ReturnType<typeof calculateNetWorth>;
@@ -295,7 +296,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setProcessingCertificateIds([...processingCertificatesRef.current]);
   }, []);
 
-  const { data, isLoading: financeLoading, isFetched } = useQuery({
+  const { data, isLoading: financeLoading, isFetched, isError } = useQuery({
     queryKey: financeQueryKey(userId!),
     queryFn: () => loadFinanceData(userId!),
     enabled: Boolean(userId),
@@ -751,6 +752,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const isFinanceLoading =
     Boolean(userId) && financeLoading && !isFetched && isOnline;
+  const isFinanceLoadError =
+    Boolean(userId) && isError && isFetched && !financeLoading;
   const isFinanceReady = !userId || isFetched || (!isOnline && !authLoading);
   const isHydrated = !authLoading;
   const isLoading = authLoading || isFinanceLoading;
@@ -769,6 +772,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       isHydrated,
       isFinanceReady,
       isFinanceLoading,
+      isFinanceLoadError,
       isProcessingInterest,
       isProcessingCertificateInterest,
       netWorth,
@@ -815,6 +819,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       isHydrated,
       isFinanceReady,
       isFinanceLoading,
+      isFinanceLoadError,
       isProcessingInterest,
       isProcessingCertificateInterest,
       netWorth,

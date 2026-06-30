@@ -56,21 +56,34 @@ describe("record and activity form foundation", () => {
   });
 
   it("uses save button foundation on record and activity screens", () => {
-    for (const screen of [
-      "add-record-form-screen.tsx",
-      "add-credit-card-payment-screen.tsx",
-      "add-credit-card-purchase-screen.tsx",
-    ]) {
-      const source = fs.readFileSync(
-        path.join(process.cwd(), "src/components/screens", screen),
-        "utf8",
-      );
+    const recordForm = fs.readFileSync(
+      path.join(process.cwd(), "src/components/screens/add-record-form-screen.tsx"),
+      "utf8",
+    );
+    const purchase = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/screens/add-credit-card-purchase-screen.tsx",
+      ),
+      "utf8",
+    );
+    const payment = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/screens/add-credit-card-payment-screen.tsx",
+      ),
+      "utf8",
+    );
 
+    for (const source of [recordForm, purchase, payment]) {
       expect(source).toContain("FORM_PRIMARY_ACTION_BUTTON_CLASS");
-      expect(source).toContain('t("common.save")');
       expect(source).toContain("disabled={submitting}");
       expect(source).not.toMatch(/disabled=\{submitting \|\|/);
     }
+
+    expect(recordForm).toContain('t("common.save")');
+    expect(purchase).toContain('t("creditCards.purchase.submit")');
+    expect(payment).toContain('t("creditCards.payment.submit")');
   });
 
   it("orders payment fields as amount, date, from account, description", () => {

@@ -41,3 +41,10 @@ export function getAddAccountScreenTitle(
 ): string {
   return t("accounts.add.createTitle", { type: t(getAccountTypeLabelKey(type)) });
 }
+
+export function getEditAccountScreenTitle(
+  type: AccountType,
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string,
+): string {
+  return t("accounts.edit.createTitle", { type: t(getAccountTypeLabelKey(type)) });
+}

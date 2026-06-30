@@ -46,7 +46,7 @@ export function AddRecordTypeScreen({ accountId }: AddRecordTypeScreenProps) {
         />
         <ScreenBody withTabBar={false}>
           <p className="text-muted-foreground">
-            {t("accounts.add.typeUnavailable")}
+            {t("records.add.unsupportedAccountType")}
           </p>
         </ScreenBody>
       </>

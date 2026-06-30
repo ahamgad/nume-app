@@ -158,7 +158,7 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               router.push(accountsListHref(getPersistedAccountsListFilter()))
             }
           >
-            {t("accounts.title")}
+            {t("accounts.navigation.backToList")}
           </Button>
         </ScreenBody>
       </>
@@ -210,7 +210,13 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
           })}
           editable={!isArchived}
           onBalanceSave={async (balance) => {
-            await updateAccount(account.id, { currentBalance: balance });
+            try {
+              await updateAccount(account.id, { currentBalance: balance });
+            } catch (error) {
+              logSupabaseError("updateAccountBalance", error);
+              showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+              throw error;
+            }
           }}
         />
 
@@ -252,9 +258,14 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
               label={t("accounts.settings.includeInNetWorth.label")}
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
-              onCheckedChange={(checked) =>
-                void updateAccount(account.id, { includeInNetWorth: checked })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, { includeInNetWorth: checked });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInNetWorth", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
             <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInEmergencyFund.label")}
@@ -262,11 +273,16 @@ export function AccountDetailsScreen({ accountId }: AccountDetailsScreenProps) {
                 "accounts.settings.includeInEmergencyFund.description",
               )}
               checked={account.includeInEmergencyFund}
-              onCheckedChange={(checked) =>
-                void updateAccount(account.id, {
-                  includeInEmergencyFund: checked,
-                })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, {
+                    includeInEmergencyFund: checked,
+                  });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInEmergencyFund", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
           </AccountDetailsSettingsSection>
         ) : (

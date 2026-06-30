@@ -36,6 +36,7 @@ describe("account action picker sheet foundation", () => {
 
     expect(source).toContain("PickerBottomSheet");
     expect(source).toContain('t("creditCards.activity.title")');
+    expect(source).toContain("creditCards.activity.purchase.title");
     expect(source).toContain("AccountActionPickerCard");
   });
 

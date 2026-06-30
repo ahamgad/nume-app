@@ -15,6 +15,7 @@ import {
 } from "@/components/accounts/account-details-chrome";
 import { AccountDetailsSettingsSection } from "@/components/accounts/account-details-settings-section";
 import { ArchivedAccountActions } from "@/components/accounts/archived-account-actions";
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import { BalanceMetricCard } from "@/components/accounts/balance-metric-card";
 import { RecentRecordsSection } from "@/components/accounts/recent-records-section";
 import { ACCOUNT_DETAILS_RECENT_RECORDS_LIMIT } from "@/lib/finance/recent-records-display";
@@ -55,6 +56,7 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
     certificates,
     creditCards,
     isFinanceReady,
+    isFinanceLoadError,
     refresh,
   } = useFinance();
 
@@ -196,6 +198,9 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
         }
       />
       <ScreenBody withTabBar={false} onRefresh={refresh}>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -214,7 +219,13 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
           })}
           editable={!isArchived}
           onBalanceSave={async (balance) => {
-            await updateAccount(account.id, { currentBalance: balance });
+            try {
+              await updateAccount(account.id, { currentBalance: balance });
+            } catch (error) {
+              logSupabaseError("updateAccountBalance", error);
+              showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+              throw error;
+            }
           }}
         />
 
@@ -283,9 +294,14 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
               label={t("accounts.settings.includeInNetWorth.label")}
               description={t("accounts.settings.includeInNetWorth.description")}
               checked={account.includeInNetWorth}
-              onCheckedChange={(checked) =>
-                updateAccount(account.id, { includeInNetWorth: checked })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, { includeInNetWorth: checked });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInNetWorth", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
             <AccountDetailsToggleSettingRow
               label={t("accounts.settings.includeInEmergencyFund.label")}
@@ -293,9 +309,16 @@ export function SavingsDetailsScreen({ accountId }: SavingsDetailsScreenProps) {
                 "accounts.settings.includeInEmergencyFund.description",
               )}
               checked={account.includeInEmergencyFund}
-              onCheckedChange={(checked) =>
-                updateAccount(account.id, { includeInEmergencyFund: checked })
-              }
+              onCheckedChange={async (checked) => {
+                try {
+                  await updateAccount(account.id, {
+                    includeInEmergencyFund: checked,
+                  });
+                } catch (error) {
+                  logSupabaseError("updateAccountIncludeInEmergencyFund", error);
+                  showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+                }
+              }}
             />
           </AccountDetailsSettingsSection>
         ) : (

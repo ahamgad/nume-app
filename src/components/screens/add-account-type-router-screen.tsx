@@ -45,7 +45,7 @@ export function AddAccountTypeRouterScreen({ type }: AddAccountTypeRouterScreenP
               router.push(accountsListHref(getPersistedAccountsListFilter()))
             }
           >
-            {t("accounts.title")}
+            {t("accounts.navigation.backToList")}
           </Button>
         </ScreenBody>
       </>

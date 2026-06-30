@@ -13,7 +13,7 @@ import { useT } from "@/providers/i18n-provider";
 export function PlanningScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, refresh } = useFinance();
+  const { accounts, refresh, isFinanceLoadError } = useFinance();
   const hasAccounts = accounts.length > 0;
 
   return (
@@ -21,6 +21,9 @@ export function PlanningScreen() {
       <RootPageHeader title={t("planning.title")} />
       <ScreenBody onRefresh={refresh}>
         <RootPageTitle>{t("planning.title")}</RootPageTitle>
+        {isFinanceLoadError ? (
+          <p className="px-4 text-sm text-destructive">{t("planning.error")}</p>
+        ) : null}
         <EmptyState
           icon={<CalendarRange />}
           title={t("planning.empty.title")}
@@ -45,7 +48,7 @@ export function PlanningScreen() {
 export function GoalsScreen() {
   const t = useT();
   const router = useRouter();
-  const { accounts, refresh } = useFinance();
+  const { accounts, refresh, isFinanceLoadError } = useFinance();
   const hasAccounts = accounts.length > 0;
 
   return (
@@ -53,6 +56,9 @@ export function GoalsScreen() {
       <RootPageHeader title={t("goals.title")} />
       <ScreenBody onRefresh={refresh}>
         <RootPageTitle>{t("goals.title")}</RootPageTitle>
+        {isFinanceLoadError ? (
+          <p className="px-4 text-sm text-destructive">{t("goals.error")}</p>
+        ) : null}
         <EmptyState
           icon={<Target />}
           title={t("goals.empty.title")}

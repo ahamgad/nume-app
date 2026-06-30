@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigationGuard } from "@/hooks/use-dirty-form-navigation";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
+import { getEditAccountScreenTitle } from "@/lib/finance/account-labels";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import {
   isSavingsFormDirty,
@@ -166,11 +167,13 @@ function EditSavingsAccountForm({
     guardBack();
   }
 
+  const pageTitle = getEditAccountScreenTitle("savings_account", t);
+
   return (
     <>
-      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <SavingsFormFields
             values={values}

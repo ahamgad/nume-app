@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { AddActivityActionSheet } from "@/components/accounts/add-activity-action-sheet";
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import {
   AccountDetailsBodySurface,
   AccountDetailsContentHeader,
@@ -60,6 +61,7 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
     deleteAccount,
     updateAccount,
     isFinanceReady,
+    isFinanceLoadError,
     refresh,
   } = useFinance();
 
@@ -191,6 +193,9 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
         }
       />
       <ScreenBody withTabBar={false} onRefresh={refresh}>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}
@@ -207,9 +212,15 @@ export function CreditCardDetailsScreen({ accountId }: CreditCardDetailsScreenPr
           meta={liabilityBalanceMeta(account.updatedAt, t, formatLocale)}
           editable={!isArchived}
           onBalanceSave={async (outstandingBalance) => {
-            await updateAccount(account.id, {
-              currentBalance: toStoredCreditCardBalance(outstandingBalance),
-            });
+            try {
+              await updateAccount(account.id, {
+                currentBalance: toStoredCreditCardBalance(outstandingBalance),
+              });
+            } catch (error) {
+              logSupabaseError("updateCreditCardBalance", error);
+              showToast(getSupabaseErrorMessage(error) || t("common.retry"));
+              throw error;
+            }
           }}
         />
 

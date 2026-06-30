@@ -18,6 +18,7 @@ import {
   type CreditCardFormValues,
 } from "@/lib/credit-cards/form";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
+import { getEditAccountScreenTitle } from "@/lib/finance/account-labels";
 import { filterTransferAccounts } from "@/lib/finance/account-capabilities";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { useFinance } from "@/lib/finance/store";
@@ -158,11 +159,13 @@ function EditCreditCardAccountForm({
     guardBack();
   }
 
+  const pageTitle = getEditAccountScreenTitle("credit_card", t);
+
   return (
     <>
-      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter>
-        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CreditCardFormFields
             values={values}

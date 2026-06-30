@@ -22,6 +22,7 @@ import type { RecordType } from "@/lib/finance/types";
 import type { TranslationKey } from "@/lib/i18n";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { FORM_PRIMARY_ACTION_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
+import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { useT, useLocale } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 
@@ -112,8 +113,9 @@ export function AddRecordFormScreen({ accountId, type }: AddRecordFormScreenProp
       else showToast(t("common.adjustmentRecorded"));
 
       router.replace(`/accounts/${accountId}`);
-    } catch {
-      setErrors({ form: t("common.retry") });
+    } catch (error) {
+      logSupabaseError("createRecord", error);
+      setErrors({ form: getSupabaseErrorMessage(error) || t("common.retry") });
     } finally {
       setSubmitting(false);
     }

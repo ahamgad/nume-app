@@ -171,7 +171,7 @@ export function AddCreditCardPaymentScreen({
           disabled={submitting}
           onClick={() => void handleSubmit()}
         >
-          {submitting ? t("records.add.saving") : t("common.save")}
+          {submitting ? t("creditCards.payment.saving") : t("creditCards.payment.submit")}
         </Button>
       </StickyFooter>
     </>

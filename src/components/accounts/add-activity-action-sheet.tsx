@@ -20,8 +20,8 @@ function activityActionIcon(type: ActivityAction) {
 }
 
 const ACTIVITY_LABEL_KEYS: Record<ActivityAction, TranslationKey> = {
-  purchase: "records.types.credit_card_purchase",
-  payment: "records.types.credit_card_payment",
+  purchase: "creditCards.activity.purchase.title",
+  payment: "creditCards.activity.payment.title",
 };
 
 interface AddActivityActionSheetProps {

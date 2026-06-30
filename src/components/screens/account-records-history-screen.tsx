@@ -9,6 +9,7 @@ import {
   AccountDetailsHeaderRegion,
   AccountDetailsStackHeader,
 } from "@/components/accounts/account-details-chrome";
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import { RecordTypeIcon } from "@/components/finance/record-type-icon";
 import { ScreenBody } from "@/components/layout/screen-header";
 import { EmptyState, RecordRow } from "@/components/patterns";
@@ -55,6 +56,7 @@ export function AccountRecordsHistoryScreen({
     savingsAccounts,
     records: allFinanceRecords,
     isFinanceReady,
+    isFinanceLoadError,
     refresh,
   } = useFinance();
   const [monthFilter, setMonthFilter] = useState<RecordMonthFilter>("this_month");
@@ -136,6 +138,9 @@ export function AccountRecordsHistoryScreen({
         onBack={() => router.back()}
       />
       <ScreenBody withTabBar={false} onRefresh={refresh}>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
         <AccountDetailsHeaderRegion>
           <AccountDetailsContentHeader
             accountName={account.name}

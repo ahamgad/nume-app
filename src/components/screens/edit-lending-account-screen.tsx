@@ -14,6 +14,7 @@ import { StickyFooter } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
+import { getEditAccountScreenTitle } from "@/lib/finance/account-labels";
 import { parseOptionalIdentifierLast4 } from "@/lib/finance/account-identifier";
 import { getAmountInputLocale } from "@/lib/i18n/locale";
 import { useFinance } from "@/lib/finance/store";
@@ -157,11 +158,13 @@ function EditLendingAccountForm({
     guardBack();
   }
 
+  const pageTitle = getEditAccountScreenTitle("loan", t);
+
   return (
     <>
-      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} className="pb-28">
-        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <LendingAccountFormFields
             values={values}

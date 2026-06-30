@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import { CertificateFormFields } from "@/components/certificates/certificate-form-fields";
 import { AccountFormEditContent } from "@/components/forms/account-form-layout";
 import { StackPageHeader, StackPageTitle } from "@/components/layout/stack-page-chrome";
@@ -20,6 +21,7 @@ import {
   type CertificateFormValues,
 } from "@/lib/certificates/form";
 import { buildAccountIdentityContext } from "@/lib/finance/account-identity-context";
+import { getEditAccountScreenTitle } from "@/lib/finance/account-labels";
 import { filterInterestDestinationAccounts } from "@/lib/finance/interest-destination-accounts";
 import { parseAmount } from "@/lib/format/currency";
 import { parsePostingDayFromForm } from "@/lib/savings/posting-schedule";
@@ -51,7 +53,7 @@ function EditCertificateForm({
   const amountInputLocale = getAmountInputLocale(locale);
   const router = useRouter();
   const { showToast } = useToast();
-  const { updateCertificate, refresh, accounts, certificates, creditCards, loans } = useFinance();
+  const { updateCertificate, refresh, accounts, certificates, creditCards, loans, isFinanceLoadError } = useFinance();
   const identityContext = useMemo(
     () => buildAccountIdentityContext({ accounts, certificates, creditCards, loans }),
     [accounts, certificates, creditCards, loans],
@@ -141,11 +143,16 @@ function EditCertificateForm({
     }
   }
 
+  const pageTitle = getEditAccountScreenTitle("certificate", t);
+
   return (
     <>
-      <StackPageHeader title={t("accounts.edit.title")} onBack={handleBack} />
+      <StackPageHeader title={pageTitle} onBack={handleBack} />
       <ScreenBody withTabBar={false} withStickyFooter onRefresh={refresh}>
-        <StackPageTitle>{t("accounts.edit.title")}</StackPageTitle>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
+        <StackPageTitle>{pageTitle}</StackPageTitle>
         <AccountFormEditContent disabled={submitting} formError={errors.form}>
           <CertificateFormFields
             values={values}

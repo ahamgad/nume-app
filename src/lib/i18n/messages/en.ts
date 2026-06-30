@@ -43,9 +43,11 @@ export const en = {
     },
     verify: {
       title: "Verify your email",
-      lead: "We sent a confirmation link to your inbox. Verify your email to continue.",
+      lead: "We sent a confirmation link to your inbox. Open the link to continue.",
       continue: "I've verified my email",
+      continuing: "Checking…",
       resend: "Resend confirmation email",
+      resending: "Resending…",
       resendSuccess: "Confirmation email sent.",
       notVerifiedYet: "Email not verified yet. Check your inbox and try again.",
       noEmail: "No email on file",
@@ -56,7 +58,7 @@ export const en = {
       lead: "Enter your email and we'll send you a reset link.",
       sent: "If an account exists for that email, a reset link is on its way.",
       submit: "Send reset link",
-      submitting: "Sending…",
+      submitting: "Sending reset link…",
       remembered: "Remember your password?",
       backToLogin: "Back to sign in",
     },
@@ -64,7 +66,18 @@ export const en = {
       title: "Set a new password",
       lead: "Choose a new password for your account.",
       submit: "Update password",
-      submitting: "Updating…",
+      submitting: "Updating password…",
+      success: "Password updated",
+    },
+    errors: {
+      invalidCredentials: "Email or password is incorrect",
+      emailInUse: "An account already exists for this email",
+      weakPassword: "Password must be at least 8 characters",
+      generic: "Something went wrong. Try again.",
+      callbackFailed:
+        "This link is invalid or has expired. Request a new one.",
+      notConfigured:
+        "Sign-in is unavailable. Check your environment configuration.",
     },
     sessionExpired: "Your session has expired. Please sign in again.",
   },
@@ -129,14 +142,15 @@ export const en = {
       liabilities: "Liabilities",
       updated: "Updated {time}",
       justNow: "just now",
-      addFirstAccount: "Add your first account",
+      addFirstAccount: "Add account",
       error: "Unable to load net worth",
       subline:
         "{assetsLabel} {assets} · {liabilitiesLabel} {liabilities}",
     },
     setup: {
       title: "Add your first account",
-      description: "Track your wealth starting here",
+      description:
+        "Add an account you use every day to see your net worth here",
       action: "Add",
     },
     certificates: {
@@ -146,6 +160,7 @@ export const en = {
       },
       maturingSoon: {
         title: "Certificates maturing soon",
+        day: "1 day",
         days: "{count} days",
       },
       autoRenewalIndicator: "Auto renewal",
@@ -153,7 +168,7 @@ export const en = {
     widgets: {
       financialHealth: {
         title: "Financial health",
-        body: "A simple score based on your emergency fund, savings rate, and debt exposure.",
+        body: "A simple view of your emergency fund, savings rate, and debt exposure.",
         hint: "Becomes available as you continue setting up NUME.",
       },
       emergencyFund: {
@@ -179,22 +194,27 @@ export const en = {
   },
   planning: {
     title: "Planning",
+    error: "Unable to refresh",
     empty: {
       title: "Plan your money with confidence.",
       body: "Planning helps you understand how your monthly income and expenses shape the decisions ahead.",
-      linkAccounts: "Start with your accounts",
+      linkAccounts: "Start with your first account",
     },
   },
   goals: {
     title: "Goals",
+    error: "Unable to refresh",
     empty: {
       title: "Turn your financial goals into a plan.",
       body: "Goals become more meaningful once you understand your current position and monthly capacity.",
-      linkAccounts: "Set up your accounts first",
+      linkAccounts: "Start with your first account",
     },
   },
   accounts: {
     title: "Accounts",
+    navigation: {
+      backToList: "Back to accounts",
+    },
     addAccount: "Add account",
     headerActions: {
       addAccount: "Add account",
@@ -252,6 +272,7 @@ export const en = {
       active: "Active",
       archived: "Archived",
     },
+    refreshError: "Couldn't load accounts",
     status: {
       archived: "Archived",
     },
@@ -263,6 +284,7 @@ export const en = {
     },
     edit: {
       title: "Edit account",
+      createTitle: "Edit {type}",
       submit: "Save changes",
       saving: "Saving…",
       success: "Account updated",
@@ -351,7 +373,7 @@ export const en = {
       records: {
         title: "Recent records",
         emptyTitle: "No records yet",
-        emptyDescription: "Add a record to track balance changes.",
+        emptyDescription: "Add a record to track balance changes",
         viewAll: "View all",
       },
       addRecord: "Add record",
@@ -390,15 +412,15 @@ export const en = {
       },
       empty: {
         title: "No records this month",
-        description: "Try another month or add a record to this account.",
+        description: "Try another month or add a record to this account",
       },
     },
     validation: {
-      nameRequired: "Account name is required",
-      balanceRequired: "Current balance is required",
+      nameRequired: "Enter an account name",
+      balanceRequired: "Enter the current balance",
       balanceInvalid: "Enter a valid amount",
       balanceNegative: "Balance cannot be negative",
-      institutionRequired: "Institution is required",
+      institutionRequired: "Select an institution",
       identifierLast4Invalid: "Enter exactly 4 digits",
       interestDestinationAccountRequired: "Select a destination account",
       duplicateAccount:
@@ -735,7 +757,7 @@ export const en = {
       archiveConfirm: {
         title: "Archive this certificate?",
         description:
-          "This removes the certificate from your active accounts and net worth.",
+          "This removes the certificate from your active accounts and net worth. Records are preserved.",
         confirm: "Archive certificate",
         archiving: "Archiving…",
         cancel: "Cancel",
@@ -744,13 +766,13 @@ export const en = {
       notFoundDescription: "This certificate may have been archived or removed.",
     },
     validation: {
-      nameRequired: "Certificate name is required",
-      principalRequired: "Principal amount is required",
+      nameRequired: "Enter a certificate name",
+      principalRequired: "Enter the principal amount",
       principalPositive: "Principal must be greater than zero",
-      rateRequired: "Annual interest rate is required",
+      rateRequired: "Enter a valid annual interest rate",
       rateNegative: "Rate cannot be negative",
       rateMax: "Rate cannot exceed 9999%",
-      purchaseDateRequired: "Purchase date is required",
+      purchaseDateRequired: "Select a purchase date",
       purchaseDateFuture: "Purchase date cannot be in the future",
       termRequired: "Enter a valid term in years",
       termMin: "Term must be at least 1 month",
@@ -778,7 +800,7 @@ export const en = {
     },
     fields: {
       outstandingBalance: {
-        label: "Current outstanding balance",
+        label: "Outstanding balance",
       },
       creditLimit: {
         label: "Credit limit",
@@ -859,9 +881,11 @@ export const en = {
         description: "Move money between accounts",
       },
       adjustment: {
-        title: "Adjustment",
+        title: "Add adjustment",
         description: "Correct account balance",
       },
+      unsupportedAccountType:
+        "Manual records aren't supported for this account type",
       save: "Save",
       saving: "Saving…",
     },
@@ -903,11 +927,11 @@ export const en = {
       "This expense exceeds your current balance. You can still save this record.",
     adjustmentNoChange: "Correct balance matches the current balance.",
     validation: {
-      amountRequired: "Amount is required",
+      amountRequired: "Enter an amount",
       amountInvalid: "Enter a valid amount",
       amountZero: "Amount must be greater than zero",
-      correctBalanceRequired: "Correct balance is required",
-      dateRequired: "Date is required",
+      correctBalanceRequired: "Enter the correct balance",
+      dateRequired: "Select a date",
       dateFuture: "Date cannot be in the future",
       fromAccountRequired: "Select a source account",
       toAccountRequired: "Select a destination account",

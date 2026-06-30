@@ -4,6 +4,7 @@ import { Landmark } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { FinanceRefreshErrorNotice } from "@/components/finance/finance-refresh-error-notice";
 import { AccountsListSkeleton } from "@/components/accounts/accounts-list-skeleton";
 import { AccountCardsSection } from "@/components/accounts/account-cards-section";
 import { AccountTypePickerSheet } from "@/components/accounts/account-type-picker-sheet";
@@ -32,7 +33,7 @@ export function AccountsListScreen() {
   const formatLocale = useFormatLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { accounts, certificates, creditCards, loans, isFinanceReady, refresh } =
+  const { accounts, certificates, creditCards, loans, isFinanceReady, isFinanceLoadError, refresh } =
     useFinance();
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -104,10 +105,15 @@ export function AccountsListScreen() {
     />
   );
 
+  const hasFilteredAccounts = filteredAccounts.length > 0;
+  const activeCount = accounts.filter((account) => account.status === "active").length;
+  const isFirstTimeEmpty = filter === "active" && activeCount === 0;
+  const listHeaderAction = isFirstTimeEmpty ? undefined : addAccountAction;
+
   if (!isFinanceReady) {
     return (
       <>
-        <RootPageHeader title={t("accounts.title")} rightAction={addAccountAction} />
+        <RootPageHeader title={t("accounts.title")} rightAction={listHeaderAction} />
         <ScreenBody withTabBar onRefresh={refresh}>
           <RootPageTitle>{t("accounts.title")}</RootPageTitle>
           <AccountsListSkeleton />
@@ -116,14 +122,14 @@ export function AccountsListScreen() {
     );
   }
 
-  const hasFilteredAccounts = filteredAccounts.length > 0;
-  const activeCount = accounts.filter((account) => account.status === "active").length;
-
   return (
     <>
-      <RootPageHeader title={t("accounts.title")} rightAction={addAccountAction} />
+      <RootPageHeader title={t("accounts.title")} rightAction={listHeaderAction} />
       <ScreenBody withTabBar onRefresh={refresh}>
         <RootPageTitle>{t("accounts.title")}</RootPageTitle>
+        {isFinanceLoadError ? (
+          <FinanceRefreshErrorNotice onRetry={() => void refresh()} />
+        ) : null}
         <div className="mb-4">
           <ScrollChipSelect
             value={filter}
