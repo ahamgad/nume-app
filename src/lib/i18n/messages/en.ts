@@ -79,6 +79,12 @@ export const en = {
       notConfigured:
         "Sign-in is unavailable. Check your environment configuration.",
     },
+    validation: {
+      emailRequired: "Email is required",
+      emailInvalid: "Enter a valid email address",
+      passwordRequired: "Password is required",
+      passwordMinLength: "Enter at least 8 characters",
+    },
     sessionExpired: "Your session has expired. Please sign in again.",
   },
   common: {

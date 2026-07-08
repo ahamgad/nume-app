@@ -20,6 +20,11 @@ import { Label } from "@/components/ui/label";
 import { useT } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
 
+function isValidEmailAddress(value: string) {
+  // Keep intentionally simple + predictable (avoid browser-native validation UI).
+  return /^\S+@\S+\.\S+$/.test(value.trim());
+}
+
 export function LoginScreen() {
   const t = useT();
   const router = useRouter();
@@ -29,6 +34,8 @@ export function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,10 +57,24 @@ export function LoginScreen() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const trimmedEmail = email.trim();
+    const nextEmailError =
+      trimmedEmail.length === 0
+        ? t("auth.validation.emailRequired")
+        : isValidEmailAddress(trimmedEmail)
+          ? null
+          : t("auth.validation.emailInvalid");
+    const nextPasswordError =
+      password.length === 0 ? t("auth.validation.passwordRequired") : null;
+
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) return;
+
     setSubmitting(true);
     setError(null);
     setNotice(null);
-    const { error: signInError } = await signIn(email, password);
+    const { error: signInError } = await signIn(trimmedEmail, password);
     setSubmitting(false);
     if (signInError) {
       setError(authErrorMessage(signInError));
@@ -75,7 +96,7 @@ export function LoginScreen() {
           />
         }
       >
-        <form onSubmit={handleSubmit}>
+        <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t("auth.fields.email")}</Label>
@@ -84,9 +105,27 @@ export function LoginScreen() {
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setEmail(next);
+                  if (emailError) {
+                    const trimmed = next.trim();
+                    const nextError =
+                      trimmed.length === 0
+                        ? t("auth.validation.emailRequired")
+                        : isValidEmailAddress(trimmed)
+                          ? null
+                          : t("auth.validation.emailInvalid");
+                    setEmailError(nextError);
+                  }
+                }}
                 required
               />
+              {emailError ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {emailError}
+                </p>
+              ) : null}
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -102,9 +141,24 @@ export function LoginScreen() {
                 id="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setPassword(next);
+                  if (passwordError) {
+                    setPasswordError(
+                      next.length === 0
+                        ? t("auth.validation.passwordRequired")
+                        : null,
+                    );
+                  }
+                }}
                 required
               />
+              {passwordError ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {passwordError}
+                </p>
+              ) : null}
             </div>
             {notice ? (
               <p className="text-sm text-muted-foreground">{notice}</p>
@@ -131,13 +185,33 @@ export function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const trimmedEmail = email.trim();
+    const nextEmailError =
+      trimmedEmail.length === 0
+        ? t("auth.validation.emailRequired")
+        : isValidEmailAddress(trimmedEmail)
+          ? null
+          : t("auth.validation.emailInvalid");
+    const nextPasswordError =
+      password.length === 0
+        ? t("auth.validation.passwordRequired")
+        : password.length < 8
+          ? t("auth.validation.passwordMinLength")
+          : null;
+
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+    if (nextEmailError || nextPasswordError) return;
+
     setSubmitting(true);
     setError(null);
-    const { error: signUpError } = await signUp(email, password);
+    const { error: signUpError } = await signUp(trimmedEmail, password);
     setSubmitting(false);
     if (signUpError) {
       setError(authErrorMessage(signUpError));
@@ -160,7 +234,7 @@ export function RegisterScreen() {
           />
         }
       >
-        <form onSubmit={handleSubmit}>
+        <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t("auth.fields.email")}</Label>
@@ -169,9 +243,27 @@ export function RegisterScreen() {
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setEmail(next);
+                  if (emailError) {
+                    const trimmed = next.trim();
+                    const nextError =
+                      trimmed.length === 0
+                        ? t("auth.validation.emailRequired")
+                        : isValidEmailAddress(trimmed)
+                          ? null
+                          : t("auth.validation.emailInvalid");
+                    setEmailError(nextError);
+                  }
+                }}
                 required
               />
+              {emailError ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {emailError}
+                </p>
+              ) : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("auth.fields.password")}</Label>
@@ -179,13 +271,31 @@ export function RegisterScreen() {
                 id="password"
                 autoComplete="new-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setPassword(next);
+                  if (passwordError) {
+                    setPasswordError(
+                      next.length === 0
+                        ? t("auth.validation.passwordRequired")
+                        : next.length < 8
+                          ? t("auth.validation.passwordMinLength")
+                          : null,
+                    );
+                  }
+                }}
                 minLength={8}
                 required
               />
-              <p className="text-[0.8125rem] text-muted-foreground">
-                {t("auth.register.passwordHint")}
-              </p>
+              {passwordError ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {passwordError}
+                </p>
+              ) : (
+                <p className="text-[0.8125rem] text-muted-foreground">
+                  {t("auth.register.passwordHint")}
+                </p>
+              )}
             </div>
           </div>
           <Button
@@ -298,14 +408,25 @@ export function ForgotPasswordScreen() {
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const trimmedEmail = email.trim();
+    const nextEmailError =
+      trimmedEmail.length === 0
+        ? t("auth.validation.emailRequired")
+        : isValidEmailAddress(trimmedEmail)
+          ? null
+          : t("auth.validation.emailInvalid");
+    setEmailError(nextEmailError);
+    if (nextEmailError) return;
+
     setSubmitting(true);
     setError(null);
-    const { error: resetError } = await resetPassword(email);
+    const { error: resetError } = await resetPassword(trimmedEmail);
     setSubmitting(false);
     if (resetError) {
       setError(authErrorMessage(resetError));
@@ -330,7 +451,7 @@ export function ForgotPasswordScreen() {
         {sent ? (
           <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form noValidate onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t("auth.fields.email")}</Label>
@@ -339,9 +460,27 @@ export function ForgotPasswordScreen() {
                   type="email"
                   autoComplete="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setEmail(next);
+                    if (emailError) {
+                      const trimmed = next.trim();
+                      const nextError =
+                        trimmed.length === 0
+                          ? t("auth.validation.emailRequired")
+                          : isValidEmailAddress(trimmed)
+                            ? null
+                            : t("auth.validation.emailInvalid");
+                      setEmailError(nextError);
+                    }
+                  }}
                   required
                 />
+                {emailError ? (
+                  <p className="text-sm text-destructive" role="alert">
+                    {emailError}
+                  </p>
+                ) : null}
               </div>
             </div>
             <Button
@@ -365,10 +504,20 @@ export function ResetPasswordScreen() {
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const nextPasswordError =
+      password.length === 0
+        ? t("auth.validation.passwordRequired")
+        : password.length < 8
+          ? t("auth.validation.passwordMinLength")
+          : null;
+    setPasswordError(nextPasswordError);
+    if (nextPasswordError) return;
+
     setSubmitting(true);
     setError(null);
     const { error: updateError } = await updatePassword(password);
@@ -384,7 +533,7 @@ export function ResetPasswordScreen() {
   return (
     <AuthLayout>
       <AuthCard title={t("auth.reset.title")} errorMessage={error}>
-        <form onSubmit={handleSubmit}>
+        <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
@@ -392,10 +541,27 @@ export function ResetPasswordScreen() {
                 id="password"
                 autoComplete="new-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setPassword(next);
+                  if (passwordError) {
+                    setPasswordError(
+                      next.length === 0
+                        ? t("auth.validation.passwordRequired")
+                        : next.length < 8
+                          ? t("auth.validation.passwordMinLength")
+                          : null,
+                    );
+                  }
+                }}
                 minLength={8}
                 required
               />
+              {passwordError ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {passwordError}
+                </p>
+              ) : null}
             </div>
           </div>
           <Button

@@ -79,6 +79,12 @@ export const ar = {
       callbackFailed: "هذا الرابط غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا.",
       notConfigured: "تسجيل الدخول غير متاح. تحقق من إعدادات البيئة.",
     },
+    validation: {
+      emailRequired: "البريد الإلكتروني مطلوب",
+      emailInvalid: "أدخل بريدًا إلكترونيًا صالحًا",
+      passwordRequired: "كلمة المرور مطلوبة",
+      passwordMinLength: "أدخل 8 أحرف على الأقل",
+    },
     sessionExpired: "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
   },
   common: {
