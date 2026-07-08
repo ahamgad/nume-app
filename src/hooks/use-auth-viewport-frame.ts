@@ -7,6 +7,11 @@ export interface AuthViewportFrame {
   offsetTop: number;
 }
 
+const SERVER_SNAPSHOT: AuthViewportFrame = { height: 0, offsetTop: 0 };
+
+/** Stable client snapshot — referential equality is required by useSyncExternalStore. */
+let clientSnapshot: AuthViewportFrame = SERVER_SNAPSHOT;
+
 function readAuthViewportFrame(): AuthViewportFrame {
   const viewport = window.visualViewport;
   if (!viewport) {
@@ -17,6 +22,19 @@ function readAuthViewportFrame(): AuthViewportFrame {
     height: viewport.height,
     offsetTop: viewport.offsetTop,
   };
+}
+
+function syncClientSnapshot(): boolean {
+  const next = readAuthViewportFrame();
+  if (
+    clientSnapshot.height === next.height &&
+    clientSnapshot.offsetTop === next.offsetTop
+  ) {
+    return false;
+  }
+
+  clientSnapshot = next;
+  return true;
 }
 
 function lockDocumentScroll() {
@@ -31,12 +49,24 @@ function lockDocumentScroll() {
   }
 }
 
+function getSnapshot(): AuthViewportFrame {
+  syncClientSnapshot();
+  return clientSnapshot;
+}
+
+function getServerSnapshot(): AuthViewportFrame {
+  return SERVER_SNAPSHOT;
+}
+
 function subscribe(onStoreChange: () => void) {
   function onViewportChange() {
     lockDocumentScroll();
-    onStoreChange();
+    if (syncClientSnapshot()) {
+      onStoreChange();
+    }
   }
 
+  syncClientSnapshot();
   lockDocumentScroll();
 
   const viewport = window.visualViewport;
@@ -49,14 +79,6 @@ function subscribe(onStoreChange: () => void) {
     viewport?.removeEventListener("scroll", onViewportChange);
     window.removeEventListener("scroll", lockDocumentScroll);
   };
-}
-
-function getSnapshot(): AuthViewportFrame {
-  return readAuthViewportFrame();
-}
-
-function getServerSnapshot(): AuthViewportFrame {
-  return { height: 0, offsetTop: 0 };
 }
 
 /**
