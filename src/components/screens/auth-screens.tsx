@@ -7,11 +7,13 @@ import { Eye, EyeOff } from "lucide-react";
 
 import {
   AuthCard,
+  AUTH_PRIMARY_CTA_TOP_CLASS,
   AuthFooterLink,
   AuthLayout,
 } from "@/components/layout/auth-layout";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,46 +74,48 @@ export function LoginScreen() {
           />
         }
       >
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("auth.login.lead")}
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.fields.email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">{t("auth.fields.password")}</Label>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-              >
-                {t("auth.login.forgotPassword")}
-              </Link>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("auth.fields.email")}</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t("auth.fields.password")}</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  {t("auth.login.forgotPassword")}
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            {notice ? (
+              <p className="text-sm text-muted-foreground">{notice}</p>
+            ) : null}
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
-          {notice ? (
-            <p className="text-sm text-muted-foreground">{notice}</p>
-          ) : null}
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <Button type="submit" className="h-12 w-full" disabled={submitting}>
+          <Button
+            type="submit"
+            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+            disabled={submitting}
+          >
             {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
           </Button>
         </form>
@@ -157,54 +161,60 @@ export function RegisterScreen() {
           />
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.fields.email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.fields.password")}</Label>
-            <div className="relative">
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("auth.fields.email")}</Label>
               <Input
-                id="password"
-                type={isPasswordVisible ? "text" : "password"}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                minLength={8}
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                className="pr-14"
               />
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => setIsPasswordVisible((value) => !value)}
-                aria-label={
-                  isPasswordVisible
-                    ? "Hide password"
-                    : "Show password"
-                }
-              >
-                {isPasswordVisible ? (
-                  <EyeOff className="size-5" />
-                ) : (
-                  <Eye className="size-5" />
-                )}
-              </button>
             </div>
-            <p className="text-[0.8125rem] text-muted-foreground">
-              {t("auth.register.passwordHint")}
-            </p>
+            <div className="space-y-2">
+              <Label htmlFor="password">{t("auth.fields.password")}</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={isPasswordVisible ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  minLength={8}
+                  required
+                  className="pr-14"
+                />
+                <button
+                  type="button"
+                  className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => setIsPasswordVisible((value) => !value)}
+                  aria-label={
+                    isPasswordVisible
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                >
+                  {isPasswordVisible ? (
+                    <EyeOff className="size-5" />
+                  ) : (
+                    <Eye className="size-5" />
+                  )}
+                </button>
+              </div>
+              <p className="text-[0.8125rem] text-muted-foreground">
+                {t("auth.register.passwordHint")}
+              </p>
+            </div>
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <Button type="submit" className="h-12 w-full" disabled={submitting}>
+          <Button
+            type="submit"
+            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+            disabled={submitting}
+          >
             {submitting ? t("auth.register.submitting") : t("auth.register.submit")}
           </Button>
         </form>
@@ -262,11 +272,8 @@ export function VerifyEmailScreen() {
   return (
     <AuthLayout>
       <AuthCard title={t("auth.verify.title")}>
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("auth.verify.lead")}
-        </p>
         {user?.email ? (
-          <p className="mt-2 text-sm font-medium">{user.email}</p>
+          <p className="text-sm font-medium">{user.email}</p>
         ) : null}
 
         {message ? (
@@ -274,7 +281,7 @@ export function VerifyEmailScreen() {
         ) : null}
         {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
 
-        <div className="mt-4 space-y-3">
+        <div className={cn("space-y-3", AUTH_PRIMARY_CTA_TOP_CLASS)}>
           <Button
             className="h-12 w-full"
             onClick={handleContinue}
@@ -342,29 +349,33 @@ export function ForgotPasswordScreen() {
           />
         }
       >
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {sent ? t("auth.forgot.sent") : t("auth.forgot.lead")}
-        </p>
-
-        {!sent ? (
-          <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("auth.fields.email")}</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+        {sent ? (
+          <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">{t("auth.fields.email")}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <Button type="submit" className="h-12 w-full" disabled={submitting}>
+            <Button
+              type="submit"
+              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+              disabled={submitting}
+            >
               {submitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
             </Button>
           </form>
-        ) : null}
+        )}
       </AuthCard>
     </AuthLayout>
   );
@@ -396,25 +407,27 @@ export function ResetPasswordScreen() {
   return (
     <AuthLayout>
       <AuthCard title={t("auth.reset.title")}>
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("auth.reset.lead")}
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
-              required
-            />
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
+                required
+              />
+            </div>
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <Button type="submit" className="h-12 w-full" disabled={submitting}>
+          <Button
+            type="submit"
+            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+            disabled={submitting}
+          >
             {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}
           </Button>
         </form>

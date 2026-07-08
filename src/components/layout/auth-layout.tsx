@@ -6,8 +6,12 @@ import type { ReactNode } from "react";
 
 import { RootPageTitle } from "@/components/layout/stack-page-chrome";
 import { WidgetCard } from "@/components/patterns";
+import { ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS } from "@/lib/layout/account-form-chrome";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
+
+/** 24px — same rhythm as {@link SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS}. */
+export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-6";
 
 export function AuthBrandLogo() {
   const t = useT();
@@ -17,16 +21,16 @@ export function AuthBrandLogo() {
       <Image
         src="/brand-flatten-black.svg"
         alt={t("common.brandName")}
-        width={40}
-        height={40}
+        width={48}
+        height={48}
         className="dark:hidden"
         priority
       />
       <Image
         src="/brand-flatten-white.svg"
         alt={t("common.brandName")}
-        width={40}
-        height={40}
+        width={48}
+        height={48}
         className="hidden dark:block"
         priority
       />
@@ -62,7 +66,9 @@ export function AuthCard({
     <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
       <AuthBrandLogo />
       <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
-      <div className={cn("mt-4", contentClassName)}>{children}</div>
+      <div className={cn(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS, contentClassName)}>
+        {children}
+      </div>
       {footer}
     </WidgetCard>
   );
