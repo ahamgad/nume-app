@@ -1,3 +1,4 @@
+// Temporary QA tool — remove before production release.
 import { NextResponse } from "next/server";
 
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -5,18 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-function isQaToolEnabled() {
-  return (
-    process.env.NODE_ENV === "development" ||
-    process.env.QA_TOOLS_ENABLED === "true"
-  );
-}
-
 export async function POST() {
-  if (!isQaToolEnabled()) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,4 +29,3 @@ export async function POST() {
 
   return NextResponse.json({ ok: true });
 }
-

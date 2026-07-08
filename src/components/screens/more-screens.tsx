@@ -38,8 +38,6 @@ export function MoreScreen() {
   const t = useT();
   const router = useRouter();
   const { signOut } = useAuth();
-  const shouldShowQaTools =
-    isDevEnvironment || process.env.NEXT_PUBLIC_QA_TOOLS === "1";
   const [deleting, setDeleting] = useState(false);
 
   async function handleLogout() {
@@ -99,16 +97,15 @@ export function MoreScreen() {
           {t("more.logout")}
         </Button>
 
-        {shouldShowQaTools ? (
-          <Button
-            variant="outline"
-            className="mt-3 h-11 w-full text-destructive hover:text-destructive"
-            onClick={handleDeleteTestAccount}
-            disabled={deleting}
-          >
-            {t("more.deleteTestAccount")}
-          </Button>
-        ) : null}
+        {/* Temporary QA tool — remove before production release. */}
+        <Button
+          variant="outline"
+          className="mt-3 h-11 w-full text-destructive hover:text-destructive"
+          onClick={handleDeleteTestAccount}
+          disabled={deleting}
+        >
+          {t("more.deleteTestAccount")}
+        </Button>
 
         {isDevEnvironment ? <CertificatesQaDevPanel /> : null}
       </ScreenBody>
