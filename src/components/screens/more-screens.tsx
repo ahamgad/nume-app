@@ -3,6 +3,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
   RootPageHeader,
@@ -37,11 +38,27 @@ export function MoreScreen() {
   const t = useT();
   const router = useRouter();
   const { signOut } = useAuth();
+  const shouldShowQaTools =
+    isDevEnvironment || process.env.NEXT_PUBLIC_QA_TOOLS === "1";
+  const [deleting, setDeleting] = useState(false);
 
   async function handleLogout() {
     await signOut();
     router.replace("/login");
     router.refresh();
+  }
+
+  async function handleDeleteTestAccount() {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await fetch("/api/qa/delete-test-account", { method: "POST" });
+    } finally {
+      await signOut();
+      router.replace("/login");
+      router.refresh();
+      setDeleting(false);
+    }
   }
 
   return (
@@ -81,6 +98,17 @@ export function MoreScreen() {
         >
           {t("more.logout")}
         </Button>
+
+        {shouldShowQaTools ? (
+          <Button
+            variant="outline"
+            className="mt-3 h-11 w-full text-destructive hover:text-destructive"
+            onClick={handleDeleteTestAccount}
+            disabled={deleting}
+          >
+            {t("more.deleteTestAccount")}
+          </Button>
+        ) : null}
 
         {isDevEnvironment ? <CertificatesQaDevPanel /> : null}
       </ScreenBody>

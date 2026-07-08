@@ -989,5 +989,6 @@ export const ar = {
       version: "الإصدار {version}",
     },
     logout: "تسجيل الخروج",
+    deleteTestAccount: "حذف حساب الاختبار",
   },
 } satisfies Messages;

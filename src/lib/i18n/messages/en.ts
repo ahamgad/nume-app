@@ -994,6 +994,7 @@ export const en = {
       version: "Version {version}",
     },
     logout: "Log out",
+    deleteTestAccount: "Delete test account",
   },
 } as const;
 
