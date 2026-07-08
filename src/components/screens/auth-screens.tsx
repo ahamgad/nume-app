@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 
+import { AuthPasswordField } from "@/components/forms/auth-password-field";
 import {
   AuthCard,
   AUTH_PRIMARY_CTA_TOP_CLASS,
@@ -97,9 +97,8 @@ export function LoginScreen() {
                   {t("auth.login.forgotPassword")}
                 </Link>
               </div>
-              <Input
+              <AuthPasswordField
                 id="password"
-                type="password"
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -131,7 +130,6 @@ export function RegisterScreen() {
   const { signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -176,34 +174,14 @@ export function RegisterScreen() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("auth.fields.password")}</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={isPasswordVisible ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  minLength={8}
-                  required
-                  className="pr-14"
-                />
-                <button
-                  type="button"
-                  className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={() => setIsPasswordVisible((value) => !value)}
-                  aria-label={
-                    isPasswordVisible
-                      ? "Hide password"
-                      : "Show password"
-                  }
-                >
-                  {isPasswordVisible ? (
-                    <EyeOff className="size-5" />
-                  ) : (
-                    <Eye className="size-5" />
-                  )}
-                </button>
-              </div>
+              <AuthPasswordField
+                id="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
+                required
+              />
               <p className="text-[0.8125rem] text-muted-foreground">
                 {t("auth.register.passwordHint")}
               </p>
@@ -411,9 +389,8 @@ export function ResetPasswordScreen() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
-              <Input
+              <AuthPasswordField
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
