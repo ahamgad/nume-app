@@ -66,6 +66,7 @@ export function LoginScreen() {
     <AuthLayout>
       <AuthCard
         title={t("auth.login.title")}
+        errorMessage={error}
         footer={
           <AuthFooterLink
             prompt={t("auth.login.noAccount")}
@@ -108,7 +109,6 @@ export function LoginScreen() {
             {notice ? (
               <p className="text-sm text-muted-foreground">{notice}</p>
             ) : null}
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
           <Button
             type="submit"
@@ -151,6 +151,7 @@ export function RegisterScreen() {
     <AuthLayout>
       <AuthCard
         title={t("auth.register.title")}
+        errorMessage={error}
         footer={
           <AuthFooterLink
             prompt={t("auth.register.hasAccount")}
@@ -186,7 +187,6 @@ export function RegisterScreen() {
                 {t("auth.register.passwordHint")}
               </p>
             </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
           <Button
             type="submit"
@@ -249,7 +249,7 @@ export function VerifyEmailScreen() {
 
   return (
     <AuthLayout>
-      <AuthCard title={t("auth.verify.title")}>
+      <AuthCard title={t("auth.verify.title")} errorMessage={error}>
         {user?.email ? (
           <p className="text-sm font-medium">{user.email}</p>
         ) : null}
@@ -257,7 +257,6 @@ export function VerifyEmailScreen() {
         {message ? (
           <p className="mt-4 text-sm text-muted-foreground">{message}</p>
         ) : null}
-        {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
 
         <div className={cn("space-y-3", AUTH_PRIMARY_CTA_TOP_CLASS)}>
           <Button
@@ -319,6 +318,7 @@ export function ForgotPasswordScreen() {
     <AuthLayout>
       <AuthCard
         title={t("auth.forgot.title")}
+        errorMessage={error}
         footer={
           <AuthFooterLink
             prompt={t("auth.forgot.remembered")}
@@ -343,7 +343,6 @@ export function ForgotPasswordScreen() {
                   required
                 />
               </div>
-              {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </div>
             <Button
               type="submit"
@@ -384,7 +383,7 @@ export function ResetPasswordScreen() {
 
   return (
     <AuthLayout>
-      <AuthCard title={t("auth.reset.title")}>
+      <AuthCard title={t("auth.reset.title")} errorMessage={error}>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -398,7 +397,6 @@ export function ResetPasswordScreen() {
                 required
               />
             </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
           <Button
             type="submit"

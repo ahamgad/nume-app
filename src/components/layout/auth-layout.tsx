@@ -71,6 +71,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
 interface AuthCardProps {
   title: string;
+  errorMessage?: string | null;
   children: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -80,6 +81,7 @@ interface AuthCardProps {
 /** Foundation card shell for authentication screens. */
 export function AuthCard({
   title,
+  errorMessage,
   children,
   footer,
   className,
@@ -89,6 +91,11 @@ export function AuthCard({
     <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
       <AuthBrandLogo />
       <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
+      {errorMessage ? (
+        <p className="mt-4 text-sm text-destructive" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
       <div className={cn(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS, contentClassName)}>
         {children}
       </div>
