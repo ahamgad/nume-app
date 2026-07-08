@@ -6,11 +6,10 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 import {
-  AuthBrandLogo,
+  AuthCard,
   AuthFooterLink,
   AuthLayout,
 } from "@/components/layout/auth-layout";
-import { WidgetCard } from "@/components/patterns";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { Button } from "@/components/ui/button";
@@ -63,15 +62,21 @@ export function LoginScreen() {
 
   return (
     <AuthLayout>
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center text-2xl font-semibold tracking-tight">
-          {t("auth.login.title")}
-        </h1>
-        <p className="mt-2 text-center text-[0.9375rem] text-muted-foreground">
+      <AuthCard
+        title={t("auth.login.title")}
+        footer={
+          <AuthFooterLink
+            prompt={t("auth.login.noAccount")}
+            href="/register"
+            label={t("auth.login.createAccount")}
+          />
+        }
+      >
+        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("auth.login.lead")}
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">{t("auth.fields.email")}</Label>
             <Input
@@ -110,13 +115,7 @@ export function LoginScreen() {
             {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
           </Button>
         </form>
-
-        <AuthFooterLink
-          prompt={t("auth.login.noAccount")}
-          href="/register"
-          label={t("auth.login.createAccount")}
-        />
-      </div>
+      </AuthCard>
     </AuthLayout>
   );
 }
@@ -147,15 +146,18 @@ export function RegisterScreen() {
   }
 
   return (
-    <AuthLayout showLogo={false}>
-      <WidgetCard paddingClass="p-4" className="mx-auto w-full max-w-sm">
-        <AuthBrandLogo />
-
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
-          {t("auth.register.title")}
-        </h1>
-
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+    <AuthLayout>
+      <AuthCard
+        title={t("auth.register.title")}
+        footer={
+          <AuthFooterLink
+            prompt={t("auth.register.hasAccount")}
+            href="/login"
+            label={t("auth.register.signIn")}
+          />
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">{t("auth.fields.email")}</Label>
             <Input
@@ -206,13 +208,7 @@ export function RegisterScreen() {
             {submitting ? t("auth.register.submitting") : t("auth.register.submit")}
           </Button>
         </form>
-
-        <AuthFooterLink
-          prompt={t("auth.register.hasAccount")}
-          href="/login"
-          label={t("auth.register.signIn")}
-        />
-      </WidgetCard>
+      </AuthCard>
     </AuthLayout>
   );
 }
@@ -265,11 +261,8 @@ export function VerifyEmailScreen() {
 
   return (
     <AuthLayout>
-      <div className="mx-auto w-full max-w-sm text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("auth.verify.title")}
-        </h1>
-        <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+      <AuthCard title={t("auth.verify.title")}>
+        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("auth.verify.lead")}
         </p>
         {user?.email ? (
@@ -281,7 +274,7 @@ export function VerifyEmailScreen() {
         ) : null}
         {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-4 space-y-3">
           <Button
             className="h-12 w-full"
             onClick={handleContinue}
@@ -310,7 +303,7 @@ export function VerifyEmailScreen() {
             {t("auth.verify.signOut")}
           </Button>
         </div>
-      </div>
+      </AuthCard>
     </AuthLayout>
   );
 }
@@ -339,16 +332,22 @@ export function ForgotPasswordScreen() {
 
   return (
     <AuthLayout>
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center text-2xl font-semibold tracking-tight">
-          {t("auth.forgot.title")}
-        </h1>
-        <p className="mt-2 text-center text-[0.9375rem] text-muted-foreground">
+      <AuthCard
+        title={t("auth.forgot.title")}
+        footer={
+          <AuthFooterLink
+            prompt={t("auth.forgot.remembered")}
+            href="/login"
+            label={t("auth.forgot.backToLogin")}
+          />
+        }
+      >
+        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {sent ? t("auth.forgot.sent") : t("auth.forgot.lead")}
         </p>
 
         {!sent ? (
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t("auth.fields.email")}</Label>
               <Input
@@ -366,13 +365,7 @@ export function ForgotPasswordScreen() {
             </Button>
           </form>
         ) : null}
-
-        <AuthFooterLink
-          prompt={t("auth.forgot.remembered")}
-          href="/login"
-          label={t("auth.forgot.backToLogin")}
-        />
-      </div>
+      </AuthCard>
     </AuthLayout>
   );
 }
@@ -402,15 +395,12 @@ export function ResetPasswordScreen() {
 
   return (
     <AuthLayout>
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center text-2xl font-semibold tracking-tight">
-          {t("auth.reset.title")}
-        </h1>
-        <p className="mt-2 text-center text-[0.9375rem] text-muted-foreground">
+      <AuthCard title={t("auth.reset.title")}>
+        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("auth.reset.lead")}
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
             <Input
@@ -428,7 +418,7 @@ export function ResetPasswordScreen() {
             {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}
           </Button>
         </form>
-      </div>
+      </AuthCard>
     </AuthLayout>
   );
 }

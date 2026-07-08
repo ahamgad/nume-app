@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { RootPageTitle } from "@/components/layout/stack-page-chrome";
+import { WidgetCard } from "@/components/patterns";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -32,24 +34,37 @@ export function AuthBrandLogo() {
   );
 }
 
-export function AuthLayout({
-  children,
-  showLogo = true,
-}: {
-  children: ReactNode;
-  showLogo?: boolean;
-}) {
+export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-      <div className="flex flex-1 flex-col justify-center py-8">
-        {showLogo ? (
-          <div className="mb-8 flex justify-center">
-            <AuthBrandLogo />
-          </div>
-        ) : null}
-        {children}
-      </div>
+      <div className="flex flex-1 flex-col justify-center py-8">{children}</div>
     </div>
+  );
+}
+
+interface AuthCardProps {
+  title: string;
+  children: ReactNode;
+  footer?: ReactNode;
+  className?: string;
+  contentClassName?: string;
+}
+
+/** Foundation card shell for authentication screens. */
+export function AuthCard({
+  title,
+  children,
+  footer,
+  className,
+  contentClassName,
+}: AuthCardProps) {
+  return (
+    <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
+      <AuthBrandLogo />
+      <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
+      <div className={cn("mt-4", contentClassName)}>{children}</div>
+      {footer}
+    </WidgetCard>
   );
 }
 
