@@ -79,6 +79,11 @@ export function isSplashComplete(): boolean {
   return window.sessionStorage.getItem(SPLASH_COMPLETE_KEY) === "1";
 }
 
+/** Splash overlay dismisses once routing has left the splash page. */
+export function isSplashHandoffRoute(pathname: string): boolean {
+  return pathname !== "/splash";
+}
+
 /** Inline bootstrap + lifecycle listeners — runs before first paint. */
 export function getSplashBootstrapScript(): string {
   return `(function(){try{

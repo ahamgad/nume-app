@@ -5,7 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-import { AuthFooterLink, AuthLayout } from "@/components/layout/auth-layout";
+import {
+  AuthBrandLogo,
+  AuthFooterLink,
+  AuthLayout,
+} from "@/components/layout/auth-layout";
+import { WidgetCard } from "@/components/patterns";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { Button } from "@/components/ui/button";
@@ -142,13 +147,15 @@ export function RegisterScreen() {
   }
 
   return (
-    <AuthLayout logoAlign="left">
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-start text-2xl font-semibold tracking-tight">
+    <AuthLayout showLogo={false}>
+      <WidgetCard paddingClass="p-4" className="mx-auto w-full max-w-sm">
+        <AuthBrandLogo />
+
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
           {t("auth.register.title")}
         </h1>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">{t("auth.fields.email")}</Label>
             <Input
@@ -205,7 +212,7 @@ export function RegisterScreen() {
           href="/login"
           label={t("auth.register.signIn")}
         />
-      </div>
+      </WidgetCard>
     </AuthLayout>
   );
 }

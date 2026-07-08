@@ -39,7 +39,7 @@ export const ar = {
       lead: "ابدأ في بناء صورة واضحة لحياتك المالية.",
       submit: "إنشاء حساب",
       submitting: "جارٍ إنشاء الحساب…",
-      passwordHint: "ثمانية أحرف على الأقل.",
+      passwordHint: "أدخل 8 أحرف على الأقل",
       hasAccount: "لديك حساب بالفعل؟",
       signIn: "تسجيل الدخول",
     },

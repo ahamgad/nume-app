@@ -37,7 +37,7 @@ export const en = {
       lead: "Start building a clear picture of your financial life.",
       submit: "Create account",
       submitting: "Creating account…",
-      passwordHint: "At least 8 characters.",
+      passwordHint: "Enter at least 8 characters",
       hasAccount: "Already have an account?",
       signIn: "Sign in",
     },

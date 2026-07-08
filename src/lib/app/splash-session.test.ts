@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getSplashExitDelayMs,
+  isSplashHandoffRoute,
   isSplashInitializationReady,
   shouldSkipSplashOnLoad,
 } from "@/lib/app/splash-session";
@@ -47,6 +48,14 @@ describe("isSplashInitializationReady", () => {
         isFinanceReady: false,
       }),
     ).toBe(true);
+  });
+});
+
+describe("isSplashHandoffRoute", () => {
+  it("keeps the overlay until routing leaves /splash", () => {
+    expect(isSplashHandoffRoute("/splash")).toBe(false);
+    expect(isSplashHandoffRoute("/")).toBe(true);
+    expect(isSplashHandoffRoute("/login")).toBe(true);
   });
 });
 

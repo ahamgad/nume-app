@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { SplashAnimation } from "@/components/screens/splash-animation";
 import {
+  isSplashHandoffRoute,
   markSplashComplete,
   markSplashHandoff,
 } from "@/lib/app/splash-session";
@@ -31,7 +32,7 @@ export function SplashOverlayLayer() {
     if (!handoffStartedRef.current || !curtainCompletePendingRef.current) {
       return;
     }
-    if (pathname !== "/") return;
+    if (!isSplashHandoffRoute(pathname)) return;
     dismissAfterAppPaint();
   }, [dismissAfterAppPaint, pathname]);
 
@@ -43,13 +44,12 @@ export function SplashOverlayLayer() {
     handoffStartedRef.current = true;
     markSplashHandoff();
     markSplashComplete();
-    router.replace("/");
-  }, [router, state.active, state.canStartCurtain]);
+  }, [state.active, state.canStartCurtain]);
 
   const handleCurtainComplete = useCallback(() => {
     curtainCompletePendingRef.current = true;
-    tryDismiss();
-  }, [tryDismiss]);
+    router.replace("/");
+  }, [router]);
 
   useEffect(() => {
     tryDismiss();
@@ -59,7 +59,7 @@ export function SplashOverlayLayer() {
 
   return (
     <SplashAnimation
-      canStartCurtain={state.canStartCurtain && pathname === "/"}
+      canStartCurtain={state.canStartCurtain}
       reducedMotion={state.reducedMotion}
       onLogoFadeComplete={() => setLogoFadeComplete(true)}
       onCurtainComplete={handleCurtainComplete}
