@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AuthPasswordField } from "@/components/forms/auth-password-field";
+import { InputField } from "@/components/forms/input-field";
 import {
   AuthCard,
   AUTH_PRIMARY_CTA_TOP_CLASS,
@@ -16,7 +17,6 @@ import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useT } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -98,8 +98,12 @@ export function LoginScreen() {
       >
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("auth.fields.email")}</Label>
+            <InputField
+              id="email"
+              label={t("auth.fields.email")}
+              required
+              error={emailError ?? undefined}
+            >
               <Input
                 id="email"
                 type="email"
@@ -121,15 +125,15 @@ export function LoginScreen() {
                 }}
                 required
               />
-              {emailError ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {emailError}
-                </p>
-              ) : null}
-            </div>
-            <div className="space-y-2">
+            </InputField>
+            <InputField
+              id="password"
+              label={t("auth.fields.password")}
+              required
+              error={passwordError ?? undefined}
+              className="space-y-2"
+            >
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">{t("auth.fields.password")}</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-muted-foreground underline-offset-4 hover:underline"
@@ -154,12 +158,7 @@ export function LoginScreen() {
                 }}
                 required
               />
-              {passwordError ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {passwordError}
-                </p>
-              ) : null}
-            </div>
+            </InputField>
             {notice ? (
               <p className="text-sm text-muted-foreground">{notice}</p>
             ) : null}
@@ -236,8 +235,12 @@ export function RegisterScreen() {
       >
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("auth.fields.email")}</Label>
+            <InputField
+              id="email"
+              label={t("auth.fields.email")}
+              required
+              error={emailError ?? undefined}
+            >
               <Input
                 id="email"
                 type="email"
@@ -259,14 +262,14 @@ export function RegisterScreen() {
                 }}
                 required
               />
-              {emailError ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {emailError}
-                </p>
-              ) : null}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("auth.fields.password")}</Label>
+            </InputField>
+            <InputField
+              id="password"
+              label={t("auth.fields.password")}
+              required
+              error={passwordError ?? undefined}
+              hint={t("auth.register.passwordHint")}
+            >
               <AuthPasswordField
                 id="password"
                 autoComplete="new-password"
@@ -287,16 +290,7 @@ export function RegisterScreen() {
                 minLength={8}
                 required
               />
-              {passwordError ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {passwordError}
-                </p>
-              ) : (
-                <p className="text-[0.8125rem] text-muted-foreground">
-                  {t("auth.register.passwordHint")}
-                </p>
-              )}
-            </div>
+            </InputField>
           </div>
           <Button
             type="submit"
@@ -453,8 +447,12 @@ export function ForgotPasswordScreen() {
         ) : (
           <form noValidate onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">{t("auth.fields.email")}</Label>
+              <InputField
+                id="email"
+                label={t("auth.fields.email")}
+                required
+                error={emailError ?? undefined}
+              >
                 <Input
                   id="email"
                   type="email"
@@ -476,12 +474,7 @@ export function ForgotPasswordScreen() {
                   }}
                   required
                 />
-                {emailError ? (
-                  <p className="text-sm text-destructive" role="alert">
-                    {emailError}
-                  </p>
-                ) : null}
-              </div>
+              </InputField>
             </div>
             <Button
               type="submit"
@@ -535,8 +528,12 @@ export function ResetPasswordScreen() {
       <AuthCard title={t("auth.reset.title")} errorMessage={error}>
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("auth.fields.newPassword")}</Label>
+            <InputField
+              id="password"
+              label={t("auth.fields.newPassword")}
+              required
+              error={passwordError ?? undefined}
+            >
               <AuthPasswordField
                 id="password"
                 autoComplete="new-password"
@@ -557,12 +554,7 @@ export function ResetPasswordScreen() {
                 minLength={8}
                 required
               />
-              {passwordError ? (
-                <p className="text-sm text-destructive" role="alert">
-                  {passwordError}
-                </p>
-              ) : null}
-            </div>
+            </InputField>
           </div>
           <Button
             type="submit"

@@ -7,6 +7,11 @@ export interface AuthViewportFrame {
   offsetTop: number;
 }
 
+export interface AuthViewportFrameOptions {
+  /** When true, clamps window scroll to prevent browser focus scroll nudges. */
+  shouldLockDocumentScroll?: boolean;
+}
+
 const SERVER_SNAPSHOT: AuthViewportFrame = { height: 0, offsetTop: 0 };
 
 /** Stable client snapshot — referential equality is required by useSyncExternalStore. */
@@ -86,24 +91,35 @@ function getServerSnapshot(): AuthViewportFrame {
   return SERVER_SNAPSHOT;
 }
 
-function subscribe(onStoreChange: () => void) {
+function subscribe(
+  onStoreChange: () => void,
+  shouldLockDocumentScroll: boolean,
+) {
   function onViewportChange() {
-    lockDocumentScroll();
+    if (shouldLockDocumentScroll) {
+      lockDocumentScroll();
+    }
     if (syncClientSnapshot()) {
       onStoreChange();
     }
   }
 
   syncClientSnapshot();
-  lockDocumentScroll();
+  if (shouldLockDocumentScroll) {
+    lockDocumentScroll();
+  }
 
   const viewport = window.visualViewport;
   viewport?.addEventListener("resize", onViewportChange);
-  window.addEventListener("scroll", lockDocumentScroll, { passive: true });
+  if (shouldLockDocumentScroll) {
+    window.addEventListener("scroll", lockDocumentScroll, { passive: true });
+  }
 
   return () => {
     viewport?.removeEventListener("resize", onViewportChange);
-    window.removeEventListener("scroll", lockDocumentScroll);
+    if (shouldLockDocumentScroll) {
+      window.removeEventListener("scroll", lockDocumentScroll);
+    }
   };
 }
 
@@ -112,5 +128,15 @@ function subscribe(onStoreChange: () => void) {
  * while the keyboard is presenting so the card moves once, not per field.
  */
 export function useAuthViewportFrame() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useAuthViewportFrameWithOptions({});
+}
+
+export function useAuthViewportFrameWithOptions(options: AuthViewportFrameOptions) {
+  const shouldLockDocumentScroll = options.shouldLockDocumentScroll ?? true;
+
+  return useSyncExternalStore(
+    (onStoreChange) => subscribe(onStoreChange, shouldLockDocumentScroll),
+    getSnapshot,
+    getServerSnapshot,
+  );
 }
