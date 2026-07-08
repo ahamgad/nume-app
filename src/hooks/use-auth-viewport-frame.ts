@@ -7,11 +7,6 @@ export interface AuthViewportFrame {
   offsetTop: number;
 }
 
-export interface AuthViewportFrameOptions {
-  /** When true, clamps window scroll to prevent browser focus scroll nudges. */
-  shouldLockDocumentScroll?: boolean;
-}
-
 const SERVER_SNAPSHOT: AuthViewportFrame = { height: 0, offsetTop: 0 };
 
 /** Stable client snapshot — referential equality is required by useSyncExternalStore. */
@@ -70,18 +65,6 @@ function syncClientSnapshot(): boolean {
   return true;
 }
 
-function lockDocumentScroll() {
-  if (window.scrollY !== 0) {
-    window.scrollTo(0, 0);
-  }
-  if (document.documentElement.scrollTop !== 0) {
-    document.documentElement.scrollTop = 0;
-  }
-  if (document.body.scrollTop !== 0) {
-    document.body.scrollTop = 0;
-  }
-}
-
 function getSnapshot(): AuthViewportFrame {
   syncClientSnapshot();
   return clientSnapshot;
@@ -91,52 +74,27 @@ function getServerSnapshot(): AuthViewportFrame {
   return SERVER_SNAPSHOT;
 }
 
-function subscribe(
-  onStoreChange: () => void,
-  shouldLockDocumentScroll: boolean,
-) {
+function subscribe(onStoreChange: () => void) {
   function onViewportChange() {
-    if (shouldLockDocumentScroll) {
-      lockDocumentScroll();
-    }
     if (syncClientSnapshot()) {
       onStoreChange();
     }
   }
 
   syncClientSnapshot();
-  if (shouldLockDocumentScroll) {
-    lockDocumentScroll();
-  }
 
   const viewport = window.visualViewport;
   viewport?.addEventListener("resize", onViewportChange);
-  if (shouldLockDocumentScroll) {
-    window.addEventListener("scroll", lockDocumentScroll, { passive: true });
-  }
 
   return () => {
     viewport?.removeEventListener("resize", onViewportChange);
-    if (shouldLockDocumentScroll) {
-      window.removeEventListener("scroll", lockDocumentScroll);
-    }
   };
 }
 
 /**
- * Tracks the visual viewport for auth screens and prevents document scroll
- * while the keyboard is presenting so the card moves once, not per field.
+ * Tracks the visual viewport for auth screens so the card moves once when the
+ * keyboard opens, not on every field focus change.
  */
 export function useAuthViewportFrame() {
-  return useAuthViewportFrameWithOptions({});
-}
-
-export function useAuthViewportFrameWithOptions(options: AuthViewportFrameOptions) {
-  const shouldLockDocumentScroll = options.shouldLockDocumentScroll ?? true;
-
-  return useSyncExternalStore(
-    (onStoreChange) => subscribe(onStoreChange, shouldLockDocumentScroll),
-    getSnapshot,
-    getServerSnapshot,
-  );
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

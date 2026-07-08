@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { AuthInputField } from "@/components/forms/auth-input-field";
 import { AuthPasswordField } from "@/components/forms/auth-password-field";
-import { InputField } from "@/components/forms/input-field";
+import { InputFieldLabel } from "@/components/forms/input-field";
 import {
   AuthCard,
   AUTH_PRIMARY_CTA_TOP_CLASS,
@@ -98,7 +99,7 @@ export function LoginScreen() {
       >
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <InputField
+            <AuthInputField
               id="email"
               label={t("auth.fields.email")}
               required
@@ -125,22 +126,25 @@ export function LoginScreen() {
                 }}
                 required
               />
-            </InputField>
-            <InputField
+            </AuthInputField>
+            <AuthInputField
               id="password"
-              label={t("auth.fields.password")}
               required
               error={passwordError ?? undefined}
-              className="space-y-2"
+              label={
+                <div className="flex items-center justify-between gap-2">
+                  <InputFieldLabel htmlFor="password" required>
+                    {t("auth.fields.password")}
+                  </InputFieldLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:underline"
+                  >
+                    {t("auth.login.forgotPassword")}
+                  </Link>
+                </div>
+              }
             >
-              <div className="flex items-center justify-between">
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-                >
-                  {t("auth.login.forgotPassword")}
-                </Link>
-              </div>
               <AuthPasswordField
                 id="password"
                 autoComplete="current-password"
@@ -158,7 +162,7 @@ export function LoginScreen() {
                 }}
                 required
               />
-            </InputField>
+            </AuthInputField>
             {notice ? (
               <p className="text-sm text-muted-foreground">{notice}</p>
             ) : null}
@@ -235,7 +239,7 @@ export function RegisterScreen() {
       >
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <InputField
+            <AuthInputField
               id="email"
               label={t("auth.fields.email")}
               required
@@ -262,8 +266,8 @@ export function RegisterScreen() {
                 }}
                 required
               />
-            </InputField>
-            <InputField
+            </AuthInputField>
+            <AuthInputField
               id="password"
               label={t("auth.fields.password")}
               required
@@ -290,7 +294,7 @@ export function RegisterScreen() {
                 minLength={8}
                 required
               />
-            </InputField>
+            </AuthInputField>
           </div>
           <Button
             type="submit"
@@ -447,7 +451,7 @@ export function ForgotPasswordScreen() {
         ) : (
           <form noValidate onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <InputField
+              <AuthInputField
                 id="email"
                 label={t("auth.fields.email")}
                 required
@@ -474,7 +478,7 @@ export function ForgotPasswordScreen() {
                   }}
                   required
                 />
-              </InputField>
+              </AuthInputField>
             </div>
             <Button
               type="submit"
@@ -528,7 +532,7 @@ export function ResetPasswordScreen() {
       <AuthCard title={t("auth.reset.title")} errorMessage={error}>
         <form noValidate onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <InputField
+            <AuthInputField
               id="password"
               label={t("auth.fields.newPassword")}
               required
@@ -554,7 +558,7 @@ export function ResetPasswordScreen() {
                 minLength={8}
                 required
               />
-            </InputField>
+            </AuthInputField>
           </div>
           <Button
             type="submit"

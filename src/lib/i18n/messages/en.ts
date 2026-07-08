@@ -54,13 +54,13 @@ export const en = {
       signOut: "Sign out",
     },
     forgot: {
-      title: "Reset your password",
+      title: "Forgot password?",
       lead: "Enter your email and we'll send you a reset link.",
-      sent: "If an account exists for that email, a reset link is on its way.",
+      sent: "Check your email for a reset link.",
       submit: "Send reset link",
       submitting: "Sending reset link…",
       remembered: "Remember your password?",
-      backToLogin: "Back to sign in",
+      backToLogin: "Sign in",
     },
     reset: {
       title: "Set a new password",
@@ -70,8 +70,8 @@ export const en = {
       success: "Password updated",
     },
     errors: {
-      invalidCredentials: "Email or password is incorrect",
-      emailInUse: "An account already exists for this email",
+      invalidCredentials: "Invalid email or password",
+      emailInUse: "An account already exists for this email.",
       weakPassword: "Password must be at least 8 characters",
       generic: "Something went wrong. Try again.",
       callbackFailed:

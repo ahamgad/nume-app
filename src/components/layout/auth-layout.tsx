@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 
 import { RootPageTitle } from "@/components/layout/stack-page-chrome";
 import { WidgetCard } from "@/components/patterns";
-import { useAuthViewportFrameWithOptions } from "@/hooks/use-auth-viewport-frame";
+import { useAuthViewportFrame } from "@/hooks/use-auth-viewport-frame";
 import { ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS } from "@/lib/layout/account-form-chrome";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
@@ -44,41 +43,35 @@ export function AuthBrandLogo() {
   );
 }
 
+function handleAuthInputPointerDownCapture(
+  event: ReactPointerEvent<HTMLDivElement>,
+) {
+  // Pre-focus stabilization: avoid Safari's focus-induced scroll nudge by
+  // preventing the native focus action and re-focusing with preventScroll.
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const input = target.closest("input, textarea") as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | null;
+  if (!input) return;
+  if (input.disabled || input.readOnly) return;
+  if (document.activeElement === input) return;
+
+  // Only for touch-like pointer interactions (desktop should behave normally).
+  if (event.pointerType && event.pointerType !== "touch") return;
+
+  event.preventDefault();
+  input.focus({ preventScroll: true });
+}
+
 export function AuthLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const isLoginKeyboardSpike = pathname === "/login";
-  const frame = useAuthViewportFrameWithOptions({
-    // Spike: disable document scroll correction so we can validate that
-    // pre-focus stabilization prevents the scroll nudge in the first place.
-    shouldLockDocumentScroll: !isLoginKeyboardSpike,
-  });
+  const frame = useAuthViewportFrame();
 
   const frameStyle: CSSProperties = {
     height: frame.height > 0 ? frame.height : "100dvh",
     transform: `translateY(${frame.offsetTop}px)`,
   };
-
-  function handlePointerDownCapture(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!isLoginKeyboardSpike) return;
-
-    // Pre-focus stabilization spike: avoid Safari's focus-induced scroll nudge by
-    // preventing the native focus action and re-focusing with preventScroll.
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-    const input = target.closest("input, textarea") as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | null;
-    if (!input) return;
-    if (input.disabled || input.readOnly) return;
-    if (document.activeElement === input) return;
-
-    // Only for touch-like pointer interactions (desktop should behave normally).
-    if (event.pointerType && event.pointerType !== "touch") return;
-
-    event.preventDefault();
-    input.focus({ preventScroll: true });
-  }
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-background">
@@ -92,7 +85,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       >
         <div
           className="flex min-h-0 flex-1 flex-col justify-center py-8"
-          onPointerDownCapture={handlePointerDownCapture}
+          onPointerDownCapture={handleAuthInputPointerDownCapture}
         >
           {children}
         </div>
