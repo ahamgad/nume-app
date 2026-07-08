@@ -134,7 +134,7 @@ describe("edit form balance field", () => {
 
   it("skips balance validation on edit", () => {
     const errors = validateMoneyAccountForm(
-      { name: "Main", institution: "CIB", balance: "" },
+      { name: "Main", institution: "CIB", accountNumber: "", balance: "" },
       "current_account",
       t,
       "edit",

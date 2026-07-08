@@ -7,25 +7,32 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 
+import { mapSupabaseAuthError, type AuthErrorCode } from "@/lib/auth/errors";
+import { markSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { createClient } from "@/lib/supabase/client";
 import { getAppUrl, hasSupabaseEnv } from "@/lib/supabase/env";
-
-const missingConfigError = "Supabase is not configured. Copy .env.example to .env.local";
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: AuthErrorCode | null }>;
+  signUp: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: AuthErrorCode | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: string | null }>;
-  updatePassword: (password: string) => Promise<{ error: string | null }>;
-  resendVerification: () => Promise<{ error: string | null }>;
+  resetPassword: (email: string) => Promise<{ error: AuthErrorCode | null }>;
+  updatePassword: (password: string) => Promise<{ error: AuthErrorCode | null }>;
+  resendVerification: () => Promise<{ error: AuthErrorCode | null }>;
   refreshSession: () => Promise<User | null>;
 }
 
@@ -39,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(() => hasSupabaseEnv());
+  const intentionalSignOutRef = useRef(false);
+  const hadAuthenticatedSessionRef = useRef(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -47,7 +56,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (nextSession?.user) {
+        hadAuthenticatedSessionRef.current = true;
+      }
+
+      if (
+        event === "SIGNED_OUT" &&
+        hadAuthenticatedSessionRef.current &&
+        !intentionalSignOutRef.current
+      ) {
+        markSessionExpiredNotice();
+      }
+
+      if (event === "SIGNED_OUT") {
+        hadAuthenticatedSessionRef.current = false;
+      }
+
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
       setIsLoading(false);
@@ -58,19 +83,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string) => {
-      if (!supabase) return { error: missingConfigError };
+      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      return { error: error?.message ?? null };
+      return { error: error ? mapSupabaseAuthError(error.message) : null };
     },
     [supabase],
   );
 
   const signUp = useCallback(
     async (email: string, password: string) => {
-      if (!supabase) return { error: missingConfigError };
+      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -78,45 +103,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email`,
         },
       });
-      return { error: error?.message ?? null };
+      return { error: error ? mapSupabaseAuthError(error.message) : null };
     },
     [supabase],
   );
 
   const signOut = useCallback(async () => {
     if (!supabase) return;
-    await supabase.auth.signOut();
+    intentionalSignOutRef.current = true;
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      intentionalSignOutRef.current = false;
+    }
   }, [supabase]);
 
   const resetPassword = useCallback(
     async (email: string) => {
-      if (!supabase) return { error: missingConfigError };
+      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
       });
-      return { error: error?.message ?? null };
+      return { error: error ? mapSupabaseAuthError(error.message) : null };
     },
     [supabase],
   );
 
   const updatePassword = useCallback(
     async (password: string) => {
-      if (!supabase) return { error: missingConfigError };
+      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.updateUser({ password });
-      return { error: error?.message ?? null };
+      return { error: error ? mapSupabaseAuthError(error.message) : null };
     },
     [supabase],
   );
 
   const resendVerification = useCallback(async () => {
-    if (!supabase) return { error: missingConfigError };
-    if (!user?.email) return { error: "No email on file" };
+    if (!supabase) return { error: "notConfigured" as const };
+    if (!user?.email) return { error: "noEmail" as const };
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: user.email,
-      options: { emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email` },
+      options: {
+        emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email`,
+      },
     });
-    return { error: error?.message ?? null };
+    return { error: error ? mapSupabaseAuthError(error.message) : null };
   }, [supabase, user]);
 
   const refreshSession = useCallback(async (): Promise<User | null> => {

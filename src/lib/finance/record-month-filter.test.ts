@@ -10,11 +10,15 @@ function record(date: string): FinanceRecord {
   return {
     id: `r-${date}`,
     accountId: "a1",
-    userId: "u1",
     type: "expense",
     amount: -10,
     description: null,
     date,
+    certificateId: null,
+    scheduleEntryId: null,
+    savingsAccountId: null,
+    creditCardId: null,
+    paymentSourceAccountId: null,
     createdAt: `${date}T12:00:00.000Z`,
   };
 }

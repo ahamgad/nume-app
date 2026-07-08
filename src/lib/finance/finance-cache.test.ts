@@ -6,7 +6,6 @@ import type { Account } from "@/lib/finance/types";
 function account(overrides: Partial<Account> = {}): Account {
   return {
     id: "acct-1",
-    userId: "user-1",
     name: "Main",
     type: "current_account",
     institution: null,

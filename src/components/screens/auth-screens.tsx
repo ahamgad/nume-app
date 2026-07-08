@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { AuthFooterLink, AuthLayout } from "@/components/layout/auth-layout";
+import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
+import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,20 +17,40 @@ import { useAuth } from "@/providers/auth-provider";
 export function LoginScreen() {
   const t = useT();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const authErrorMessage = useAuthErrorMessage();
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("password_updated") === "1") {
+      queueMicrotask(() => setNotice(t("auth.reset.success")));
+      return;
+    }
+
+    if (searchParams.get("error") === "auth_callback") {
+      queueMicrotask(() => setError(t("auth.errors.callbackFailed")));
+      return;
+    }
+
+    if (consumeSessionExpiredNotice()) {
+      queueMicrotask(() => setNotice(t("auth.sessionExpired")));
+    }
+  }, [searchParams, t]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    setNotice(null);
     const { error: signInError } = await signIn(email, password);
     setSubmitting(false);
     if (signInError) {
-      setError(signInError);
+      setError(authErrorMessage(signInError));
       return;
     }
     router.replace("/");
@@ -74,6 +97,9 @@ export function LoginScreen() {
               required
             />
           </div>
+          {notice ? (
+            <p className="text-sm text-muted-foreground">{notice}</p>
+          ) : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button type="submit" className="h-12 w-full" disabled={submitting}>
             {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
@@ -93,9 +119,11 @@ export function LoginScreen() {
 export function RegisterScreen() {
   const t = useT();
   const router = useRouter();
+  const authErrorMessage = useAuthErrorMessage();
   const { signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -106,7 +134,7 @@ export function RegisterScreen() {
     const { error: signUpError } = await signUp(email, password);
     setSubmitting(false);
     if (signUpError) {
-      setError(signUpError);
+      setError(authErrorMessage(signUpError));
       return;
     }
     router.replace("/verify-email");
@@ -114,16 +142,13 @@ export function RegisterScreen() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout logoAlign="left">
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center text-2xl font-semibold tracking-tight">
+        <h1 className="text-start text-2xl font-semibold tracking-tight">
           {t("auth.register.title")}
         </h1>
-        <p className="mt-2 text-center text-[0.9375rem] text-muted-foreground">
-          {t("auth.register.lead")}
-        </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">{t("auth.fields.email")}</Label>
             <Input
@@ -137,15 +162,34 @@ export function RegisterScreen() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">{t("auth.fields.password")}</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={isPasswordVisible ? "text" : "password"}
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
+                required
+                className="pr-14"
+              />
+              <button
+                type="button"
+                className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setIsPasswordVisible((value) => !value)}
+                aria-label={
+                  isPasswordVisible
+                    ? "Hide password"
+                    : "Show password"
+                }
+              >
+                {isPasswordVisible ? (
+                  <EyeOff className="size-5" />
+                ) : (
+                  <Eye className="size-5" />
+                )}
+              </button>
+            </div>
             <p className="text-[0.8125rem] text-muted-foreground">
               {t("auth.register.passwordHint")}
             </p>
@@ -166,35 +210,36 @@ export function RegisterScreen() {
   );
 }
 
+type VerifyPendingAction = "continue" | "resend" | null;
+
 export function VerifyEmailScreen() {
   const t = useT();
   const router = useRouter();
+  const authErrorMessage = useAuthErrorMessage();
   const { user, resendVerification, refreshSession, signOut } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [pendingAction, setPendingAction] = useState<VerifyPendingAction>(null);
 
   async function handleResend() {
-    setSubmitting(true);
+    setPendingAction("resend");
     setError(null);
+    setMessage(null);
     const { error: resendError } = await resendVerification();
-    setSubmitting(false);
+    setPendingAction(null);
     if (resendError) {
-      setError(
-        resendError === "No email on file"
-          ? t("auth.verify.noEmail")
-          : resendError,
-      );
+      setError(authErrorMessage(resendError));
       return;
     }
     setMessage(t("auth.verify.resendSuccess"));
   }
 
   async function handleContinue() {
-    setSubmitting(true);
+    setPendingAction("continue");
     setError(null);
+    setMessage(null);
     const nextUser = await refreshSession();
-    setSubmitting(false);
+    setPendingAction(null);
     if (nextUser?.email_confirmed_at) {
       router.replace("/");
       router.refresh();
@@ -208,6 +253,8 @@ export function VerifyEmailScreen() {
     router.replace("/login");
     router.refresh();
   }
+
+  const isBusy = pendingAction !== null;
 
   return (
     <AuthLayout>
@@ -231,22 +278,27 @@ export function VerifyEmailScreen() {
           <Button
             className="h-12 w-full"
             onClick={handleContinue}
-            disabled={submitting}
+            disabled={isBusy}
           >
-            {t("auth.verify.continue")}
+            {pendingAction === "continue"
+              ? t("auth.verify.continuing")
+              : t("auth.verify.continue")}
           </Button>
           <Button
             variant="outline"
             className="h-12 w-full"
             onClick={handleResend}
-            disabled={submitting}
+            disabled={isBusy}
           >
-            {t("auth.verify.resend")}
+            {pendingAction === "resend"
+              ? t("auth.verify.resending")
+              : t("auth.verify.resend")}
           </Button>
           <Button
             variant="ghost"
             className="h-11 w-full"
             onClick={handleSignOut}
+            disabled={isBusy}
           >
             {t("auth.verify.signOut")}
           </Button>
@@ -258,6 +310,7 @@ export function VerifyEmailScreen() {
 
 export function ForgotPasswordScreen() {
   const t = useT();
+  const authErrorMessage = useAuthErrorMessage();
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -271,7 +324,7 @@ export function ForgotPasswordScreen() {
     const { error: resetError } = await resetPassword(email);
     setSubmitting(false);
     if (resetError) {
-      setError(resetError);
+      setError(authErrorMessage(resetError));
       return;
     }
     setSent(true);
@@ -320,6 +373,7 @@ export function ForgotPasswordScreen() {
 export function ResetPasswordScreen() {
   const t = useT();
   const router = useRouter();
+  const authErrorMessage = useAuthErrorMessage();
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -332,10 +386,10 @@ export function ResetPasswordScreen() {
     const { error: updateError } = await updatePassword(password);
     setSubmitting(false);
     if (updateError) {
-      setError(updateError);
+      setError(authErrorMessage(updateError));
       return;
     }
-    router.replace("/login");
+    router.replace("/login?password_updated=1");
     router.refresh();
   }
 

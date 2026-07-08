@@ -6,12 +6,24 @@ import type { ReactNode } from "react";
 
 import { useT } from "@/providers/i18n-provider";
 
-export function AuthLayout({ children }: { children: ReactNode }) {
+export function AuthLayout({
+  children,
+  logoAlign = "center",
+}: {
+  children: ReactNode;
+  logoAlign?: "center" | "left";
+}) {
   const t = useT();
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div className="flex flex-1 flex-col justify-center py-8">
-        <div className="mb-8 flex justify-center">
+        <div
+          className={
+            logoAlign === "left"
+              ? "mb-6 flex justify-start"
+              : "mb-8 flex justify-center"
+          }
+        >
           <Image
             src="/brand-flatten-black.svg"
             alt={t("common.brandName")}

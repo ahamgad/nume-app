@@ -37,6 +37,10 @@ describe("processing concurrency guards", () => {
       renewed_certificate_id: null,
       source_certificate_id: "old-cert",
       renewal_processed_at: null,
+      exclude_weekends: false,
+      exclude_egyptian_holidays: false,
+      certificate_number_last4: null,
+      payout_day: 1,
       created_at: "",
       updated_at: "",
     } satisfies DbCertificate;
@@ -67,6 +71,10 @@ describe("processing concurrency guards", () => {
       renewed_certificate_id: "new-cert",
       source_certificate_id: null,
       renewal_processed_at: "2027-01-01T00:00:00Z",
+      exclude_weekends: false,
+      exclude_egyptian_holidays: false,
+      certificate_number_last4: null,
+      payout_day: 1,
       created_at: "",
       updated_at: "",
     } satisfies DbCertificate;
