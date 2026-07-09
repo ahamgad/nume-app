@@ -21,7 +21,6 @@ import { resolveSignUpResult } from "@/lib/auth/sign-up-result";
 import { markSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { getAuthCallbackUrl } from "@/lib/auth/urls";
 import { createClient } from "@/lib/supabase/client";
-import { hasSupabaseEnv } from "@/lib/supabase/env";
 
 type AuthActionResult = {
   error: AuthErrorCode | null;
@@ -64,21 +63,15 @@ function applySessionState(
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const supabase = useMemo(
-    () => (hasSupabaseEnv() ? createClient() : null),
-    [],
-  );
+  // Fail fast on missing Supabase env — configuration error, not an auth error.
+  const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(() => hasSupabaseEnv());
+  const [isLoading, setIsLoading] = useState(true);
   const intentionalSignOutRef = useRef(false);
   const hadAuthenticatedSessionRef = useRef(false);
 
   useEffect(() => {
-    if (!supabase) {
-      return;
-    }
-
     let active = true;
 
     void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
@@ -123,7 +116,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string): Promise<AuthActionResult> => {
-      if (!supabase) return { error: "notConfigured" as const };
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -141,7 +133,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(
     async (email: string, password: string): Promise<AuthActionResult> => {
-      if (!supabase) return { error: "notConfigured" as const };
       const response = await supabase.auth.signUp({
         email,
         password,
@@ -155,7 +146,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
-    if (!supabase) return;
     intentionalSignOutRef.current = true;
     try {
       await supabase.auth.signOut();
@@ -166,7 +156,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(
     async (email: string) => {
-      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: getAuthCallbackUrl("/reset-password"),
       });
@@ -177,7 +166,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updatePassword = useCallback(
     async (password: string) => {
-      if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.updateUser({ password });
       return { error: error ? mapSupabaseAuthError(error) : null };
     },
@@ -186,9 +174,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resendVerification = useCallback(
     async (email?: string) => {
-      if (!supabase) return { error: "notConfigured" as const };
       const targetEmail = email ?? user?.email ?? getPendingVerificationEmail();
-      if (!targetEmail) return { error: "noEmail" as const };
+      if (!targetEmail) {
+        throw new Error(
+          "Internal state error: verification resend requested without an email",
+        );
+      }
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: targetEmail,
@@ -202,7 +193,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const refreshSession = useCallback(async (): Promise<User | null> => {
-    if (!supabase) return null;
     const { data } = await supabase.auth.refreshSession();
     const nextUser = data.session?.user ?? null;
     applySessionState(data.session, setSession, setUser);

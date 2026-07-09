@@ -51,13 +51,11 @@ export const ar = {
       resendPrompt: "لم تستلم الرسالة؟",
       resend: "إعادة الإرسال",
       resending: "جارٍ إعادة الإرسال…",
-      resendSuccess: "تم إرسال رسالة التأكيد.",
-      noEmail: "لا يوجد بريد إلكتروني مسجّل",
+      resendSuccess: "تم إرسال رسالة التأكيد",
     },
     forgot: {
       title: "نسيت كلمة المرور؟",
       lead: "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.",
-      sent: "تحقق من بريدك الإلكتروني للحصول على رابط إعادة التعيين.",
       openPrefix: "افتح",
       openSuffix: "واضغط على رابط إعادة التعيين للمتابعة",
       submit: "إرسال رابط إعادة التعيين",
@@ -67,7 +65,7 @@ export const ar = {
       resendPrompt: "لم تستلم الرسالة؟",
       resend: "إعادة الإرسال",
       resending: "جارٍ إعادة الإرسال…",
-      resendSuccess: "تم إرسال رسالة إعادة التعيين.",
+      resendSuccess: "تم إرسال رسالة إعادة التعيين",
     },
     reset: {
       title: "تعيين كلمة مرور جديدة",
@@ -78,6 +76,10 @@ export const ar = {
       remembered: "تذكرت كلمة المرور؟",
       backToLogin: "تسجيل الدخول",
     },
+    passwordVisibility: {
+      show: "إظهار كلمة المرور",
+      hide: "إخفاء كلمة المرور",
+    },
     errors: {
       invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صالحة",
       emailInUse: "يوجد حساب مسجّل بهذا البريد بالفعل",
@@ -85,9 +87,8 @@ export const ar = {
       weakPassword: "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
       samePassword: "اختر كلمة مرور مختلفة",
       emailSendRateLimit: "انتظر دقيقة قبل طلب رسالة أخرى",
-      generic: "حدث خطأ. حاول مرة أخرى",
-      callbackFailed: "هذا الرابط غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا",
-      notConfigured: "تسجيل الدخول غير متاح. تحقق من إعدادات البيئة",
+      generic: "يرجى المحاولة مرة أخرى",
+      callbackFailed: "اطلب رسالة جديدة",
     },
     validation: {
       emailRequired: "البريد الإلكتروني مطلوب",
@@ -95,7 +96,7 @@ export const ar = {
       passwordRequired: "كلمة المرور مطلوبة",
       passwordMinLength: "أدخل 8 أحرف على الأقل",
     },
-    sessionExpired: "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+    sessionExpired: "انتهت جلستك، يرجى تسجيل الدخول مرة أخرى",
   },
   common: {
     back: "رجوع",

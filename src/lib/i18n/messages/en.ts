@@ -49,13 +49,11 @@ export const en = {
       resendPrompt: "Didn't receive the email?",
       resend: "Resend",
       resending: "Resending…",
-      resendSuccess: "Confirmation email sent.",
-      noEmail: "No email on file",
+      resendSuccess: "Confirmation email sent",
     },
     forgot: {
       title: "Forgot password?",
       lead: "Enter your email and we'll send you a reset link.",
-      sent: "Check your email for a reset link.",
       openPrefix: "Open",
       openSuffix: "and tap the reset link to continue",
       submit: "Send reset link",
@@ -65,7 +63,7 @@ export const en = {
       resendPrompt: "Didn't receive the email?",
       resend: "Resend",
       resending: "Resending…",
-      resendSuccess: "Reset email sent.",
+      resendSuccess: "Reset email sent",
     },
     reset: {
       title: "Set a new password",
@@ -76,6 +74,10 @@ export const en = {
       remembered: "Remember your password?",
       backToLogin: "Sign in",
     },
+    passwordVisibility: {
+      show: "Show password",
+      hide: "Hide password",
+    },
     errors: {
       invalidCredentials: "Invalid email or password",
       emailInUse: "An account already exists for this email",
@@ -83,11 +85,8 @@ export const en = {
       weakPassword: "Password must be at least 8 characters",
       samePassword: "Choose a different password",
       emailSendRateLimit: "Wait a minute before requesting another email",
-      generic: "Something went wrong. Try again",
-      callbackFailed:
-        "This link is invalid or has expired. Request a new one",
-      notConfigured:
-        "Sign-in is unavailable. Check your environment configuration",
+      generic: "Please try again",
+      callbackFailed: "Request a new email",
     },
     validation: {
       emailRequired: "Email is required",
@@ -95,7 +94,7 @@ export const en = {
       passwordRequired: "Password is required",
       passwordMinLength: "Enter at least 8 characters",
     },
-    sessionExpired: "Your session has expired. Please sign in again.",
+    sessionExpired: "Your session has expired, please sign in again",
   },
   common: {
     back: "Back",

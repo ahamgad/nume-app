@@ -344,6 +344,12 @@ export function VerifyEmailScreen() {
   const liveEmail = user?.email ?? getPendingVerificationEmail();
   const displayEmail = liveEmail ?? pinnedEmail;
 
+  useEffect(() => {
+    if (!displayEmail) {
+      router.replace("/register");
+    }
+  }, [displayEmail, router]);
+
   async function handleSignIn() {
     // If the user has an unverified session (e.g. after attempting login),
     // navigating to /login would bounce back to /verify-email via middleware.
@@ -353,12 +359,11 @@ export function VerifyEmailScreen() {
   }
 
   async function handleResend() {
+    if (!displayEmail) return;
     setPendingAction("resend");
     setError(null);
     setMessage(null);
-    const { error: resendError } = await resendVerification(
-      displayEmail ?? undefined,
-    );
+    const { error: resendError } = await resendVerification(displayEmail);
     setPendingAction(null);
     if (resendError) {
       setError(authErrorMessage(resendError));
@@ -368,6 +373,10 @@ export function VerifyEmailScreen() {
   }
 
   const isBusy = pendingAction !== null;
+
+  if (!displayEmail) {
+    return null;
+  }
 
   return (
     <AuthLayout>
@@ -382,15 +391,9 @@ export function VerifyEmailScreen() {
         >
           <div>
             <p className="text-sm text-muted-foreground">
-              {displayEmail ? (
-                <>
-                  {t("auth.checkEmail.openPrefix")}{" "}
-                  <span className="font-medium text-foreground">{displayEmail}</span>{" "}
-                  {t("auth.checkEmail.openSuffix")}
-                </>
-              ) : (
-                t("auth.checkEmail.noEmail")
-              )}
+              {t("auth.checkEmail.openPrefix")}{" "}
+              <span className="font-medium text-foreground">{displayEmail}</span>{" "}
+              {t("auth.checkEmail.openSuffix")}
             </p>
 
             {message ? (
@@ -415,7 +418,7 @@ export function VerifyEmailScreen() {
                 variant="link"
                 className="h-auto p-0 text-sm font-medium"
                 onClick={handleResend}
-                disabled={isBusy || !displayEmail}
+                disabled={isBusy}
               >
                 {pendingAction === "resend"
                   ? t("auth.checkEmail.resending")
@@ -495,17 +498,9 @@ export function ForgotPasswordScreen() {
           >
             <div>
               <p className="text-sm text-muted-foreground">
-                {sentEmail ? (
-                  <>
-                    {t("auth.forgot.openPrefix")}{" "}
-                    <span className="font-medium text-foreground">
-                      {sentEmail}
-                    </span>{" "}
-                    {t("auth.forgot.openSuffix")}
-                  </>
-                ) : (
-                  t("auth.forgot.sent")
-                )}
+                {t("auth.forgot.openPrefix")}{" "}
+                <span className="font-medium text-foreground">{sentEmail}</span>{" "}
+                {t("auth.forgot.openSuffix")}
               </p>
 
               {message ? (

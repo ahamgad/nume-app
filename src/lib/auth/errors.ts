@@ -5,8 +5,6 @@ export type AuthErrorCode =
   | "weakPassword"
   | "samePassword"
   | "emailSendRateLimit"
-  | "noEmail"
-  | "notConfigured"
   | "callbackFailed"
   | "generic";
 
