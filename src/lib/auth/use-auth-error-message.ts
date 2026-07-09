@@ -11,7 +11,7 @@ const AUTH_ERROR_KEYS = {
   generic: "auth.errors.generic",
   callbackFailed: "auth.errors.callbackFailed",
   notConfigured: "auth.errors.notConfigured",
-  noEmail: "auth.verify.noEmail",
+  noEmail: "auth.checkEmail.noEmail",
 } as const satisfies Record<AuthErrorCode, TranslationKey>;
 
 export function useAuthErrorMessage() {

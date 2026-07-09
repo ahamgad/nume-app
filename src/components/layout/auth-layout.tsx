@@ -97,6 +97,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 interface AuthCardProps {
   title: string;
   errorMessage?: string | null;
+  header?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -107,6 +108,7 @@ interface AuthCardProps {
 export function AuthCard({
   title,
   errorMessage,
+  header,
   children,
   footer,
   className,
@@ -114,7 +116,7 @@ export function AuthCard({
 }: AuthCardProps) {
   return (
     <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
-      <AuthBrandLogo />
+      {header ?? <AuthBrandLogo />}
       <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
       {errorMessage ? (
         <p className="mt-4 text-sm text-destructive" role="alert">

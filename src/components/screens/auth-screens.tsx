@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle } from "lucide-react";
 
 import { AuthInputField } from "@/components/forms/auth-input-field";
 import { AuthPasswordField } from "@/components/forms/auth-password-field";
@@ -13,6 +14,10 @@ import {
   AuthFooterLink,
   AuthLayout,
 } from "@/components/layout/auth-layout";
+import {
+  getPendingVerificationEmail,
+  setPendingVerificationEmail,
+} from "@/lib/auth/pending-verification-email";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { cn } from "@/lib/utils";
@@ -75,10 +80,19 @@ export function LoginScreen() {
     setSubmitting(true);
     setError(null);
     setNotice(null);
-    const { error: signInError } = await signIn(trimmedEmail, password);
+    const { error: signInError, requiresVerification } = await signIn(
+      trimmedEmail,
+      password,
+    );
     setSubmitting(false);
     if (signInError) {
       setError(authErrorMessage(signInError));
+      return;
+    }
+    if (requiresVerification) {
+      setPendingVerificationEmail(trimmedEmail);
+      router.replace("/verify-email");
+      router.refresh();
       return;
     }
     router.replace("/");
@@ -220,6 +234,7 @@ export function RegisterScreen() {
       setError(authErrorMessage(signUpError));
       return;
     }
+    setPendingVerificationEmail(trimmedEmail);
     router.replace("/verify-email");
     router.refresh();
   }
@@ -309,92 +324,174 @@ export function RegisterScreen() {
   );
 }
 
-type VerifyPendingAction = "continue" | "resend" | null;
+type VerifyPendingAction = "resend" | null;
 
 export function VerifyEmailScreen() {
   const t = useT();
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
-  const { user, resendVerification, refreshSession, signOut } = useAuth();
+  const { user, resendVerification, signOut } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<VerifyPendingAction>(null);
+  const displayEmail = user?.email ?? getPendingVerificationEmail();
 
-  async function handleResend() {
-    setPendingAction("resend");
-    setError(null);
-    setMessage(null);
-    const { error: resendError } = await resendVerification();
-    setPendingAction(null);
-    if (resendError) {
-      setError(authErrorMessage(resendError));
-      return;
-    }
-    setMessage(t("auth.verify.resendSuccess"));
-  }
-
-  async function handleContinue() {
-    setPendingAction("continue");
-    setError(null);
-    setMessage(null);
-    const nextUser = await refreshSession();
-    setPendingAction(null);
-    if (nextUser?.email_confirmed_at) {
+  useEffect(() => {
+    if (user?.email_confirmed_at) {
       router.replace("/");
       router.refresh();
-    } else {
-      setError(t("auth.verify.notVerifiedYet"));
     }
-  }
+  }, [router, user?.email_confirmed_at]);
 
-  async function handleSignOut() {
+  async function handleSignIn() {
+    // If the user has an unverified session (e.g. after attempting login),
+    // navigating to /login would bounce back to /verify-email via middleware.
     await signOut();
     router.replace("/login");
     router.refresh();
   }
 
+  async function handleResend() {
+    setPendingAction("resend");
+    setError(null);
+    setMessage(null);
+    const { error: resendError } = await resendVerification(
+      displayEmail ?? undefined,
+    );
+    setPendingAction(null);
+    if (resendError) {
+      setError(authErrorMessage(resendError));
+      return;
+    }
+    setMessage(t("auth.checkEmail.resendSuccess"));
+  }
+
   const isBusy = pendingAction !== null;
+  const hasEmail = Boolean(displayEmail);
 
   return (
     <AuthLayout>
-      <AuthCard title={t("auth.verify.title")} errorMessage={error}>
-        {user?.email ? (
-          <p className="text-sm font-medium">{user.email}</p>
-        ) : null}
+      <AuthCard
+        title={t("auth.checkEmail.title")}
+        errorMessage={error}
+        footer={
+          <AuthFooterLink
+            prompt={t("auth.checkEmail.footerPrompt")}
+            href="/register"
+            label={t("auth.checkEmail.footerAction")}
+          />
+        }
+      >
+        <p className="text-sm text-muted-foreground">
+          {hasEmail ? (
+            <>
+              {t("auth.checkEmail.openPrefix")}{" "}
+              <span className="font-medium text-foreground">{displayEmail}</span>{" "}
+              {t("auth.checkEmail.openSuffix")}
+            </>
+          ) : (
+            t("auth.checkEmail.noEmail")
+          )}
+        </p>
 
         {message ? (
           <p className="mt-4 text-sm text-muted-foreground">{message}</p>
         ) : null}
 
-        <div className={cn("space-y-3", AUTH_PRIMARY_CTA_TOP_CLASS)}>
+        <Button
+          className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+          onClick={handleSignIn}
+          disabled={isBusy}
+        >
+          {t("auth.checkEmail.signIn")}
+        </Button>
+
+        <div className="mt-4 text-center">
+          <span className="text-sm text-muted-foreground">
+            {t("auth.checkEmail.resendPrompt")}{" "}
+          </span>
           <Button
-            className="h-12 w-full"
-            onClick={handleContinue}
-            disabled={isBusy}
-          >
-            {pendingAction === "continue"
-              ? t("auth.verify.continuing")
-              : t("auth.verify.continue")}
-          </Button>
-          <Button
-            variant="outline"
-            className="h-12 w-full"
+            type="button"
+            variant="link"
+            className="h-auto p-0 text-sm font-medium"
             onClick={handleResend}
-            disabled={isBusy}
+            disabled={isBusy || !hasEmail}
           >
             {pendingAction === "resend"
-              ? t("auth.verify.resending")
-              : t("auth.verify.resend")}
-          </Button>
-          <Button
-            variant="ghost"
-            className="h-11 w-full"
-            onClick={handleSignOut}
-            disabled={isBusy}
-          >
-            {t("auth.verify.signOut")}
+              ? t("auth.checkEmail.resending")
+              : t("auth.checkEmail.resend")}
           </Button>
         </div>
+      </AuthCard>
+    </AuthLayout>
+  );
+}
+
+export function EmailVerifiedScreen() {
+  const t = useT();
+  const router = useRouter();
+  const timerRef = useRef<number | null>(null);
+  const [seconds, setSeconds] = useState(5);
+
+  const header = useMemo(
+    () => (
+      <CheckCircle
+        className="size-12 text-foreground"
+        aria-hidden="true"
+      />
+    ),
+    [],
+  );
+
+  useEffect(() => {
+    timerRef.current = window.setInterval(() => {
+      setSeconds((current) => {
+        if (current <= 1) {
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (seconds !== 0) return;
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    router.replace("/splash");
+    router.refresh();
+  }, [router, seconds]);
+
+  function handleSignIn() {
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    router.replace("/splash");
+    router.refresh();
+  }
+
+  return (
+    <AuthLayout>
+      <AuthCard title={t("auth.emailVerified.title")} header={header}>
+        <p className="text-sm text-muted-foreground">
+          {t("auth.emailVerified.redirecting", { seconds })}
+        </p>
+        <Button
+          className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+          onClick={handleSignIn}
+        >
+          {t("auth.emailVerified.continue")}
+        </Button>
       </AuthCard>
     </AuthLayout>
   );
@@ -498,7 +595,7 @@ export function ResetPasswordScreen() {
   const t = useT();
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
-  const { updatePassword } = useAuth();
+  const { updatePassword, signOut } = useAuth();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -523,6 +620,7 @@ export function ResetPasswordScreen() {
       setError(authErrorMessage(updateError));
       return;
     }
+    await signOut();
     router.replace("/login?password_updated=1");
     router.refresh();
   }

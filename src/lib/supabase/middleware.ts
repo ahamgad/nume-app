@@ -9,6 +9,7 @@ const AUTH_ROUTES = [
   "/forgot-password",
   "/reset-password",
   "/verify-email",
+  "/email-verified",
 ];
 
 const PUBLIC_ROUTES = ["/splash"];

@@ -13,9 +13,20 @@ import {
 } from "react";
 
 import { mapSupabaseAuthError, type AuthErrorCode } from "@/lib/auth/errors";
+import {
+  clearPendingVerificationEmail,
+  getPendingVerificationEmail,
+} from "@/lib/auth/pending-verification-email";
+import { resolveSignUpResult } from "@/lib/auth/sign-up-result";
 import { markSessionExpiredNotice } from "@/lib/auth/session-notice";
+import { getAuthCallbackUrl } from "@/lib/auth/urls";
 import { createClient } from "@/lib/supabase/client";
-import { getAppUrl, hasSupabaseEnv } from "@/lib/supabase/env";
+import { hasSupabaseEnv } from "@/lib/supabase/env";
+
+type AuthActionResult = {
+  error: AuthErrorCode | null;
+  requiresVerification?: boolean;
+};
 
 interface AuthContextValue {
   user: User | null;
@@ -24,19 +35,33 @@ interface AuthContextValue {
   signIn: (
     email: string,
     password: string,
-  ) => Promise<{ error: AuthErrorCode | null }>;
+  ) => Promise<AuthActionResult>;
   signUp: (
     email: string,
     password: string,
-  ) => Promise<{ error: AuthErrorCode | null }>;
+  ) => Promise<AuthActionResult>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthErrorCode | null }>;
   updatePassword: (password: string) => Promise<{ error: AuthErrorCode | null }>;
-  resendVerification: () => Promise<{ error: AuthErrorCode | null }>;
+  resendVerification: (
+    email?: string,
+  ) => Promise<{ error: AuthErrorCode | null }>;
   refreshSession: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+function applySessionState(
+  nextSession: Session | null,
+  setSession: (session: Session | null) => void,
+  setUser: (user: User | null) => void,
+) {
+  setSession(nextSession);
+  setUser(nextSession?.user ?? null);
+  if (nextSession?.user?.email_confirmed_at) {
+    clearPendingVerificationEmail();
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(
@@ -53,6 +78,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) {
       return;
     }
+
+    let active = true;
+
+    void supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      if (!active) {
+        return;
+      }
+      if (initialSession?.user) {
+        hadAuthenticatedSessionRef.current = true;
+      }
+      applySessionState(initialSession, setSession, setUser);
+      setIsLoading(false);
+    });
 
     const {
       data: { subscription },
@@ -71,39 +109,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (event === "SIGNED_OUT") {
         hadAuthenticatedSessionRef.current = false;
+        clearPendingVerificationEmail();
       }
 
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      applySessionState(nextSession, setSession, setUser);
       setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   const signIn = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string): Promise<AuthActionResult> => {
       if (!supabase) return { error: "notConfigured" as const };
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      return { error: error ? mapSupabaseAuthError(error.message) : null };
+      if (error) {
+        return { error: mapSupabaseAuthError(error.message) };
+      }
+      if (data.user && !data.user.email_confirmed_at) {
+        return { error: null, requiresVerification: true };
+      }
+      return { error: null };
     },
     [supabase],
   );
 
   const signUp = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string): Promise<AuthActionResult> => {
       if (!supabase) return { error: "notConfigured" as const };
-      const { error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email`,
+          emailRedirectTo: getAuthCallbackUrl("/email-verified"),
         },
       });
-      return { error: error ? mapSupabaseAuthError(error.message) : null };
+      return resolveSignUpResult(response);
     },
     [supabase],
   );
@@ -122,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (email: string) => {
       if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
+        redirectTo: getAuthCallbackUrl("/reset-password"),
       });
       return { error: error ? mapSupabaseAuthError(error.message) : null };
     },
@@ -138,25 +185,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [supabase],
   );
 
-  const resendVerification = useCallback(async () => {
-    if (!supabase) return { error: "notConfigured" as const };
-    if (!user?.email) return { error: "noEmail" as const };
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: user.email,
-      options: {
-        emailRedirectTo: `${getAppUrl()}/auth/callback?next=/verify-email`,
-      },
-    });
-    return { error: error ? mapSupabaseAuthError(error.message) : null };
-  }, [supabase, user]);
+  const resendVerification = useCallback(
+    async (email?: string) => {
+      if (!supabase) return { error: "notConfigured" as const };
+      const targetEmail = email ?? user?.email ?? getPendingVerificationEmail();
+      if (!targetEmail) return { error: "noEmail" as const };
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: targetEmail,
+        options: {
+          emailRedirectTo: getAuthCallbackUrl("/email-verified"),
+        },
+      });
+      return { error: error ? mapSupabaseAuthError(error.message) : null };
+    },
+    [supabase, user],
+  );
 
   const refreshSession = useCallback(async (): Promise<User | null> => {
     if (!supabase) return null;
     const { data } = await supabase.auth.refreshSession();
     const nextUser = data.session?.user ?? null;
-    setSession(data.session);
-    setUser(nextUser);
+    applySessionState(data.session, setSession, setUser);
     return nextUser;
   }, [supabase]);
 
