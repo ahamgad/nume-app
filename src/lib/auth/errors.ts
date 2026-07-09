@@ -4,6 +4,7 @@ export type AuthErrorCode =
   | "emailNotConfirmed"
   | "weakPassword"
   | "samePassword"
+  | "emailSendRateLimit"
   | "noEmail"
   | "notConfigured"
   | "callbackFailed"
@@ -29,6 +30,10 @@ export function mapSupabaseAuthError(
     return "samePassword";
   }
 
+  if (code === "over_email_send_rate_limit") {
+    return "emailSendRateLimit";
+  }
+
   if (!message) {
     return "generic";
   }
@@ -46,6 +51,16 @@ export function mapSupabaseAuthError(
       normalized.includes("old password"))
   ) {
     return "samePassword";
+  }
+
+  if (
+    normalized.includes("over_email_send_rate_limit") ||
+    (normalized.includes("for security purposes") &&
+      normalized.includes("request this after")) ||
+    (normalized.includes("only request this after") &&
+      normalized.includes("second"))
+  ) {
+    return "emailSendRateLimit";
   }
 
   if (normalized.includes("invalid login credentials")) {

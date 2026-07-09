@@ -35,6 +35,17 @@ describe("mapSupabaseAuthError", () => {
     ).toBe("samePassword");
   });
 
+  it("maps email send rate-limit errors", () => {
+    expect(mapSupabaseAuthError({ code: "over_email_send_rate_limit" })).toBe(
+      "emailSendRateLimit",
+    );
+    expect(
+      mapSupabaseAuthError(
+        "For security purposes, you can only request this after 57 seconds.",
+      ),
+    ).toBe("emailSendRateLimit");
+  });
+
   it("falls back to generic", () => {
     expect(mapSupabaseAuthError("Network error")).toBe("generic");
     expect(mapSupabaseAuthError(undefined)).toBe("generic");

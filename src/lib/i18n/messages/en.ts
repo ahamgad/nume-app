@@ -78,16 +78,16 @@ export const en = {
     },
     errors: {
       invalidCredentials: "Invalid email or password",
-      emailInUse: "An account already exists for this email.",
+      emailInUse: "An account already exists for this email",
       emailNotConfirmed: "Verify your email to continue",
       weakPassword: "Password must be at least 8 characters",
-      samePassword:
-        "The new password must be different from your current password.",
-      generic: "Something went wrong. Try again.",
+      samePassword: "Choose a different password",
+      emailSendRateLimit: "Wait a minute before requesting another email",
+      generic: "Something went wrong. Try again",
       callbackFailed:
-        "This link is invalid or has expired. Request a new one.",
+        "This link is invalid or has expired. Request a new one",
       notConfigured:
-        "Sign-in is unavailable. Check your environment configuration.",
+        "Sign-in is unavailable. Check your environment configuration",
     },
     validation: {
       emailRequired: "Email is required",
