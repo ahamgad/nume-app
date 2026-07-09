@@ -19,6 +19,7 @@ import {
 } from "@/lib/auth/pending-verification-email";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
+import { useEmailSendCooldown } from "@/lib/auth/use-email-send-cooldown";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -199,6 +200,7 @@ export function RegisterScreen() {
   const t = useT();
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
+  const emailSendCooldown = useEmailSendCooldown();
   const { signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -209,6 +211,7 @@ export function RegisterScreen() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (emailSendCooldown.isActive) return;
     const trimmedEmail = email.trim();
     const nextEmailError =
       trimmedEmail.length === 0
@@ -229,9 +232,14 @@ export function RegisterScreen() {
 
     setSubmitting(true);
     setError(null);
+    emailSendCooldown.clear();
     const { error: signUpError } = await signUp(trimmedEmail, password);
     setSubmitting(false);
     if (signUpError) {
+      if (signUpError.code === "emailSendRateLimit") {
+        emailSendCooldown.start(signUpError.retryAfterSeconds);
+        return;
+      }
       setError(authErrorMessage(signUpError));
       return;
     }
@@ -245,6 +253,7 @@ export function RegisterScreen() {
       <AuthCard
         title={t("auth.register.title")}
         errorMessage={error}
+        statusMessage={emailSendCooldown.message}
       >
         <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <div className="space-y-4">
@@ -310,7 +319,7 @@ export function RegisterScreen() {
             <Button
               type="submit"
               className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-              disabled={submitting}
+              disabled={submitting || emailSendCooldown.isActive}
             >
               {submitting
                 ? t("auth.register.submitting")
@@ -334,6 +343,7 @@ export function VerifyEmailScreen() {
   const t = useT();
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
+  const emailSendCooldown = useEmailSendCooldown();
   const { user, resendVerification, signOut } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -359,13 +369,18 @@ export function VerifyEmailScreen() {
   }
 
   async function handleResend() {
-    if (!displayEmail) return;
+    if (!displayEmail || emailSendCooldown.isActive) return;
     setPendingAction("resend");
     setError(null);
     setMessage(null);
+    emailSendCooldown.clear();
     const { error: resendError } = await resendVerification(displayEmail);
     setPendingAction(null);
     if (resendError) {
+      if (resendError.code === "emailSendRateLimit") {
+        emailSendCooldown.start(resendError.retryAfterSeconds);
+        return;
+      }
       setError(authErrorMessage(resendError));
       return;
     }
@@ -373,6 +388,7 @@ export function VerifyEmailScreen() {
   }
 
   const isBusy = pendingAction !== null;
+  const resendDisabled = isBusy || emailSendCooldown.isActive;
 
   if (!displayEmail) {
     return null;
@@ -383,6 +399,7 @@ export function VerifyEmailScreen() {
       <AuthCard
         title={t("auth.checkEmail.title")}
         errorMessage={error}
+        statusMessage={emailSendCooldown.message}
       >
         <form
           noValidate
@@ -418,7 +435,7 @@ export function VerifyEmailScreen() {
                 variant="link"
                 className="h-auto p-0 text-sm font-medium"
                 onClick={handleResend}
-                disabled={isBusy}
+                disabled={resendDisabled}
               >
                 {pendingAction === "resend"
                   ? t("auth.checkEmail.resending")
@@ -435,6 +452,7 @@ export function VerifyEmailScreen() {
 export function ForgotPasswordScreen() {
   const t = useT();
   const authErrorMessage = useAuthErrorMessage();
+  const emailSendCooldown = useEmailSendCooldown();
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -447,6 +465,7 @@ export function ForgotPasswordScreen() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (emailSendCooldown.isActive) return;
     const trimmedEmail = email.trim();
     const nextEmailError =
       trimmedEmail.length === 0
@@ -460,9 +479,14 @@ export function ForgotPasswordScreen() {
     setSubmitting(true);
     setError(null);
     setMessage(null);
+    emailSendCooldown.clear();
     const { error: resetError } = await resetPassword(trimmedEmail);
     setSubmitting(false);
     if (resetError) {
+      if (resetError.code === "emailSendRateLimit") {
+        emailSendCooldown.start(resetError.retryAfterSeconds);
+        return;
+      }
       setError(authErrorMessage(resetError));
       return;
     }
@@ -471,13 +495,18 @@ export function ForgotPasswordScreen() {
   }
 
   async function handleResend() {
-    if (!sentEmail) return;
+    if (!sentEmail || emailSendCooldown.isActive) return;
     setResending(true);
     setError(null);
     setMessage(null);
+    emailSendCooldown.clear();
     const { error: resetError } = await resetPassword(sentEmail);
     setResending(false);
     if (resetError) {
+      if (resetError.code === "emailSendRateLimit") {
+        emailSendCooldown.start(resetError.retryAfterSeconds);
+        return;
+      }
       setError(authErrorMessage(resetError));
       return;
     }
@@ -489,6 +518,7 @@ export function ForgotPasswordScreen() {
       <AuthCard
         title={t("auth.forgot.title")}
         errorMessage={error}
+        statusMessage={emailSendCooldown.message}
       >
         {sent ? (
           <form
@@ -524,7 +554,9 @@ export function ForgotPasswordScreen() {
                   variant="link"
                   className="h-auto p-0 text-sm font-medium"
                   onClick={handleResend}
-                  disabled={resending || !sentEmail}
+                  disabled={
+                    resending || !sentEmail || emailSendCooldown.isActive
+                  }
                 >
                   {resending
                     ? t("auth.forgot.resending")
@@ -570,7 +602,7 @@ export function ForgotPasswordScreen() {
               <Button
                 type="submit"
                 className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-                disabled={submitting}
+                disabled={submitting || emailSendCooldown.isActive}
               >
                 {submitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
               </Button>

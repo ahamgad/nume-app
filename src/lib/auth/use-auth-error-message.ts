@@ -1,6 +1,10 @@
 "use client";
 
-import type { AuthErrorCode } from "@/lib/auth/errors";
+import {
+  formatEmailSendRateLimitMessage,
+  type AuthErrorCode,
+  type MappedAuthError,
+} from "@/lib/auth/errors";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/providers/i18n-provider";
 
@@ -17,5 +21,11 @@ const AUTH_ERROR_KEYS = {
 
 export function useAuthErrorMessage() {
   const t = useT();
-  return (code: AuthErrorCode) => t(AUTH_ERROR_KEYS[code]);
+  return (error: MappedAuthError | AuthErrorCode) => {
+    const mapped = typeof error === "string" ? { code: error } : error;
+    if (mapped.code === "emailSendRateLimit") {
+      return formatEmailSendRateLimitMessage(t, mapped.retryAfterSeconds);
+    }
+    return t(AUTH_ERROR_KEYS[mapped.code]);
+  };
 }

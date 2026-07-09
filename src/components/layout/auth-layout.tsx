@@ -156,6 +156,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 interface AuthCardProps {
   title: string;
   errorMessage?: string | null;
+  /** Non-destructive status (e.g. email-send cooldown). Cleared by the screen when done. */
+  statusMessage?: string | null;
   header?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
@@ -167,6 +169,7 @@ interface AuthCardProps {
 export function AuthCard({
   title,
   errorMessage,
+  statusMessage,
   header,
   children,
   footer,
@@ -188,8 +191,8 @@ export function AuthCard({
     if (!body) return;
 
     const measure = () => {
-      // Never let transient error states increase the shared baseline.
-      if (document.querySelector('[role="alert"]')) {
+      // Never let transient error/status states increase the shared baseline.
+      if (document.querySelector('[role="alert"], [role="status"]')) {
         return;
       }
       const height = Math.ceil(body.getBoundingClientRect().height);
@@ -215,6 +218,10 @@ export function AuthCard({
         {errorMessage ? (
           <p className="text-sm text-destructive" role="alert">
             {errorMessage}
+          </p>
+        ) : statusMessage ? (
+          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+            {statusMessage}
           </p>
         ) : null}
       </div>

@@ -12,7 +12,10 @@ import {
   type ReactNode,
 } from "react";
 
-import { mapSupabaseAuthError, type AuthErrorCode } from "@/lib/auth/errors";
+import {
+  mapSupabaseAuthError,
+  type MappedAuthError,
+} from "@/lib/auth/errors";
 import {
   clearPendingVerificationEmail,
   getPendingVerificationEmail,
@@ -23,7 +26,7 @@ import { getAuthCallbackUrl } from "@/lib/auth/urls";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthActionResult = {
-  error: AuthErrorCode | null;
+  error: MappedAuthError | null;
   requiresVerification?: boolean;
 };
 
@@ -40,11 +43,13 @@ interface AuthContextValue {
     password: string,
   ) => Promise<AuthActionResult>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: AuthErrorCode | null }>;
-  updatePassword: (password: string) => Promise<{ error: AuthErrorCode | null }>;
+  resetPassword: (email: string) => Promise<{ error: MappedAuthError | null }>;
+  updatePassword: (
+    password: string,
+  ) => Promise<{ error: MappedAuthError | null }>;
   resendVerification: (
     email?: string,
-  ) => Promise<{ error: AuthErrorCode | null }>;
+  ) => Promise<{ error: MappedAuthError | null }>;
   refreshSession: () => Promise<User | null>;
 }
 

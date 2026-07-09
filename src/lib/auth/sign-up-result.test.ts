@@ -16,7 +16,7 @@ describe("resolveSignUpResult", () => {
         },
         error: null,
       } as unknown as AuthResponse),
-    ).toEqual({ error: "emailInUse" });
+    ).toEqual({ error: { code: "emailInUse" } });
   });
 
   it("returns null error for a new signup user", () => {
@@ -44,6 +44,6 @@ describe("resolveSignUpResult", () => {
           status: 400,
         },
       } as unknown as AuthResponse),
-    ).toEqual({ error: "emailInUse" });
+    ).toEqual({ error: { code: "emailInUse" } });
   });
 });
