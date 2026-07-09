@@ -109,7 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (event === "SIGNED_OUT") {
         hadAuthenticatedSessionRef.current = false;
-        clearPendingVerificationEmail();
       }
 
       applySessionState(nextSession, setSession, setUser);

@@ -338,7 +338,11 @@ export function VerifyEmailScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<VerifyPendingAction>(null);
-  const displayEmail = user?.email ?? getPendingVerificationEmail();
+  const [pinnedEmail] = useState<string | null>(
+    () => user?.email ?? getPendingVerificationEmail(),
+  );
+  const liveEmail = user?.email ?? getPendingVerificationEmail();
+  const displayEmail = liveEmail ?? pinnedEmail;
 
   async function handleSignIn() {
     // If the user has an unverified session (e.g. after attempting login),
@@ -364,7 +368,6 @@ export function VerifyEmailScreen() {
   }
 
   const isBusy = pendingAction !== null;
-  const hasEmail = Boolean(displayEmail);
 
   return (
     <AuthLayout>
@@ -372,46 +375,55 @@ export function VerifyEmailScreen() {
         title={t("auth.checkEmail.title")}
         errorMessage={error}
       >
-        <p className="text-sm text-muted-foreground">
-          {hasEmail ? (
-            <>
-              {t("auth.checkEmail.openPrefix")}{" "}
-              <span className="font-medium text-foreground">{displayEmail}</span>{" "}
-              {t("auth.checkEmail.openSuffix")}
-            </>
-          ) : (
-            t("auth.checkEmail.noEmail")
-          )}
-        </p>
-
-        {message ? (
-          <p className="mt-4 text-sm text-muted-foreground">{message}</p>
-        ) : null}
-
-        <Button
-          className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-          onClick={handleSignIn}
-          disabled={isBusy}
+        <form
+          noValidate
+          className="flex flex-1 flex-col"
+          onSubmit={(event) => event.preventDefault()}
         >
-          {t("auth.checkEmail.signIn")}
-        </Button>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {displayEmail ? (
+                <>
+                  {t("auth.checkEmail.openPrefix")}{" "}
+                  <span className="font-medium text-foreground">{displayEmail}</span>{" "}
+                  {t("auth.checkEmail.openSuffix")}
+                </>
+              ) : (
+                t("auth.checkEmail.noEmail")
+              )}
+            </p>
 
-        <div className="mt-4 text-center">
-          <span className="text-sm text-muted-foreground">
-            {t("auth.checkEmail.resendPrompt")}{" "}
-          </span>
-          <Button
-            type="button"
-            variant="link"
-            className="h-auto p-0 text-sm font-medium"
-            onClick={handleResend}
-            disabled={isBusy || !hasEmail}
-          >
-            {pendingAction === "resend"
-              ? t("auth.checkEmail.resending")
-              : t("auth.checkEmail.resend")}
-          </Button>
-        </div>
+            {message ? (
+              <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+            ) : null}
+          </div>
+
+          <div className="mt-auto">
+            <Button
+              type="button"
+              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+              onClick={handleSignIn}
+              disabled={isBusy}
+            >
+              {t("auth.checkEmail.signIn")}
+            </Button>
+
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              {t("auth.checkEmail.resendPrompt")}{" "}
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0 text-sm font-medium"
+                onClick={handleResend}
+                disabled={isBusy || !displayEmail}
+              >
+                {pendingAction === "resend"
+                  ? t("auth.checkEmail.resending")
+                  : t("auth.checkEmail.resend")}
+              </Button>
+            </p>
+          </div>
+        </form>
       </AuthCard>
     </AuthLayout>
   );
@@ -558,7 +570,7 @@ export function ResetPasswordScreen() {
   return (
     <AuthLayout>
       <AuthCard title={t("auth.reset.title")} errorMessage={error}>
-        <form noValidate onSubmit={handleSubmit}>
+        <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <div className="space-y-4">
             <AuthInputField
               id="password"
@@ -588,13 +600,16 @@ export function ResetPasswordScreen() {
               />
             </AuthInputField>
           </div>
-          <Button
-            type="submit"
-            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-            disabled={submitting}
-          >
-            {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}
-          </Button>
+
+          <div className="mt-auto">
+            <Button
+              type="submit"
+              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+              disabled={submitting}
+            >
+              {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}
+            </Button>
+          </div>
         </form>
       </AuthCard>
     </AuthLayout>

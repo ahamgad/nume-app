@@ -170,7 +170,7 @@ export function AuthCard({
         style={baselineHeightPx ? { minHeight: baselineHeightPx } : undefined}
         className={cn(
           ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
-          "flex flex-col",
+          "flex flex-col [&>:only-child]:flex [&>:only-child]:min-h-0 [&>:only-child]:flex-1 [&>:only-child]:flex-col",
           contentClassName,
         )}
       >

@@ -1,38 +1,31 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
+import { completeAuthCallback } from "@/lib/auth/complete-auth-callback";
 import { getAppUrl } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/splash";
   const appUrl = getAppUrl();
 
-  const supabase = await createClient();
+  const destination = next.startsWith("/") ? next : `/${next}`;
+  const successUrl = `${appUrl}${destination}`;
+  const failureUrl = `${appUrl}/login?error=auth_callback`;
 
-  // Exchange/verify on the server so auth cookies are set before we enter
-  // middleware-protected app routes (prevents "verified but still on login").
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) {
-      return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
-    }
-  } else if (tokenHash && type) {
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type,
-    });
-    if (error) {
-      return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
-    }
-  } else {
-    return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
+  const successResponse = NextResponse.redirect(successUrl);
+  const established = await completeAuthCallback(request, successResponse, {
+    code,
+    tokenHash,
+    type,
+  });
+
+  if (established) {
+    return successResponse;
   }
 
-  const destination = next.startsWith("/") ? next : `/${next}`;
-  return NextResponse.redirect(`${appUrl}${destination}`);
+  return NextResponse.redirect(failureUrl);
 }
