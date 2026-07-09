@@ -135,6 +135,10 @@ export function AuthCard({
     if (!body) return;
 
     const measure = () => {
+      // Never let transient error states increase the shared baseline.
+      if (document.querySelector('[role="alert"]')) {
+        return;
+      }
       const height = Math.ceil(body.getBoundingClientRect().height);
       if (!Number.isFinite(height) || height <= 0) return;
       const next = Math.max(baselineHeightPx ?? 0, height);

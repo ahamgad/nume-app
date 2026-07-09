@@ -48,8 +48,6 @@ export function SplashOverlayLayer() {
 
   const handleCurtainComplete = useCallback(() => {
     curtainCompletePendingRef.current = true;
-    // Temporary verification trace: indicates the splash overlay is handing off.
-    console.info("[AUTH-VERIFY]", "Splash overlay curtain complete; router.replace('/')");
     router.replace("/");
   }, [router]);
 
