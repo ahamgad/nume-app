@@ -12,7 +12,7 @@ let browserClient: SupabaseClient | undefined;
 export function createClient() {
   if (!hasSupabaseEnv()) {
     throw new Error(
-      "Supabase is not configured. Copy .env.example to .env.local",
+      "Internal configuration error: missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
     );
   }
 
