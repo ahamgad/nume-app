@@ -14,6 +14,9 @@ import { useT } from "@/providers/i18n-provider";
 /** 24px — same rhythm as {@link SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS}. */
 export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-6";
 
+/** Shared stable height for all auth card content. */
+export const AUTH_CARD_CONTENT_CLASS = "min-h-[28rem] flex flex-col";
+
 /** Matches iOS keyboard presentation timing. */
 export const AUTH_KEYBOARD_FRAME_TRANSITION_CLASS =
   "transition-[height,transform] duration-[250ms] ease-out";
@@ -118,11 +121,13 @@ export function AuthCard({
     <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
       {header ?? <AuthBrandLogo />}
       <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
-      {errorMessage ? (
-        <p className="mt-4 text-sm text-destructive" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
+      <div className="mt-4 min-h-5">
+        {errorMessage ? (
+          <p className="text-sm text-destructive" role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
+      </div>
       <div className={cn(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS, contentClassName)}>
         {children}
       </div>

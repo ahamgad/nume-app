@@ -17,7 +17,15 @@ export async function GET(request: Request) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
+      // Some clients (prefetchers / link scanners) may hit the callback twice.
+      // If the session is already established, treat this as success and keep
+      // the flow going rather than showing an "expired" message.
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
+      }
     }
   } else if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({
@@ -25,7 +33,12 @@ export async function GET(request: Request) {
       type,
     });
     if (error) {
-      return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
+      }
     }
   } else {
     return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);

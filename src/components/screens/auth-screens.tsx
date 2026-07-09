@@ -13,6 +13,7 @@ import {
   AuthFooterLink,
   AuthLayout,
 } from "@/components/layout/auth-layout";
+import { AUTH_CARD_CONTENT_CLASS } from "@/components/layout/auth-layout";
 import {
   getPendingVerificationEmail,
   setPendingVerificationEmail,
@@ -94,7 +95,7 @@ export function LoginScreen() {
       router.refresh();
       return;
     }
-    router.replace("/");
+    router.replace("/splash");
     router.refresh();
   }
 
@@ -103,92 +104,95 @@ export function LoginScreen() {
       <AuthCard
         title={t("auth.login.title")}
         errorMessage={error}
-        footer={
-          <AuthFooterLink
-            prompt={t("auth.login.noAccount")}
-            href="/register"
-            label={t("auth.login.createAccount")}
-          />
-        }
       >
-        <form noValidate onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <AuthInputField
-              id="email"
-              label={t("auth.fields.email")}
-              required
-              error={emailError ?? undefined}
-            >
-              <Input
+        <div className={AUTH_CARD_CONTENT_CLASS}>
+          <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+            <div className="space-y-4">
+              <AuthInputField
                 id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setEmail(next);
-                  if (emailError) {
-                    const trimmed = next.trim();
-                    const nextError =
-                      trimmed.length === 0
-                        ? t("auth.validation.emailRequired")
-                        : isValidEmailAddress(trimmed)
-                          ? null
-                          : t("auth.validation.emailInvalid");
-                    setEmailError(nextError);
-                  }
-                }}
+                label={t("auth.fields.email")}
                 required
-              />
-            </AuthInputField>
-            <AuthInputField
-              id="password"
-              required
-              error={passwordError ?? undefined}
-              label={
-                <div className="flex items-center justify-between gap-2">
-                  <InputFieldLabel htmlFor="password" required>
-                    {t("auth.fields.password")}
-                  </InputFieldLabel>
-                  <Link
-                    href="/forgot-password"
-                    className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:underline"
-                  >
-                    {t("auth.login.forgotPassword")}
-                  </Link>
-                </div>
-              }
-            >
-              <AuthPasswordField
+                error={emailError ?? undefined}
+              >
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setEmail(next);
+                    if (emailError) {
+                      const trimmed = next.trim();
+                      const nextError =
+                        trimmed.length === 0
+                          ? t("auth.validation.emailRequired")
+                          : isValidEmailAddress(trimmed)
+                            ? null
+                            : t("auth.validation.emailInvalid");
+                      setEmailError(nextError);
+                    }
+                  }}
+                  required
+                />
+              </AuthInputField>
+              <AuthInputField
                 id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setPassword(next);
-                  if (passwordError) {
-                    setPasswordError(
-                      next.length === 0
-                        ? t("auth.validation.passwordRequired")
-                        : null,
-                    );
-                  }
-                }}
                 required
+                error={passwordError ?? undefined}
+                label={
+                  <div className="flex items-center justify-between gap-2">
+                    <InputFieldLabel htmlFor="password" required>
+                      {t("auth.fields.password")}
+                    </InputFieldLabel>
+                    <Link
+                      href="/forgot-password"
+                      className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:underline"
+                    >
+                      {t("auth.login.forgotPassword")}
+                    </Link>
+                  </div>
+                }
+              >
+                <AuthPasswordField
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setPassword(next);
+                    if (passwordError) {
+                      setPasswordError(
+                        next.length === 0
+                          ? t("auth.validation.passwordRequired")
+                          : null,
+                      );
+                    }
+                  }}
+                  required
+                />
+              </AuthInputField>
+              {notice ? (
+                <p className="text-sm text-muted-foreground">{notice}</p>
+              ) : null}
+            </div>
+
+            <div className="mt-auto">
+              <Button
+                type="submit"
+                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+                disabled={submitting}
+              >
+                {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
+              </Button>
+              <AuthFooterLink
+                prompt={t("auth.login.noAccount")}
+                href="/register"
+                label={t("auth.login.createAccount")}
               />
-            </AuthInputField>
-            {notice ? (
-              <p className="text-sm text-muted-foreground">{notice}</p>
-            ) : null}
-          </div>
-          <Button
-            type="submit"
-            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-            disabled={submitting}
-          >
-            {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
-          </Button>
-        </form>
+            </div>
+          </form>
+        </div>
       </AuthCard>
     </AuthLayout>
   );
@@ -244,81 +248,86 @@ export function RegisterScreen() {
       <AuthCard
         title={t("auth.register.title")}
         errorMessage={error}
-        footer={
-          <AuthFooterLink
-            prompt={t("auth.register.hasAccount")}
-            href="/login"
-            label={t("auth.register.signIn")}
-          />
-        }
       >
-        <form noValidate onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <AuthInputField
-              id="email"
-              label={t("auth.fields.email")}
-              required
-              error={emailError ?? undefined}
-            >
-              <Input
+        <div className={AUTH_CARD_CONTENT_CLASS}>
+          <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+            <div className="space-y-4">
+              <AuthInputField
                 id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setEmail(next);
-                  if (emailError) {
-                    const trimmed = next.trim();
-                    const nextError =
-                      trimmed.length === 0
-                        ? t("auth.validation.emailRequired")
-                        : isValidEmailAddress(trimmed)
-                          ? null
-                          : t("auth.validation.emailInvalid");
-                    setEmailError(nextError);
-                  }
-                }}
+                label={t("auth.fields.email")}
                 required
-              />
-            </AuthInputField>
-            <AuthInputField
-              id="password"
-              label={t("auth.fields.password")}
-              required
-              error={passwordError ?? undefined}
-              hint={t("auth.register.passwordHint")}
-            >
-              <AuthPasswordField
+                error={emailError ?? undefined}
+              >
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setEmail(next);
+                    if (emailError) {
+                      const trimmed = next.trim();
+                      const nextError =
+                        trimmed.length === 0
+                          ? t("auth.validation.emailRequired")
+                          : isValidEmailAddress(trimmed)
+                            ? null
+                            : t("auth.validation.emailInvalid");
+                      setEmailError(nextError);
+                    }
+                  }}
+                  required
+                />
+              </AuthInputField>
+              <AuthInputField
                 id="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  setPassword(next);
-                  if (passwordError) {
-                    setPasswordError(
-                      next.length === 0
-                        ? t("auth.validation.passwordRequired")
-                        : next.length < 8
-                          ? t("auth.validation.passwordMinLength")
-                          : null,
-                    );
-                  }
-                }}
-                minLength={8}
+                label={t("auth.fields.password")}
                 required
+                error={passwordError ?? undefined}
+                hint={t("auth.register.passwordHint")}
+              >
+                <AuthPasswordField
+                  id="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setPassword(next);
+                    if (passwordError) {
+                      setPasswordError(
+                        next.length === 0
+                          ? t("auth.validation.passwordRequired")
+                          : next.length < 8
+                            ? t("auth.validation.passwordMinLength")
+                            : null,
+                      );
+                    }
+                  }}
+                  minLength={8}
+                  required
+                />
+              </AuthInputField>
+            </div>
+
+            <div className="mt-auto">
+              <Button
+                type="submit"
+                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+                disabled={submitting}
+              >
+                {submitting
+                  ? t("auth.register.submitting")
+                  : t("auth.register.submit")}
+              </Button>
+              <AuthFooterLink
+                prompt={t("auth.register.hasAccount")}
+                href="/login"
+                label={t("auth.register.signIn")}
               />
-            </AuthInputField>
-          </div>
-          <Button
-            type="submit"
-            className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-            disabled={submitting}
-          >
-            {submitting ? t("auth.register.submitting") : t("auth.register.submit")}
-          </Button>
-        </form>
+            </div>
+          </form>
+        </div>
       </AuthCard>
     </AuthLayout>
   );
@@ -451,57 +460,71 @@ export function ForgotPasswordScreen() {
       <AuthCard
         title={t("auth.forgot.title")}
         errorMessage={error}
-        footer={
-          <AuthFooterLink
-            prompt={t("auth.forgot.remembered")}
-            href="/login"
-            label={t("auth.forgot.backToLogin")}
-          />
-        }
       >
-        {sent ? (
-          <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
-        ) : (
-          <form noValidate onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <AuthInputField
-                id="email"
-                label={t("auth.fields.email")}
-                required
-                error={emailError ?? undefined}
-              >
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => {
-                    const next = e.target.value;
-                    setEmail(next);
-                    if (emailError) {
-                      const trimmed = next.trim();
-                      const nextError =
-                        trimmed.length === 0
-                          ? t("auth.validation.emailRequired")
-                          : isValidEmailAddress(trimmed)
-                            ? null
-                            : t("auth.validation.emailInvalid");
-                      setEmailError(nextError);
-                    }
-                  }}
-                  required
+        <div className={AUTH_CARD_CONTENT_CLASS}>
+          {sent ? (
+            <div className="flex flex-1 flex-col">
+              <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
+              <div className="mt-auto">
+                <AuthFooterLink
+                  prompt={t("auth.forgot.remembered")}
+                  href="/login"
+                  label={t("auth.forgot.backToLogin")}
                 />
-              </AuthInputField>
+              </div>
             </div>
-            <Button
-              type="submit"
-              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-              disabled={submitting}
-            >
-              {submitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
-            </Button>
-          </form>
-        )}
+          ) : (
+            <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+              <div className="space-y-4">
+                <AuthInputField
+                  id="email"
+                  label={t("auth.fields.email")}
+                  required
+                  error={emailError ?? undefined}
+                >
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setEmail(next);
+                      if (emailError) {
+                        const trimmed = next.trim();
+                        const nextError =
+                          trimmed.length === 0
+                            ? t("auth.validation.emailRequired")
+                            : isValidEmailAddress(trimmed)
+                              ? null
+                              : t("auth.validation.emailInvalid");
+                        setEmailError(nextError);
+                      }
+                    }}
+                    required
+                  />
+                </AuthInputField>
+              </div>
+
+              <div className="mt-auto">
+                <Button
+                  type="submit"
+                  className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+                  disabled={submitting}
+                >
+                  {submitting
+                    ? t("auth.forgot.submitting")
+                    : t("auth.forgot.submit")}
+                </Button>
+                <AuthFooterLink
+                  prompt={t("auth.forgot.remembered")}
+                  href="/login"
+                  label={t("auth.forgot.backToLogin")}
+                />
+              </div>
+            </form>
+          )}
+        </div>
       </AuthCard>
     </AuthLayout>
   );
