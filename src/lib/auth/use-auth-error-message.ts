@@ -9,6 +9,7 @@ const AUTH_ERROR_KEYS = {
   emailInUse: "auth.errors.emailInUse",
   emailNotConfirmed: "auth.errors.emailNotConfirmed",
   weakPassword: "auth.errors.weakPassword",
+  samePassword: "auth.errors.samePassword",
   generic: "auth.errors.generic",
   callbackFailed: "auth.errors.callbackFailed",
   notConfigured: "auth.errors.notConfigured",

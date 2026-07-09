@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -71,8 +72,55 @@ function handleAuthInputPointerDownCapture(
   input.focus({ preventScroll: true });
 }
 
+function useAuthKeyboardScrollLock(active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+
+    function resetDocumentScroll() {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+      if (document.documentElement.scrollTop !== 0) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body.scrollTop !== 0) {
+        document.body.scrollTop = 0;
+      }
+    }
+
+    function preventTouchMove(event: TouchEvent) {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        event.preventDefault();
+        return;
+      }
+      // Allow caret movement / selection inside focused fields.
+      if (target.closest("input, textarea, [contenteditable='true']")) {
+        return;
+      }
+      event.preventDefault();
+    }
+
+    resetDocumentScroll();
+    window.visualViewport?.addEventListener("resize", resetDocumentScroll);
+    window.visualViewport?.addEventListener("scroll", resetDocumentScroll);
+    window.addEventListener("scroll", resetDocumentScroll, { passive: true });
+    document.addEventListener("touchmove", preventTouchMove, {
+      passive: false,
+    });
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", resetDocumentScroll);
+      window.visualViewport?.removeEventListener("scroll", resetDocumentScroll);
+      window.removeEventListener("scroll", resetDocumentScroll);
+      document.removeEventListener("touchmove", preventTouchMove);
+    };
+  }, [active]);
+}
+
 export function AuthLayout({ children }: { children: ReactNode }) {
   const frame = useAuthViewportFrame();
+  useAuthKeyboardScrollLock(frame.keyboardVisible);
 
   const frameStyle: CSSProperties = {
     height: frame.height > 0 ? frame.height : "100dvh",
@@ -80,7 +128,12 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-background">
+    <div
+      className={cn(
+        "fixed inset-0 overflow-hidden bg-background",
+        frame.keyboardVisible && "overscroll-none",
+      )}
+    >
       <div
         className={cn(
           "mx-auto flex w-full max-w-lg flex-col px-4",

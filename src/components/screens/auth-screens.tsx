@@ -437,7 +437,10 @@ export function ForgotPasswordScreen() {
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -453,13 +456,29 @@ export function ForgotPasswordScreen() {
 
     setSubmitting(true);
     setError(null);
+    setMessage(null);
     const { error: resetError } = await resetPassword(trimmedEmail);
     setSubmitting(false);
     if (resetError) {
       setError(authErrorMessage(resetError));
       return;
     }
+    setSentEmail(trimmedEmail);
     setSent(true);
+  }
+
+  async function handleResend() {
+    if (!sentEmail) return;
+    setResending(true);
+    setError(null);
+    setMessage(null);
+    const { error: resetError } = await resetPassword(sentEmail);
+    setResending(false);
+    if (resetError) {
+      setError(authErrorMessage(resetError));
+      return;
+    }
+    setMessage(t("auth.forgot.resendSuccess"));
   }
 
   return (
@@ -469,16 +488,56 @@ export function ForgotPasswordScreen() {
         errorMessage={error}
       >
         {sent ? (
-          <div className="flex flex-1 flex-col">
-            <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
-            <div className="mt-auto">
-              <AuthFooterLink
-                prompt={t("auth.forgot.remembered")}
-                href="/login"
-                label={t("auth.forgot.backToLogin")}
-              />
+          <form
+            noValidate
+            className="flex flex-1 flex-col"
+            onSubmit={(event) => event.preventDefault()}
+          >
+            <div>
+              <p className="text-sm text-muted-foreground">
+                {sentEmail ? (
+                  <>
+                    {t("auth.forgot.openPrefix")}{" "}
+                    <span className="font-medium text-foreground">
+                      {sentEmail}
+                    </span>{" "}
+                    {t("auth.forgot.openSuffix")}
+                  </>
+                ) : (
+                  t("auth.forgot.sent")
+                )}
+              </p>
+
+              {message ? (
+                <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+              ) : null}
             </div>
-          </div>
+
+            <div className="mt-auto">
+              <Button
+                type="button"
+                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+                asChild
+              >
+                <Link href="/login">{t("auth.forgot.backToLogin")}</Link>
+              </Button>
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                {t("auth.forgot.resendPrompt")}{" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm font-medium"
+                  onClick={handleResend}
+                  disabled={resending || !sentEmail}
+                >
+                  {resending
+                    ? t("auth.forgot.resending")
+                    : t("auth.forgot.resend")}
+                </Button>
+              </p>
+            </div>
+          </form>
         ) : (
           <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
             <div className="space-y-4">
@@ -609,6 +668,22 @@ export function ResetPasswordScreen() {
             >
               {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}
             </Button>
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              {t("auth.reset.remembered")}{" "}
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto p-0 text-sm font-medium"
+                disabled={submitting}
+                onClick={async () => {
+                  await signOut();
+                  router.replace("/login");
+                  router.refresh();
+                }}
+              >
+                {t("auth.reset.backToLogin")}
+              </Button>
+            </p>
           </div>
         </form>
       </AuthCard>

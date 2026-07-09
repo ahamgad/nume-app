@@ -56,10 +56,16 @@ export const en = {
       title: "Forgot password?",
       lead: "Enter your email and we'll send you a reset link.",
       sent: "Check your email for a reset link.",
+      openPrefix: "Open",
+      openSuffix: "and tap the reset link to continue",
       submit: "Send reset link",
       submitting: "Sending reset link…",
       remembered: "Remember your password?",
       backToLogin: "Sign in",
+      resendPrompt: "Didn't receive the email?",
+      resend: "Resend",
+      resending: "Resending…",
+      resendSuccess: "Reset email sent.",
     },
     reset: {
       title: "Set a new password",
@@ -67,12 +73,16 @@ export const en = {
       submit: "Update password",
       submitting: "Updating password…",
       success: "Password updated",
+      remembered: "Remember your password?",
+      backToLogin: "Sign in",
     },
     errors: {
       invalidCredentials: "Invalid email or password",
       emailInUse: "An account already exists for this email.",
       emailNotConfirmed: "Verify your email to continue",
       weakPassword: "Password must be at least 8 characters",
+      samePassword:
+        "The new password must be different from your current password.",
       generic: "Something went wrong. Try again.",
       callbackFailed:
         "This link is invalid or has expired. Request a new one.",

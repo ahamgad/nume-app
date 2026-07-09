@@ -5,15 +5,22 @@ import { useSyncExternalStore } from "react";
 export interface AuthViewportFrame {
   height: number;
   offsetTop: number;
+  keyboardVisible: boolean;
 }
 
-const SERVER_SNAPSHOT: AuthViewportFrame = { height: 0, offsetTop: 0 };
+const SERVER_SNAPSHOT: AuthViewportFrame = {
+  height: 0,
+  offsetTop: 0,
+  keyboardVisible: false,
+};
 
 /** Stable client snapshot — referential equality is required by useSyncExternalStore. */
 let clientSnapshot: AuthViewportFrame = SERVER_SNAPSHOT;
 let keyboardVisibleSnapshot = false;
 
-function getKeyboardVisible(next: AuthViewportFrame): boolean {
+function getKeyboardVisible(
+  next: Pick<AuthViewportFrame, "height" | "offsetTop">,
+): boolean {
   // iOS Safari / Android Chrome: keyboard presence manifests as visual viewport overlap.
   // overlap = layout viewport height - visual viewport height - visual viewport offset.
   const overlap = Math.max(
@@ -23,7 +30,10 @@ function getKeyboardVisible(next: AuthViewportFrame): boolean {
   return overlap > 0;
 }
 
-function readAuthViewportFrame(): AuthViewportFrame {
+function readAuthViewportFrame(): Pick<
+  AuthViewportFrame,
+  "height" | "offsetTop"
+> {
   const viewport = window.visualViewport;
   if (!viewport) {
     return { height: window.innerHeight, offsetTop: 0 };
@@ -61,7 +71,10 @@ function syncClientSnapshot(): boolean {
   }
 
   keyboardVisibleSnapshot = nextKeyboardVisible;
-  clientSnapshot = next;
+  clientSnapshot = {
+    ...next,
+    keyboardVisible: nextKeyboardVisible,
+  };
   return true;
 }
 

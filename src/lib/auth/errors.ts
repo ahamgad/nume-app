@@ -3,6 +3,7 @@ export type AuthErrorCode =
   | "emailInUse"
   | "emailNotConfirmed"
   | "weakPassword"
+  | "samePassword"
   | "noEmail"
   | "notConfigured"
   | "callbackFailed"
@@ -24,6 +25,10 @@ export function mapSupabaseAuthError(
     return "emailNotConfirmed";
   }
 
+  if (code === "same_password") {
+    return "samePassword";
+  }
+
   if (!message) {
     return "generic";
   }
@@ -32,6 +37,15 @@ export function mapSupabaseAuthError(
 
   if (normalized.includes("email not confirmed")) {
     return "emailNotConfirmed";
+  }
+
+  if (
+    normalized.includes("same_password") ||
+    (normalized.includes("new password") &&
+      normalized.includes("different") &&
+      normalized.includes("old password"))
+  ) {
+    return "samePassword";
   }
 
   if (normalized.includes("invalid login credentials")) {

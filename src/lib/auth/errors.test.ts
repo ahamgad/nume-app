@@ -26,6 +26,15 @@ describe("mapSupabaseAuthError", () => {
     expect(mapSupabaseAuthError("Email not confirmed")).toBe("emailNotConfirmed");
   });
 
+  it("maps same-password update errors", () => {
+    expect(mapSupabaseAuthError({ code: "same_password" })).toBe("samePassword");
+    expect(
+      mapSupabaseAuthError(
+        "New password should be different from the old password.",
+      ),
+    ).toBe("samePassword");
+  });
+
   it("falls back to generic", () => {
     expect(mapSupabaseAuthError("Network error")).toBe("generic");
     expect(mapSupabaseAuthError(undefined)).toBe("generic");
