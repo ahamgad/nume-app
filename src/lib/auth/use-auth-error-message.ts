@@ -7,6 +7,7 @@ import { useT } from "@/providers/i18n-provider";
 const AUTH_ERROR_KEYS = {
   invalidCredentials: "auth.errors.invalidCredentials",
   emailInUse: "auth.errors.emailInUse",
+  emailNotConfirmed: "auth.errors.emailNotConfirmed",
   weakPassword: "auth.errors.weakPassword",
   generic: "auth.errors.generic",
   callbackFailed: "auth.errors.callbackFailed",

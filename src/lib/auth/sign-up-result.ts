@@ -7,7 +7,7 @@ export function resolveSignUpResult(
   response: AuthResponse,
 ): { error: AuthErrorCode | null } {
   if (response.error) {
-    return { error: mapSupabaseAuthError(response.error.message) };
+    return { error: mapSupabaseAuthError(response.error) };
   }
 
   // Supabase returns an empty identities array when the email is already registered.

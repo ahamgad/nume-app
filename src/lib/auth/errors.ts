@@ -1,18 +1,38 @@
 export type AuthErrorCode =
   | "invalidCredentials"
   | "emailInUse"
+  | "emailNotConfirmed"
   | "weakPassword"
   | "noEmail"
   | "notConfigured"
   | "callbackFailed"
   | "generic";
 
-export function mapSupabaseAuthError(message: string | undefined): AuthErrorCode {
+export function mapSupabaseAuthError(
+  error:
+    | {
+        message?: string;
+        code?: string;
+      }
+    | string
+    | undefined,
+): AuthErrorCode {
+  const message = typeof error === "string" ? error : error?.message;
+  const code = typeof error === "string" ? undefined : error?.code;
+
+  if (code === "email_not_confirmed") {
+    return "emailNotConfirmed";
+  }
+
   if (!message) {
     return "generic";
   }
 
   const normalized = message.toLowerCase();
+
+  if (normalized.includes("email not confirmed")) {
+    return "emailNotConfirmed";
+  }
 
   if (normalized.includes("invalid login credentials")) {
     return "invalidCredentials";

@@ -96,6 +96,7 @@ export function LoginScreen() {
       return;
     }
     router.replace("/");
+    router.refresh();
   }
 
   return (
@@ -374,13 +375,6 @@ export function VerifyEmailScreen() {
       <AuthCard
         title={t("auth.checkEmail.title")}
         errorMessage={error}
-        footer={
-          <AuthFooterLink
-            prompt={t("auth.checkEmail.footerPrompt")}
-            href="/register"
-            label={t("auth.checkEmail.footerAction")}
-          />
-        }
       >
         <p className="text-sm text-muted-foreground">
           {hasEmail ? (

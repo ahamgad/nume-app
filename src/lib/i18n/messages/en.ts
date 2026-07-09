@@ -78,6 +78,7 @@ export const en = {
     errors: {
       invalidCredentials: "Invalid email or password",
       emailInUse: "An account already exists for this email.",
+      emailNotConfirmed: "Verify your email to continue.",
       weakPassword: "Password must be at least 8 characters",
       generic: "Something went wrong. Try again.",
       callbackFailed:

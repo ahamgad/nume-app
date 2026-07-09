@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       if (error) {
-        return { error: mapSupabaseAuthError(error.message) };
+        return { error: mapSupabaseAuthError(error) };
       }
       if (data.user && !data.user.email_confirmed_at) {
         return { error: null, requiresVerification: true };
@@ -171,7 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: getAuthCallbackUrl("/reset-password"),
       });
-      return { error: error ? mapSupabaseAuthError(error.message) : null };
+      return { error: error ? mapSupabaseAuthError(error) : null };
     },
     [supabase],
   );
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (password: string) => {
       if (!supabase) return { error: "notConfigured" as const };
       const { error } = await supabase.auth.updateUser({ password });
-      return { error: error ? mapSupabaseAuthError(error.message) : null };
+      return { error: error ? mapSupabaseAuthError(error) : null };
     },
     [supabase],
   );
@@ -197,7 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: getAuthCallbackUrl("/email-verified"),
         },
       });
-      return { error: error ? mapSupabaseAuthError(error.message) : null };
+      return { error: error ? mapSupabaseAuthError(error) : null };
     },
     [supabase, user],
   );

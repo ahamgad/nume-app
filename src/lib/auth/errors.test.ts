@@ -19,6 +19,13 @@ describe("mapSupabaseAuthError", () => {
     ).toBe("weakPassword");
   });
 
+  it("maps unconfirmed email errors", () => {
+    expect(mapSupabaseAuthError({ code: "email_not_confirmed" })).toBe(
+      "emailNotConfirmed",
+    );
+    expect(mapSupabaseAuthError("Email not confirmed")).toBe("emailNotConfirmed");
+  });
+
   it("falls back to generic", () => {
     expect(mapSupabaseAuthError("Network error")).toBe("generic");
     expect(mapSupabaseAuthError(undefined)).toBe("generic");
