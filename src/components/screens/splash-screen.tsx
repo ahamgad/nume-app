@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 import {
   getSplashExitDelayMs,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/app/splash-session";
 import { readStoredLocale } from "@/lib/i18n/locale-restart";
 import { getLocaleAttributes } from "@/lib/fonts";
+import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
 import { useFinance } from "@/lib/finance/store";
 import { useSplashOverlay } from "@/providers/splash-overlay-provider";
@@ -39,6 +41,36 @@ export function SplashScreen() {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
     document.documentElement.dataset.locale = locale;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const tokenHash = params.get("token_hash");
+    const type = params.get("type");
+    if (!code && !(tokenHash && type)) return;
+
+    const supabase = createClient();
+
+    void (async () => {
+      const { error } = code
+        ? await supabase.auth.exchangeCodeForSession(code)
+        : await supabase.auth.verifyOtp({
+            token_hash: tokenHash ?? "",
+            // Supabase EmailOtpType is a string union; keep runtime permissive.
+            type: type as EmailOtpType,
+          });
+
+      if (error) {
+        // Keep existing UX: show callback error on login.
+        window.location.assign("/login?error=auth_callback");
+        return;
+      }
+
+      // Remove one-time tokens from the URL after success.
+      window.history.replaceState(null, "", "/splash");
+    })();
   }, []);
 
   useEffect(() => {

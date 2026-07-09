@@ -13,7 +13,6 @@ import {
   AuthFooterLink,
   AuthLayout,
 } from "@/components/layout/auth-layout";
-import { AUTH_CARD_CONTENT_CLASS } from "@/components/layout/auth-layout";
 import {
   getPendingVerificationEmail,
   setPendingVerificationEmail,
@@ -105,9 +104,8 @@ export function LoginScreen() {
         title={t("auth.login.title")}
         errorMessage={error}
       >
-        <div className={AUTH_CARD_CONTENT_CLASS}>
-          <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
-            <div className="space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+          <div className="space-y-4">
               <AuthInputField
                 id="email"
                 label={t("auth.fields.email")}
@@ -175,24 +173,23 @@ export function LoginScreen() {
               {notice ? (
                 <p className="text-sm text-muted-foreground">{notice}</p>
               ) : null}
-            </div>
+          </div>
 
-            <div className="mt-auto">
-              <Button
-                type="submit"
-                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-                disabled={submitting}
-              >
-                {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
-              </Button>
-              <AuthFooterLink
-                prompt={t("auth.login.noAccount")}
-                href="/register"
-                label={t("auth.login.createAccount")}
-              />
-            </div>
-          </form>
-        </div>
+          <div className="mt-auto">
+            <Button
+              type="submit"
+              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+              disabled={submitting}
+            >
+              {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
+            </Button>
+            <AuthFooterLink
+              prompt={t("auth.login.noAccount")}
+              href="/register"
+              label={t("auth.login.createAccount")}
+            />
+          </div>
+        </form>
       </AuthCard>
     </AuthLayout>
   );
@@ -249,9 +246,8 @@ export function RegisterScreen() {
         title={t("auth.register.title")}
         errorMessage={error}
       >
-        <div className={AUTH_CARD_CONTENT_CLASS}>
-          <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
-            <div className="space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+          <div className="space-y-4">
               <AuthInputField
                 id="email"
                 label={t("auth.fields.email")}
@@ -308,26 +304,25 @@ export function RegisterScreen() {
                   required
                 />
               </AuthInputField>
-            </div>
+          </div>
 
-            <div className="mt-auto">
-              <Button
-                type="submit"
-                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-                disabled={submitting}
-              >
-                {submitting
-                  ? t("auth.register.submitting")
-                  : t("auth.register.submit")}
-              </Button>
-              <AuthFooterLink
-                prompt={t("auth.register.hasAccount")}
-                href="/login"
-                label={t("auth.register.signIn")}
-              />
-            </div>
-          </form>
-        </div>
+          <div className="mt-auto">
+            <Button
+              type="submit"
+              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+              disabled={submitting}
+            >
+              {submitting
+                ? t("auth.register.submitting")
+                : t("auth.register.submit")}
+            </Button>
+            <AuthFooterLink
+              prompt={t("auth.register.hasAccount")}
+              href="/login"
+              label={t("auth.register.signIn")}
+            />
+          </div>
+        </form>
       </AuthCard>
     </AuthLayout>
   );
@@ -461,70 +456,66 @@ export function ForgotPasswordScreen() {
         title={t("auth.forgot.title")}
         errorMessage={error}
       >
-        <div className={AUTH_CARD_CONTENT_CLASS}>
-          {sent ? (
-            <div className="flex flex-1 flex-col">
-              <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
-              <div className="mt-auto">
-                <AuthFooterLink
-                  prompt={t("auth.forgot.remembered")}
-                  href="/login"
-                  label={t("auth.forgot.backToLogin")}
-                />
-              </div>
+        {sent ? (
+          <div className="flex flex-1 flex-col">
+            <p className="text-sm text-muted-foreground">{t("auth.forgot.sent")}</p>
+            <div className="mt-auto">
+              <AuthFooterLink
+                prompt={t("auth.forgot.remembered")}
+                href="/login"
+                label={t("auth.forgot.backToLogin")}
+              />
             </div>
-          ) : (
-            <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
-              <div className="space-y-4">
-                <AuthInputField
+          </div>
+        ) : (
+          <form noValidate onSubmit={handleSubmit} className="flex flex-1 flex-col">
+            <div className="space-y-4">
+              <AuthInputField
+                id="email"
+                label={t("auth.fields.email")}
+                required
+                error={emailError ?? undefined}
+              >
+                <Input
                   id="email"
-                  label={t("auth.fields.email")}
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setEmail(next);
+                    if (emailError) {
+                      const trimmed = next.trim();
+                      const nextError =
+                        trimmed.length === 0
+                          ? t("auth.validation.emailRequired")
+                          : isValidEmailAddress(trimmed)
+                            ? null
+                            : t("auth.validation.emailInvalid");
+                      setEmailError(nextError);
+                    }
+                  }}
                   required
-                  error={emailError ?? undefined}
-                >
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => {
-                      const next = e.target.value;
-                      setEmail(next);
-                      if (emailError) {
-                        const trimmed = next.trim();
-                        const nextError =
-                          trimmed.length === 0
-                            ? t("auth.validation.emailRequired")
-                            : isValidEmailAddress(trimmed)
-                              ? null
-                              : t("auth.validation.emailInvalid");
-                        setEmailError(nextError);
-                      }
-                    }}
-                    required
-                  />
-                </AuthInputField>
-              </div>
-
-              <div className="mt-auto">
-                <Button
-                  type="submit"
-                  className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? t("auth.forgot.submitting")
-                    : t("auth.forgot.submit")}
-                </Button>
-                <AuthFooterLink
-                  prompt={t("auth.forgot.remembered")}
-                  href="/login"
-                  label={t("auth.forgot.backToLogin")}
                 />
-              </div>
-            </form>
-          )}
-        </div>
+              </AuthInputField>
+            </div>
+
+            <div className="mt-auto">
+              <Button
+                type="submit"
+                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
+                disabled={submitting}
+              >
+                {submitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
+              </Button>
+              <AuthFooterLink
+                prompt={t("auth.forgot.remembered")}
+                href="/login"
+                label={t("auth.forgot.backToLogin")}
+              />
+            </div>
+          </form>
+        )}
       </AuthCard>
     </AuthLayout>
   );

@@ -1,8 +1,13 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 
 import { RootPageTitle } from "@/components/layout/stack-page-chrome";
 import { WidgetCard } from "@/components/patterns";
@@ -13,9 +18,7 @@ import { useT } from "@/providers/i18n-provider";
 
 /** 24px — same rhythm as {@link SCREEN_PAGE_TITLE_TO_CONTENT_GAP_CLASS}. */
 export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-6";
-
-/** Shared stable height for all auth card content. */
-export const AUTH_CARD_CONTENT_CLASS = "min-h-[28rem] flex flex-col";
+const AUTH_CARD_BASELINE_STORAGE_KEY = "nume:authCardBaselineHeight";
 
 /** Matches iOS keyboard presentation timing. */
 export const AUTH_KEYBOARD_FRAME_TRANSITION_CLASS =
@@ -117,6 +120,36 @@ export function AuthCard({
   className,
   contentClassName,
 }: AuthCardProps) {
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const [baselineHeightPx, setBaselineHeightPx] = useState<number | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = window.sessionStorage.getItem(AUTH_CARD_BASELINE_STORAGE_KEY);
+    if (!stored) return null;
+    const parsed = Number(stored);
+    if (!Number.isFinite(parsed) || parsed <= 0) return null;
+    return parsed;
+  });
+
+  useLayoutEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+
+    const measure = () => {
+      const height = Math.ceil(body.getBoundingClientRect().height);
+      if (!Number.isFinite(height) || height <= 0) return;
+      const next = Math.max(baselineHeightPx ?? 0, height);
+      window.sessionStorage.setItem(AUTH_CARD_BASELINE_STORAGE_KEY, String(next));
+      if (next !== baselineHeightPx) {
+        setBaselineHeightPx(next);
+      }
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(body);
+    return () => observer.disconnect();
+  }, [baselineHeightPx]);
+
   return (
     <WidgetCard paddingClass="p-4" className={cn("mx-auto w-full max-w-sm", className)}>
       {header ?? <AuthBrandLogo />}
@@ -128,10 +161,18 @@ export function AuthCard({
           </p>
         ) : null}
       </div>
-      <div className={cn(ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS, contentClassName)}>
+      <div
+        ref={bodyRef}
+        style={baselineHeightPx ? { minHeight: baselineHeightPx } : undefined}
+        className={cn(
+          ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
+          "flex flex-col",
+          contentClassName,
+        )}
+      >
         {children}
+        {footer}
       </div>
-      {footer}
     </WidgetCard>
   );
 }
