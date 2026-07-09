@@ -220,7 +220,11 @@ export function AuthCard({
             {errorMessage}
           </p>
         ) : statusMessage ? (
-          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+          <p
+            className="text-sm text-destructive"
+            role="status"
+            aria-live="polite"
+          >
             {statusMessage}
           </p>
         ) : null}
