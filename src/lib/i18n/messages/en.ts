@@ -51,13 +51,6 @@ export const en = {
       resending: "Resending…",
       resendSuccess: "Confirmation email sent.",
       noEmail: "No email on file",
-      footerPrompt: "Don't have an account?",
-      footerAction: "Create account",
-    },
-    emailVerified: {
-      title: "Email verified",
-      redirecting: "Redirecting you in {seconds} seconds",
-      continue: "Continue",
     },
     forgot: {
       title: "Forgot password?",
@@ -78,7 +71,7 @@ export const en = {
     errors: {
       invalidCredentials: "Invalid email or password",
       emailInUse: "An account already exists for this email.",
-      emailNotConfirmed: "Verify your email to continue.",
+      emailNotConfirmed: "Verify your email to continue",
       weakPassword: "Password must be at least 8 characters",
       generic: "Something went wrong. Try again.",
       callbackFailed:

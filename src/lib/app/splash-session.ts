@@ -16,6 +16,21 @@ export const SPLASH_COMPLETE_KEY = "nume-splash-complete";
  */
 export const BG_RESUME_ELIGIBLE_KEY = "nume-bg-resume-eligible";
 
+/** Auth routes must render without the cold-start splash redirect. */
+export const AUTH_ROUTE_PREFIXES = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+] as const;
+
+export function isAuthRoute(pathname: string): boolean {
+  return AUTH_ROUTE_PREFIXES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
 export function getSplashAnimationDurationMs(
   prefersReducedMotion = false,
 ): number {
@@ -47,6 +62,7 @@ export function shouldSkipSplashOnLoad(options: {
   wasDiscarded: boolean;
 }): boolean {
   if (options.pathname === "/splash") return true;
+  if (isAuthRoute(options.pathname)) return true;
   if (options.wasDiscarded) return false;
   return options.splashComplete && options.bgResumeEligible;
 }
@@ -97,6 +113,8 @@ window.addEventListener("pagehide",function(e){
 });
 var p=location.pathname;
 if(p==="/splash")return;
+var authRoutes=${JSON.stringify(AUTH_ROUTE_PREFIXES)};
+if(authRoutes.some(function(r){return p===r||p.indexOf(r+"/")===0;}))return;
 var complete=sessionStorage.getItem(SPLASH)==="1";
 var resume=sessionStorage.getItem(RESUME)==="1";
 var discarded=typeof document!=="undefined"&&document.wasDiscarded===true;

@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: getAuthCallbackUrl("/email-verified"),
+          emailRedirectTo: getAuthCallbackUrl("/splash"),
         },
       });
       return resolveSignUpResult(response);
@@ -194,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         type: "signup",
         email: targetEmail,
         options: {
-          emailRedirectTo: getAuthCallbackUrl("/email-verified"),
+          emailRedirectTo: getAuthCallbackUrl("/splash"),
         },
       });
       return { error: error ? mapSupabaseAuthError(error) : null };

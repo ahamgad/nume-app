@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { AuthInputField } from "@/components/forms/auth-input-field";
 import { AuthPasswordField } from "@/components/forms/auth-password-field";
@@ -337,13 +336,6 @@ export function VerifyEmailScreen() {
   const [pendingAction, setPendingAction] = useState<VerifyPendingAction>(null);
   const displayEmail = user?.email ?? getPendingVerificationEmail();
 
-  useEffect(() => {
-    if (user?.email_confirmed_at) {
-      router.replace("/");
-      router.refresh();
-    }
-  }, [router, user?.email_confirmed_at]);
-
   async function handleSignIn() {
     // If the user has an unverified session (e.g. after attempting login),
     // navigating to /login would bounce back to /verify-email via middleware.
@@ -416,76 +408,6 @@ export function VerifyEmailScreen() {
               : t("auth.checkEmail.resend")}
           </Button>
         </div>
-      </AuthCard>
-    </AuthLayout>
-  );
-}
-
-export function EmailVerifiedScreen() {
-  const t = useT();
-  const router = useRouter();
-  const timerRef = useRef<number | null>(null);
-  const [seconds, setSeconds] = useState(5);
-
-  const header = useMemo(
-    () => (
-      <CheckCircle
-        className="size-12 text-foreground"
-        aria-hidden="true"
-      />
-    ),
-    [],
-  );
-
-  useEffect(() => {
-    timerRef.current = window.setInterval(() => {
-      setSeconds((current) => {
-        if (current <= 1) {
-          return 0;
-        }
-        return current - 1;
-      });
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (seconds !== 0) return;
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    router.replace("/splash");
-    router.refresh();
-  }, [router, seconds]);
-
-  function handleSignIn() {
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    router.replace("/splash");
-    router.refresh();
-  }
-
-  return (
-    <AuthLayout>
-      <AuthCard title={t("auth.emailVerified.title")} header={header}>
-        <p className="text-sm text-muted-foreground">
-          {t("auth.emailVerified.redirecting", { seconds })}
-        </p>
-        <Button
-          className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-          onClick={handleSignIn}
-        >
-          {t("auth.emailVerified.continue")}
-        </Button>
       </AuthCard>
     </AuthLayout>
   );

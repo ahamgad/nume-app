@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getSplashExitDelayMs,
+  isAuthRoute,
   isSplashHandoffRoute,
   isSplashInitializationReady,
   shouldSkipSplashOnLoad,
@@ -59,11 +60,30 @@ describe("isSplashHandoffRoute", () => {
   });
 });
 
+describe("isAuthRoute", () => {
+  it("matches authentication screens", () => {
+    expect(isAuthRoute("/login")).toBe(true);
+    expect(isAuthRoute("/verify-email")).toBe(true);
+    expect(isAuthRoute("/")).toBe(false);
+  });
+});
+
 describe("shouldSkipSplashOnLoad", () => {
   it("always allows the splash route", () => {
     expect(
       shouldSkipSplashOnLoad({
         pathname: "/splash",
+        splashComplete: false,
+        bgResumeEligible: false,
+        wasDiscarded: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("skips splash on auth routes", () => {
+    expect(
+      shouldSkipSplashOnLoad({
+        pathname: "/verify-email",
         splashComplete: false,
         bgResumeEligible: false,
         wasDiscarded: false,

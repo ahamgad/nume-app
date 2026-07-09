@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/splash";
   const appUrl = getAppUrl();
 
   const supabase = await createClient();
@@ -31,16 +31,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${appUrl}/login?error=auth_callback`);
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let destination = next.startsWith("/") ? next : `/${next}`;
-  if (user?.email_confirmed_at && destination === "/") {
-    // After confirming email, we show a dedicated success screen which will
-    // redirect the user to sign in.
-    destination = "/email-verified";
-  }
+  const destination = next.startsWith("/") ? next : `/${next}`;
 
   return NextResponse.redirect(`${appUrl}${destination}`);
 }

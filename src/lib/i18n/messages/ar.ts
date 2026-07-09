@@ -53,13 +53,6 @@ export const ar = {
       resending: "جارٍ إعادة الإرسال…",
       resendSuccess: "تم إرسال رسالة التأكيد.",
       noEmail: "لا يوجد بريد إلكتروني مسجّل",
-      footerPrompt: "ليس لديك حساب؟",
-      footerAction: "إنشاء حساب",
-    },
-    emailVerified: {
-      title: "تم التحقق من البريد",
-      redirecting: "سيتم تحويلك خلال {seconds} ثوانٍ",
-      continue: "متابعة",
     },
     forgot: {
       title: "نسيت كلمة المرور؟",
@@ -80,7 +73,7 @@ export const ar = {
     errors: {
       invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صالحة",
       emailInUse: "يوجد حساب مسجّل بهذا البريد بالفعل.",
-      emailNotConfirmed: "تحقق من بريدك الإلكتروني للمتابعة.",
+      emailNotConfirmed: "تحقق من بريدك الإلكتروني للمتابعة",
       weakPassword: "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
       generic: "حدث خطأ. حاول مرة أخرى.",
       callbackFailed: "هذا الرابط غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا.",
