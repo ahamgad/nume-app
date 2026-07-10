@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -70,7 +69,7 @@ export function LandingScreen() {
           priority
         />
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">
-          {t("common.brandName")}
+          {t("landing.title")}
         </h1>
         <p className="mt-3 max-w-sm text-[0.9375rem] leading-relaxed text-muted-foreground">
           {t("landing.description")}
@@ -78,12 +77,6 @@ export function LandingScreen() {
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        <Button className="h-12 w-full" asChild>
-          <Link href="/login">{t("landing.login")}</Link>
-        </Button>
-        <Button className="h-12 w-full" variant="outline" asChild>
-          <Link href="/register">{t("landing.register")}</Link>
-        </Button>
         {installVisible ? (
           <Button
             className="h-12 w-full"

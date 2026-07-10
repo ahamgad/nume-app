@@ -62,6 +62,7 @@ describe("isSplashHandoffRoute", () => {
 
 describe("isAuthRoute", () => {
   it("matches authentication screens", () => {
+    expect(isAuthRoute("/continue")).toBe(true);
     expect(isAuthRoute("/login")).toBe(true);
     expect(isAuthRoute("/verify-email")).toBe(true);
     expect(isAuthRoute("/")).toBe(false);

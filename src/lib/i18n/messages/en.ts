@@ -7,10 +7,8 @@ export const en = {
     more: "More",
   },
   landing: {
-    description:
-      "Your personal wealth operating system — track accounts, plan ahead, and understand where you stand",
-    login: "Log in",
-    register: "Create account",
+    title: "Welcome to NUME",
+    description: "Your personal wealth operating system. Install the app to get started",
     installApp: "Install app",
   },
   a11y: {
@@ -106,6 +104,24 @@ export const en = {
       passwordMinLength: "Enter at least 8 characters",
     },
     sessionExpired: "Your session has expired, please sign in again",
+    continue: {
+      emailTitle: "Continue with email",
+      emailLead: "Enter your email to receive a sign-in code",
+      emailSubmit: "Continue",
+      emailSubmitting: "Sending code…",
+      otpTitle: "Enter your code",
+      otpLead: "We sent a code to {email}",
+      otpLabel: "Sign-in code",
+      otpSubmit: "Continue",
+      otpSubmitting: "Verifying…",
+      otpRequired: "Enter the 6-digit code",
+      otpInvalid: "Invalid or expired code",
+      resendPrompt: "Didn't receive the code?",
+      resend: "Resend code",
+      resending: "Resending…",
+      resendSuccess: "Code sent",
+      changeEmail: "Use a different email",
+    },
   },
   common: {
     back: "Back",

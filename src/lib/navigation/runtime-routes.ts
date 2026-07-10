@@ -10,10 +10,12 @@ const TRANSPORT_ROUTE_PREFIXES = [
 
 /** Application runtime only — install gate applies in browser. */
 const APPLICATION_ROUTE_PREFIXES = [
+  "/continue",
   "/login",
   "/register",
   "/forgot-password",
   "/splash",
+  "/splash-debug",
   "/dashboard",
   "/planning",
   "/accounts",

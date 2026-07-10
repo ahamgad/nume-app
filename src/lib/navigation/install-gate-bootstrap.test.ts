@@ -7,6 +7,7 @@ describe("getInstallGateBootstrapScript", () => {
     const script = getInstallGateBootstrapScript();
 
     expect(script).toContain('location.replace("/")');
+    expect(script).toContain("/continue");
     expect(script).toContain("/forgot-password");
     expect(script).toContain("/verify-email");
     expect(script).toContain('if(p==="/")return');

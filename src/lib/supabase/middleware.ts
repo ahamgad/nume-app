@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 const AUTH_ROUTES = [
+  "/continue",
   "/login",
   "/register",
   "/forgot-password",
@@ -62,12 +63,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   const onLandingRoute = pathname === "/";
-
-  if (user && onLandingRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = user.email_confirmed_at ? "/dashboard" : "/verify-email";
-    return NextResponse.redirect(url);
-  }
 
   if (!user && !onAuthRoute && !isPublicRoute(pathname) && !onLandingRoute) {
     const url = request.nextUrl.clone();

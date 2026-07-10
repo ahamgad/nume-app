@@ -9,10 +9,8 @@ export const ar = {
     more: "المزيد",
   },
   landing: {
-    description:
-      "نظامك الشخصي لإدارة الثروة — تتبّع حساباتك، خطّط للمستقبل، وافهم وضعك المالي",
-    login: "تسجيل الدخول",
-    register: "إنشاء حساب",
+    title: "مرحبًا بك في NUME",
+    description: "نظامك الشخصي لإدارة الثروة. ثبّت التطبيق للبدء",
     installApp: "تثبيت التطبيق",
   },
   a11y: {
@@ -108,6 +106,24 @@ export const ar = {
       passwordMinLength: "أدخل 8 أحرف على الأقل",
     },
     sessionExpired: "انتهت جلستك، يرجى تسجيل الدخول مرة أخرى",
+    continue: {
+      emailTitle: "المتابعة بالبريد الإلكتروني",
+      emailLead: "أدخل بريدك الإلكتروني لاستلام رمز تسجيل الدخول",
+      emailSubmit: "متابعة",
+      emailSubmitting: "جارٍ إرسال الرمز…",
+      otpTitle: "أدخل الرمز",
+      otpLead: "أرسلنا رمزًا إلى {email}",
+      otpLabel: "رمز تسجيل الدخول",
+      otpSubmit: "متابعة",
+      otpSubmitting: "جارٍ التحقق…",
+      otpRequired: "أدخل الرمز المكوّن من 6 أرقام",
+      otpInvalid: "الرمز غير صالح أو منتهي الصلاحية",
+      resendPrompt: "لم تستلم الرمز؟",
+      resend: "إعادة إرسال الرمز",
+      resending: "جارٍ إعادة الإرسال…",
+      resendSuccess: "تم إرسال الرمز",
+      changeEmail: "استخدام بريد إلكتروني آخر",
+    },
   },
   common: {
     back: "رجوع",

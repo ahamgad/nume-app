@@ -18,6 +18,7 @@ export const BG_RESUME_ELIGIBLE_KEY = "nume-bg-resume-eligible";
 
 /** Auth routes must render without the cold-start splash redirect. */
 export const AUTH_ROUTE_PREFIXES = [
+  "/continue",
   "/login",
   "/register",
   "/forgot-password",

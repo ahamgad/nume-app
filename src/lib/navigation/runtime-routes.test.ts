@@ -24,6 +24,7 @@ describe("isTransportRoute", () => {
 
 describe("isApplicationRoute", () => {
   it("matches auth entry and tab roots", () => {
+    expect(isApplicationRoute("/continue")).toBe(true);
     expect(isApplicationRoute("/login")).toBe(true);
     expect(isApplicationRoute("/register")).toBe(true);
     expect(isApplicationRoute("/forgot-password")).toBe(true);
@@ -39,6 +40,7 @@ describe("isApplicationRoute", () => {
     expect(isApplicationRoute("/accounts/abc-123/edit")).toBe(true);
     expect(isApplicationRoute("/more/profile")).toBe(true);
     expect(isApplicationRoute("/splash")).toBe(true);
+    expect(isApplicationRoute("/splash-debug")).toBe(true);
   });
 
   it("excludes distribution and transport routes", () => {
