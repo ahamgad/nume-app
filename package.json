@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "icons:generate": "node scripts/generate-pwa-icons.mjs",
+    "emails:generate": "tsx scripts/generate-auth-emails.mjs",
     "brand-assets:collect": "node scripts/collect-institution-brand-assets.mjs && node scripts/generate-brand-assets-registry.mjs",
     "logos:collect": "npm run brand-assets:collect",
     "content-matrix:generate": "tsx scripts/generate-content-matrix.ts"
