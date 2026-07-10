@@ -15,11 +15,11 @@ import {
 } from "@/lib/accounts/accounts-list-filter";
 import { useT } from "@/providers/i18n-provider";
 import { isStackScreen } from "@/lib/layout/tab-bar-visibility";
-import { isTabRootPath } from "@/lib/navigation/tab-roots";
+import { DASHBOARD_PATH, isTabRootPath } from "@/lib/navigation/tab-roots";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { href: "/", labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
+  { href: DASHBOARD_PATH, labelKey: "nav.dashboard" as const, icon: LayoutDashboard },
   { href: "/planning", labelKey: "nav.planning" as const, icon: CalendarRange },
   { href: "/accounts", labelKey: "nav.accounts" as const, icon: Landmark },
   { href: "/goals", labelKey: "nav.goals" as const, icon: Target },
@@ -27,7 +27,7 @@ const tabs = [
 ];
 
 function isTabActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
+  if (href === DASHBOARD_PATH) return pathname === DASHBOARD_PATH;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -57,7 +57,7 @@ export function TabBar() {
                     : href;
                 if (
                   pathname === targetHref ||
-                  (href !== "/" && pathname === href)
+                  (href !== DASHBOARD_PATH && pathname === href)
                 ) {
                   return;
                 }

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { AppProviders } from "@/providers/app-providers";
 import { fontVariables, geistSans } from "@/lib/fonts";
 import { getRootBodyHeightClass } from "@/lib/layout/keyboard-snap-investigation";
+import { getInstallGateBootstrapScript } from "@/lib/navigation/install-gate-bootstrap";
 import { getSplashBootstrapScript } from "@/lib/app/splash-session";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +59,11 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("nume-theme");var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;r.classList.toggle("dark",d);r.dataset.theme=t==="light"||t==="dark"||t==="system"?t:"system";r.style.colorScheme=d?"dark":"light";r.dataset.themeVersion=String(Date.now());var c=d?"#171717":"#ffffff";var m=document.querySelector('meta[name="theme-color"]:not([media])');if(!m){m=document.createElement("meta");m.setAttribute("name","theme-color");document.head.appendChild(m);}m.setAttribute("content",c);}catch(e){}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: getInstallGateBootstrapScript(),
           }}
         />
         <script

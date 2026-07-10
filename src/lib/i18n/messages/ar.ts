@@ -8,6 +8,13 @@ export const ar = {
     goals: "الأهداف",
     more: "المزيد",
   },
+  landing: {
+    description:
+      "نظامك الشخصي لإدارة الثروة — تتبّع حساباتك، خطّط للمستقبل، وافهم وضعك المالي",
+    login: "تسجيل الدخول",
+    register: "إنشاء حساب",
+    installApp: "تثبيت التطبيق",
+  },
   a11y: {
     mainNavigation: "التنقل الرئيسي",
     dismiss: "إغلاق",

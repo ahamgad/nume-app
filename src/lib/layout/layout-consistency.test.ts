@@ -15,7 +15,8 @@ import { supportsQuickBalanceEdit } from "@/lib/finance/account-form";
 describe("tab bar visibility", () => {
   it("shows on tab roots and hides on stack routes", () => {
     expect(isTabBarVisible("/accounts")).toBe(true);
-    expect(isTabBarVisible("/")).toBe(true);
+    expect(isTabBarVisible("/dashboard")).toBe(true);
+    expect(isTabBarVisible("/")).toBe(false);
     expect(isTabBarVisible("/accounts/abc")).toBe(false);
     expect(isTabBarVisible("/accounts/abc/records/new")).toBe(false);
   });

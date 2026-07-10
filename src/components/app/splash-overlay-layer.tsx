@@ -9,11 +9,14 @@ import {
   markSplashComplete,
   markSplashHandoff,
 } from "@/lib/app/splash-session";
+import { DASHBOARD_PATH } from "@/lib/navigation/tab-roots";
+import { useAuth } from "@/providers/auth-provider";
 import { useSplashOverlay } from "@/providers/splash-overlay-provider";
 
 export function SplashOverlayLayer() {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
   const { state, dismissSplash, setLogoFadeComplete } = useSplashOverlay();
   const handoffStartedRef = useRef(false);
   const curtainCompletePendingRef = useRef(false);
@@ -48,8 +51,8 @@ export function SplashOverlayLayer() {
 
   const handleCurtainComplete = useCallback(() => {
     curtainCompletePendingRef.current = true;
-    router.replace("/");
-  }, [router]);
+    router.replace(user ? DASHBOARD_PATH : "/");
+  }, [router, user]);
 
   useEffect(() => {
     tryDismiss();

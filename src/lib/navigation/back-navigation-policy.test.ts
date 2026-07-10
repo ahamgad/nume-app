@@ -13,7 +13,9 @@ describe("shouldRestoreTabRootAfterPopState", () => {
     expect(shouldRestoreTabRootAfterPopState("/accounts", "/planning")).toBe(
       true,
     );
-    expect(shouldRestoreTabRootAfterPopState("/accounts", "/")).toBe(true);
+    expect(shouldRestoreTabRootAfterPopState("/accounts", "/dashboard")).toBe(
+      true,
+    );
   });
 
   it("does not restore when staying on the same tab root", () => {

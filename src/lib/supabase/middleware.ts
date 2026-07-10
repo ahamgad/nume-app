@@ -61,7 +61,15 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if (!user && !onAuthRoute && !isPublicRoute(pathname)) {
+  const onLandingRoute = pathname === "/";
+
+  if (user && onLandingRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = user.email_confirmed_at ? "/dashboard" : "/verify-email";
+    return NextResponse.redirect(url);
+  }
+
+  if (!user && !onAuthRoute && !isPublicRoute(pathname) && !onLandingRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

@@ -2,7 +2,7 @@
   "name": "NUME",
   "short_name": "NUME",
   "description": "Personal wealth operating system",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#171717",
   "theme_color": "#171717",

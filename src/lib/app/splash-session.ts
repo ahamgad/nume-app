@@ -113,6 +113,7 @@ window.addEventListener("pagehide",function(e){
 });
 var p=location.pathname;
 if(p==="/splash")return;
+if(p==="/")return;
 var authRoutes=${JSON.stringify(AUTH_ROUTE_PREFIXES)};
 if(authRoutes.some(function(r){return p===r||p.indexOf(r+"/")===0;}))return;
 var complete=sessionStorage.getItem(SPLASH)==="1";

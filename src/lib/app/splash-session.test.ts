@@ -55,7 +55,7 @@ describe("isSplashInitializationReady", () => {
 describe("isSplashHandoffRoute", () => {
   it("keeps the overlay until routing leaves /splash", () => {
     expect(isSplashHandoffRoute("/splash")).toBe(false);
-    expect(isSplashHandoffRoute("/")).toBe(true);
+    expect(isSplashHandoffRoute("/dashboard")).toBe(true);
     expect(isSplashHandoffRoute("/login")).toBe(true);
   });
 });

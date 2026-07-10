@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { FinanceProvider } from "@/lib/finance/store";
 import { AppBootstrap } from "@/components/app/app-bootstrap";
+import { InstallGate } from "@/components/app/install-gate";
 import { SplashOverlayLayer } from "@/components/app/splash-overlay-layer";
 import { ConnectivityToasts } from "@/components/connectivity/connectivity-toasts";
 import { NavigationEdgeGuard } from "@/components/platform/navigation-edge-guard";
@@ -35,8 +36,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
                         <SplashOverlayProvider>
                           <NavigationGuardProvider>
                             <NavigationEdgeGuard />
-                            <AppBootstrap>{children}</AppBootstrap>
-                            <SplashOverlayLayer />
+                            <InstallGate>
+                              <AppBootstrap>{children}</AppBootstrap>
+                              <SplashOverlayLayer />
+                            </InstallGate>
                           </NavigationGuardProvider>
                         </SplashOverlayProvider>
                       </FinanceProvider>

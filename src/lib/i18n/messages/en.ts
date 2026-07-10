@@ -6,6 +6,13 @@ export const en = {
     goals: "Goals",
     more: "More",
   },
+  landing: {
+    description:
+      "Your personal wealth operating system — track accounts, plan ahead, and understand where you stand",
+    login: "Log in",
+    register: "Create account",
+    installApp: "Install app",
+  },
   a11y: {
     mainNavigation: "Main navigation",
     dismiss: "Dismiss",

@@ -5,6 +5,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ScreenTitleCollapseProvider } from "@/components/layout/screen-title-collapse";
 import { consumeSplashHandoff } from "@/lib/app/splash-session";
+import { DASHBOARD_PATH } from "@/lib/navigation/tab-roots";
 import { numeMotionSafeScreenEnterClass } from "@/lib/layout/motion";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,9 @@ export function ScreenTransition({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fromPathname = previousPathnameRef.current;
     const skipForSplashHandoff =
-      pathname === "/" && fromPathname === "/splash" && consumeSplashHandoff();
+      pathname === DASHBOARD_PATH &&
+        fromPathname === "/splash" &&
+        consumeSplashHandoff();
     setShouldAnimate(
       !skipForSplashHandoff &&
         fromPathname !== null &&
