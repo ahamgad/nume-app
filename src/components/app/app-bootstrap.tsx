@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useSyncExternalStore, type ReactNode } from "react";
 
 import { isAuthRoute, isSplashComplete } from "@/lib/app/splash-session";
+import { isDistributionRoute } from "@/lib/navigation/runtime-routes";
 
 function subscribeSplashGate(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
@@ -18,6 +19,7 @@ function subscribeSplashGate(onStoreChange: () => void) {
 
 function getSplashGateSnapshot(pathname: string) {
   if (pathname === "/splash") return true;
+  if (isDistributionRoute(pathname)) return true;
   if (isAuthRoute(pathname)) return true;
   return isSplashComplete();
 }
