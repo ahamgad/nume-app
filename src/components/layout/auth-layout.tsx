@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 
 import { InputFieldLabel } from "@/components/forms/input-field";
 import { WidgetCard } from "@/components/patterns";
+import { useAuthViewportLock } from "@/hooks/use-auth-viewport-lock";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -31,6 +34,23 @@ export const AUTH_CTA_TO_FOOTER_CLASS = "mt-4";
 
 /** OTP footer alignment slot — two link rows at text-sm. */
 export const AUTH_FOOTER_AREA_CLASS = "min-h-[52px]";
+
+function handleAuthTouchInputFocus(event: ReactPointerEvent<HTMLDivElement>) {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const input = target.closest("input, textarea") as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | null;
+  if (!input) return;
+  if (input.disabled || input.readOnly) return;
+  if (document.activeElement === input) return;
+  if (event.pointerType && event.pointerType !== "touch") return;
+
+  event.preventDefault();
+  input.focus({ preventScroll: true });
+}
 
 export function AuthBrandLogo() {
   const t = useT();
@@ -78,9 +98,12 @@ function AuthTitle({
 
 /** Content-driven auth gate page — natural height, top-aligned. */
 export function AuthLayout({ children }: { children: ReactNode }) {
+  useAuthViewportLock();
+
   return (
     <div
-      className="mx-auto min-h-dvh w-full max-w-lg bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]"
+      onPointerDownCapture={handleAuthTouchInputFocus}
+      className="mx-auto w-full max-w-lg bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]"
     >
       <div className="w-full max-w-sm">{children}</div>
     </div>
