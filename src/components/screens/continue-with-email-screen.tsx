@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AuthInputField } from "@/components/forms/auth-input-field";
 import {
@@ -34,6 +34,8 @@ export function ContinueWithEmailScreen() {
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
   const emailSendCooldown = useEmailSendCooldown();
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const verifyingOtpRef = useRef(false);
 
   const [step, setStep] = useState<ContinueStep>("email");
   const [email, setEmail] = useState("");
@@ -51,6 +53,44 @@ export function ContinueWithEmailScreen() {
       queueMicrotask(() => setNotice(t("auth.sessionExpired")));
     }
   }, [t]);
+
+  useEffect(() => {
+    if (step !== "email") return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      emailInputRef.current?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [step]);
+
+  const verifyOtpCode = useCallback(
+    async (normalizedOtp: string) => {
+      const nextOtpError =
+        normalizedOtp.length === 0 ? t("auth.continue.otpRequired") : null;
+
+      setOtpError(nextOtpError);
+      if (nextOtpError || verifyingOtpRef.current) return;
+
+      verifyingOtpRef.current = true;
+      setSubmitting(true);
+      setError(null);
+      setMessage(null);
+
+      const { error: verifyError } = await verifyEmailOtp(email, normalizedOtp);
+      verifyingOtpRef.current = false;
+      setSubmitting(false);
+
+      if (verifyError) {
+        setError(t("auth.continue.otpInvalid"));
+        return;
+      }
+
+      router.replace("/splash");
+      router.refresh();
+    },
+    [email, router, t],
+  );
 
   async function handleEmailSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -90,27 +130,7 @@ export function ContinueWithEmailScreen() {
 
   async function handleOtpSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const normalizedOtp = normalizeOtp(otp);
-    const nextOtpError =
-      normalizedOtp.length === 0 ? t("auth.continue.otpRequired") : null;
-
-    setOtpError(nextOtpError);
-    if (nextOtpError) return;
-
-    setSubmitting(true);
-    setError(null);
-    setMessage(null);
-
-    const { error: verifyError } = await verifyEmailOtp(email, normalizedOtp);
-    setSubmitting(false);
-
-    if (verifyError) {
-      setError(t("auth.continue.otpInvalid"));
-      return;
-    }
-
-    router.replace("/splash");
-    router.refresh();
+    await verifyOtpCode(normalizeOtp(otp));
   }
 
   async function handleResend() {
@@ -144,6 +164,16 @@ export function ContinueWithEmailScreen() {
     emailSendCooldown.clear();
   }
 
+  function handleOtpChange(next: string) {
+    setOtp(next);
+    if (otpError && next.length > 0) {
+      setOtpError(null);
+    }
+    if (next.length === 6) {
+      void verifyOtpCode(next);
+    }
+  }
+
   if (step === "email") {
     return (
       <AuthLayout>
@@ -164,9 +194,11 @@ export function ContinueWithEmailScreen() {
                 error={emailError ?? undefined}
               >
                 <Input
+                  ref={emailInputRef}
                   id="continue-email"
                   type="email"
                   autoComplete="email"
+                  enterKeyHint="next"
                   value={email}
                   onChange={(event) => {
                     const next = event.target.value;
@@ -226,12 +258,8 @@ export function ContinueWithEmailScreen() {
                 aria-label={t("auth.continue.otpLabel")}
                 value={otp}
                 autoFocus
-                onChange={(next) => {
-                  setOtp(next);
-                  if (otpError && next.length > 0) {
-                    setOtpError(null);
-                  }
-                }}
+                disabled={submitting}
+                onChange={handleOtpChange}
               />
             </AuthInputField>
           </div>

@@ -72,6 +72,28 @@ function handleAuthInputPointerDownCapture(
   input.focus({ preventScroll: true });
 }
 
+function handleAuthRetainFocusPointerDown(
+  event: ReactPointerEvent<HTMLDivElement>,
+) {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+
+  const active = document.activeElement;
+  const focusedField =
+    active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement;
+  if (!focusedField) return;
+
+  if (
+    target.closest(
+      "input, textarea, button, a, [role='button'], [role='link']",
+    )
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+}
+
 function useAuthKeyboardScrollLock(active: boolean) {
   useEffect(() => {
     if (!active) return;
@@ -143,8 +165,14 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         style={frameStyle}
       >
         <div
-          className="flex min-h-0 flex-1 flex-col justify-center py-8"
-          onPointerDownCapture={handleAuthInputPointerDownCapture}
+          className={cn(
+            "flex min-h-0 flex-1 flex-col justify-start",
+            frame.keyboardVisible ? "pt-2" : "pt-8",
+          )}
+          onPointerDownCapture={(event) => {
+            handleAuthInputPointerDownCapture(event);
+            handleAuthRetainFocusPointerDown(event);
+          }}
         >
           {children}
         </div>

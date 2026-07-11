@@ -65,8 +65,13 @@ export function OtpInput({
     if (!autoFocus || disabled) {
       return;
     }
-    focusIndex(0);
-  }, [autoFocus, disabled, focusIndex]);
+
+    const frameId = window.requestAnimationFrame(() => {
+      inputRefs.current[0]?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [autoFocus, disabled]);
 
   function handleChange(index: number, nextRaw: string) {
     const nextDigit = normalizeOtpDigits(nextRaw, 1);
