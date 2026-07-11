@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import { useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 
 import { InputFieldLabel } from "@/components/forms/input-field";
 import { WidgetCard } from "@/components/patterns";
-import { useAuthViewportLock } from "@/hooks/use-auth-viewport-lock";
+import {
+  AUTH_KEYBOARD_SURFACE_CLASS,
+  useAuthViewportLock,
+} from "@/hooks/use-auth-viewport-lock";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -98,12 +101,18 @@ function AuthTitle({
 
 /** Content-driven auth gate page — natural height, top-aligned. */
 export function AuthLayout({ children }: { children: ReactNode }) {
-  useAuthViewportLock();
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const { keyboardVisible } = useAuthViewportLock(surfaceRef);
 
   return (
     <div
+      ref={surfaceRef}
+      data-auth-layout
       onPointerDownCapture={handleAuthTouchInputFocus}
-      className="mx-auto w-full max-w-lg bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]"
+      className={cn(
+        "mx-auto w-full max-w-lg bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]",
+        keyboardVisible && AUTH_KEYBOARD_SURFACE_CLASS,
+      )}
     >
       <div className="w-full max-w-sm">{children}</div>
     </div>
