@@ -28,7 +28,6 @@ type OtpInputProps = {
   length?: number;
   disabled?: boolean;
   readOnly?: boolean;
-  autoFocus?: boolean;
   "aria-label"?: string;
   className?: string;
 };
@@ -41,7 +40,6 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     length = OTP_LENGTH,
     disabled = false,
     readOnly = false,
-    autoFocus = false,
     "aria-label": ariaLabel,
     className,
   },

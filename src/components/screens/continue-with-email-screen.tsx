@@ -39,6 +39,7 @@ export function ContinueWithEmailScreen() {
   const authErrorMessage = useAuthErrorMessage();
   const emailSendCooldown = useEmailSendCooldown();
   const verifyingOtpRef = useRef(false);
+  const didMountRef = useRef(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const otpInputRef = useRef<OtpInputHandle>(null);
 
@@ -48,19 +49,19 @@ export function ContinueWithEmailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [otpError, setOtpError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice] = useState<string | null>(() =>
+    consumeSessionExpiredNotice() ? t("auth.sessionExpired") : null,
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
 
   useLayoutEffect(() => {
-    if (consumeSessionExpiredNotice()) {
-      setNotice(t("auth.sessionExpired"));
-    }
-  }, [t]);
-
-  useLayoutEffect(() => {
     if (step !== "email") return;
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     refocusEmailField(emailInputRef.current);
   }, [step]);
 
@@ -261,6 +262,7 @@ export function ContinueWithEmailScreen() {
               id="continue-email"
               type="email"
               autoComplete="email"
+              autoFocus
               enterKeyHint="go"
               aria-label={t("auth.fields.email")}
               value={email}
