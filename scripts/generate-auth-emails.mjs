@@ -15,11 +15,12 @@ import {
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EMAIL_ASSET_DIR = path.join(ROOT, "public", "email");
 const OTP_EMAIL_DIR = path.join(ROOT, "emails", "otp");
-const ICON_ASSET_PX = 60;
+const LOGO_DISPLAY_PX = 40;
+const LOGO_ASSET_PX = LOGO_DISPLAY_PX * 3;
 
-async function writeIconAsset(sourceSvg, filename) {
+async function writeLogoAsset(sourceSvg, filename) {
   await sharp(path.join(ROOT, sourceSvg), { density: 288 })
-    .resize(ICON_ASSET_PX, ICON_ASSET_PX)
+    .resize(LOGO_ASSET_PX, LOGO_ASSET_PX, { fit: "inside" })
     .png()
     .toFile(path.join(EMAIL_ASSET_DIR, filename));
 }
@@ -28,10 +29,8 @@ async function main() {
   await mkdir(EMAIL_ASSET_DIR, { recursive: true });
   await mkdir(OTP_EMAIL_DIR, { recursive: true });
 
-  await writeIconAsset("public/brand-flatten-black.svg", "nume-icon-light.png");
-  await writeIconAsset("public/brand-flatten-white.svg", "nume-icon-dark.png");
-  console.log("✓ public/email/nume-icon-light.png");
-  console.log("✓ public/email/nume-icon-dark.png");
+  await writeLogoAsset("public/brand-flatten-black.svg", "nume-logo.png");
+  console.log("✓ public/email/nume-logo.png");
 
   await writeFile(
     path.join(OTP_EMAIL_DIR, "template.html"),
