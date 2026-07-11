@@ -279,6 +279,13 @@ export function ContinueWithEmailScreen() {
             ref={otpInputRef}
             id="continue-otp"
             aria-label={t("auth.continue.otpLabel")}
+            getDigitAriaLabel={(index, length) =>
+              t("auth.continue.otpDigitAriaLabel", {
+                label: t("auth.continue.otpLabel"),
+                current: index + 1,
+                total: length,
+              })
+            }
             value={otp}
             onChange={handleOtpChange}
           />

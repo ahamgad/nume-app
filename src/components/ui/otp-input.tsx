@@ -29,6 +29,7 @@ type OtpInputProps = {
   disabled?: boolean;
   readOnly?: boolean;
   "aria-label"?: string;
+  getDigitAriaLabel?: (index: number, length: number) => string;
   className?: string;
 };
 
@@ -41,6 +42,7 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     disabled = false,
     readOnly = false,
     "aria-label": ariaLabel,
+    getDigitAriaLabel,
     className,
   },
   ref,
@@ -172,7 +174,11 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
           disabled={disabled}
           readOnly={readOnly}
           aria-label={
-            ariaLabel ? `${ariaLabel} digit ${index + 1} of ${length}` : undefined
+            getDigitAriaLabel
+              ? getDigitAriaLabel(index, length)
+              : ariaLabel
+                ? `${ariaLabel} digit ${index + 1} of ${length}`
+                : undefined
           }
           className={cn(
             "box-border h-12 w-full min-w-0 rounded-md border border-input bg-background text-center text-[1.0625rem] font-medium tabular-nums text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 read-only:opacity-100",

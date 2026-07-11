@@ -47,6 +47,7 @@ export const en = {
       otpTitle: "Enter your code",
       otpLead: "We sent a code to {email}",
       otpLabel: "Sign-in code",
+      otpDigitAriaLabel: "{label} digit {current} of {total}",
       otpSubmit: "Continue",
       otpSubmitting: "Verifying…",
       otpRequired: "Enter the 6-digit code",
