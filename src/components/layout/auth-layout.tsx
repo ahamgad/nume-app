@@ -24,7 +24,7 @@ export const AUTH_TITLE_TO_MESSAGE_CLASS = "mt-3";
 
 /** One-line message slot; expands when copy wraps. */
 export const AUTH_MESSAGE_AREA_CLASS =
-  "min-h-5 text-base leading-5";
+  "min-h-5 text-sm leading-5";
 
 /** 16px — message slot to field block. */
 export const AUTH_MESSAGE_TO_FIELD_CLASS = "mt-4";

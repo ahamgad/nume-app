@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  focusOtpInput,
   OtpInput,
   refocusOtpInput,
   type OtpInputHandle,
@@ -34,10 +33,6 @@ function refocusEmailField(input: HTMLInputElement | null) {
   });
 }
 
-/** Keeps OTP mounted but off-screen until the email step completes. */
-const OTP_PREMOUNT_CLASS =
-  "pointer-events-none fixed h-px w-px overflow-hidden opacity-0";
-
 export function ContinueWithEmailScreen() {
   const t = useT();
   const router = useRouter();
@@ -57,7 +52,6 @@ export function ContinueWithEmailScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
-  const [otpMounted, setOtpMounted] = useState(false);
 
   useLayoutEffect(() => {
     if (consumeSessionExpiredNotice()) {
@@ -66,8 +60,8 @@ export function ContinueWithEmailScreen() {
   }, [t]);
 
   useLayoutEffect(() => {
-    if (step !== "otp") return;
-    refocusOtpInput(otpInputRef.current);
+    if (step !== "email") return;
+    refocusEmailField(emailInputRef.current);
   }, [step]);
 
   const verifyOtpCode = useCallback(
@@ -83,16 +77,15 @@ export function ContinueWithEmailScreen() {
       if (verifyingOtpRef.current) return;
 
       verifyingOtpRef.current = true;
-      setSubmitting(true);
       setError(null);
       setMessage(null);
 
       const { error: verifyError } = await verifyEmailOtp(email, normalizedOtp);
       verifyingOtpRef.current = false;
-      setSubmitting(false);
 
       if (verifyError) {
         setError(t("auth.continue.otpInvalid"));
+        setOtp("");
         refocusOtpInput(otpInputRef.current);
         return;
       }
@@ -122,13 +115,18 @@ export function ContinueWithEmailScreen() {
     setSubmitting(true);
     setError(null);
     setMessage(null);
-    setOtpMounted(true);
-    focusOtpInput(otpInputRef.current);
+    setEmail(trimmedEmail);
+    setOtp("");
+    setOtpError(null);
+    emailSendCooldown.clear();
+    setStep("otp");
+    refocusOtpInput(otpInputRef.current);
 
     const { error: sendError } = await sendEmailOtp(trimmedEmail);
     setSubmitting(false);
 
     if (sendError) {
+      setStep("email");
       if (sendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(sendError.retryAfterSeconds);
         refocusEmailField(emailInputRef.current);
@@ -138,13 +136,6 @@ export function ContinueWithEmailScreen() {
       refocusEmailField(emailInputRef.current);
       return;
     }
-
-    setEmail(trimmedEmail);
-    setOtp("");
-    setOtpError(null);
-    emailSendCooldown.clear();
-    setStep("otp");
-    refocusOtpInput(otpInputRef.current);
   }
 
   async function handleResend() {
@@ -183,12 +174,11 @@ export function ContinueWithEmailScreen() {
   }
 
   function handleOtpChange(next: string) {
-    if (submitting || verifyingOtpRef.current) return;
     setOtp(next);
     if (otpError && next.length > 0) {
       setOtpError(null);
     }
-    if (next.length === 6) {
+    if (next.length === 6 && !verifyingOtpRef.current) {
       void verifyOtpCode(next);
     }
   }
@@ -235,7 +225,7 @@ export function ContinueWithEmailScreen() {
                   type="button"
                   variant="link"
                   className="h-auto p-0 text-sm font-medium"
-                  disabled={submitting || resending}
+                  disabled={resending}
                   onClick={handleChangeEmail}
                 >
                   {t("auth.continue.changeEmail")}
@@ -291,21 +281,15 @@ export function ContinueWithEmailScreen() {
             />
           </form>
         </div>
-        {otpMounted ? (
-          <div
-            className={step === "otp" ? undefined : OTP_PREMOUNT_CLASS}
-            aria-hidden={step !== "otp"}
-          >
-            <OtpInput
-              ref={otpInputRef}
-              id="continue-otp"
-              aria-label={t("auth.continue.otpLabel")}
-              value={otp}
-              readOnly={submitting}
-              onChange={handleOtpChange}
-            />
-          </div>
-        ) : null}
+        <div className={step === "otp" ? undefined : "hidden"}>
+          <OtpInput
+            ref={otpInputRef}
+            id="continue-otp"
+            aria-label={t("auth.continue.otpLabel")}
+            value={otp}
+            onChange={handleOtpChange}
+          />
+        </div>
       </AuthCard>
     </AuthLayout>
   );

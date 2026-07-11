@@ -189,18 +189,8 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   );
 });
 
-/** Focus OTP within the current user-gesture chain when possible. */
-export function focusOtpInput(input: OtpInputHandle | null) {
-  if (!input) return;
-  input.focusFirst();
-}
-
-/** Retry focus after layout for step transitions and post-async recovery. */
+/** Refocus OTP after step transitions while the user gesture is still active. */
 export function refocusOtpInput(input: OtpInputHandle | null) {
   if (!input) return;
-  input.focusFirst();
-  requestAnimationFrame(() => {
-    input.focusFirst();
-    requestAnimationFrame(() => input.focusFirst());
-  });
+  queueMicrotask(() => input.focusFirst());
 }
