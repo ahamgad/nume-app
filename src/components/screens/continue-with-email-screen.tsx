@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import {
   AuthCard,
@@ -39,7 +39,6 @@ export function ContinueWithEmailScreen() {
   const authErrorMessage = useAuthErrorMessage();
   const emailSendCooldown = useEmailSendCooldown();
   const verifyingOtpRef = useRef(false);
-  const didMountRef = useRef(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const otpInputRef = useRef<OtpInputHandle>(null);
 
@@ -55,15 +54,6 @@ export function ContinueWithEmailScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
-
-  useLayoutEffect(() => {
-    if (step !== "email") return;
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-    refocusEmailField(emailInputRef.current);
-  }, [step]);
 
   const verifyOtpCode = useCallback(
     async (normalizedOtp: string) => {
@@ -262,7 +252,6 @@ export function ContinueWithEmailScreen() {
               id="continue-email"
               type="email"
               autoComplete="email"
-              autoFocus
               enterKeyHint="go"
               aria-label={t("auth.fields.email")}
               value={email}

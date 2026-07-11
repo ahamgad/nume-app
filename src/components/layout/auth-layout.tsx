@@ -10,6 +10,7 @@ import {
   AUTH_KEYBOARD_SURFACE_CLASS,
   useAuthViewportLock,
 } from "@/hooks/use-auth-viewport-lock";
+import { isKeyboardPresent } from "@/lib/scroll/scroll-input-into-view";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -48,10 +49,16 @@ function handleAuthTouchInputFocus(event: ReactPointerEvent<HTMLDivElement>) {
     | null;
   if (!input) return;
   if (input.disabled || input.readOnly) return;
-  if (document.activeElement === input) return;
   if (event.pointerType && event.pointerType !== "touch") return;
 
   event.preventDefault();
+
+  // iOS can leave an input focused without presenting the keyboard after
+  // programmatic mount focus. Re-engage editing under the current user gesture.
+  if (document.activeElement === input && !isKeyboardPresent()) {
+    input.blur();
+  }
+
   input.focus({ preventScroll: true });
 }
 
