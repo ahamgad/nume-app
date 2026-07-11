@@ -3,19 +3,34 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { InputFieldLabel } from "@/components/forms/input-field";
-import { RootPageTitle } from "@/components/layout/stack-page-chrome";
 import { WidgetCard } from "@/components/patterns";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
-/** 24px — rhythm between the input block and primary CTA. */
+/** Page inset below the safe area (px). */
+export const AUTH_PAGE_TOP_PADDING_PX = 24;
+
+/** 12px — logo to title. */
+export const AUTH_LOGO_TO_TITLE_CLASS = "mt-3";
+
+/** 12px — title to message slot. */
+export const AUTH_TITLE_TO_MESSAGE_CLASS = "mt-3";
+
+/** One-line message slot; expands when copy wraps. */
+export const AUTH_MESSAGE_AREA_CLASS =
+  "min-h-5 text-base leading-5";
+
+/** 16px — message slot to field block. */
+export const AUTH_MESSAGE_TO_FIELD_CLASS = "mt-4";
+
+/** 24px — input block to primary CTA. */
 export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-6";
 
-/** Reserved height for validation, error, and status copy. */
-export const AUTH_MESSAGE_AREA_CLASS = "mt-4 min-h-10 text-sm leading-5";
+/** 16px — primary CTA to footer slot. */
+export const AUTH_CTA_TO_FOOTER_CLASS = "mt-4";
 
-/** Reserved height for OTP footer links so both steps stay aligned. */
-export const AUTH_FOOTER_AREA_CLASS = "mt-6 min-h-[5.5rem]";
+/** OTP footer alignment slot — two link rows at text-sm. */
+export const AUTH_FOOTER_AREA_CLASS = "min-h-[52px]";
 
 export function AuthBrandLogo() {
   const t = useT();
@@ -42,13 +57,32 @@ export function AuthBrandLogo() {
   );
 }
 
+function AuthTitle({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <h1
+      className={cn(
+        "text-2xl font-semibold leading-tight tracking-tight text-foreground",
+        className,
+      )}
+    >
+      {children}
+    </h1>
+  );
+}
+
+/** Content-driven auth gate page — natural height, top-aligned. */
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="fixed inset-0 overflow-hidden bg-background">
-      <div className="mx-auto flex h-dvh w-full max-w-lg flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-        <div className="w-full max-w-sm shrink-0 pt-8">{children}</div>
-        <div aria-hidden className="min-h-0 flex-1" />
-      </div>
+    <div
+      className="mx-auto min-h-dvh w-full max-w-lg bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]"
+    >
+      <div className="w-full max-w-sm">{children}</div>
     </div>
   );
 }
@@ -66,7 +100,7 @@ interface AuthCardProps {
   className?: string;
 }
 
-/** Top-aligned auth step shell with stable section heights. */
+/** Compact auth step shell with content-sized reserved slots. */
 export function AuthCard({
   title,
   message,
@@ -82,8 +116,8 @@ export function AuthCard({
   return (
     <WidgetCard paddingClass="p-4" className={cn("w-full", className)}>
       <AuthBrandLogo />
-      <RootPageTitle className="mb-0 mt-4">{title}</RootPageTitle>
-      <div className={AUTH_MESSAGE_AREA_CLASS}>
+      <AuthTitle className={AUTH_LOGO_TO_TITLE_CLASS}>{title}</AuthTitle>
+      <div className={cn(AUTH_TITLE_TO_MESSAGE_CLASS, AUTH_MESSAGE_AREA_CLASS)}>
         {message ? (
           <p
             className="text-destructive"
@@ -94,13 +128,15 @@ export function AuthCard({
           </p>
         ) : null}
       </div>
-      <div className="mt-4">
+      <div className={AUTH_MESSAGE_TO_FIELD_CLASS}>
         <InputFieldLabel htmlFor={fieldId} required={required}>
           {label}
         </InputFieldLabel>
         <div className="mt-2">{children}</div>
         <div className={AUTH_PRIMARY_CTA_TOP_CLASS}>{primaryAction}</div>
-        <div className={AUTH_FOOTER_AREA_CLASS}>{footer}</div>
+        <div className={cn(AUTH_CTA_TO_FOOTER_CLASS, AUTH_FOOTER_AREA_CLASS)}>
+          {footer}
+        </div>
       </div>
     </WidgetCard>
   );
