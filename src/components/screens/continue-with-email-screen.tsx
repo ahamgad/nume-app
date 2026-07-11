@@ -9,7 +9,7 @@ import {
 } from "@/components/layout/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { OtpInput } from "@/components/ui/otp-input";
+import { OtpInput, type OtpInputHandle } from "@/components/ui/otp-input";
 import { sendEmailOtp, verifyEmailOtp } from "@/lib/auth/email-otp";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
@@ -26,12 +26,21 @@ function normalizeOtp(value: string) {
   return value.replace(/\D/g, "").slice(0, 6);
 }
 
+function refocusEmailField(input: HTMLInputElement | null) {
+  if (!input) return;
+  queueMicrotask(() => {
+    input.focus({ preventScroll: true });
+  });
+}
+
 export function ContinueWithEmailScreen() {
   const t = useT();
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
   const emailSendCooldown = useEmailSendCooldown();
   const verifyingOtpRef = useRef(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const otpInputRef = useRef<OtpInputHandle>(null);
 
   const [step, setStep] = useState<ContinueStep>("email");
   const [email, setEmail] = useState("");
@@ -50,13 +59,25 @@ export function ContinueWithEmailScreen() {
     }
   }, [t]);
 
+  useEffect(() => {
+    if (step !== "otp") return;
+    const frameId = window.requestAnimationFrame(() => {
+      otpInputRef.current?.focusFirst();
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [step]);
+
   const verifyOtpCode = useCallback(
     async (normalizedOtp: string) => {
       const nextOtpError =
         normalizedOtp.length === 0 ? t("auth.continue.otpRequired") : null;
 
       setOtpError(nextOtpError);
-      if (nextOtpError || verifyingOtpRef.current) return;
+      if (nextOtpError) {
+        otpInputRef.current?.focusFirst();
+        return;
+      }
+      if (verifyingOtpRef.current) return;
 
       verifyingOtpRef.current = true;
       setSubmitting(true);
@@ -69,6 +90,7 @@ export function ContinueWithEmailScreen() {
 
       if (verifyError) {
         setError(t("auth.continue.otpInvalid"));
+        otpInputRef.current?.focusFirst();
         return;
       }
 
@@ -89,7 +111,10 @@ export function ContinueWithEmailScreen() {
           : t("auth.validation.emailInvalid");
 
     setEmailError(nextEmailError);
-    if (nextEmailError) return;
+    if (nextEmailError) {
+      refocusEmailField(emailInputRef.current);
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -101,9 +126,11 @@ export function ContinueWithEmailScreen() {
     if (sendError) {
       if (sendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(sendError.retryAfterSeconds);
+        refocusEmailField(emailInputRef.current);
         return;
       }
       setError(authErrorMessage(sendError));
+      refocusEmailField(emailInputRef.current);
       return;
     }
 
@@ -112,11 +139,6 @@ export function ContinueWithEmailScreen() {
     setOtpError(null);
     emailSendCooldown.clear();
     setStep("otp");
-  }
-
-  async function handleOtpSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    await verifyOtpCode(normalizeOtp(otp));
   }
 
   async function handleResend() {
@@ -132,13 +154,16 @@ export function ContinueWithEmailScreen() {
     if (resendError) {
       if (resendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(resendError.retryAfterSeconds);
+        otpInputRef.current?.focusFirst();
         return;
       }
       setError(authErrorMessage(resendError));
+      otpInputRef.current?.focusFirst();
       return;
     }
 
     setMessage(t("auth.continue.resendSuccess"));
+    otpInputRef.current?.focusFirst();
   }
 
   function handleChangeEmail() {
@@ -180,13 +205,6 @@ export function ContinueWithEmailScreen() {
         }
         message={bannerMessage}
         messageRole={bannerRole}
-        fieldId={step === "email" ? "continue-email" : "continue-otp"}
-        label={
-          step === "email"
-            ? t("auth.fields.email")
-            : t("auth.continue.otpLabel")
-        }
-        required
         footer={
           step === "otp" ? (
             <div className="space-y-3">
@@ -216,27 +234,21 @@ export function ContinueWithEmailScreen() {
                 </Button>
               </p>
             </div>
-          ) : null
+          ) : undefined
         }
         primaryAction={
-          <Button
-            type="submit"
-            form={step === "email" ? "continue-email-form" : "continue-otp-form"}
-            className="h-12 w-full"
-            disabled={
-              step === "email"
-                ? submitting || emailSendCooldown.isActive
-                : submitting
-            }
-          >
-            {step === "email"
-              ? submitting
+          step === "email" ? (
+            <Button
+              type="submit"
+              form="continue-email-form"
+              className="h-12 w-full"
+              disabled={submitting || emailSendCooldown.isActive}
+            >
+              {submitting
                 ? t("auth.continue.emailSubmitting")
-                : t("auth.continue.emailSubmit")
-              : submitting
-                ? t("auth.continue.otpSubmitting")
-                : t("auth.continue.otpSubmit")}
-          </Button>
+                : t("auth.continue.emailSubmit")}
+            </Button>
+          ) : undefined
         }
       >
         {step === "email" ? (
@@ -246,10 +258,12 @@ export function ContinueWithEmailScreen() {
             onSubmit={handleEmailSubmit}
           >
             <Input
+              ref={emailInputRef}
               id="continue-email"
               type="email"
               autoComplete="email"
-              enterKeyHint="next"
+              enterKeyHint="go"
+              aria-label={t("auth.fields.email")}
               value={email}
               onChange={(event) => {
                 const next = event.target.value;
@@ -268,16 +282,15 @@ export function ContinueWithEmailScreen() {
             />
           </form>
         ) : (
-          <form id="continue-otp-form" noValidate onSubmit={handleOtpSubmit}>
-            <OtpInput
-              id="continue-otp"
-              aria-label={t("auth.continue.otpLabel")}
-              value={otp}
-              autoFocus
-              disabled={submitting}
-              onChange={handleOtpChange}
-            />
-          </form>
+          <OtpInput
+            ref={otpInputRef}
+            id="continue-otp"
+            aria-label={t("auth.continue.otpLabel")}
+            value={otp}
+            autoFocus
+            disabled={submitting}
+            onChange={handleOtpChange}
+          />
         )}
       </AuthCard>
     </AuthLayout>

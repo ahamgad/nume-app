@@ -123,11 +123,11 @@ interface AuthCardProps {
   title: string;
   message?: string | null;
   messageRole?: "alert" | "status";
-  fieldId: string;
-  label: string;
+  fieldId?: string;
+  label?: string;
   required?: boolean;
   children: ReactNode;
-  primaryAction: ReactNode;
+  primaryAction?: ReactNode;
   footer?: ReactNode;
   className?: string;
 }
@@ -161,14 +161,29 @@ export function AuthCard({
         ) : null}
       </div>
       <div className={AUTH_MESSAGE_TO_FIELD_CLASS}>
-        <InputFieldLabel htmlFor={fieldId} required={required}>
-          {label}
-        </InputFieldLabel>
-        <div className="mt-2">{children}</div>
-        <div className={AUTH_PRIMARY_CTA_TOP_CLASS}>{primaryAction}</div>
-        <div className={cn(AUTH_CTA_TO_FOOTER_CLASS, AUTH_FOOTER_AREA_CLASS)}>
-          {footer}
-        </div>
+        {label && fieldId ? (
+          <>
+            <InputFieldLabel htmlFor={fieldId} required={required}>
+              {label}
+            </InputFieldLabel>
+            <div className="mt-2">{children}</div>
+          </>
+        ) : (
+          children
+        )}
+        {primaryAction ? (
+          <div className={AUTH_PRIMARY_CTA_TOP_CLASS}>{primaryAction}</div>
+        ) : null}
+        {footer ? (
+          <div
+            className={cn(
+              primaryAction ? AUTH_CTA_TO_FOOTER_CLASS : AUTH_PRIMARY_CTA_TOP_CLASS,
+              AUTH_FOOTER_AREA_CLASS,
+            )}
+          >
+            {footer}
+          </div>
+        ) : null}
       </div>
     </WidgetCard>
   );

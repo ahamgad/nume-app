@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useRef,
   type ClipboardEvent,
   type KeyboardEvent,
@@ -16,6 +18,10 @@ function normalizeOtpDigits(value: string, length = OTP_LENGTH) {
   return value.replace(/\D/g, "").slice(0, length);
 }
 
+export type OtpInputHandle = {
+  focusFirst: () => void;
+};
+
 type OtpInputProps = {
   id?: string;
   value: string;
@@ -27,17 +33,28 @@ type OtpInputProps = {
   className?: string;
 };
 
-export function OtpInput({
-  id,
-  value,
-  onChange,
-  length = OTP_LENGTH,
-  disabled = false,
-  autoFocus = false,
-  "aria-label": ariaLabel,
-  className,
-}: OtpInputProps) {
+export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpInput(
+  {
+    id,
+    value,
+    onChange,
+    length = OTP_LENGTH,
+    disabled = false,
+    autoFocus = false,
+    "aria-label": ariaLabel,
+    className,
+  },
+  ref,
+) {
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const focusFirst = useCallback(() => {
+    inputRefs.current[0]?.focus({ preventScroll: true });
+    inputRefs.current[0]?.select();
+  }, []);
+
+  useImperativeHandle(ref, () => ({ focusFirst }), [focusFirst]);
+
   const normalized = normalizeOtpDigits(value, length);
   const chars = normalized.split("");
   while (chars.length < length) {
@@ -46,7 +63,7 @@ export function OtpInput({
 
   const focusIndex = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(index, length - 1));
-    inputRefs.current[clamped]?.focus();
+    inputRefs.current[clamped]?.focus({ preventScroll: true });
     inputRefs.current[clamped]?.select();
   }, [length]);
 
@@ -67,11 +84,11 @@ export function OtpInput({
     }
 
     const frameId = window.requestAnimationFrame(() => {
-      inputRefs.current[0]?.focus({ preventScroll: true });
+      focusFirst();
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [autoFocus, disabled]);
+  }, [autoFocus, disabled, focusFirst]);
 
   function handleChange(index: number, nextRaw: string) {
     const nextDigit = normalizeOtpDigits(nextRaw, 1);
@@ -169,4 +186,4 @@ export function OtpInput({
       ))}
     </div>
   );
-}
+});
