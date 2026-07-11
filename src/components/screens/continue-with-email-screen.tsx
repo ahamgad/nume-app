@@ -3,10 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AuthInputField } from "@/components/forms/auth-input-field";
 import {
   AuthCard,
-  AUTH_PRIMARY_CTA_TOP_CLASS,
   AuthLayout,
 } from "@/components/layout/auth-layout";
 import { Button } from "@/components/ui/button";
@@ -16,7 +14,6 @@ import { sendEmailOtp, verifyEmailOtp } from "@/lib/auth/email-otp";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { useEmailSendCooldown } from "@/lib/auth/use-email-send-cooldown";
-import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
 type ContinueStep = "email" | "otp";
@@ -34,7 +31,6 @@ export function ContinueWithEmailScreen() {
   const router = useRouter();
   const authErrorMessage = useAuthErrorMessage();
   const emailSendCooldown = useEmailSendCooldown();
-  const emailInputRef = useRef<HTMLInputElement>(null);
   const verifyingOtpRef = useRef(false);
 
   const [step, setStep] = useState<ContinueStep>("email");
@@ -53,16 +49,6 @@ export function ContinueWithEmailScreen() {
       queueMicrotask(() => setNotice(t("auth.sessionExpired")));
     }
   }, [t]);
-
-  useEffect(() => {
-    if (step !== "email") return;
-
-    const frameId = window.requestAnimationFrame(() => {
-      emailInputRef.current?.focus({ preventScroll: true });
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [step]);
 
   const verifyOtpCode = useCallback(
     async (normalizedOtp: string) => {
@@ -174,133 +160,125 @@ export function ContinueWithEmailScreen() {
     }
   }
 
-  if (step === "email") {
-    return (
-      <AuthLayout>
-        <AuthCard
-          title={t("auth.continue.emailTitle")}
-          errorMessage={error}
-          statusMessage={notice ?? emailSendCooldown.message}
-        >
-          <form noValidate onSubmit={handleEmailSubmit} className="flex flex-1 flex-col">
-            <div className="space-y-4">
-              <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-                {t("auth.continue.emailLead")}
-              </p>
-              <AuthInputField
-                id="continue-email"
-                label={t("auth.fields.email")}
-                required
-                error={emailError ?? undefined}
-              >
-                <Input
-                  ref={emailInputRef}
-                  id="continue-email"
-                  type="email"
-                  autoComplete="email"
-                  enterKeyHint="next"
-                  value={email}
-                  onChange={(event) => {
-                    const next = event.target.value;
-                    setEmail(next);
-                    if (emailError) {
-                      setEmailError(
-                        next.trim().length === 0
-                          ? t("auth.validation.emailRequired")
-                          : isValidEmailAddress(next)
-                            ? null
-                            : t("auth.validation.emailInvalid"),
-                      );
-                    }
-                  }}
-                  required
-                />
-              </AuthInputField>
-            </div>
-
-            <div className="mt-auto">
-              <Button
-                type="submit"
-                className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-                disabled={submitting || emailSendCooldown.isActive}
-              >
-                {submitting
-                  ? t("auth.continue.emailSubmitting")
-                  : t("auth.continue.emailSubmit")}
-              </Button>
-            </div>
-          </form>
-        </AuthCard>
-      </AuthLayout>
-    );
-  }
+  const fieldError = step === "email" ? emailError : otpError;
+  const bannerMessage =
+    fieldError ??
+    error ??
+    (step === "email" ? notice ?? emailSendCooldown.message : message ?? emailSendCooldown.message);
+  const bannerRole =
+    !fieldError && !error && (notice || message || emailSendCooldown.message)
+      ? "status"
+      : "alert";
 
   return (
     <AuthLayout>
       <AuthCard
-        title={t("auth.continue.otpTitle")}
-        errorMessage={error}
-        statusMessage={message ?? emailSendCooldown.message}
-      >
-        <form noValidate onSubmit={handleOtpSubmit} className="flex flex-1 flex-col">
-          <div className="space-y-4">
-            <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-              {t("auth.continue.otpLead", { email })}
-            </p>
-            <AuthInputField
-              id="continue-otp"
-              label={t("auth.continue.otpLabel")}
-              required
-              error={otpError ?? undefined}
-            >
-              <OtpInput
-                id="continue-otp"
-                aria-label={t("auth.continue.otpLabel")}
-                value={otp}
-                autoFocus
-                disabled={submitting}
-                onChange={handleOtpChange}
-              />
-            </AuthInputField>
-          </div>
-
-          <div className="mt-auto space-y-3">
-            <Button
-              type="submit"
-              className={cn("h-12 w-full", AUTH_PRIMARY_CTA_TOP_CLASS)}
-              disabled={submitting}
-            >
-              {submitting
+        title={
+          step === "email"
+            ? t("auth.continue.emailTitle")
+            : t("auth.continue.otpTitle")
+        }
+        message={bannerMessage}
+        messageRole={bannerRole}
+        fieldId={step === "email" ? "continue-email" : "continue-otp"}
+        label={
+          step === "email"
+            ? t("auth.fields.email")
+            : t("auth.continue.otpLabel")
+        }
+        required
+        footer={
+          step === "otp" ? (
+            <div className="space-y-3">
+              <p className="text-center text-sm text-muted-foreground">
+                {t("auth.continue.resendPrompt")}{" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm font-medium"
+                  disabled={resending || emailSendCooldown.isActive}
+                  onClick={() => void handleResend()}
+                >
+                  {resending
+                    ? t("auth.continue.resending")
+                    : t("auth.continue.resend")}
+                </Button>
+              </p>
+              <p className="text-center text-sm text-muted-foreground">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm font-medium"
+                  disabled={submitting || resending}
+                  onClick={handleChangeEmail}
+                >
+                  {t("auth.continue.changeEmail")}
+                </Button>
+              </p>
+            </div>
+          ) : null
+        }
+        primaryAction={
+          <Button
+            type="submit"
+            form={step === "email" ? "continue-email-form" : "continue-otp-form"}
+            className="h-12 w-full"
+            disabled={
+              step === "email"
+                ? submitting || emailSendCooldown.isActive
+                : submitting
+            }
+          >
+            {step === "email"
+              ? submitting
+                ? t("auth.continue.emailSubmitting")
+                : t("auth.continue.emailSubmit")
+              : submitting
                 ? t("auth.continue.otpSubmitting")
                 : t("auth.continue.otpSubmit")}
-            </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              {t("auth.continue.resendPrompt")}{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-sm font-medium"
-                disabled={resending || emailSendCooldown.isActive}
-                onClick={() => void handleResend()}
-              >
-                {resending
-                  ? t("auth.continue.resending")
-                  : t("auth.continue.resend")}
-              </Button>
-            </p>
-            <p className="text-center text-sm text-muted-foreground">
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-sm font-medium"
-                disabled={submitting || resending}
-                onClick={handleChangeEmail}
-              >
-                {t("auth.continue.changeEmail")}
-              </Button>
-            </p>
-          </div>
-        </form>
+          </Button>
+        }
+      >
+        {step === "email" ? (
+          <form
+            id="continue-email-form"
+            noValidate
+            onSubmit={handleEmailSubmit}
+          >
+            <Input
+              id="continue-email"
+              type="email"
+              autoComplete="email"
+              enterKeyHint="next"
+              value={email}
+              onChange={(event) => {
+                const next = event.target.value;
+                setEmail(next);
+                if (emailError) {
+                  setEmailError(
+                    next.trim().length === 0
+                      ? t("auth.validation.emailRequired")
+                      : isValidEmailAddress(next)
+                        ? null
+                        : t("auth.validation.emailInvalid"),
+                  );
+                }
+              }}
+              required
+            />
+          </form>
+        ) : (
+          <form id="continue-otp-form" noValidate onSubmit={handleOtpSubmit}>
+            <OtpInput
+              id="continue-otp"
+              aria-label={t("auth.continue.otpLabel")}
+              value={otp}
+              autoFocus
+              disabled={submitting}
+              onChange={handleOtpChange}
+            />
+          </form>
+        )}
       </AuthCard>
     </AuthLayout>
   );
