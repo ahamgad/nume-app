@@ -183,6 +183,7 @@ export function ContinueWithEmailScreen() {
     !fieldError && !error && (notice || message || emailSendCooldown.message)
       ? "status"
       : "alert";
+  const bannerTone = message && bannerMessage === message ? "success" : "error";
 
   return (
     <AuthLayout>
@@ -194,6 +195,7 @@ export function ContinueWithEmailScreen() {
         }
         message={bannerMessage}
         messageRole={bannerRole}
+        messageTone={bannerTone}
         footer={
           step === "otp" ? (
             <div className="space-y-3">

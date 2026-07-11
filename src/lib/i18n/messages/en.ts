@@ -27,7 +27,7 @@ export const en = {
       email: "Email",
     },
     errors: {
-      emailSendRateLimit: "Wait a minute before requesting another email",
+      emailSendRateLimit: "Please wait before requesting another code",
       emailSendRateLimitRetrySecond: "Try again in {count} second",
       emailSendRateLimitRetrySeconds: "Try again in {count} seconds",
       emailSendRateLimitRetryMinute: "Try again in {count} minute",
@@ -36,7 +36,7 @@ export const en = {
     },
     validation: {
       emailRequired: "Email is required",
-      emailInvalid: "Enter a valid email address",
+      emailInvalid: "Enter a valid email",
     },
     sessionExpired: "Your session has expired, please sign in again",
     continue: {
@@ -50,11 +50,11 @@ export const en = {
       otpSubmit: "Continue",
       otpSubmitting: "Verifying…",
       otpRequired: "Enter the 6-digit code",
-      otpInvalid: "Invalid or expired code",
+      otpInvalid: "Incorrect or expired code",
       resendPrompt: "Didn't receive the code?",
       resend: "Resend code",
       resending: "Resending…",
-      resendSuccess: "Code sent",
+      resendSuccess: "A new code has been sent",
       changeEmail: "Use a different email",
     },
   },

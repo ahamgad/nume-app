@@ -130,6 +130,7 @@ interface AuthCardProps {
   title: string;
   message?: string | null;
   messageRole?: "alert" | "status";
+  messageTone?: "default" | "error" | "success";
   fieldId?: string;
   label?: string;
   required?: boolean;
@@ -144,6 +145,7 @@ export function AuthCard({
   title,
   message,
   messageRole = "alert",
+  messageTone = "error",
   fieldId,
   label,
   required = false,
@@ -159,7 +161,13 @@ export function AuthCard({
       <div className={cn(AUTH_TITLE_TO_MESSAGE_CLASS, AUTH_MESSAGE_AREA_CLASS)}>
         {message ? (
           <p
-            className="text-destructive"
+            className={cn(
+              messageTone === "success"
+                ? "text-emerald-700 dark:text-emerald-300"
+                : messageTone === "default"
+                  ? "text-muted-foreground"
+                  : "text-destructive",
+            )}
             role={messageRole}
             aria-live={messageRole === "status" ? "polite" : undefined}
           >
