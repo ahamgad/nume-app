@@ -7,16 +7,51 @@
 <meta name="supported-color-schemes" content="light dark" />
 <title>Your NUME sign-in code</title>
 <style type="text/css">
+    @font-face {
+      font-family: 'Geist Sans';
+      font-style: normal;
+      font-weight: 400;
+      src: url('https://numeos.app/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Geist Sans';
+      font-style: normal;
+      font-weight: 600;
+      src: url('https://numeos.app/fonts/geist-sans/Geist-SemiBold.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Geist Sans';
+      font-style: normal;
+      font-weight: 700;
+      src: url('https://numeos.app/fonts/geist-sans/Geist-Bold.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Geist Mono';
+      font-style: normal;
+      font-weight: 600;
+      src: url('https://numeos.app/fonts/geist-mono/GeistMono-SemiBold.woff2') format('woff2');
+    }
+  </style>
+<style type="text/css">
     .email-page { background-color: #F7F7F7; }
-    .email-card { background-color: #FFFFFF; border-color: #E8E8E8; }
-    .email-title { color: #171717; }
+    .email-card { background-color: #FFFFFF; border-color: #EFEFEF; }
+    .email-title { color: #0A0A0A; }
     .email-support { color: #737373; }
-    .email-code-box { background-color: #FFFFFF; border-color: #E8E8E8; color: #171717; }
-    .email-helper { color: #8E8E8E; }
-    .email-footer { color: #A3A3A3; }
+    .email-code-box { background-color: #FFFFFF; border-color: #EFEFEF; color: #0A0A0A; }
+    .email-helper { color: #737373; }
+    .email-footer { color: #737373; }
+    .email-brand-light { display: inline-block !important; }
+    .email-brand-dark { display: none !important; }
     @media (prefers-color-scheme: dark) {
-      .email-page { background-color: #111111 !important; }
-      .email-footer { color: #737373 !important; }
+      .email-page { background-color: #0A0A0A !important; }
+      .email-card { background-color: #171717 !important; border-color: #2E2E2E !important; }
+      .email-title { color: #FAFAFA !important; }
+      .email-support { color: #A1A1A1 !important; }
+      .email-code-box { background-color: #171717 !important; border-color: #2E2E2E !important; color: #FAFAFA !important; }
+      .email-helper { color: #A1A1A1 !important; }
+      .email-footer { color: #A1A1A1 !important; }
+      .email-brand-light { display: none !important; }
+      .email-brand-dark { display: inline-block !important; }
     }
   </style>
 <!--[if mso]>
@@ -31,23 +66,25 @@
   </div>
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-page" style="background-color:#F7F7F7;">
     <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:340px;width:100%;">
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:400px;width:100%;">
           <tr>
-            <td align="center" class="email-card" style="background-color:#FFFFFF;border:1px solid #E8E8E8;border-radius:20px;padding:56px 28px 32px 28px;text-align:center;">
+            <td align="center" class="email-card" style="background-color:#FFFFFF;border:1px solid #EFEFEF;border-radius:16px;padding:64px 36px 40px 36px;text-align:center;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td align="center" style="padding:0 0 28px 0;">
+                  <td align="center" style="padding:0 0 36px 0;">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
     <tr>
       <td align="center" style="padding:0;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td align="center" valign="middle" style="padding:0 8px 0 0;line-height:0;">
-              <img src="https://numeos.app/email/nume-icon.png" width="20" height="20" alt="" style="display:block;border:0;outline:none;text-decoration:none;width:20px;height:20px;" />
+              <img src="https://numeos.app/email/nume-icon.png" width="24" height="24" alt="" class="email-brand-light" style="display:inline-block;border:0;outline:none;text-decoration:none;width:24px;height:24px;" />
+              <img src="https://numeos.app/email/nume-icon-dark.png" width="24" height="24" alt="" class="email-brand-dark" style="display:none;border:0;outline:none;text-decoration:none;width:24px;height:24px;" />
             </td>
             <td align="left" valign="middle" style="padding:0;line-height:0;">
-              <img src="https://numeos.app/email/nume-wordmark.png" width="45" height="15" alt="NUME" style="display:block;border:0;outline:none;text-decoration:none;width:45px;height:15px;" />
+              <img src="https://numeos.app/email/nume-wordmark.png" width="54" height="18" alt="NUME" class="email-brand-light" style="display:inline-block;border:0;outline:none;text-decoration:none;width:54px;height:18px;" />
+              <img src="https://numeos.app/email/nume-wordmark-dark.png" width="54" height="18" alt="NUME" class="email-brand-dark" style="display:none;border:0;outline:none;text-decoration:none;width:54px;height:18px;" />
             </td>
           </tr>
         </table>
@@ -57,20 +94,20 @@
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" class="email-title" style="padding:0 0 12px 0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:32px;font-weight:700;line-height:1.15;letter-spacing:-0.02em;color:#171717;text-align:center;">
+                  <td align="center" class="email-title" style="padding:0 0 14px 0;font-family:'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:36px;font-weight:700;line-height:1.2;letter-spacing:-0.02em;color:#0A0A0A;text-align:center;">
                     Enter your code
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" class="email-support" style="padding:0 0 28px 0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:15px;font-weight:400;line-height:1.5;color:#737373;text-align:center;">
+                  <td align="center" class="email-support" style="padding:0 0 32px 0;font-family:'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:1.6;color:#737373;text-align:center;">
                     Use this code to continue signing in to NUME
                   </td>
                 </tr>
                 <tr>
                   <td align="center" style="padding:0;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-code-box" style="border:1px solid #E8E8E8;border-radius:12px;background-color:#FFFFFF;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-code-box" style="border:1px solid #EFEFEF;border-radius:14px;background-color:#FFFFFF;">
     <tr>
-      <td align="center" style="padding:24px 20px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;font-size:36px;font-weight:600;line-height:1.1;letter-spacing:0.32em;color:#171717;">
+      <td align="center" style="padding:32px 28px;font-family:'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;font-size:42px;font-weight:600;line-height:1.15;letter-spacing:0.28em;color:#0A0A0A;font-variant-numeric:tabular-nums;">
         847293
       </td>
     </tr>
@@ -78,7 +115,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" class="email-helper" style="padding:20px 0 0 0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:13px;font-weight:400;line-height:1.45;color:#8E8E8E;text-align:center;">
+                  <td align="center" class="email-helper" style="padding:28px 0 0 0;font-family:'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:12px;font-weight:400;line-height:1.5;color:#737373;text-align:center;">
                     If you didn't request this code, you can safely ignore this email
                   </td>
                 </tr>
@@ -86,7 +123,7 @@
             </td>
           </tr>
           <tr>
-            <td align="center" class="email-footer" style="padding:20px 0 0 0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:11px;font-weight:400;line-height:1.4;color:#A3A3A3;text-align:center;">
+            <td align="center" class="email-footer" style="padding:28px 0 0 0;font-family:'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;font-size:11px;font-weight:400;line-height:1.4;color:#737373;text-align:center;">
               2026 © NUME
             </td>
           </tr>
