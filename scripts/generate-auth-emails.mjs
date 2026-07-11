@@ -1,26 +1,62 @@
 #!/usr/bin/env node
 /**
- * Generates the hosted email brand mark PNG from the Design System SVG.
+ * Generates hosted email brand marks and foundation email previews.
  */
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-import { emailDesignTokens } from "../src/lib/email/design-tokens.ts";
+import {
+  emailFoundationTokens,
+  renderOtpEmailHtml,
+  renderOtpEmailPreviewHtml,
+} from "../src/lib/email/foundation/index.ts";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EMAIL_ASSET_DIR = path.join(ROOT, "public", "email");
-const SVG_SOURCE = path.join(ROOT, "public", "brand-flatten-background.svg");
+const OTP_EMAIL_DIR = path.join(ROOT, "emails", "otp");
+
+async function writeLogoAsset(sourceSvg, filename) {
+  await sharp(path.join(ROOT, sourceSvg), { density: 288 })
+    .resize(emailFoundationTokens.logoAssetPx, emailFoundationTokens.logoAssetPx)
+    .png()
+    .toFile(path.join(EMAIL_ASSET_DIR, filename));
+}
 
 async function main() {
   await mkdir(EMAIL_ASSET_DIR, { recursive: true });
+  await mkdir(OTP_EMAIL_DIR, { recursive: true });
 
-  await sharp(SVG_SOURCE, { density: 288 })
-    .resize(emailDesignTokens.logoAssetPx, emailDesignTokens.logoAssetPx)
-    .png()
-    .toFile(path.join(EMAIL_ASSET_DIR, "nume-mark.png"));
+  await writeLogoAsset(
+    "public/brand-flatten-background.svg",
+    "nume-mark-light.png",
+  );
+  await writeLogoAsset(
+    "public/brand-flatten-background.svg",
+    "nume-mark-dark.png",
+  );
+  await writeLogoAsset(
+    "public/brand-flatten-background.svg",
+    "nume-mark.png",
+  );
+  console.log("✓ public/email/nume-mark-light.png");
+  console.log("✓ public/email/nume-mark-dark.png");
   console.log("✓ public/email/nume-mark.png");
+
+  await writeFile(
+    path.join(OTP_EMAIL_DIR, "template.html"),
+    renderOtpEmailHtml(),
+    "utf8",
+  );
+  console.log("✓ emails/otp/template.html");
+
+  await writeFile(
+    path.join(OTP_EMAIL_DIR, "preview.html"),
+    renderOtpEmailPreviewHtml(),
+    "utf8",
+  );
+  console.log("✓ emails/otp/preview.html");
 }
 
 main().catch((error) => {
