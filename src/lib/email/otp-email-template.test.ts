@@ -16,12 +16,15 @@ describe("NUME OTP email template", () => {
     expect(html).toContain("123456");
     expect(html).toContain("2026 © NUME");
     expect(html).toContain('alt="NUME"');
-    expect(html).toContain("/email/nume-logo.png");
+    expect(html).toContain("/email/nume-icon.png");
+    expect(html).toContain("/email/nume-wordmark.png");
+    expect(html).not.toContain("/email/nume-logo.png");
   });
 
   it("uses the brand lockup and OTP box styling", () => {
     const html = renderOtpEmailPreviewHtml();
-    expect(html).toContain("width:40px;height:40px");
+    expect(html).toContain("width:20px;height:20px");
+    expect(html).toContain("width:45px;height:15px");
     expect(html).toContain("font-size:32px");
     expect(html).toContain("font-size:36px");
     expect(html).toContain("border-radius:12px");

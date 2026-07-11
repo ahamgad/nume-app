@@ -8,6 +8,10 @@
 export const OTP_EMAIL_SUBJECT = "Your NUME sign-in code";
 export const OTP_EMAIL_PREHEADER = "Use this code to continue to NUME";
 export const OTP_EMAIL_TOKEN = "{{ .Token }}";
+export const OTP_EMAIL_ICON_DISPLAY_PX = 20;
+export const OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX = 45;
+export const OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX = 15;
+export const OTP_EMAIL_BRAND_LOCKUP_GAP_PX = 8;
 
 const FONT =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
@@ -41,8 +45,17 @@ function emailStyles() {
 function renderBrandLockup(siteUrl: string) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
     <tr>
-      <td align="center" style="padding:0;line-height:0;">
-        <img src="${siteUrl}/email/nume-logo.png" width="40" height="40" alt="NUME" style="display:block;border:0;outline:none;text-decoration:none;width:40px;height:40px;margin:0 auto;" />
+      <td align="center" style="padding:0;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td align="center" valign="middle" style="padding:0 ${OTP_EMAIL_BRAND_LOCKUP_GAP_PX}px 0 0;line-height:0;">
+              <img src="${siteUrl}/email/nume-icon.png" width="${OTP_EMAIL_ICON_DISPLAY_PX}" height="${OTP_EMAIL_ICON_DISPLAY_PX}" alt="" style="display:block;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_ICON_DISPLAY_PX}px;height:${OTP_EMAIL_ICON_DISPLAY_PX}px;" />
+            </td>
+            <td align="left" valign="middle" style="padding:0;line-height:0;">
+              <img src="${siteUrl}/email/nume-wordmark.png" width="${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}" height="${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}" alt="NUME" style="display:block;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}px;height:${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}px;" />
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>`;
