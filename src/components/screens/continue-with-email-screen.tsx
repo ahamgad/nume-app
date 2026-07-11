@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import {
   AuthCard,
@@ -9,7 +9,12 @@ import {
 } from "@/components/layout/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { OtpInput, type OtpInputHandle } from "@/components/ui/otp-input";
+import {
+  focusOtpInput,
+  OtpInput,
+  refocusOtpInput,
+  type OtpInputHandle,
+} from "@/components/ui/otp-input";
 import { sendEmailOtp, verifyEmailOtp } from "@/lib/auth/email-otp";
 import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
@@ -22,16 +27,16 @@ function isValidEmailAddress(value: string) {
   return /^\S+@\S+\.\S+$/.test(value.trim());
 }
 
-function normalizeOtp(value: string) {
-  return value.replace(/\D/g, "").slice(0, 6);
-}
-
 function refocusEmailField(input: HTMLInputElement | null) {
   if (!input) return;
   queueMicrotask(() => {
     input.focus({ preventScroll: true });
   });
 }
+
+/** Keeps OTP mounted but off-screen until the email step completes. */
+const OTP_PREMOUNT_CLASS =
+  "pointer-events-none fixed h-px w-px overflow-hidden opacity-0";
 
 export function ContinueWithEmailScreen() {
   const t = useT();
@@ -52,19 +57,17 @@ export function ContinueWithEmailScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
+  const [otpMounted, setOtpMounted] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (consumeSessionExpiredNotice()) {
-      queueMicrotask(() => setNotice(t("auth.sessionExpired")));
+      setNotice(t("auth.sessionExpired"));
     }
   }, [t]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (step !== "otp") return;
-    const frameId = window.requestAnimationFrame(() => {
-      otpInputRef.current?.focusFirst();
-    });
-    return () => window.cancelAnimationFrame(frameId);
+    refocusOtpInput(otpInputRef.current);
   }, [step]);
 
   const verifyOtpCode = useCallback(
@@ -74,7 +77,7 @@ export function ContinueWithEmailScreen() {
 
       setOtpError(nextOtpError);
       if (nextOtpError) {
-        otpInputRef.current?.focusFirst();
+        refocusOtpInput(otpInputRef.current);
         return;
       }
       if (verifyingOtpRef.current) return;
@@ -90,7 +93,7 @@ export function ContinueWithEmailScreen() {
 
       if (verifyError) {
         setError(t("auth.continue.otpInvalid"));
-        otpInputRef.current?.focusFirst();
+        refocusOtpInput(otpInputRef.current);
         return;
       }
 
@@ -119,6 +122,8 @@ export function ContinueWithEmailScreen() {
     setSubmitting(true);
     setError(null);
     setMessage(null);
+    setOtpMounted(true);
+    focusOtpInput(otpInputRef.current);
 
     const { error: sendError } = await sendEmailOtp(trimmedEmail);
     setSubmitting(false);
@@ -139,6 +144,7 @@ export function ContinueWithEmailScreen() {
     setOtpError(null);
     emailSendCooldown.clear();
     setStep("otp");
+    refocusOtpInput(otpInputRef.current);
   }
 
   async function handleResend() {
@@ -154,16 +160,16 @@ export function ContinueWithEmailScreen() {
     if (resendError) {
       if (resendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(resendError.retryAfterSeconds);
-        otpInputRef.current?.focusFirst();
+        refocusOtpInput(otpInputRef.current);
         return;
       }
       setError(authErrorMessage(resendError));
-      otpInputRef.current?.focusFirst();
+      refocusOtpInput(otpInputRef.current);
       return;
     }
 
     setMessage(t("auth.continue.resendSuccess"));
-    otpInputRef.current?.focusFirst();
+    refocusOtpInput(otpInputRef.current);
   }
 
   function handleChangeEmail() {
@@ -173,9 +179,11 @@ export function ContinueWithEmailScreen() {
     setError(null);
     setMessage(null);
     emailSendCooldown.clear();
+    refocusEmailField(emailInputRef.current);
   }
 
   function handleOtpChange(next: string) {
+    if (submitting || verifyingOtpRef.current) return;
     setOtp(next);
     if (otpError && next.length > 0) {
       setOtpError(null);
@@ -243,6 +251,7 @@ export function ContinueWithEmailScreen() {
               form="continue-email-form"
               className="h-12 w-full"
               disabled={submitting || emailSendCooldown.isActive}
+              onMouseDown={(event) => event.preventDefault()}
             >
               {submitting
                 ? t("auth.continue.emailSubmitting")
@@ -251,7 +260,7 @@ export function ContinueWithEmailScreen() {
           ) : undefined
         }
       >
-        {step === "email" ? (
+        <div className={step === "email" ? undefined : "hidden"}>
           <form
             id="continue-email-form"
             noValidate
@@ -281,17 +290,22 @@ export function ContinueWithEmailScreen() {
               required
             />
           </form>
-        ) : (
-          <OtpInput
-            ref={otpInputRef}
-            id="continue-otp"
-            aria-label={t("auth.continue.otpLabel")}
-            value={otp}
-            autoFocus
-            disabled={submitting}
-            onChange={handleOtpChange}
-          />
-        )}
+        </div>
+        {otpMounted ? (
+          <div
+            className={step === "otp" ? undefined : OTP_PREMOUNT_CLASS}
+            aria-hidden={step !== "otp"}
+          >
+            <OtpInput
+              ref={otpInputRef}
+              id="continue-otp"
+              aria-label={t("auth.continue.otpLabel")}
+              value={otp}
+              readOnly={submitting}
+              onChange={handleOtpChange}
+            />
+          </div>
+        ) : null}
       </AuthCard>
     </AuthLayout>
   );

@@ -3,7 +3,6 @@
 import {
   forwardRef,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useRef,
   type ClipboardEvent,
@@ -28,6 +27,7 @@ type OtpInputProps = {
   onChange: (value: string) => void;
   length?: number;
   disabled?: boolean;
+  readOnly?: boolean;
   autoFocus?: boolean;
   "aria-label"?: string;
   className?: string;
@@ -40,6 +40,7 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     onChange,
     length = OTP_LENGTH,
     disabled = false,
+    readOnly = false,
     autoFocus = false,
     "aria-label": ariaLabel,
     className,
@@ -49,9 +50,11 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const focusFirst = useCallback(() => {
-    inputRefs.current[0]?.focus({ preventScroll: true });
-    inputRefs.current[0]?.select();
-  }, []);
+    const input = inputRefs.current[0];
+    if (!input || disabled) return;
+    input.focus({ preventScroll: true });
+    input.select();
+  }, [disabled]);
 
   useImperativeHandle(ref, () => ({ focusFirst }), [focusFirst]);
 
@@ -61,34 +64,28 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     chars.push("");
   }
 
-  const focusIndex = useCallback((index: number) => {
-    const clamped = Math.max(0, Math.min(index, length - 1));
-    inputRefs.current[clamped]?.focus({ preventScroll: true });
-    inputRefs.current[clamped]?.select();
-  }, [length]);
+  const focusIndex = useCallback(
+    (index: number) => {
+      const clamped = Math.max(0, Math.min(index, length - 1));
+      const input = inputRefs.current[clamped];
+      if (!input || disabled) return;
+      input.focus({ preventScroll: true });
+      input.select();
+    },
+    [disabled, length],
+  );
 
   const applyDigits = useCallback(
     (nextValue: string, focusAt?: number) => {
+      if (readOnly || disabled) return;
       const normalized = normalizeOtpDigits(nextValue, length);
       onChange(normalized);
       if (focusAt !== undefined) {
         focusIndex(focusAt);
       }
     },
-    [focusIndex, length, onChange],
+    [disabled, focusIndex, length, onChange, readOnly],
   );
-
-  useEffect(() => {
-    if (!autoFocus || disabled) {
-      return;
-    }
-
-    const frameId = window.requestAnimationFrame(() => {
-      focusFirst();
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [autoFocus, disabled, focusFirst]);
 
   function handleChange(index: number, nextRaw: string) {
     const nextDigit = normalizeOtpDigits(nextRaw, 1);
@@ -109,6 +106,8 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   }
 
   function handleKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
+    if (readOnly || disabled) return;
+
     const current = normalizeOtpDigits(value, length);
 
     if (event.key === "Backspace") {
@@ -144,6 +143,7 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   }
 
   function handlePaste(event: ClipboardEvent<HTMLInputElement>) {
+    if (readOnly || disabled) return;
     event.preventDefault();
     const pasted = normalizeOtpDigits(event.clipboardData.getData("text"), length);
     if (!pasted) {
@@ -172,11 +172,12 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
           maxLength={1}
           value={chars[index] ?? ""}
           disabled={disabled}
+          readOnly={readOnly}
           aria-label={
             ariaLabel ? `${ariaLabel} digit ${index + 1} of ${length}` : undefined
           }
           className={cn(
-            "box-border h-12 w-full min-w-0 rounded-md border border-input bg-background text-center text-[1.0625rem] font-medium tabular-nums text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+            "box-border h-12 w-full min-w-0 rounded-md border border-input bg-background text-center text-[1.0625rem] font-medium tabular-nums text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 read-only:opacity-100",
           )}
           onChange={(event) => handleChange(index, event.target.value)}
           onKeyDown={(event) => handleKeyDown(index, event)}
@@ -187,3 +188,19 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     </div>
   );
 });
+
+/** Focus OTP within the current user-gesture chain when possible. */
+export function focusOtpInput(input: OtpInputHandle | null) {
+  if (!input) return;
+  input.focusFirst();
+}
+
+/** Retry focus after layout for step transitions and post-async recovery. */
+export function refocusOtpInput(input: OtpInputHandle | null) {
+  if (!input) return;
+  input.focusFirst();
+  requestAnimationFrame(() => {
+    input.focusFirst();
+    requestAnimationFrame(() => input.focusFirst());
+  });
+}
