@@ -16,10 +16,7 @@ cp .env.example .env.local
 4. In Supabase Auth settings:
    - Enable Email provider
    - Set **Site URL** to `http://localhost:3000` (or your production URL)
-   - Add redirect URLs:
-     - `http://localhost:3000/auth/callback`
-     - `http://localhost:3000/verify-email`
-     - `http://localhost:3000/reset-password`
+   - Configure the Magic Link email template with `{{ .Token }}` for OTP sign-in
 
 5. Apply migration `002_rls_records_account_ownership.sql` (QA security fix)
 6. Apply migration `003_grants_authenticated.sql` if accounts were created before grants were added to 001

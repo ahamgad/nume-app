@@ -1,19 +1,9 @@
 /** Public landing — distribution, not application. */
 export const DISTRIBUTION_PATH = "/" as const;
 
-/** External entry: validation and callbacks only — not gated. */
-const TRANSPORT_ROUTE_PREFIXES = [
-  "/verify-email",
-  "/reset-password",
-  "/auth/callback",
-] as const;
-
 /** Application runtime only — install gate applies in browser. */
 const APPLICATION_ROUTE_PREFIXES = [
   "/continue",
-  "/login",
-  "/register",
-  "/forgot-password",
   "/splash",
   "/splash-debug",
   "/dashboard",
@@ -28,9 +18,7 @@ export function isDistributionRoute(pathname: string): boolean {
 }
 
 export function isTransportRoute(pathname: string): boolean {
-  return TRANSPORT_ROUTE_PREFIXES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
+  return false;
 }
 
 export function isApplicationRoute(pathname: string): boolean {
@@ -47,7 +35,7 @@ export function isApplicationRoute(pathname: string): boolean {
 export function getInstallGateBootstrapPaths() {
   return {
     distribution: DISTRIBUTION_PATH,
-    transport: TRANSPORT_ROUTE_PREFIXES,
+    transport: [] as const,
     application: APPLICATION_ROUTE_PREFIXES,
   };
 }

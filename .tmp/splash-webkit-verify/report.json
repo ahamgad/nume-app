@@ -1,0 +1,126 @@
+{
+  "base": "http://localhost:3000/splash-debug",
+  "mid": [
+    {
+      "key": "openLeft",
+      "found": true,
+      "d": "M16.13 75 L32.2 25 L39.29 25",
+      "totalLength": 59.6089973449707,
+      "dasharray": "100px",
+      "dashoffset": "29.151543px",
+      "bbox": {
+        "x": 16.1299991607666,
+        "y": 25,
+        "width": 23.160001754760742,
+        "height": 50
+      }
+    },
+    {
+      "key": "openRight",
+      "found": true,
+      "d": "M30.29 75 L46.37 25 M46.37 25 L39.29 25",
+      "totalLength": 59.602054595947266,
+      "dasharray": "100px",
+      "dashoffset": "29.151543px",
+      "bbox": {
+        "x": 30.290000915527344,
+        "y": 25,
+        "width": 16.079998016357422,
+        "height": 50
+      }
+    },
+    {
+      "key": "endLeft",
+      "found": true,
+      "d": "M32.2 25 L16.13 75 L23.21 75",
+      "totalLength": 59.5989990234375,
+      "dasharray": "100px",
+      "dashoffset": "29.151543px",
+      "bbox": {
+        "x": 16.1299991607666,
+        "y": 25,
+        "width": 16.07000160217285,
+        "height": 50
+      }
+    },
+    {
+      "key": "endRight",
+      "found": true,
+      "d": "M46.37 25 L30.29 75 M30.29 75 L23.21 75",
+      "totalLength": 59.60205841064453,
+      "dasharray": "100px",
+      "dashoffset": "29.151543px",
+      "bbox": {
+        "x": 23.209999084472656,
+        "y": 25,
+        "width": 23.15999984741211,
+        "height": 50
+      }
+    }
+  ],
+  "complete": [
+    {
+      "key": "openLeft",
+      "found": true,
+      "d": "M16.13 75 L32.2 25 L39.29 25",
+      "totalLength": 59.6089973449707,
+      "dasharray": "100px",
+      "dashoffset": "0px",
+      "bbox": {
+        "x": 16.1299991607666,
+        "y": 25,
+        "width": 23.160001754760742,
+        "height": 50
+      }
+    },
+    {
+      "key": "openRight",
+      "found": true,
+      "d": "M30.29 75 L46.37 25 M46.37 25 L39.29 25",
+      "totalLength": 59.602054595947266,
+      "dasharray": "100px",
+      "dashoffset": "0px",
+      "bbox": {
+        "x": 30.290000915527344,
+        "y": 25,
+        "width": 16.079998016357422,
+        "height": 50
+      }
+    },
+    {
+      "key": "endLeft",
+      "found": true,
+      "d": "M32.2 25 L16.13 75 L23.21 75",
+      "totalLength": 59.5989990234375,
+      "dasharray": "100px",
+      "dashoffset": "0px",
+      "bbox": {
+        "x": 16.1299991607666,
+        "y": 25,
+        "width": 16.07000160217285,
+        "height": 50
+      }
+    },
+    {
+      "key": "endRight",
+      "found": true,
+      "d": "M46.37 25 L30.29 75 M30.29 75 L23.21 75",
+      "totalLength": 59.60205841064453,
+      "dasharray": "100px",
+      "dashoffset": "0px",
+      "bbox": {
+        "x": 23.209999084472656,
+        "y": 25,
+        "width": 23.15999984741211,
+        "height": 50
+      }
+    }
+  ],
+  "checks": {
+    "rightAnimatingMid": true,
+    "rightVisibleComplete": true,
+    "openRightHasSubpath": true,
+    "endRightHasSubpath": true
+  },
+  "pass": true
+}

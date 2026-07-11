@@ -1,14 +1,6 @@
 import type { TranslationKey } from "@/lib/i18n";
 
-export type AuthErrorCode =
-  | "invalidCredentials"
-  | "emailInUse"
-  | "emailNotConfirmed"
-  | "weakPassword"
-  | "samePassword"
-  | "emailSendRateLimit"
-  | "callbackFailed"
-  | "generic";
+export type AuthErrorCode = "emailSendRateLimit" | "generic";
 
 export type MappedAuthError = {
   code: AuthErrorCode;
@@ -102,53 +94,12 @@ export function mapSupabaseAuthError(
   const code = typeof error === "string" ? undefined : error?.code;
   const normalized = message?.toLowerCase() ?? "";
 
-  if (code === "email_not_confirmed") {
-    return authError("emailNotConfirmed");
-  }
-
-  if (code === "same_password") {
-    return authError("samePassword");
-  }
-
   if (isEmailSendRateLimit(code, normalized)) {
     return authError("emailSendRateLimit", parseEmailRateLimitSeconds(message));
   }
 
   if (!message) {
     return authError("generic");
-  }
-
-  if (normalized.includes("email not confirmed")) {
-    return authError("emailNotConfirmed");
-  }
-
-  if (
-    normalized.includes("same_password") ||
-    (normalized.includes("new password") &&
-      normalized.includes("different") &&
-      normalized.includes("old password"))
-  ) {
-    return authError("samePassword");
-  }
-
-  if (normalized.includes("invalid login credentials")) {
-    return authError("invalidCredentials");
-  }
-
-  if (
-    normalized.includes("user already registered") ||
-    normalized.includes("already been registered")
-  ) {
-    return authError("emailInUse");
-  }
-
-  if (
-    normalized.includes("password") &&
-    (normalized.includes("short") ||
-      normalized.includes("least") ||
-      normalized.includes("characters"))
-  ) {
-    return authError("weakPassword");
   }
 
   return authError("generic");

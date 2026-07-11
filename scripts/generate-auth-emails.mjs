@@ -1,31 +1,26 @@
 #!/usr/bin/env node
 /**
- * Generates production auth email HTML from the Design System email rendering target.
+ * Generates the hosted email brand mark PNG from the Design System SVG.
  */
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
-import {
-  confirmEmailContent,
-  recoveryEmailContent,
-} from "../src/lib/email/design-tokens.ts";
-import { renderAuthEmailHtml } from "../src/lib/email/render-auth-email.ts";
+import { emailDesignTokens } from "../src/lib/email/design-tokens.ts";
 
-const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = path.join(ROOT, "..", "emails", "auth");
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const EMAIL_ASSET_DIR = path.join(ROOT, "public", "email");
+const SVG_SOURCE = path.join(ROOT, "public", "brand-flatten-background.svg");
 
 async function main() {
-  await mkdir(OUT_DIR, { recursive: true });
+  await mkdir(EMAIL_ASSET_DIR, { recursive: true });
 
-  const confirmHtml = renderAuthEmailHtml(confirmEmailContent);
-  const recoveryHtml = renderAuthEmailHtml(recoveryEmailContent);
-
-  await writeFile(path.join(OUT_DIR, "confirm-email.html"), confirmHtml);
-  await writeFile(path.join(OUT_DIR, "reset-password.html"), recoveryHtml);
-
-  console.log("✓ emails/auth/confirm-email.html");
-  console.log("✓ emails/auth/reset-password.html");
+  await sharp(SVG_SOURCE, { density: 288 })
+    .resize(emailDesignTokens.logoAssetPx, emailDesignTokens.logoAssetPx)
+    .png()
+    .toFile(path.join(EMAIL_ASSET_DIR, "nume-mark.png"));
+  console.log("✓ public/email/nume-mark.png");
 }
 
 main().catch((error) => {

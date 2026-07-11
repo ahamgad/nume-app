@@ -1,6 +1,12 @@
 /**
- * Shared NUME auth email shell — rendering target of the Design System.
- * Structure: Logo → Headline → Body → Primary CTA → One-time note → Security note → Footer
+ * Shared NUME auth email shell — Email Design System rendering target.
+ *
+ * Hierarchy (every auth email):
+ * Logo → Headline → Body → Primary CTA → Security note
+ * → (outside card) One-time note → Footer
+ *
+ * Confirm, Reset, and future auth templates must consume this shell.
+ * Do not fork layout, spacing, CTA, or footer chrome in individual templates.
  */
 
 import {
@@ -16,13 +22,20 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-/** Build production HTML for a NUME auth email from Design System tokens + content. */
+/**
+ * Build production HTML for a NUME auth email from Design System tokens + content.
+ *
+ * Vertical rhythm (approved baseline):
+ * Logo → Headline 16 · Headline → Body 24 · Body → CTA 32 · CTA → Security 36
+ * Card → footer block 24 · One-time → copyright 12
+ */
 export function renderAuthEmailHtml(content: AuthEmailContent): string {
-  const pad = t.space16Px;
-  const gapAfterLogo = t.space24Px;
-  const gapAfterBody = t.space24Px;
-  const gapAfterCta = t.space24Px;
-  const gapNotes = t.space16Px;
+  const gapAfterLogo = t.space16Px;
+  const gapAfterHeadline = t.space24Px;
+  const gapAfterBody = t.space32Px;
+  const gapAfterCta = t.space36Px;
+  const gapAfterCard = t.space24Px;
+  const gapFooterLines = t.space12Px;
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -49,26 +62,17 @@ export function renderAuthEmailHtml(content: AuthEmailContent): string {
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:${t.contentMaxWidthPx}px;width:100%;">
           <!-- Card -->
           <tr>
-            <td style="background-color:${t.card};border:1px solid ${t.border};border-radius:${t.cardRadiusPx}px;padding:${pad}px;">
+            <td style="background-color:${t.card};border:1px solid ${t.border};border-radius:${t.cardRadiusPx}px;padding:${t.cardPaddingPx}px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <!-- Logo -->
+                <!-- Logo (mark only — no wordmark) -->
                 <tr>
                   <td style="padding:0 0 ${gapAfterLogo}px 0;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="vertical-align:middle;padding:0 ${t.space16Px}px 0 0;">
-                          <img src="${t.logoPath}" width="${t.logoDisplayPx}" height="${t.logoDisplayPx}" alt="NUME" style="display:block;border:0;outline:none;text-decoration:none;width:${t.logoDisplayPx}px;height:${t.logoDisplayPx}px;" />
-                        </td>
-                        <td style="vertical-align:middle;font-family:${t.fontFamily};font-size:${t.wordmarkSizePx}px;font-weight:600;line-height:1.2;color:${t.foreground};">
-                          NUME
-                        </td>
-                      </tr>
-                    </table>
+                    <img src="${t.logoPath}" width="${t.logoDisplayPx}" height="${t.logoDisplayPx}" alt="NUME" style="display:block;border:0;outline:none;text-decoration:none;width:${t.logoDisplayPx}px;height:${t.logoDisplayPx}px;border-radius:${t.logoRadiusPx}px;" />
                   </td>
                 </tr>
                 <!-- Headline -->
                 <tr>
-                  <td style="padding:0 0 ${t.space16Px}px 0;font-family:${t.fontFamily};font-size:${t.headlineSizePx}px;font-weight:600;line-height:${t.headlineLineHeight};color:${t.foreground};">
+                  <td style="padding:0 0 ${gapAfterHeadline}px 0;font-family:${t.fontFamily};font-size:${t.headlineSizePx}px;font-weight:600;line-height:${t.headlineLineHeight};color:${t.foreground};">
                     ${escapeHtml(content.headline)}
                   </td>
                 </tr>
@@ -84,7 +88,7 @@ export function renderAuthEmailHtml(content: AuthEmailContent): string {
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                       <tr>
                         <td align="center" bgcolor="${t.primary}" style="background-color:${t.primary};border-radius:${t.buttonRadiusPx}px;height:${t.ctaHeightPx}px;">
-                          <a href="${content.ctaHref}" style="display:block;width:100%;box-sizing:border-box;padding:14px 16px;font-family:${t.fontFamily};font-size:${t.bodySizePx}px;font-weight:500;line-height:1.25;color:${t.primaryForeground};text-decoration:none;text-align:center;">
+                          <a href="${content.ctaHref}" style="display:block;width:100%;box-sizing:border-box;padding:${t.ctaPadYPx}px ${t.space16Px}px;font-family:${t.fontFamily};font-size:${t.bodySizePx}px;font-weight:500;line-height:1.25;color:${t.primaryForeground};text-decoration:none;text-align:center;">
                             ${escapeHtml(content.ctaLabel)}
                           </a>
                         </td>
@@ -92,13 +96,7 @@ export function renderAuthEmailHtml(content: AuthEmailContent): string {
                     </table>
                   </td>
                 </tr>
-                <!-- One-time link note -->
-                <tr>
-                  <td style="padding:0 0 ${gapNotes}px 0;font-family:${t.fontFamily};font-size:${t.captionSizePx}px;font-weight:400;line-height:${t.captionLineHeight};color:${t.mutedForeground};">
-                    ${escapeHtml(content.oneTimeNote)}
-                  </td>
-                </tr>
-                <!-- Security note -->
+                <!-- Security note (in-card helper) -->
                 <tr>
                   <td style="padding:0;font-family:${t.fontFamily};font-size:${t.captionSizePx}px;font-weight:400;line-height:${t.captionLineHeight};color:${t.mutedForeground};">
                     ${escapeHtml(content.securityNote)}
@@ -107,10 +105,21 @@ export function renderAuthEmailHtml(content: AuthEmailContent): string {
               </table>
             </td>
           </tr>
-          <!-- Footer -->
+          <!-- Footer: one-time note + copyright (outside card) -->
           <tr>
-            <td align="center" style="padding:${t.space24Px}px 0 0 0;font-family:${t.fontFamily};font-size:${t.footerSizePx}px;font-weight:400;line-height:1.4;color:${t.mutedForeground};">
-              ${escapeHtml(content.footer)}
+            <td align="center" style="padding:${gapAfterCard}px 0 0 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding:0 0 ${gapFooterLines}px 0;font-family:${t.fontFamily};font-size:${t.captionSizePx}px;font-weight:400;line-height:${t.captionLineHeight};color:${t.mutedForeground};">
+                    ${escapeHtml(content.oneTimeNote)}
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding:0;font-family:${t.fontFamily};font-size:${t.footerSizePx}px;font-weight:400;line-height:1.4;color:${t.mutedForeground};">
+                    ${escapeHtml(content.footer)}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>

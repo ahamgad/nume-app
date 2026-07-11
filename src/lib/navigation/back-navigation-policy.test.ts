@@ -31,7 +31,7 @@ describe("shouldRestoreTabRootAfterPopState", () => {
   });
 
   it("does not restore when leaving a tab root for auth routes", () => {
-    expect(shouldRestoreTabRootAfterPopState("/accounts", "/login")).toBe(
+    expect(shouldRestoreTabRootAfterPopState("/accounts", "/continue")).toBe(
       false,
     );
   });

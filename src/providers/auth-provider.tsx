@@ -12,44 +12,14 @@ import {
   type ReactNode,
 } from "react";
 
-import {
-  mapSupabaseAuthError,
-  type MappedAuthError,
-} from "@/lib/auth/errors";
-import {
-  clearPendingVerificationEmail,
-  getPendingVerificationEmail,
-} from "@/lib/auth/pending-verification-email";
-import { resolveSignUpResult } from "@/lib/auth/sign-up-result";
 import { markSessionExpiredNotice } from "@/lib/auth/session-notice";
-import { getAuthCallbackUrl } from "@/lib/auth/urls";
 import { createClient } from "@/lib/supabase/client";
-
-type AuthActionResult = {
-  error: MappedAuthError | null;
-  requiresVerification?: boolean;
-};
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signIn: (
-    email: string,
-    password: string,
-  ) => Promise<AuthActionResult>;
-  signUp: (
-    email: string,
-    password: string,
-  ) => Promise<AuthActionResult>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: MappedAuthError | null }>;
-  updatePassword: (
-    password: string,
-  ) => Promise<{ error: MappedAuthError | null }>;
-  resendVerification: (
-    email?: string,
-  ) => Promise<{ error: MappedAuthError | null }>;
   refreshSession: () => Promise<User | null>;
 }
 
@@ -62,13 +32,9 @@ function applySessionState(
 ) {
   setSession(nextSession);
   setUser(nextSession?.user ?? null);
-  if (nextSession?.user?.email_confirmed_at) {
-    clearPendingVerificationEmail();
-  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Fail fast on missing Supabase env — configuration error, not an auth error.
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -119,37 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [supabase]);
 
-  const signIn = useCallback(
-    async (email: string, password: string): Promise<AuthActionResult> => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        return { error: mapSupabaseAuthError(error) };
-      }
-      if (data.user && !data.user.email_confirmed_at) {
-        return { error: null, requiresVerification: true };
-      }
-      return { error: null };
-    },
-    [supabase],
-  );
-
-  const signUp = useCallback(
-    async (email: string, password: string): Promise<AuthActionResult> => {
-      const response = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: getAuthCallbackUrl("/splash"),
-        },
-      });
-      return resolveSignUpResult(response);
-    },
-    [supabase],
-  );
-
   const signOut = useCallback(async () => {
     intentionalSignOutRef.current = true;
     try {
@@ -158,44 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       intentionalSignOutRef.current = false;
     }
   }, [supabase]);
-
-  const resetPassword = useCallback(
-    async (email: string) => {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: getAuthCallbackUrl("/reset-password"),
-      });
-      return { error: error ? mapSupabaseAuthError(error) : null };
-    },
-    [supabase],
-  );
-
-  const updatePassword = useCallback(
-    async (password: string) => {
-      const { error } = await supabase.auth.updateUser({ password });
-      return { error: error ? mapSupabaseAuthError(error) : null };
-    },
-    [supabase],
-  );
-
-  const resendVerification = useCallback(
-    async (email?: string) => {
-      const targetEmail = email ?? user?.email ?? getPendingVerificationEmail();
-      if (!targetEmail) {
-        throw new Error(
-          "Internal state error: verification resend requested without an email",
-        );
-      }
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: targetEmail,
-        options: {
-          emailRedirectTo: getAuthCallbackUrl("/splash"),
-        },
-      });
-      return { error: error ? mapSupabaseAuthError(error) : null };
-    },
-    [supabase, user],
-  );
 
   const refreshSession = useCallback(async (): Promise<User | null> => {
     const { data } = await supabase.auth.refreshSession();
@@ -209,26 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       isLoading,
-      signIn,
-      signUp,
       signOut,
-      resetPassword,
-      updatePassword,
-      resendVerification,
       refreshSession,
     }),
-    [
-      user,
-      session,
-      isLoading,
-      signIn,
-      signUp,
-      signOut,
-      resetPassword,
-      updatePassword,
-      resendVerification,
-      refreshSession,
-    ],
+    [user, session, isLoading, signOut, refreshSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

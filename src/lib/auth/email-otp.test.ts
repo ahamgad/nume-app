@@ -38,7 +38,7 @@ describe("sendEmailOtp", () => {
 
     const result = await sendEmailOtp("user@example.com");
 
-    expect(result.error).toEqual({ code: "invalidCredentials" });
+    expect(result.error).toEqual({ code: "generic" });
   });
 });
 

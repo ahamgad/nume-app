@@ -42,7 +42,7 @@ export function MoreScreen() {
 
   async function handleLogout() {
     await signOut();
-    router.replace("/login");
+    router.replace("/continue");
     router.refresh();
   }
 
@@ -53,7 +53,7 @@ export function MoreScreen() {
       await fetch("/api/qa/delete-test-account", { method: "POST" });
     } finally {
       await signOut();
-      router.replace("/login");
+      router.replace("/continue");
       router.refresh();
       setDeleting(false);
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AuthInputField } from "@/components/forms/auth-input-field";
 import {
@@ -9,12 +9,14 @@ import {
   AUTH_PRIMARY_CTA_TOP_CLASS,
   AuthLayout,
 } from "@/components/layout/auth-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { OtpInput } from "@/components/ui/otp-input";
 import { sendEmailOtp, verifyEmailOtp } from "@/lib/auth/email-otp";
+import { consumeSessionExpiredNotice } from "@/lib/auth/session-notice";
 import { useAuthErrorMessage } from "@/lib/auth/use-auth-error-message";
 import { useEmailSendCooldown } from "@/lib/auth/use-email-send-cooldown";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useT } from "@/providers/i18n-provider";
 
 type ContinueStep = "email" | "otp";
@@ -39,9 +41,16 @@ export function ContinueWithEmailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (consumeSessionExpiredNotice()) {
+      queueMicrotask(() => setNotice(t("auth.sessionExpired")));
+    }
+  }, [t]);
 
   async function handleEmailSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -66,6 +75,7 @@ export function ContinueWithEmailScreen() {
     if (sendError) {
       if (sendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(sendError.retryAfterSeconds);
+        return;
       }
       setError(authErrorMessage(sendError));
       return;
@@ -104,6 +114,8 @@ export function ContinueWithEmailScreen() {
   }
 
   async function handleResend() {
+    if (emailSendCooldown.isActive) return;
+
     setResending(true);
     setError(null);
     setMessage(null);
@@ -114,6 +126,7 @@ export function ContinueWithEmailScreen() {
     if (resendError) {
       if (resendError.code === "emailSendRateLimit") {
         emailSendCooldown.start(resendError.retryAfterSeconds);
+        return;
       }
       setError(authErrorMessage(resendError));
       return;
@@ -137,7 +150,7 @@ export function ContinueWithEmailScreen() {
         <AuthCard
           title={t("auth.continue.emailTitle")}
           errorMessage={error}
-          statusMessage={emailSendCooldown.message}
+          statusMessage={notice ?? emailSendCooldown.message}
         >
           <form noValidate onSubmit={handleEmailSubmit} className="flex flex-1 flex-col">
             <div className="space-y-4">
@@ -208,22 +221,17 @@ export function ContinueWithEmailScreen() {
               required
               error={otpError ?? undefined}
             >
-              <Input
+              <OtpInput
                 id="continue-otp"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="[0-9]*"
-                maxLength={6}
+                aria-label={t("auth.continue.otpLabel")}
                 value={otp}
-                onChange={(event) => {
-                  const next = normalizeOtp(event.target.value);
+                autoFocus
+                onChange={(next) => {
                   setOtp(next);
                   if (otpError && next.length > 0) {
                     setOtpError(null);
                   }
                 }}
-                required
               />
             </AuthInputField>
           </div>

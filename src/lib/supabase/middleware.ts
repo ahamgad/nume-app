@@ -3,18 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 
-const AUTH_ROUTES = [
-  "/continue",
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-  "/verify-email",
-];
+const AUTH_ROUTES = ["/continue"];
 
 const PUBLIC_ROUTES = ["/splash"];
-
-const AUTH_CALLBACK = "/auth/callback";
 
 function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.some(
@@ -54,14 +45,6 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const onAuthRoute = isAuthRoute(pathname);
-  const onVerifyRoute = pathname.startsWith("/verify-email");
-  const onResetPasswordRoute = pathname.startsWith("/reset-password");
-  const onAuthCallback = pathname.startsWith(AUTH_CALLBACK);
-
-  if (onAuthCallback) {
-    return supabaseResponse;
-  }
-
   const onLandingRoute = pathname === "/";
 
   if (!user && !onAuthRoute && !isPublicRoute(pathname) && !onLandingRoute) {
@@ -70,13 +53,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && !user.email_confirmed_at && !onVerifyRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/verify-email";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && user.email_confirmed_at && onAuthRoute && !onResetPasswordRoute) {
+  if (user && onAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/splash";
     return NextResponse.redirect(url);

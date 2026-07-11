@@ -56,15 +56,13 @@ describe("isSplashHandoffRoute", () => {
   it("keeps the overlay until routing leaves /splash", () => {
     expect(isSplashHandoffRoute("/splash")).toBe(false);
     expect(isSplashHandoffRoute("/dashboard")).toBe(true);
-    expect(isSplashHandoffRoute("/login")).toBe(true);
+    expect(isSplashHandoffRoute("/continue")).toBe(true);
   });
 });
 
 describe("isAuthRoute", () => {
-  it("matches authentication screens", () => {
+  it("matches the continue screen", () => {
     expect(isAuthRoute("/continue")).toBe(true);
-    expect(isAuthRoute("/login")).toBe(true);
-    expect(isAuthRoute("/verify-email")).toBe(true);
     expect(isAuthRoute("/")).toBe(false);
   });
 });
@@ -84,7 +82,7 @@ describe("shouldSkipSplashOnLoad", () => {
   it("skips splash on auth routes", () => {
     expect(
       shouldSkipSplashOnLoad({
-        pathname: "/verify-email",
+        pathname: "/continue",
         splashComplete: false,
         bgResumeEligible: false,
         wasDiscarded: false,

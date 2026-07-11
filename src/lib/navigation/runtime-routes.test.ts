@@ -9,25 +9,20 @@ import {
 describe("isDistributionRoute", () => {
   it("matches the landing page only", () => {
     expect(isDistributionRoute("/")).toBe(true);
-    expect(isDistributionRoute("/login")).toBe(false);
+    expect(isDistributionRoute("/continue")).toBe(false);
   });
 });
 
 describe("isTransportRoute", () => {
-  it("matches transport and callback routes", () => {
-    expect(isTransportRoute("/verify-email")).toBe(true);
-    expect(isTransportRoute("/reset-password")).toBe(true);
-    expect(isTransportRoute("/auth/callback")).toBe(true);
-    expect(isTransportRoute("/login")).toBe(false);
+  it("matches no routes after legacy transport removal", () => {
+    expect(isTransportRoute("/verify-email")).toBe(false);
+    expect(isTransportRoute("/auth/callback")).toBe(false);
   });
 });
 
 describe("isApplicationRoute", () => {
   it("matches auth entry and tab roots", () => {
     expect(isApplicationRoute("/continue")).toBe(true);
-    expect(isApplicationRoute("/login")).toBe(true);
-    expect(isApplicationRoute("/register")).toBe(true);
-    expect(isApplicationRoute("/forgot-password")).toBe(true);
     expect(isApplicationRoute("/dashboard")).toBe(true);
     expect(isApplicationRoute("/planning")).toBe(true);
     expect(isApplicationRoute("/accounts")).toBe(true);
@@ -43,10 +38,7 @@ describe("isApplicationRoute", () => {
     expect(isApplicationRoute("/splash-debug")).toBe(true);
   });
 
-  it("excludes distribution and transport routes", () => {
+  it("excludes distribution routes", () => {
     expect(isApplicationRoute("/")).toBe(false);
-    expect(isApplicationRoute("/verify-email")).toBe(false);
-    expect(isApplicationRoute("/reset-password")).toBe(false);
-    expect(isApplicationRoute("/auth/callback")).toBe(false);
   });
 });

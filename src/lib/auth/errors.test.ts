@@ -7,44 +7,6 @@ import {
 } from "@/lib/auth/errors";
 
 describe("mapSupabaseAuthError", () => {
-  it("maps invalid login credentials", () => {
-    expect(mapSupabaseAuthError("Invalid login credentials")).toEqual({
-      code: "invalidCredentials",
-    });
-  });
-
-  it("maps duplicate registration", () => {
-    expect(mapSupabaseAuthError("User already registered")).toEqual({
-      code: "emailInUse",
-    });
-  });
-
-  it("maps weak password messages", () => {
-    expect(
-      mapSupabaseAuthError("Password should be at least 8 characters"),
-    ).toEqual({ code: "weakPassword" });
-  });
-
-  it("maps unconfirmed email errors", () => {
-    expect(mapSupabaseAuthError({ code: "email_not_confirmed" })).toEqual({
-      code: "emailNotConfirmed",
-    });
-    expect(mapSupabaseAuthError("Email not confirmed")).toEqual({
-      code: "emailNotConfirmed",
-    });
-  });
-
-  it("maps same-password update errors", () => {
-    expect(mapSupabaseAuthError({ code: "same_password" })).toEqual({
-      code: "samePassword",
-    });
-    expect(
-      mapSupabaseAuthError(
-        "New password should be different from the old password.",
-      ),
-    ).toEqual({ code: "samePassword" });
-  });
-
   it("maps email send rate-limit errors and parses remaining seconds", () => {
     expect(
       mapSupabaseAuthError({

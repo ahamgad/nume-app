@@ -17,14 +17,7 @@ export const SPLASH_COMPLETE_KEY = "nume-splash-complete";
 export const BG_RESUME_ELIGIBLE_KEY = "nume-bg-resume-eligible";
 
 /** Auth routes must render without the cold-start splash redirect. */
-export const AUTH_ROUTE_PREFIXES = [
-  "/continue",
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-  "/verify-email",
-] as const;
+export const AUTH_ROUTE_PREFIXES = ["/continue"] as const;
 
 export function isAuthRoute(pathname: string): boolean {
   return AUTH_ROUTE_PREFIXES.some(
