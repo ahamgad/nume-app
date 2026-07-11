@@ -2,11 +2,17 @@
 /**
  * Deploy the OTP email template to Supabase Auth (magic_link template).
  *
- * Requires:
+ * Token resolution (first match wins):
  * - SUPABASE_ACCESS_TOKEN
- * - SUPABASE_PROJECT_REF (defaults to linked project ref)
+ * - Supabase CLI macOS keychain credential
+ * - ~/.supabase/access-token
+ *
+ * Optional: SUPABASE_PROJECT_REF (defaults to linked project ref)
  */
-import { readFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { readFile, access } from "node:fs/promises";
+import { constants } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,14 +21,43 @@ import { OTP_EMAIL_SUBJECT } from "../src/lib/email/otp-email-template.ts";
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROJECT_REF =
   process.env.SUPABASE_PROJECT_REF ?? "otiwexvgrorwinrjblun";
-const ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN;
+
+async function resolveAccessToken() {
+  if (process.env.SUPABASE_ACCESS_TOKEN) {
+    return process.env.SUPABASE_ACCESS_TOKEN;
+  }
+
+  const tokenFile = path.join(os.homedir(), ".supabase", "access-token");
+  try {
+    await access(tokenFile, constants.R_OK);
+    const token = (await readFile(tokenFile, "utf8")).trim();
+    if (token) return token;
+  } catch {
+    // Fall through to keychain lookup.
+  }
+
+  if (process.platform === "darwin") {
+    for (const service of ["Supabase CLI", "supabase"]) {
+      try {
+        const token = execFileSync(
+          "security",
+          ["find-generic-password", "-s", service, "-w"],
+          { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+        ).trim();
+        if (token) return token;
+      } catch {
+        // Try the next credential service name.
+      }
+    }
+  }
+
+  throw new Error(
+    "Supabase access token not found. Run `supabase login` or set SUPABASE_ACCESS_TOKEN.",
+  );
+}
 
 async function main() {
-  if (!ACCESS_TOKEN) {
-    throw new Error(
-      "SUPABASE_ACCESS_TOKEN is required to deploy the OTP email template.",
-    );
-  }
+  const accessToken = await resolveAccessToken();
 
   const template = await readFile(
     path.join(ROOT, "emails", "otp", "template.html"),
@@ -34,7 +69,7 @@ async function main() {
     {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
