@@ -218,7 +218,7 @@ span {
   </style>
 </head>
 <body class="me_body email-page-outer" style="min-width: 100%; background-color:#ececec;margin:0 auto !important;padding:0;">
-<span class="preheader email-preheader" style="font-size:1px;color:#ffffff;">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
+<span class="preheader email-preheader" style="font-size:1px;color:#ffffff;">Your code is {{ .Token }}&nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
 <table class="me_full_wrap email-page-outer" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color:#ececec;">
 <tr>
 <td align="center" valign="top">
@@ -239,9 +239,8 @@ span {
 <tr>
 <td height="34" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
-<tr><td align="center"> <a target="_blank" class="email-logo-link" style="text-decoration: none;color: #ffffff;" href="https://numeos.app">
-<img alt="logo" src="{{ .SiteURL }}/email/nume-icon.png" width="80" height="80" class="email-brand-light" style="display:inline-block;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
-<img alt="logo" src="{{ .SiteURL }}/email/nume-icon-dark.png" width="80" height="80" class="email-brand-dark" style="display:none;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
+<tr><td align="center"> <a target="_blank" class="email-logo-link" style="text-decoration: none;" href="https://numeos.app">
+<img src="{{ .SiteURL }}/email/nume-logo.png" width="246" height="68" class="email-brand-light" style="display:inline-block;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
 </a></td></tr>
 <tr>
 <td height="20" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
@@ -250,11 +249,11 @@ span {
 <td height="35" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
 <tr>
-<td class="email-headline" style="font-family:'Inter Tight', Arial, sans-serif;font-size:38px;text-align:center;color:#000000;font-weight:800;line-height: 48px;padding-bottom: 8px">Confirm Your Email to</td>
+<td class="email-headline" style="font-family:'Inter Tight', Arial, sans-serif;font-size:32px;text-align:center;color:#000000;font-weight:800;line-height: 48px;padding-bottom: 8px">Confirm your email</td>
 </tr>
-<tr>
+<!-- <tr>
 <td height="20" style="line-height:1px;font-size:1px;">&nbsp;</td>
-</tr>
+</tr> -->
 <tr>
 <td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:#737373;font-weight:400;line-height: 30px;">Please confirm your email address using the code below</td>
 </tr>
@@ -282,10 +281,13 @@ span {
 <td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
 <tr>
-<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:#737373;font-weight:400;line-height: 30px;">Didn’t sign up for this? No worries — simply <br class="me_hide">ignore this message. </td>
+<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:16px;text-align:center;color:#737373;font-weight:400;line-height: 28px;">Didn’t sign up for this?<br>No worries, simply ignore this message </td>
 </tr>
-<tr>
 <td height="30" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
+<tr>
+  <td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:14px;text-align:center;color:#737373;font-weight:400;line-height: 30px;">2026 © NUME</td>
+<td height="30" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
+
 </tr>
 <tr>
 <td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
@@ -304,5 +306,5 @@ span {
 </td>
 </tr>
 </table>
-<div class="email-outlook-spacer" style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;">- - - - - - - - - - - - - - - - - - - - - - -</div>
+<div class="email-outlook-spacer" style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;"></div>
 </body></html>
