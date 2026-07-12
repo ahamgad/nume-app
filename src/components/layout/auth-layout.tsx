@@ -204,7 +204,7 @@ export function AuthCard({
   className,
 }: AuthCardProps) {
   return (
-    <div className={cn("w-full px-4 pb-6", className)}>
+    <div className={cn("w-full px-4 pt-4 pb-6", className)}>
       <AuthTitle>{title}</AuthTitle>
       <div className={cn(AUTH_TITLE_TO_MESSAGE_CLASS, AUTH_MESSAGE_AREA_CLASS)}>
         {message ? (
