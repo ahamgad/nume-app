@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 
 import { InputFieldLabel } from "@/components/forms/input-field";
+import { AccountDetailsBodySurface } from "@/components/accounts/account-details-chrome";
 import {
   AUTH_KEYBOARD_SURFACE_CLASS,
   useAuthViewportLock,
 } from "@/hooks/use-auth-viewport-lock";
-import { BOTTOM_SHEET_TOP_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { isKeyboardPresent } from "@/lib/scroll/scroll-input-into-view";
 import { cn } from "@/lib/utils";
@@ -18,10 +18,12 @@ import { useT } from "@/providers/i18n-provider";
 /** Page inset below the safe area (px). */
 export const AUTH_PAGE_TOP_PADDING_PX = 24;
 
-/** Auth content surface — bottom sheet top radius on a full-width card surface. */
-export const AUTH_BODY_SURFACE_CLASS = cn(
-  "relative z-[1] -mx-4 mt-auto flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-6",
-  BOTTOM_SHEET_TOP_RADIUS_CLASS,
+/** Mirrors ScreenBody horizontal inset so AccountDetailsBodySurface can full-bleed. */
+const AUTH_BODY_SURFACE_INSET_CLASS = "px-4";
+
+/** Auth-only body surface chrome — white card fill on account-details radius. */
+const AUTH_BODY_SURFACE_CHROME_CLASS = cn(
+  "mt-0 flex min-h-0 flex-1 flex-col",
   CARD_SURFACE_BG_CLASS,
   "pb-[env(safe-area-inset-bottom)]",
 );
@@ -159,7 +161,16 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       )}
     >
       <AuthHero />
-      <div className={AUTH_BODY_SURFACE_CLASS}>{children}</div>
+      <div
+        className={cn(
+          "mt-auto flex min-h-0 flex-1 flex-col",
+          AUTH_BODY_SURFACE_INSET_CLASS,
+        )}
+      >
+        <AccountDetailsBodySurface className={AUTH_BODY_SURFACE_CHROME_CLASS}>
+          {children}
+        </AccountDetailsBodySurface>
+      </div>
     </div>
   );
 }
