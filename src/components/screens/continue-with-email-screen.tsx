@@ -9,6 +9,7 @@ import {
 } from "@/components/layout/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FORM_PRIMARY_ACTION_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
 import {
   OtpInput,
   refocusOtpInput,
@@ -232,7 +233,7 @@ export function ContinueWithEmailScreen() {
             <Button
               type="submit"
               form="continue-email-form"
-              className="h-12 w-full"
+              className={FORM_PRIMARY_ACTION_BUTTON_CLASS}
               disabled={submitting || emailSendCooldown.isActive}
               onMouseDown={(event) => event.preventDefault()}
             >
@@ -255,6 +256,7 @@ export function ContinueWithEmailScreen() {
               type="email"
               autoComplete="email"
               enterKeyHint="go"
+              placeholder={t("auth.continue.emailPlaceholder")}
               aria-label={t("auth.fields.email")}
               value={email}
               onChange={(event) => {

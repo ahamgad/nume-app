@@ -42,8 +42,9 @@ export const en = {
     continue: {
       emailTitle: "Continue with email",
       emailLead: "Enter your email to receive a sign-in code",
-      emailSubmit: "Continue",
-      emailSubmitting: "Sending code…",
+      emailPlaceholder: "Type your email",
+      emailSubmit: "Send code",
+      emailSubmitting: "Sending...",
       otpTitle: "Enter your code",
       otpLead: "We sent a code to {email}",
       otpLabel: "Sign-in code",

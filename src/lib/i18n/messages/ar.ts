@@ -44,8 +44,9 @@ export const ar = {
     continue: {
       emailTitle: "المتابعة بالبريد الإلكتروني",
       emailLead: "أدخل بريدك الإلكتروني لاستلام رمز تسجيل الدخول",
-      emailSubmit: "متابعة",
-      emailSubmitting: "جارٍ إرسال الرمز…",
+      emailPlaceholder: "اكتب بريدك الإلكتروني",
+      emailSubmit: "إرسال الرمز",
+      emailSubmitting: "جارٍ الإرسال...",
       otpTitle: "أدخل الرمز",
       otpLead: "أرسلنا رمزًا إلى {email}",
       otpLabel: "رمز تسجيل الدخول",
