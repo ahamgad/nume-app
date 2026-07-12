@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { NUME_EMAIL_COLORS } from "@/lib/email/email-design-tokens";
 import {
   OTP_EMAIL_ICON_DISPLAY_PX,
   OTP_EMAIL_SUBJECT,
+  OTP_EMAIL_THEME,
   OTP_EMAIL_TOKEN,
   renderOtpEmailPreviewHtml,
   renderOtpEmailTemplateHtml,
@@ -23,17 +23,18 @@ describe("NUME OTP email template", () => {
     expect(html).toContain("Inter Tight");
   });
 
-  it("uses foundation light colors and NUME dark palette swaps", () => {
+  it("maps every semantic light color to a dark equivalent", () => {
     const html = renderOtpEmailPreviewHtml();
-    expect(html).toContain("#ececec");
-    expect(html).toContain(NUME_EMAIL_COLORS.light.background);
-    expect(html).toContain("#E8E8E8");
-    expect(html).toContain(NUME_EMAIL_COLORS.light.card);
-    expect(html).toContain(NUME_EMAIL_COLORS.dark.background);
-    expect(html).toContain(NUME_EMAIL_COLORS.dark.card);
-    expect(html).toContain(NUME_EMAIL_COLORS.dark.foreground);
-    expect(html).toContain(NUME_EMAIL_COLORS.dark.mutedForeground);
-    expect(html).toContain(NUME_EMAIL_COLORS.dark.border);
+    const darkBlock = html.slice(
+      html.indexOf("@media (prefers-color-scheme: dark)"),
+    );
+
+    for (const [key, lightColor] of Object.entries(OTP_EMAIL_THEME.light)) {
+      const darkColor =
+        OTP_EMAIL_THEME.dark[key as keyof typeof OTP_EMAIL_THEME.dark];
+      expect(html).toContain(lightColor);
+      expect(darkBlock).toContain(darkColor);
+    }
   });
 
   it("swaps light and dark brand icons at 80px", () => {
@@ -62,6 +63,9 @@ describe("NUME OTP email template", () => {
     expect(html).toContain(".email-headline");
     expect(html).toContain(".email-support");
     expect(html).toContain(".email-otp-cell");
+    expect(html).toContain(".email-logo-link");
+    expect(html).toContain(".email-preheader");
+    expect(html).toContain(".email-outlook-spacer");
   });
 
   it("preserves Outlook and mobile compatibility markup", () => {

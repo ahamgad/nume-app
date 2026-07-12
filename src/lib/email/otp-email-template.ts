@@ -13,14 +13,34 @@ export const OTP_EMAIL_ICON_DISPLAY_PX = 80;
 
 const { light, dark } = NUME_EMAIL_COLORS;
 
-const OTP_EMAIL_LIGHT = {
-  pageOuter: "#ececec",
-  pageMain: light.background,
-  headline: "#000000",
-  support: light.mutedForeground,
-  otpBackground: light.card,
-  otpBorder: "#E8E8E8",
-  otpCode: "#000000",
+/** Every semantic color used by the OTP email — light and dark pairs. */
+export const OTP_EMAIL_THEME = {
+  light: {
+    pageOuter: "#ececec",
+    pageMain: light.background,
+    headline: "#000000",
+    support: light.mutedForeground,
+    otpBackground: light.card,
+    otpBorder: "#E8E8E8",
+    otpCode: "#000000",
+    defaultLink: "#000000",
+    logoLink: "#ffffff",
+    preheader: "#ffffff",
+    outlookSpacer: "#dbdbdb",
+  },
+  dark: {
+    pageOuter: dark.background,
+    pageMain: dark.background,
+    headline: dark.foreground,
+    support: dark.mutedForeground,
+    otpBackground: dark.card,
+    otpBorder: dark.border,
+    otpCode: dark.foreground,
+    defaultLink: dark.foreground,
+    logoLink: dark.foreground,
+    preheader: dark.background,
+    outlookSpacer: dark.background,
+  },
 } as const;
 
 function escapeHtml(value: string) {
@@ -32,27 +52,49 @@ function escapeHtml(value: string) {
 }
 
 function emailThemeStyles() {
+  const L = OTP_EMAIL_THEME.light;
+  const D = OTP_EMAIL_THEME.dark;
+
   return `<style type="text/css">
-    .email-page-outer { background-color: ${OTP_EMAIL_LIGHT.pageOuter} !important; }
-    .email-page-main { background-color: ${OTP_EMAIL_LIGHT.pageMain} !important; }
-    .email-headline { color: ${OTP_EMAIL_LIGHT.headline} !important; }
-    .email-support { color: ${OTP_EMAIL_LIGHT.support} !important; }
+    .email-page-outer { background-color: ${L.pageOuter} !important; }
+    .email-page-main { background-color: ${L.pageMain} !important; }
+    .email-headline { color: ${L.headline} !important; }
+    .email-support { color: ${L.support} !important; }
     .email-otp-cell {
-      background-color: ${OTP_EMAIL_LIGHT.otpBackground} !important;
-      border-color: ${OTP_EMAIL_LIGHT.otpBorder} !important;
-      color: ${OTP_EMAIL_LIGHT.otpCode} !important;
+      background-color: ${L.otpBackground} !important;
+      border-color: ${L.otpBorder} !important;
+      color: ${L.otpCode} !important;
+    }
+    .email-logo-link,
+    .email-logo-link:link,
+    .email-logo-link:visited { color: ${L.logoLink} !important; }
+    .email-preheader { color: ${L.preheader} !important; }
+    .email-outlook-spacer {
+      color: ${L.outlookSpacer} !important;
+      background-color: ${L.outlookSpacer} !important;
     }
     .email-brand-light { display: inline-block !important; }
     .email-brand-dark { display: none !important; }
     @media (prefers-color-scheme: dark) {
-      .email-page-outer { background-color: ${dark.background} !important; }
-      .email-page-main { background-color: ${dark.background} !important; }
-      .email-headline { color: ${dark.foreground} !important; }
-      .email-support { color: ${dark.mutedForeground} !important; }
+      .email-page-outer { background-color: ${D.pageOuter} !important; }
+      .email-page-main { background-color: ${D.pageMain} !important; }
+      .email-headline { color: ${D.headline} !important; }
+      .email-support { color: ${D.support} !important; }
       .email-otp-cell {
-        background-color: ${dark.card} !important;
-        border-color: ${dark.border} !important;
-        color: ${dark.foreground} !important;
+        background-color: ${D.otpBackground} !important;
+        border-color: ${D.otpBorder} !important;
+        color: ${D.otpCode} !important;
+      }
+      a,
+      a:link,
+      a:visited { color: ${D.defaultLink} !important; }
+      .email-logo-link,
+      .email-logo-link:link,
+      .email-logo-link:visited { color: ${D.logoLink} !important; }
+      .email-preheader { color: ${D.preheader} !important; }
+      .email-outlook-spacer {
+        color: ${D.outlookSpacer} !important;
+        background-color: ${D.outlookSpacer} !important;
       }
       .email-brand-light { display: none !important; }
       .email-brand-dark { display: inline-block !important; }
@@ -71,6 +113,7 @@ export function renderOtpEmailTemplateHtml(
   const token = options.token ?? OTP_EMAIL_TOKEN;
   const siteUrl = options.siteUrl ?? "{{ .SiteURL }}";
   const iconSize = OTP_EMAIL_ICON_DISPLAY_PX;
+  const L = OTP_EMAIL_THEME.light;
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="EN">
@@ -172,7 +215,7 @@ img.g-img div {
 a,
 a:link,
 a:visited {
- color: #000000;
+ color: ${L.defaultLink};
 }
 
 img {
@@ -247,12 +290,12 @@ span {
 </style>
 ${emailThemeStyles()}
 </head>
-<body class="me_body email-page-outer" style="min-width: 100%; background-color:${OTP_EMAIL_LIGHT.pageOuter};margin:0 auto !important;padding:0;">
-<span class="preheader" style="font-size:1px;color:#ffffff;">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
-<table class="me_full_wrap email-page-outer" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color:${OTP_EMAIL_LIGHT.pageOuter};">
+<body class="me_body email-page-outer" style="min-width: 100%; background-color:${L.pageOuter};margin:0 auto !important;padding:0;">
+<span class="preheader email-preheader" style="font-size:1px;color:${L.preheader};">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
+<table class="me_full_wrap email-page-outer" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color:${L.pageOuter};">
 <tr>
 <td align="center" valign="top">
-<table align="center" class="me_main_table email-page-main" width="600" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed;background-color:${OTP_EMAIL_LIGHT.pageMain};">
+<table align="center" class="me_main_table email-page-main" width="600" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed;background-color:${L.pageMain};">
 <tr>
 <td>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -269,7 +312,7 @@ ${emailThemeStyles()}
 <tr>
 <td height="34" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
-<tr><td align="center"> <a target="_blank" style="text-decoration: none;color: #ffffff;" href="https://numeos.app">
+<tr><td align="center"> <a target="_blank" class="email-logo-link" style="text-decoration: none;color: ${L.logoLink};" href="https://numeos.app">
 <img alt="logo" src="${siteUrl}/email/nume-icon.png" width="${iconSize}" height="${iconSize}" class="email-brand-light" style="display:inline-block;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
 <img alt="logo" src="${siteUrl}/email/nume-icon-dark.png" width="${iconSize}" height="${iconSize}" class="email-brand-dark" style="display:none;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
 </a></td></tr>
@@ -280,13 +323,13 @@ ${emailThemeStyles()}
 <td height="35" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
 <tr>
-<td class="email-headline" style="font-family:'Inter Tight', Arial, sans-serif;font-size:38px;text-align:center;color:${OTP_EMAIL_LIGHT.headline};font-weight:800;line-height: 48px;padding-bottom: 8px">Confirm Your Email to</td>
+<td class="email-headline" style="font-family:'Inter Tight', Arial, sans-serif;font-size:38px;text-align:center;color:${L.headline};font-weight:800;line-height: 48px;padding-bottom: 8px">Confirm Your Email to</td>
 </tr>
 <tr>
 <td height="20" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
 <tr>
-<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${OTP_EMAIL_LIGHT.support};font-weight:400;line-height: 30px;">Please confirm your email address using the code below</td>
+<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${L.support};font-weight:400;line-height: 30px;">Please confirm your email address using the code below</td>
 </tr>
 <tr>
 <td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
@@ -306,13 +349,13 @@ ${emailThemeStyles()}
 <td valign="top" class="me_side_space">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td class="email-otp-cell" style="font-family:'Inter Tight', Arial, sans-serif;font-size:32px;text-align:center;color:${OTP_EMAIL_LIGHT.otpCode};font-weight:700;line-height: 40px;padding: 30px;display: block;border:1px solid ${OTP_EMAIL_LIGHT.otpBorder};" bgcolor="${OTP_EMAIL_LIGHT.otpBackground}">${escapeHtml(token)}</td>
+<td class="email-otp-cell" style="font-family:'Inter Tight', Arial, sans-serif;font-size:32px;text-align:center;color:${L.otpCode};font-weight:700;line-height: 40px;padding: 30px;display: block;border:1px solid ${L.otpBorder};" bgcolor="${L.otpBackground}">${escapeHtml(token)}</td>
 </tr>
 <tr>
 <td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
 <tr>
-<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${OTP_EMAIL_LIGHT.support};font-weight:400;line-height: 30px;">Didn’t sign up for this? No worries — simply <br class="me_hide">ignore this message. </td>
+<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${L.support};font-weight:400;line-height: 30px;">Didn’t sign up for this? No worries — simply <br class="me_hide">ignore this message. </td>
 </tr>
 <tr>
 <td height="30" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
@@ -334,7 +377,7 @@ ${emailThemeStyles()}
 </td>
 </tr>
 </table>
-<div style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;">- - - - - - - - - - - - - - - - - - - - - - -</div>
+<div class="email-outlook-spacer" style="display:none; white-space:nowrap; font:20px courier; color:${L.outlookSpacer}; background-color:${L.outlookSpacer};">- - - - - - - - - - - - - - - - - - - - - - -</div>
 </body></html>`;
 }
 

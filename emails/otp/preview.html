@@ -181,6 +181,14 @@ span {
       border-color: #E8E8E8 !important;
       color: #000000 !important;
     }
+    .email-logo-link,
+    .email-logo-link:link,
+    .email-logo-link:visited { color: #ffffff !important; }
+    .email-preheader { color: #ffffff !important; }
+    .email-outlook-spacer {
+      color: #dbdbdb !important;
+      background-color: #dbdbdb !important;
+    }
     .email-brand-light { display: inline-block !important; }
     .email-brand-dark { display: none !important; }
     @media (prefers-color-scheme: dark) {
@@ -193,13 +201,24 @@ span {
         border-color: #2E2E2E !important;
         color: #FAFAFA !important;
       }
+      a,
+      a:link,
+      a:visited { color: #FAFAFA !important; }
+      .email-logo-link,
+      .email-logo-link:link,
+      .email-logo-link:visited { color: #FAFAFA !important; }
+      .email-preheader { color: #0A0A0A !important; }
+      .email-outlook-spacer {
+        color: #0A0A0A !important;
+        background-color: #0A0A0A !important;
+      }
       .email-brand-light { display: none !important; }
       .email-brand-dark { display: inline-block !important; }
     }
   </style>
 </head>
 <body class="me_body email-page-outer" style="min-width: 100%; background-color:#ececec;margin:0 auto !important;padding:0;">
-<span class="preheader" style="font-size:1px;color:#ffffff;">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
+<span class="preheader email-preheader" style="font-size:1px;color:#ffffff;">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
 <table class="me_full_wrap email-page-outer" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color:#ececec;">
 <tr>
 <td align="center" valign="top">
@@ -220,7 +239,7 @@ span {
 <tr>
 <td height="34" style="line-height:1px;font-size:1px;">&nbsp;</td>
 </tr>
-<tr><td align="center"> <a target="_blank" style="text-decoration: none;color: #ffffff;" href="https://numeos.app">
+<tr><td align="center"> <a target="_blank" class="email-logo-link" style="text-decoration: none;color: #ffffff;" href="https://numeos.app">
 <img alt="logo" src="https://numeos.app/email/nume-icon.png" width="80" height="80" class="email-brand-light" style="display:inline-block;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
 <img alt="logo" src="https://numeos.app/email/nume-icon-dark.png" width="80" height="80" class="email-brand-dark" style="display:none;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
 </a></td></tr>
@@ -285,5 +304,5 @@ span {
 </td>
 </tr>
 </table>
-<div style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;">- - - - - - - - - - - - - - - - - - - - - - -</div>
+<div class="email-outlook-spacer" style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;">- - - - - - - - - - - - - - - - - - - - - - -</div>
 </body></html>
