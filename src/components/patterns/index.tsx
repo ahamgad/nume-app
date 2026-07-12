@@ -18,6 +18,31 @@ import {
   RECORD_ROW_SUBLINE_CLASS,
 } from "@/lib/layout/record-row-chrome";
 import { cn } from "@/lib/utils";
+import { TEXT_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
+
+/** Foundation text button — label only, no surface chrome. */
+export function TextButton({
+  label,
+  disabled,
+  className,
+  type = "button",
+  ...props
+}: TextButtonProps) {
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      className={cn(TEXT_BUTTON_CLASS, className)}
+      {...props}
+    >
+      <span>{label}</span>
+    </button>
+  );
+}
+
+type TextButtonProps = Omit<ComponentProps<"button">, "children"> & {
+  label: string;
+};
 
 /** Full-width bordered form section action — Add Tier, View all, etc. */
 export const FORM_SECTION_ACTION_BUTTON_CLASS =
@@ -28,7 +53,7 @@ type FormSectionActionButtonProps = Omit<ComponentProps<"button">, "children"> &
   icon?: ReactNode;
 };
 
-/** Foundation text button — full-width bordered action with label only. */
+/** Full-width bordered form section action — Add Tier, View all, etc. */
 export function FormSectionActionButton({
   label,
   disabled,
@@ -486,4 +511,5 @@ export { AccountCreateActionButton } from "@/components/patterns/account-create-
 export {
   CONFIRMATION_SHEET_ACTION_BUTTON_CLASS,
   FORM_PRIMARY_ACTION_BUTTON_CLASS,
+  TEXT_BUTTON_CLASS,
 } from "@/lib/layout/form-action-chrome";

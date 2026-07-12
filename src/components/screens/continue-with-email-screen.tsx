@@ -7,7 +7,7 @@ import {
   AuthCard,
   AuthLayout,
 } from "@/components/layout/auth-layout";
-import { FormSectionActionButton } from "@/components/patterns";
+import { TextButton } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -230,7 +230,7 @@ export function ContinueWithEmailScreen() {
         }
         primaryAction={
           step === "email" ? (
-            <FormSectionActionButton
+            <TextButton
               type="submit"
               form="continue-email-form"
               label={

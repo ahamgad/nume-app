@@ -20,14 +20,14 @@ export const AUTH_PAGE_TOP_PADDING_PX = 24;
 
 /** Auth content surface — bottom sheet top radius on a full-width card surface. */
 export const AUTH_BODY_SURFACE_CLASS = cn(
-  "relative z-[1] -mx-4 mt-auto flex min-h-0 flex-1 flex-col px-4 pt-6",
+  "relative z-[1] -mx-4 mt-auto flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-6",
   BOTTOM_SHEET_TOP_RADIUS_CLASS,
   CARD_SURFACE_BG_CLASS,
   "pb-[env(safe-area-inset-bottom)]",
 );
 
-/** 12px — welcome copy below logo. */
-export const AUTH_LOGO_TO_WELCOME_CLASS = "mt-3";
+/** 10px — welcome copy below logo. */
+export const AUTH_LOGO_TO_WELCOME_CLASS = "mt-[10px]";
 
 /** 12px — step title to message slot. */
 export const AUTH_TITLE_TO_MESSAGE_CLASS = "mt-3";
@@ -107,7 +107,7 @@ function AuthWelcomeCopy() {
       className={cn(
         AUTH_LOGO_TO_WELCOME_CLASS,
         AUTH_MESSAGE_AREA_CLASS,
-        "text-muted-foreground",
+        "font-semibold text-foreground",
       )}
     >
       {t("landing.title")}
