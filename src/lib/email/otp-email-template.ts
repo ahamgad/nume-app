@@ -30,7 +30,7 @@ export const OTP_EMAIL_THEME = {
   },
   dark: {
     pageOuter: dark.background,
-    pageMain: dark.background,
+    pageMain: dark.card,
     headline: dark.foreground,
     support: dark.mutedForeground,
     otpBackground: dark.card,
