@@ -23,7 +23,7 @@ const AUTH_BODY_SURFACE_INSET_CLASS = "px-4";
 
 /** Auth-only body surface chrome — white card fill on account-details radius. */
 const AUTH_BODY_SURFACE_CHROME_CLASS = cn(
-  "mt-0 flex min-h-0 flex-1 flex-col",
+  "mt-0 flex min-h-0 flex-1 flex-col pt-4",
   CARD_SURFACE_BG_CLASS,
   "pb-[env(safe-area-inset-bottom)]",
 );
