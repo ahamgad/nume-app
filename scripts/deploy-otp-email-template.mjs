@@ -16,7 +16,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const OTP_EMAIL_SUBJECT = "Your NUME sign-in code";
+const OTP_EMAIL_SUBJECT = "Welcome to NUME";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROJECT_REF =

@@ -79,6 +79,6 @@ describe("NUME OTP email template", () => {
   });
 
   it("exports the Supabase mailer subject", () => {
-    expect(OTP_EMAIL_SUBJECT).toBe("Your NUME sign-in code");
+    expect(OTP_EMAIL_SUBJECT).toBe("Welcome to NUME");
   });
 });

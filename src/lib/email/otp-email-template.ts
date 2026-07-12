@@ -7,7 +7,7 @@ import {
   NUME_EMAIL_COLORS,
 } from "@/lib/email/email-design-tokens";
 
-export const OTP_EMAIL_SUBJECT = "Your NUME sign-in code";
+export const OTP_EMAIL_SUBJECT = "Welcome to NUME";
 export const OTP_EMAIL_TOKEN = "{{ .Token }}";
 export const OTP_EMAIL_ICON_DISPLAY_PX = 80;
 
