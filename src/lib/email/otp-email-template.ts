@@ -1,37 +1,27 @@
 /**
- * NUME OTP email — standalone template (draft foundation candidate).
- *
- * Intentionally minimal: one centered card, brand lockup, title, supporting
- * sentence, OTP box, helper sentence, and a small footer outside the card.
+ * NUME OTP email — Supabase magic_link template.
+ * Light layout is fixed; dark mode swaps foundation colors only.
  */
 
 import {
   NUME_EMAIL_COLORS,
-  NUME_EMAIL_FONT_FAMILY,
-  NUME_EMAIL_MONO_FAMILY,
 } from "@/lib/email/email-design-tokens";
 
 export const OTP_EMAIL_SUBJECT = "Your NUME sign-in code";
-export const OTP_EMAIL_PREHEADER = "Use this code to continue to NUME";
 export const OTP_EMAIL_TOKEN = "{{ .Token }}";
-
-export const OTP_EMAIL_CONTENT_MAX_WIDTH_PX = 400;
-export const OTP_EMAIL_CARD_RADIUS_PX = 16;
-export const OTP_EMAIL_CARD_PADDING_X_PX = 36;
-export const OTP_EMAIL_CARD_PADDING_TOP_PX = 64;
-export const OTP_EMAIL_CARD_PADDING_BOTTOM_PX = 40;
-export const OTP_EMAIL_ICON_DISPLAY_PX = 24;
-export const OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX = 54;
-export const OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX = 18;
-export const OTP_EMAIL_BRAND_LOCKUP_GAP_PX = 8;
-export const OTP_EMAIL_BRAND_TO_TITLE_GAP_PX = 36;
-export const OTP_EMAIL_TITLE_SIZE_PX = 36;
-export const OTP_EMAIL_SUPPORT_SIZE_PX = 16;
-export const OTP_EMAIL_OTP_SIZE_PX = 42;
-export const OTP_EMAIL_HELPER_SIZE_PX = 12;
-export const OTP_EMAIL_FOOTER_SIZE_PX = 11;
+export const OTP_EMAIL_ICON_DISPLAY_PX = 80;
 
 const { light, dark } = NUME_EMAIL_COLORS;
+
+const OTP_EMAIL_LIGHT = {
+  pageOuter: "#ececec",
+  pageMain: light.background,
+  headline: "#000000",
+  support: light.mutedForeground,
+  otpBackground: light.card,
+  otpBorder: "#E8E8E8",
+  otpCode: "#000000",
+} as const;
 
 function escapeHtml(value: string) {
   return value
@@ -41,98 +31,38 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-function renderFontFaces(siteUrl: string) {
+function emailThemeStyles() {
   return `<style type="text/css">
-    @font-face {
-      font-family: 'Geist Sans';
-      font-style: normal;
-      font-weight: 400;
-      src: url('${siteUrl}/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
+    .email-page-outer { background-color: ${OTP_EMAIL_LIGHT.pageOuter} !important; }
+    .email-page-main { background-color: ${OTP_EMAIL_LIGHT.pageMain} !important; }
+    .email-headline { color: ${OTP_EMAIL_LIGHT.headline} !important; }
+    .email-support { color: ${OTP_EMAIL_LIGHT.support} !important; }
+    .email-otp-cell {
+      background-color: ${OTP_EMAIL_LIGHT.otpBackground} !important;
+      border-color: ${OTP_EMAIL_LIGHT.otpBorder} !important;
+      color: ${OTP_EMAIL_LIGHT.otpCode} !important;
     }
-    @font-face {
-      font-family: 'Geist Sans';
-      font-style: normal;
-      font-weight: 600;
-      src: url('${siteUrl}/fonts/geist-sans/Geist-SemiBold.woff2') format('woff2');
-    }
-    @font-face {
-      font-family: 'Geist Sans';
-      font-style: normal;
-      font-weight: 700;
-      src: url('${siteUrl}/fonts/geist-sans/Geist-Bold.woff2') format('woff2');
-    }
-    @font-face {
-      font-family: 'Geist Mono';
-      font-style: normal;
-      font-weight: 600;
-      src: url('${siteUrl}/fonts/geist-mono/GeistMono-SemiBold.woff2') format('woff2');
-    }
-  </style>`;
-}
-
-function emailStyles() {
-  return `<style type="text/css">
-    .email-page { background-color: ${light.background}; }
-    .email-card { background-color: ${light.card}; border-color: ${light.border}; }
-    .email-title { color: ${light.foreground}; }
-    .email-support { color: ${light.mutedForeground}; }
-    .email-code-box { background-color: ${light.card}; border-color: ${light.border}; color: ${light.foreground}; }
-    .email-helper { color: ${light.mutedForeground}; }
-    .email-footer { color: ${light.mutedForeground}; }
     .email-brand-light { display: inline-block !important; }
     .email-brand-dark { display: none !important; }
     @media (prefers-color-scheme: dark) {
-      .email-page { background-color: ${dark.background} !important; }
-      .email-card { background-color: ${dark.card} !important; border-color: ${dark.border} !important; }
-      .email-title { color: ${dark.foreground} !important; }
+      .email-page-outer { background-color: ${dark.background} !important; }
+      .email-page-main { background-color: ${dark.background} !important; }
+      .email-headline { color: ${dark.foreground} !important; }
       .email-support { color: ${dark.mutedForeground} !important; }
-      .email-code-box { background-color: ${dark.card} !important; border-color: ${dark.border} !important; color: ${dark.foreground} !important; }
-      .email-helper { color: ${dark.mutedForeground} !important; }
-      .email-footer { color: ${dark.mutedForeground} !important; }
+      .email-otp-cell {
+        background-color: ${dark.card} !important;
+        border-color: ${dark.border} !important;
+        color: ${dark.foreground} !important;
+      }
       .email-brand-light { display: none !important; }
       .email-brand-dark { display: inline-block !important; }
     }
   </style>`;
 }
 
-function renderBrandLockup(siteUrl: string) {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
-    <tr>
-      <td align="center" style="padding:0;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td align="center" valign="middle" style="padding:0 ${OTP_EMAIL_BRAND_LOCKUP_GAP_PX}px 0 0;line-height:0;">
-              <img src="${siteUrl}/email/nume-icon.png" width="${OTP_EMAIL_ICON_DISPLAY_PX}" height="${OTP_EMAIL_ICON_DISPLAY_PX}" alt="" class="email-brand-light" style="display:inline-block;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_ICON_DISPLAY_PX}px;height:${OTP_EMAIL_ICON_DISPLAY_PX}px;" />
-              <img src="${siteUrl}/email/nume-icon-dark.png" width="${OTP_EMAIL_ICON_DISPLAY_PX}" height="${OTP_EMAIL_ICON_DISPLAY_PX}" alt="" class="email-brand-dark" style="display:none;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_ICON_DISPLAY_PX}px;height:${OTP_EMAIL_ICON_DISPLAY_PX}px;" />
-            </td>
-            <td align="left" valign="middle" style="padding:0;line-height:0;">
-              <img src="${siteUrl}/email/nume-wordmark.png" width="${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}" height="${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}" alt="NUME" class="email-brand-light" style="display:inline-block;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}px;height:${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}px;" />
-              <img src="${siteUrl}/email/nume-wordmark-dark.png" width="${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}" height="${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}" alt="NUME" class="email-brand-dark" style="display:none;border:0;outline:none;text-decoration:none;width:${OTP_EMAIL_WORDMARK_DISPLAY_WIDTH_PX}px;height:${OTP_EMAIL_WORDMARK_DISPLAY_HEIGHT_PX}px;" />
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>`;
-}
-
-function renderOtpBox(code: string) {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-code-box" style="border:1px solid ${light.border};border-radius:14px;background-color:${light.card};">
-    <tr>
-      <td align="center" style="padding:32px 28px;font-family:${NUME_EMAIL_MONO_FAMILY};font-size:${OTP_EMAIL_OTP_SIZE_PX}px;font-weight:600;line-height:1.15;letter-spacing:0.28em;color:${light.foreground};font-variant-numeric:tabular-nums;">
-        ${escapeHtml(code)}
-      </td>
-    </tr>
-  </table>`;
-}
-
 export type OtpEmailTemplateOptions = {
   token?: string;
   siteUrl?: string;
-  title?: string;
-  supportingText?: string;
-  helperText?: string;
-  footer?: string;
 };
 
 export function renderOtpEmailTemplateHtml(
@@ -140,80 +70,272 @@ export function renderOtpEmailTemplateHtml(
 ): string {
   const token = options.token ?? OTP_EMAIL_TOKEN;
   const siteUrl = options.siteUrl ?? "{{ .SiteURL }}";
-  const title = options.title ?? "Enter your code";
-  const supportingText =
-    options.supportingText ?? "Use this code to continue signing in to NUME";
-  const helperText =
-    options.helperText ??
-    "If you didn't request this code, you can safely ignore this email";
-  const footer = options.footer ?? "2026 © NUME";
+  const iconSize = OTP_EMAIL_ICON_DISPLAY_PX;
 
-  return `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="EN">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light dark" />
-<meta name="supported-color-schemes" content="light dark" />
-<title>${escapeHtml(OTP_EMAIL_SUBJECT)}</title>
-${renderFontFaces(siteUrl)}
-${emailStyles()}
-<!--[if mso]>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="x-apple-disable-message-reformatting">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0 ">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<meta name="format-detection" content="telephone=no">
+<link href="https://fonts.googleapis.com/css?family=Inter+Tight:300,400,600,700,800" rel="stylesheet">
 <style type="text/css">
-  body, table, td { font-family: Arial, Helvetica, sans-serif !important; }
+html,
+body {
+ Margin: 0 auto !important;
+ padding: 0 !important;
+ width: 100% !important;
+ height: 100% !important;
+}
+
+* {
+ -ms-text-size-adjust: 100%;
+ -webkit-text-size-adjust: 100%;
+ text-rendering: optimizeLegibility;
+}
+
+.ExternalClass {
+ width: 100%;
+}
+
+.ExternalClass,
+.ExternalClass p,
+.ExternalClass span,
+.ExternalClass font,
+.ExternalClass td,
+.ExternalClass div {
+ line-height: 100%;
+}
+
+table,
+th {
+ mso-table-lspace: 0pt;
+ mso-table-rspace: 0pt;
+}
+
+.ExternalClass,
+.ExternalClass * {
+ line-height: 100% !important;
+}
+
+table {
+ border-spacing: 0 !important;
+ border-collapse: collapse !important;
+ border: none;
+ Margin: 0 auto;
+}
+
+img {
+ -ms-interpolation-mode: bicubic;
+}
+
+.yshortcuts a {
+ border-bottom: none !important;
+}
+
+*[x-apple-data-detectors],
+.x-gmail-data-detectors,
+.x-gmail-data-detectors *,
+.aBn {
+ border-bottom: none !important;
+ cursor: default !important;
+ color: inherit !important;
+ text-decoration: none !important;
+ font-size: inherit !important;
+ font-family: inherit !important;
+ font-weight: inherit !important;
+ line-height: inherit !important;
+}
+
+u #body a {
+ color: inherit;
+ text-decoration: none;
+ font-size: inherit;
+ font-family: inherit;
+ font-weight: inherit;
+ line-height: inherit;
+}
+
+.a6S {
+ display: none !important;
+ opacity: 0.01 !important;
+}
+
+img.g-img div {
+ display: none !important;
+}
+
+a,
+a:link,
+a:visited {
+ color: #000000;
+}
+
+img {
+ border: none !important;
+ outline: none !important;
+ text-decoration: none !important;
+ overflow: hidden !important;
+}
+
+#MessageViewBody,
+#MessageWebViewDiv {
+ width: 100% !important;
+ min-width: 100vw;
+ margin: 0 !important;
+ zoom: 1 !important;
+}
+
+u+.me_body .glist {
+ margin-left: 0 !important;
+}
+
+span.preheader {
+ display: none !important;
+}
+
+p {
+ margin: 0px !important;
+ padding: 0px !important;
+}
+
+td,
+a,
+span {
+ border-collapse: collapse;
+ mso-line-height-rule: exactly;
+}
+
+@media only screen and (max-width:600px) {
+ .me_main_table {
+  width: 100% !important;
+ }
+
+ .me_wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+ }
+
+ .me_wrapper_two {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+ }
+
+ .me_hide {
+  display: none !important;
+ }
+
+ .me_side_space {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+ }
+
+ u+.me_body .glist {
+  margin-left: 25px !important;
+ }
+
+ u+.me_body .me_full_wrap {
+  width: 100% !important;
+  width: 100vw !important;
+ }
+}
 </style>
-<![endif]-->
+${emailThemeStyles()}
 </head>
-<body class="email-page" style="margin:0;padding:0;background-color:${light.background};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
-  <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
-    ${escapeHtml(OTP_EMAIL_PREHEADER)}
-  </div>
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-page" style="background-color:${light.background};">
-    <tr>
-      <td align="center" style="padding:40px 20px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:${OTP_EMAIL_CONTENT_MAX_WIDTH_PX}px;width:100%;">
-          <tr>
-            <td align="center" class="email-card" style="background-color:${light.card};border:1px solid ${light.border};border-radius:${OTP_EMAIL_CARD_RADIUS_PX}px;padding:${OTP_EMAIL_CARD_PADDING_TOP_PX}px ${OTP_EMAIL_CARD_PADDING_X_PX}px ${OTP_EMAIL_CARD_PADDING_BOTTOM_PX}px ${OTP_EMAIL_CARD_PADDING_X_PX}px;text-align:center;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td align="center" style="padding:0 0 ${OTP_EMAIL_BRAND_TO_TITLE_GAP_PX}px 0;">
-                    ${renderBrandLockup(siteUrl)}
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" class="email-title" style="padding:0 0 14px 0;font-family:${NUME_EMAIL_FONT_FAMILY};font-size:${OTP_EMAIL_TITLE_SIZE_PX}px;font-weight:700;line-height:1.2;letter-spacing:-0.02em;color:${light.foreground};text-align:center;">
-                    ${escapeHtml(title)}
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" class="email-support" style="padding:0 0 32px 0;font-family:${NUME_EMAIL_FONT_FAMILY};font-size:${OTP_EMAIL_SUPPORT_SIZE_PX}px;font-weight:400;line-height:1.6;color:${light.mutedForeground};text-align:center;">
-                    ${escapeHtml(supportingText)}
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding:0;">
-                    ${renderOtpBox(token)}
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" class="email-helper" style="padding:28px 0 0 0;font-family:${NUME_EMAIL_FONT_FAMILY};font-size:${OTP_EMAIL_HELPER_SIZE_PX}px;font-weight:400;line-height:1.5;color:${light.mutedForeground};text-align:center;">
-                    ${escapeHtml(helperText)}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" class="email-footer" style="padding:28px 0 0 0;font-family:${NUME_EMAIL_FONT_FAMILY};font-size:${OTP_EMAIL_FOOTER_SIZE_PX}px;font-weight:400;line-height:1.4;color:${light.mutedForeground};text-align:center;">
-              ${escapeHtml(footer)}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+<body class="me_body email-page-outer" style="min-width: 100%; background-color:${OTP_EMAIL_LIGHT.pageOuter};margin:0 auto !important;padding:0;">
+<span class="preheader" style="font-size:1px;color:#ffffff;">Preheader Preview text here &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌ &nbsp;‌</span>
+<table class="me_full_wrap email-page-outer" width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color:${OTP_EMAIL_LIGHT.pageOuter};">
+<tr>
+<td align="center" valign="top">
+<table align="center" class="me_main_table email-page-main" width="600" border="0" cellspacing="0" cellpadding="0" style="table-layout:fixed;background-color:${OTP_EMAIL_LIGHT.pageMain};">
+<tr>
+<td>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="70" class="me_hide">&nbsp;</td>
+<td valign="top" class="me_side_space">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td height="10" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td height="34" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr><td align="center"> <a target="_blank" style="text-decoration: none;color: #ffffff;" href="https://numeos.app">
+<img alt="logo" src="${siteUrl}/email/nume-icon.png" width="${iconSize}" height="${iconSize}" class="email-brand-light" style="display:inline-block;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
+<img alt="logo" src="${siteUrl}/email/nume-icon-dark.png" width="${iconSize}" height="${iconSize}" class="email-brand-dark" style="display:none;border:none!important;outline:none!important;text-decoration:none!important;overflow:hidden!important;">
+</a></td></tr>
+<tr>
+<td height="20" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td height="35" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td class="email-headline" style="font-family:'Inter Tight', Arial, sans-serif;font-size:38px;text-align:center;color:${OTP_EMAIL_LIGHT.headline};font-weight:800;line-height: 48px;padding-bottom: 8px">Confirm Your Email to</td>
+</tr>
+<tr>
+<td height="20" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${OTP_EMAIL_LIGHT.support};font-weight:400;line-height: 30px;">Please confirm your email address using the code below</td>
+</tr>
+<tr>
+<td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+</table>
+</td>
+<td width="70" class="me_hide">&nbsp;</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="50" class="me_hide">&nbsp;</td>
+<td valign="top" class="me_side_space">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td class="email-otp-cell" style="font-family:'Inter Tight', Arial, sans-serif;font-size:32px;text-align:center;color:${OTP_EMAIL_LIGHT.otpCode};font-weight:700;line-height: 40px;padding: 30px;display: block;border:1px solid ${OTP_EMAIL_LIGHT.otpBorder};" bgcolor="${OTP_EMAIL_LIGHT.otpBackground}">${escapeHtml(token)}</td>
+</tr>
+<tr>
+<td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td class="email-support" style="font-family:'Inter Tight', Arial, sans-serif;font-size:18px;text-align:center;color:${OTP_EMAIL_LIGHT.support};font-weight:400;line-height: 30px;">Didn’t sign up for this? No worries — simply <br class="me_hide">ignore this message. </td>
+</tr>
+<tr>
+<td height="30" class="me_hide" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+<tr>
+<td height="40" style="line-height:1px;font-size:1px;">&nbsp;</td>
+</tr>
+</table>
+</td>
+<td width="50" class="me_hide">&nbsp;</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<div style="display:none; white-space:nowrap; font:20px courier; color:#dbdbdb; background-color:#dbdbdb;">- - - - - - - - - - - - - - - - - - - - - - -</div>
+</body></html>`;
 }
 
 export function renderOtpEmailPreviewHtml(code = "847293") {

@@ -16,7 +16,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { OTP_EMAIL_SUBJECT } from "../src/lib/email/otp-email-template.ts";
+const OTP_EMAIL_SUBJECT = "Your NUME sign-in code";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROJECT_REF =
