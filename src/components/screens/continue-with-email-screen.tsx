@@ -7,9 +7,9 @@ import {
   AuthCard,
   AuthLayout,
 } from "@/components/layout/auth-layout";
+import { FormSectionActionButton } from "@/components/patterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FORM_PRIMARY_ACTION_BUTTON_CLASS } from "@/lib/layout/form-action-chrome";
 import {
   OtpInput,
   refocusOtpInput,
@@ -230,17 +230,17 @@ export function ContinueWithEmailScreen() {
         }
         primaryAction={
           step === "email" ? (
-            <Button
+            <FormSectionActionButton
               type="submit"
               form="continue-email-form"
-              className={FORM_PRIMARY_ACTION_BUTTON_CLASS}
+              label={
+                submitting
+                  ? t("auth.continue.emailSubmitting")
+                  : t("auth.continue.emailSubmit")
+              }
               disabled={submitting || emailSendCooldown.isActive}
               onMouseDown={(event) => event.preventDefault()}
-            >
-              {submitting
-                ? t("auth.continue.emailSubmitting")
-                : t("auth.continue.emailSubmit")}
-            </Button>
+            />
           ) : undefined
         }
       >

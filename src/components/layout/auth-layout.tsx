@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 
-import { AccountDetailsBodySurface } from "@/components/accounts/account-details-chrome";
 import { InputFieldLabel } from "@/components/forms/input-field";
 import {
   AUTH_KEYBOARD_SURFACE_CLASS,
   useAuthViewportLock,
 } from "@/hooks/use-auth-viewport-lock";
+import { BOTTOM_SHEET_TOP_RADIUS_CLASS } from "@/lib/layout/bottom-sheet";
 import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { isKeyboardPresent } from "@/lib/scroll/scroll-input-into-view";
 import { cn } from "@/lib/utils";
@@ -18,23 +18,32 @@ import { useT } from "@/providers/i18n-provider";
 /** Page inset below the safe area (px). */
 export const AUTH_PAGE_TOP_PADDING_PX = 24;
 
-/** 12px — welcome title below logo. */
+/** Auth content surface — bottom sheet top radius on a full-width card surface. */
+export const AUTH_BODY_SURFACE_CLASS = cn(
+  "relative z-[1] -mx-4 mt-auto flex min-h-0 flex-1 flex-col px-4 pt-6",
+  BOTTOM_SHEET_TOP_RADIUS_CLASS,
+  CARD_SURFACE_BG_CLASS,
+  "pb-[env(safe-area-inset-bottom)]",
+);
+
+/** 12px — welcome copy below logo. */
 export const AUTH_LOGO_TO_WELCOME_CLASS = "mt-3";
 
 /** 12px — step title to message slot. */
 export const AUTH_TITLE_TO_MESSAGE_CLASS = "mt-3";
 
 /** One-line message slot; expands when copy wraps. */
-export const AUTH_MESSAGE_AREA_CLASS = "min-h-5 text-sm leading-5";
+export const AUTH_MESSAGE_AREA_CLASS =
+  "min-h-5 text-sm leading-5";
 
 /** 16px — message slot to field block. */
 export const AUTH_MESSAGE_TO_FIELD_CLASS = "mt-4";
 
-/** 12px — field block to primary CTA. */
-export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-3";
+/** 32px — field block to primary CTA. */
+export const AUTH_PRIMARY_CTA_TOP_CLASS = "mt-8";
 
-/** 12px — field block to OTP footer when no primary CTA. */
-export const AUTH_OTP_FOOTER_TOP_CLASS = "mt-3";
+/** 32px — field block to OTP footer when no primary CTA. */
+export const AUTH_OTP_FOOTER_TOP_CLASS = "mt-8";
 
 /** 16px — primary CTA to footer slot. */
 export const AUTH_CTA_TO_FOOTER_CLASS = "mt-4";
@@ -90,13 +99,19 @@ export function AuthBrandLogo() {
   );
 }
 
-function AuthWelcomeTitle() {
+function AuthWelcomeCopy() {
   const t = useT();
 
   return (
-    <h1 className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
+    <p
+      className={cn(
+        AUTH_LOGO_TO_WELCOME_CLASS,
+        AUTH_MESSAGE_AREA_CLASS,
+        "text-muted-foreground",
+      )}
+    >
       {t("landing.title")}
-    </h1>
+    </p>
   );
 }
 
@@ -104,7 +119,7 @@ function AuthHero() {
   return (
     <div className="flex shrink-0 flex-col items-center px-4 pb-8 pt-2 text-center">
       <AuthBrandLogo />
-      <AuthWelcomeTitle />
+      <AuthWelcomeCopy />
     </div>
   );
 }
@@ -139,16 +154,12 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       data-auth-layout
       onPointerDownCapture={handleAuthTouchInputFocus}
       className={cn(
-        "mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[calc(env(safe-area-inset-top)+24px)]",
+        "mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background pt-[calc(env(safe-area-inset-top)+24px)]",
         keyboardVisible && AUTH_KEYBOARD_SURFACE_CLASS,
       )}
     >
       <AuthHero />
-      <AccountDetailsBodySurface
-        className={cn("mt-auto flex flex-1 flex-col", CARD_SURFACE_BG_CLASS)}
-      >
-        {children}
-      </AccountDetailsBodySurface>
+      <div className={AUTH_BODY_SURFACE_CLASS}>{children}</div>
     </div>
   );
 }
@@ -167,7 +178,7 @@ interface AuthCardProps {
   className?: string;
 }
 
-/** Auth step content inside the account-details body surface. */
+/** Auth step content inside the auth body surface. */
 export function AuthCard({
   title,
   message,

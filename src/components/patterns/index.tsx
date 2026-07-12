@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
 
@@ -23,27 +23,26 @@ import { cn } from "@/lib/utils";
 export const FORM_SECTION_ACTION_BUTTON_CLASS =
   "inline-flex h-11 w-full items-center justify-center gap-1 rounded-md border border-border bg-background px-1 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50";
 
-interface FormSectionActionButtonProps {
+type FormSectionActionButtonProps = Omit<ComponentProps<"button">, "children"> & {
   label: string;
-  onClick: () => void;
-  disabled?: boolean;
   icon?: ReactNode;
-  className?: string;
-}
+};
 
+/** Foundation text button — full-width bordered action with label only. */
 export function FormSectionActionButton({
   label,
-  onClick,
   disabled,
   icon,
   className,
+  type = "button",
+  ...props
 }: FormSectionActionButtonProps) {
   return (
     <button
-      type="button"
+      type={type}
       disabled={disabled}
-      onClick={onClick}
       className={cn(FORM_SECTION_ACTION_BUTTON_CLASS, className)}
+      {...props}
     >
       {icon}
       <span>{label}</span>
