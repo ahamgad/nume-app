@@ -39,6 +39,7 @@ describe("account forms foundation", () => {
       "utf8",
     );
     expect(sectionSource).toContain("ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS");
+    expect(sectionSource).toContain("ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS");
   });
 
   it("uses account form field wrappers in form modules", () => {

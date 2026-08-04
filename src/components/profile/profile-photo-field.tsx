@@ -125,6 +125,7 @@ export function ProfilePhotoField({
           }
           className={cn(
             "absolute inset-0 inline-flex items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground transition-opacity",
+            "[&_img]:pointer-events-none [&_svg]:pointer-events-none",
             busy && "pointer-events-none opacity-60",
           )}
         >
@@ -135,10 +136,11 @@ export function ProfilePhotoField({
               alt=""
               fill
               unoptimized
-              className="object-cover"
+              draggable={false}
+              className="pointer-events-none object-cover"
             />
           ) : (
-            <Camera className="size-10" aria-hidden />
+            <Camera className="pointer-events-none size-10" aria-hidden />
           )}
         </button>
 

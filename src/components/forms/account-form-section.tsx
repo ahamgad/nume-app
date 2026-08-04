@@ -3,6 +3,7 @@ import { Children, isValidElement, type ReactNode } from "react";
 import {
   ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS,
+  ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS,
   ACCOUNT_FORM_SECTION_FIELDS_CLASS,
   ACCOUNT_FORM_SECTION_GAP_PX,
   ACCOUNT_FORM_SECTION_PADDING_CLASS,
@@ -54,6 +55,9 @@ interface AccountFormSectionProps {
 /**
  * Frozen account form section — one card surface; title and fields share 16px padding.
  *
+ * Titleless action sections use horizontal section inset + standalone field-row
+ * vertical rhythm so padding does not stack.
+ *
  * @see docs/FOUNDATION.md — Account forms foundation
  */
 export function AccountFormSection({
@@ -63,17 +67,20 @@ export function AccountFormSection({
   className,
 }: AccountFormSectionProps) {
   const fields = Children.toArray(children).filter(isValidElement);
-  const flushFieldEdges = Boolean(title || leading);
-  const fieldRowClass = flushFieldEdges
-    ? ACCOUNT_FORM_FIELD_ROW_CLASS
-    : ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS;
+  const isActionSection = !title && !leading;
+  const fieldRowClass = isActionSection
+    ? ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS
+    : ACCOUNT_FORM_FIELD_ROW_CLASS;
+  const sectionPaddingClass = isActionSection
+    ? ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS
+    : ACCOUNT_FORM_SECTION_PADDING_CLASS;
 
   return (
     <SurfaceStateProvider value="card">
       <section
         className={cn(
           CARD_SURFACE_CLASS,
-          ACCOUNT_FORM_SECTION_PADDING_CLASS,
+          sectionPaddingClass,
           "min-w-0 w-full overflow-hidden",
           className,
         )}

@@ -683,13 +683,13 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 
 1. **Description → first section** (create only) — `ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX` = 16px via `AccountFormCreateContent`
 2. **Section → section** — `ACCOUNT_FORM_SECTION_GAP_PX` = 24px via `AccountFormSections`
-3. **Card surface** — `CARD_SURFACE_CLASS` + `ACCOUNT_FORM_SECTION_PADDING_CLASS` (`p-4`) on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
+3. **Card surface** — `CARD_SURFACE_CLASS` on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`. Titled/leading sections use `ACCOUNT_FORM_SECTION_PADDING_CLASS` (`p-4`); titleless action sections use `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS` (`px-4`)
 4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium; title lives **inside** the section container (no detached header, no title divider). Optional — omit for titleless action sections (e.g. Sign out)
 4a. **Section leading** — optional `leading` content rendered **above** the title (horizontally centered); not a field row (e.g. Profile avatar). Leading adds `ACCOUNT_FORM_SECTION_GAP_PX` (24px) top and bottom margin around the avatar container, in addition to the existing 16px leading → title rhythm
-5. **Section padding** — `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`
+5. **Section padding** — titled/leading: `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`. Titleless action: horizontal only via `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS`
 6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`); same 16px rhythm for leading → title and title/leading → fields
 7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`); titled/leading sections flush first/last edges with `first:pt-0 last:pb-0`
-7a. **Titleless sections** — use `ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS` (`py-4` both sides) so a single action row keeps the same vertical rhythm as standard form rows
+7a. **Titleless action sections** — `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS` (`px-4`) + `ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS` (`py-4` both sides). Vertical rhythm is owned by the field row so section and row padding do not stack
 8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` when a title/leading owns the outer rhythm (title/section padding owns outer edges)
 9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
 10. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
@@ -703,7 +703,7 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 
 | Component | Role |
 |---|---|
-| `AccountFormSection` | Single card surface — optional leading, optional title + fields share 16px padding |
+| `AccountFormSection` | Single card surface — optional leading, optional title; titled sections use full `p-4`, titleless action sections use `px-4` + standalone row `py-4` |
 | `AccountFormSections` | Stacks sections with 24px gap + requirement context |
 | `AccountFormEditableField` | Row `EditableField` for all account form inputs |
 | `AccountFormGroupError` | In-flow group validation for conditional clusters |

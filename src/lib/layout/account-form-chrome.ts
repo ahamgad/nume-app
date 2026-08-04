@@ -27,6 +27,13 @@ export const ACCOUNT_FORM_SECTION_TITLE_CLASS = "text-lg font-medium";
 /** Single card section — 16px padding on all sides. */
 export const ACCOUNT_FORM_SECTION_PADDING_CLASS = "p-4";
 
+/**
+ * Titleless action sections — horizontal section inset only.
+ * Vertical rhythm is owned by {@link ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS}
+ * so section padding and row padding do not stack.
+ */
+export const ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS = "px-4";
+
 /** 16px between section title and first field row. */
 export const ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS = "mt-4";
 
@@ -37,8 +44,8 @@ export const ACCOUNT_FORM_FIELD_ROW_CLASS =
   "py-4 first:pt-0 last:pb-0";
 
 /**
- * Field rows in titleless sections — keep full 16px vertical rhythm on both sides
- * so a single action row matches standard form-row optical padding.
+ * Field rows in titleless action sections — full 16px vertical rhythm both sides.
+ * Paired with {@link ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS} (horizontal only).
  */
 export const ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS = "py-4";
 
