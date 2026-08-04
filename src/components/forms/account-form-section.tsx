@@ -2,6 +2,7 @@ import { Children, isValidElement, type ReactNode } from "react";
 
 import {
   ACCOUNT_FORM_FIELD_ROW_CLASS,
+  ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS,
   ACCOUNT_FORM_SECTION_FIELDS_CLASS,
   ACCOUNT_FORM_SECTION_GAP_PX,
   ACCOUNT_FORM_SECTION_PADDING_CLASS,
@@ -62,6 +63,10 @@ export function AccountFormSection({
   className,
 }: AccountFormSectionProps) {
   const fields = Children.toArray(children).filter(isValidElement);
+  const flushFieldEdges = Boolean(title || leading);
+  const fieldRowClass = flushFieldEdges
+    ? ACCOUNT_FORM_FIELD_ROW_CLASS
+    : ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS;
 
   return (
     <SurfaceStateProvider value="card">
@@ -104,9 +109,9 @@ export function AccountFormSection({
             )}
           >
             {fields.map((field, index) => (
-              <AccountFormField key={field.key ?? index}>
+              <div key={field.key ?? index} className={fieldRowClass}>
                 {field}
-              </AccountFormField>
+              </div>
             ))}
           </div>
         ) : null}

@@ -46,21 +46,23 @@ export function ProfileScreen() {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [signingOut, setSigningOut] = useState(false);
+  const [teardownProfile, setTeardownProfile] = useState<Profile | null>(null);
   const supabase = useMemo(() => createClient(), []);
   const userId = user?.id;
 
   const profileQuery = useQuery({
     queryKey: profileQueryKey(userId ?? "anonymous"),
-    enabled: Boolean(userId),
+    enabled: Boolean(userId) && !signingOut,
     queryFn: async () => {
       if (!userId) throw new Error("Missing user");
       return getProfile(supabase, userId);
     },
   });
 
-  const profile = profileQuery.data;
-  const loading = profileQuery.isLoading;
-  const loadError = profileQuery.isError;
+  const profile = profileQuery.data ?? (signingOut ? teardownProfile : null);
+  const showLoading = !signingOut && profileQuery.isLoading && !profile;
+  const showLoadError =
+    !signingOut && Boolean(userId) && (profileQuery.isError || !profile);
 
   const persist = useCallback(
     async (
@@ -70,7 +72,7 @@ export function ProfileScreen() {
         | "more.profile.photoSaveSuccess"
         | "more.profile.photoRemoveSuccess",
     ) => {
-      if (!userId) return;
+      if (!userId || signingOut) return;
       try {
         const next = await task();
         // Trust the mutation response — avoid a post-save refetch race that can
@@ -83,7 +85,7 @@ export function ProfileScreen() {
         throw error;
       }
     },
-    [queryClient, showToast, t, userId],
+    [queryClient, showToast, signingOut, t, userId],
   );
 
   async function handleNameSave(value: string) {
@@ -129,17 +131,24 @@ export function ProfileScreen() {
 
   async function handleSignOut() {
     if (signingOut) return;
+    if (profileQuery.data) {
+      setTeardownProfile(profileQuery.data);
+    }
     setSigningOut(true);
     try {
       if (userId) {
+        // Cancel only — keep cached UI until navigation; removing queries
+        // mid-teardown caused a false "Unable to load profile" flash.
         await queryClient.cancelQueries({ queryKey: profileQueryKey(userId) });
-        queryClient.removeQueries({ queryKey: profileQueryKey(userId) });
       }
       await signOut();
       router.replace("/continue");
       router.refresh();
-    } finally {
+    } catch (error) {
+      logSupabaseError("signOut", error);
       setSigningOut(false);
+      setTeardownProfile(null);
+      showToast(getSupabaseErrorMessage(error) || t("common.retry"));
     }
   }
 
@@ -149,7 +158,7 @@ export function ProfileScreen() {
       <ScreenBody withTabBar={false}>
         <StackPageTitle>{t("more.profile.title")}</StackPageTitle>
 
-        {loading ? (
+        {showLoading ? (
           <div
             className="flex flex-col"
             style={{ gap: ACCOUNT_FORM_SECTION_GAP_PX }}
@@ -157,7 +166,7 @@ export function ProfileScreen() {
             <Skeleton className="h-56 w-full rounded-2xl" />
             <Skeleton className="h-14 w-full rounded-2xl" />
           </div>
-        ) : loadError || !profile ? (
+        ) : !signingOut && (showLoadError || !profile) ? (
           <div className="space-y-4">
             <p className="text-sm text-destructive">
               {t("more.profile.loadError")}
@@ -171,8 +180,8 @@ export function ProfileScreen() {
               {t("common.retry")}
             </Button>
           </div>
-        ) : (
-          <AccountFormEditContent>
+        ) : profile ? (
+          <AccountFormEditContent disabled={signingOut}>
             <AccountFormSections
               style={{ gap: ACCOUNT_TYPE_PICKER_CARD_GAP_PX }}
             >
@@ -181,6 +190,7 @@ export function ProfileScreen() {
                 leading={
                   <ProfilePhotoField
                     avatarUrl={profile.avatarUrl}
+                    disabled={signingOut}
                     onSave={handlePhotoSave}
                     onRemove={handlePhotoRemove}
                   />
@@ -192,6 +202,7 @@ export function ProfileScreen() {
                   value={profile.fullName ?? ""}
                   placeholder={t("more.profile.namePlaceholder")}
                   mode="text"
+                  disabled={signingOut}
                   onSave={(value) => {
                     void handleNameSave(value);
                   }}
@@ -203,6 +214,7 @@ export function ProfileScreen() {
                   placeholder={t("more.profile.birthdatePlaceholder")}
                   locale={locale}
                   maxDate={todayIsoDate()}
+                  disabled={signingOut}
                   onChange={(value) => {
                     void handleBirthdateSave(value);
                   }}
@@ -211,6 +223,7 @@ export function ProfileScreen() {
                   id="gender"
                   label={t("more.profile.gender")}
                   value={profile.gender}
+                  disabled={signingOut}
                   onSave={handleGenderSave}
                 />
               </AccountFormSection>
@@ -231,7 +244,7 @@ export function ProfileScreen() {
               </AccountFormSection>
             </AccountFormSections>
           </AccountFormEditContent>
-        )}
+        ) : null}
       </ScreenBody>
     </>
   );

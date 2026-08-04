@@ -33,6 +33,14 @@ describe("account forms foundation", () => {
     expect(ACCOUNT_FORM_FIELD_ROW_CLASS).toContain("last:pb-0");
   });
 
+  it("keeps full row padding for titleless action sections", () => {
+    const sectionSource = fs.readFileSync(
+      path.join(process.cwd(), "src/components/forms/account-form-section.tsx"),
+      "utf8",
+    );
+    expect(sectionSource).toContain("ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS");
+  });
+
   it("uses account form field wrappers in form modules", () => {
     const modules = [
       "src/components/accounts/money-account-form-fields.tsx",

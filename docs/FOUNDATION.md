@@ -688,8 +688,9 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 4a. **Section leading** — optional `leading` content rendered **above** the title (horizontally centered); not a field row (e.g. Profile avatar). Leading adds `ACCOUNT_FORM_SECTION_GAP_PX` (24px) top and bottom margin around the avatar container, in addition to the existing 16px leading → title rhythm
 5. **Section padding** — `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`
 6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`); same 16px rhythm for leading → title and title/leading → fields
-7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`)
-8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` (title/section padding owns outer edges)
+7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`); titled/leading sections flush first/last edges with `first:pt-0 last:pb-0`
+7a. **Titleless sections** — use `ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS` (`py-4` both sides) so a single action row keeps the same vertical rhythm as standard form rows
+8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` when a title/leading owns the outer rhythm (title/section padding owns outer edges)
 9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
 10. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
 11. **Requirement context** — `AccountFormSections` `requirements` prop + `resolveAccountFormFieldRequired()`; `*` only when submit validation fails on empty/unset (optional last-4 identifiers, chip-default fields, and open-ended tier max never show `*`)

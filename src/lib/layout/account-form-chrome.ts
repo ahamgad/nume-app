@@ -36,6 +36,12 @@ export const ACCOUNT_FORM_SECTION_FIELDS_CLASS = "divide-y divide-border";
 export const ACCOUNT_FORM_FIELD_ROW_CLASS =
   "py-4 first:pt-0 last:pb-0";
 
+/**
+ * Field rows in titleless sections — keep full 16px vertical rhythm on both sides
+ * so a single action row matches standard form-row optical padding.
+ */
+export const ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS = "py-4";
+
 export const ACCOUNT_FORM_DISABLED_CLASS =
   "pointer-events-none opacity-60";
 
