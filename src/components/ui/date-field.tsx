@@ -28,6 +28,7 @@ export interface DateFieldProps {
   required?: boolean;
   hideLabel?: boolean;
   variant?: "input" | "row";
+  maxDate?: string;
 }
 
 export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
@@ -46,6 +47,7 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
       required = false,
       hideLabel = false,
       variant = "input",
+      maxDate,
     },
     ref,
   ) => {
@@ -123,6 +125,7 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
             value={value}
             onChange={onChange}
             title={label}
+            maxDate={maxDate}
           />
         </>
       );
@@ -138,6 +141,7 @@ export const DateField = React.forwardRef<HTMLButtonElement, DateFieldProps>(
           value={value}
           onChange={onChange}
           title={label}
+          maxDate={maxDate}
         />
       </>
     );

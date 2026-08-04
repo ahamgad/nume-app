@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Info, MessageSquare, Settings, User } from "lucide-react";
 
 import { AccountTypePickerCardRow } from "@/components/accounts/account-type-picker-card";
@@ -17,11 +18,11 @@ import type { AppLocale } from "@/lib/fonts";
 import { ACCOUNT_TYPE_PICKER_CARD_GAP_PX } from "@/lib/layout/account-type-picker-chrome";
 import type { ThemePreference } from "@/lib/theme/theme-preference";
 import { useT, useTranslations } from "@/providers/i18n-provider";
-import { useAuth } from "@/providers/auth-provider";
 import { useTheme } from "@/providers/theme-provider";
 
 export function MoreScreen() {
   const t = useT();
+  const router = useRouter();
 
   return (
     <>
@@ -35,6 +36,7 @@ export function MoreScreen() {
           <AccountTypePickerCardRow
             icon={<User className="size-6" aria-hidden />}
             label={t("more.profile.title")}
+            onSelect={() => router.push("/more/profile")}
           />
           <AccountTypePickerCardRow
             icon={<Settings className="size-6" aria-hidden />}
@@ -49,28 +51,6 @@ export function MoreScreen() {
             label={t("more.feedback.title")}
           />
         </div>
-      </ScreenBody>
-    </>
-  );
-}
-
-export function MoreProfileScreen() {
-  const t = useT();
-  const { user } = useAuth();
-  return (
-    <>
-      <StackPageHeader title={t("more.profile.title")} />
-      <ScreenBody withTabBar={false} className="space-y-4">
-        <StackPageTitle>{t("more.profile.title")}</StackPageTitle>
-        <div className="rounded-lg border border-border px-4 py-3">
-          <p className="text-sm font-medium">{t("more.profile.email")}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {user?.email ?? t("common.emptyValue")}
-          </p>
-        </div>
-        <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-          {t("more.profile.stub")}
-        </p>
       </ScreenBody>
     </>
   );

@@ -1,5 +1,5 @@
-import { MoreProfileScreen } from "@/components/screens/more-screens";
+import { ProfileScreen } from "@/components/screens/profile-screen";
 
 export default function MoreProfilePage() {
-  return <MoreProfileScreen />;
+  return <ProfileScreen />;
 }
