@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { Info, MessageSquare, Settings, User } from "lucide-react";
 
+import { AccountTypePickerCardRow } from "@/components/accounts/account-type-picker-card";
 import {
   RootPageHeader,
   RootPageTitle,
@@ -9,11 +11,10 @@ import {
   StackPageTitle,
 } from "@/components/layout/stack-page-chrome";
 import { ScreenBody } from "@/components/layout/screen-header";
-import { MoreMenuRow } from "@/components/patterns";
-import { Card } from "@/components/ui/card";
 import { SettingsRadioList } from "@/components/ui/settings-radio-list";
 import { requestLocaleRestart } from "@/lib/i18n/locale-restart";
 import type { AppLocale } from "@/lib/fonts";
+import { ACCOUNT_TYPE_PICKER_CARD_GAP_PX } from "@/lib/layout/account-type-picker-chrome";
 import type { ThemePreference } from "@/lib/theme/theme-preference";
 import { useT, useTranslations } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
@@ -27,15 +28,27 @@ export function MoreScreen() {
       <RootPageHeader title={t("more.title")} />
       <ScreenBody>
         <RootPageTitle>{t("more.title")}</RootPageTitle>
-        <Card className="overflow-hidden shadow-none">
-          <MoreMenuRow title={t("more.profile.title")} />
-          <div className="mx-4 border-b border-border" />
-          <MoreMenuRow title={t("more.settings.title")} />
-          <div className="mx-4 border-b border-border" />
-          <MoreMenuRow title={t("more.about.title")} />
-          <div className="mx-4 border-b border-border" />
-          <MoreMenuRow title={t("more.feedback.title")} />
-        </Card>
+        <div
+          className="flex flex-col"
+          style={{ gap: ACCOUNT_TYPE_PICKER_CARD_GAP_PX }}
+        >
+          <AccountTypePickerCardRow
+            icon={<User className="size-6" aria-hidden />}
+            label={t("more.profile.title")}
+          />
+          <AccountTypePickerCardRow
+            icon={<Settings className="size-6" aria-hidden />}
+            label={t("more.settings.title")}
+          />
+          <AccountTypePickerCardRow
+            icon={<Info className="size-6" aria-hidden />}
+            label={t("more.about.title")}
+          />
+          <AccountTypePickerCardRow
+            icon={<MessageSquare className="size-6" aria-hidden />}
+            label={t("more.feedback.title")}
+          />
+        </div>
       </ScreenBody>
     </>
   );

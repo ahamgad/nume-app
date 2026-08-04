@@ -49,9 +49,21 @@ describe("account type picker sheet foundation", () => {
     expect(cardSource).toContain("text-muted-foreground");
     expect(cardSource).toContain("CardChevron");
     expect(cardSource).toContain("CARD_CHEVRON_ROW_CLASS");
+    expect(cardSource).toContain("AccountTypePickerCardRow");
     expect(cardSource).not.toContain("size-4");
     expect(CARD_SURFACE_CLASS).toContain("rounded-2xl");
     expect(CARD_SURFACE_CLASS).toContain("border-border");
     expect(CARD_SURFACE_CLASS).not.toContain("shadow");
+  });
+
+  it("More menu rows consume the shared type picker card row surface", () => {
+    const source = fs.readFileSync(
+      path.join(process.cwd(), "src/components/screens/more-screens.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain("AccountTypePickerCardRow");
+    expect(source).toContain("ACCOUNT_TYPE_PICKER_CARD_GAP_PX");
+    expect(source).not.toContain("MoreMenuRow");
   });
 });
