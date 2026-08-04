@@ -113,7 +113,7 @@ export const ar = {
     none: "لا شيء",
   },
   fieldEditor: {
-    confirm: "حفظ التغييرات",
+    confirm: "حفظ",
   },
   dashboard: {
     title: "لوحة التحكم",

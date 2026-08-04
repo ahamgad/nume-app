@@ -111,7 +111,7 @@ export const en = {
     none: "None",
   },
   fieldEditor: {
-    confirm: "Save changes",
+    confirm: "Save",
   },
   dashboard: {
     title: "Dashboard",

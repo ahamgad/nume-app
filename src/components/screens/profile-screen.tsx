@@ -1,11 +1,15 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
 import { GenderPicker } from "@/components/profile/gender-picker";
-import { ProfilePhotoField } from "@/components/profile/profile-photo-field";
+import {
+  ProfilePhotoField,
+  PROFILE_PHOTO_SIZE_PX,
+} from "@/components/profile/profile-photo-field";
 import {
   AccountFormDateField,
   AccountFormEditableField,
@@ -21,11 +25,10 @@ import { todayIsoDate } from "@/lib/format/date";
 import { ACCOUNT_FORM_SECTION_GAP_PX } from "@/lib/layout/account-form-chrome";
 import {
   getProfile,
-  removeProfileAvatar,
   updateProfile,
   uploadProfileAvatar,
 } from "@/lib/profile/service";
-import type { ProfileGender } from "@/lib/profile/types";
+import type { Profile, ProfileGender } from "@/lib/profile/types";
 import { getSupabaseErrorMessage, logSupabaseError } from "@/lib/supabase/errors";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
@@ -60,23 +63,17 @@ export function ProfileScreen() {
   const loading = profileQuery.isLoading;
   const loadError = profileQuery.isError;
 
-  const invalidate = useCallback(async () => {
-    if (!userId) return;
-    await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
-  }, [queryClient, userId]);
-
   const persist = useCallback(
     async (
-      task: () => Promise<unknown>,
-      successKey:
-        | "more.profile.saveSuccess"
-        | "more.profile.photoSaveSuccess"
-        | "more.profile.photoRemoveSuccess",
+      task: () => Promise<Profile>,
+      successKey: "more.profile.saveSuccess" | "more.profile.photoSaveSuccess",
     ) => {
       if (!userId) return;
       try {
-        await task();
-        await invalidate();
+        const next = await task();
+        // Trust the mutation response — avoid a post-save refetch race that can
+        // run after sign-out and poison the cache with a null signed URL.
+        queryClient.setQueryData(profileQueryKey(userId), next);
         showToast(t(successKey));
       } catch (error) {
         logSupabaseError("updateProfile", error);
@@ -84,7 +81,7 @@ export function ProfileScreen() {
         throw error;
       }
     },
-    [invalidate, showToast, t, userId],
+    [queryClient, showToast, t, userId],
   );
 
   async function handleNameSave(value: string) {
@@ -103,7 +100,7 @@ export function ProfileScreen() {
     );
   }
 
-  async function handleGenderSave(value: ProfileGender | null) {
+  async function handleGenderSave(value: ProfileGender) {
     if (!userId) return;
     await persist(
       () => updateProfile(supabase, userId, { gender: value }),
@@ -112,18 +109,11 @@ export function ProfileScreen() {
   }
 
   async function handlePhotoSave(file: File) {
-    if (!userId) return;
-    await persist(
-      () => uploadProfileAvatar(supabase, userId, file),
-      "more.profile.photoSaveSuccess",
-    );
-  }
-
-  async function handlePhotoRemove() {
     if (!userId || !profile) return;
     await persist(
-      () => removeProfileAvatar(supabase, userId, profile.avatarPath),
-      "more.profile.photoRemoveSuccess",
+      () =>
+        uploadProfileAvatar(supabase, userId, file, profile.avatarPath),
+      "more.profile.photoSaveSuccess",
     );
   }
 
@@ -131,6 +121,10 @@ export function ProfileScreen() {
     if (signingOut) return;
     setSigningOut(true);
     try {
+      if (userId) {
+        await queryClient.cancelQueries({ queryKey: profileQueryKey(userId) });
+        queryClient.removeQueries({ queryKey: profileQueryKey(userId) });
+      }
       await signOut();
       router.replace("/continue");
       router.refresh();
@@ -147,10 +141,16 @@ export function ProfileScreen() {
 
         {loading ? (
           <div
-            className="flex flex-col"
+            className="flex flex-col items-center"
             style={{ gap: ACCOUNT_FORM_SECTION_GAP_PX }}
           >
-            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton
+              className="rounded-full"
+              style={{
+                width: PROFILE_PHOTO_SIZE_PX,
+                height: PROFILE_PHOTO_SIZE_PX,
+              }}
+            />
             <Skeleton className="h-40 w-full rounded-2xl" />
           </div>
         ) : loadError || !profile ? (
@@ -176,7 +176,6 @@ export function ProfileScreen() {
               <ProfilePhotoField
                 avatarUrl={profile.avatarUrl}
                 onSave={handlePhotoSave}
-                onRemove={handlePhotoRemove}
               />
 
               <AccountFormSections>
@@ -213,13 +212,14 @@ export function ProfileScreen() {
 
               <Button
                 type="button"
-                variant="outline"
-                className="h-11 w-full"
+                variant="ghost"
+                className="h-11 w-full justify-start gap-2 px-0 text-destructive hover:bg-transparent hover:text-destructive"
                 onClick={() => {
                   void handleSignOut();
                 }}
                 disabled={signingOut}
               >
+                <LogOut className="size-5" aria-hidden />
                 {signingOut ? t("more.profile.signingOut") : t("more.logout")}
               </Button>
             </div>

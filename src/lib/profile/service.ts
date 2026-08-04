@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Profile, ProfileGender, ProfileUpdate } from "@/lib/profile/types";
+import { logSupabaseError } from "@/lib/supabase/errors";
 
 const AVATAR_BUCKET = "avatars";
 const AVATAR_SIGNED_URL_TTL_SECONDS = 60 * 60;
@@ -38,8 +39,13 @@ async function resolveAvatarUrl(
     .from(AVATAR_BUCKET)
     .createSignedUrl(avatarPath, AVATAR_SIGNED_URL_TTL_SECONDS);
 
-  if (error || !data?.signedUrl) {
-    return null;
+  if (error) {
+    logSupabaseError("resolveAvatarUrl", error);
+    throw error;
+  }
+
+  if (!data?.signedUrl) {
+    throw new Error("Avatar signed URL missing");
   }
 
   return data.signedUrl;
@@ -124,25 +130,56 @@ function extensionForMimeType(mimeType: string): string {
   return "jpg";
 }
 
+function nextAvatarPath(userId: string, mimeType: string): string {
+  const extension = extensionForMimeType(mimeType);
+  const unique =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${userId}/${unique}.${extension}`;
+}
+
+async function removeAvatarObject(
+  supabase: SupabaseClient,
+  path: string | null | undefined,
+) {
+  if (!path) return;
+  const { error } = await supabase.storage.from(AVATAR_BUCKET).remove([path]);
+  if (error) {
+    // Best-effort cleanup — do not fail the user-facing update.
+    logSupabaseError("removeAvatarObject", error);
+  }
+}
+
 export async function uploadProfileAvatar(
   supabase: SupabaseClient,
   userId: string,
   file: File,
+  currentPath: string | null = null,
 ): Promise<Profile> {
-  const extension = extensionForMimeType(file.type || "image/jpeg");
-  const path = `${userId}/avatar.${extension}`;
+  const contentType = file.type || "image/jpeg";
+  const path = nextAvatarPath(userId, contentType);
 
   const { error: uploadError } = await supabase.storage
     .from(AVATAR_BUCKET)
     .upload(path, file, {
-      upsert: true,
-      contentType: file.type || "image/jpeg",
+      upsert: false,
+      contentType,
       cacheControl: "3600",
     });
 
   if (uploadError) throw uploadError;
 
-  return updateProfile(supabase, userId, { avatarPath: path });
+  try {
+    const profile = await updateProfile(supabase, userId, { avatarPath: path });
+    if (currentPath && currentPath !== path) {
+      await removeAvatarObject(supabase, currentPath);
+    }
+    return profile;
+  } catch (error) {
+    await removeAvatarObject(supabase, path);
+    throw error;
+  }
 }
 
 export async function removeProfileAvatar(
@@ -150,9 +187,7 @@ export async function removeProfileAvatar(
   userId: string,
   currentPath: string | null,
 ): Promise<Profile> {
-  if (currentPath) {
-    await supabase.storage.from(AVATAR_BUCKET).remove([currentPath]);
-  }
-
-  return updateProfile(supabase, userId, { avatarPath: null });
+  const profile = await updateProfile(supabase, userId, { avatarPath: null });
+  await removeAvatarObject(supabase, currentPath);
+  return profile;
 }
