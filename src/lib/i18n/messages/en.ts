@@ -943,6 +943,9 @@ export const en = {
       email: "Email",
       stub: "Profile editing will be available in a future update.",
     },
+    settings: {
+      title: "Settings",
+    },
     appearance: {
       title: "Appearance",
       description: "Theme and display preferences",
@@ -961,10 +964,13 @@ export const en = {
         "Switching language restarts the app and opens the dashboard in your chosen language.",
     },
     about: {
-      title: "About NUME",
+      title: "About",
       description:
         "NUME is your personal wealth operating system — understand, manage, and grow your financial life",
       version: "Version {version}",
+    },
+    feedback: {
+      title: "Feedback",
     },
     logout: "Log out",
     deleteTestAccount: "Delete test account",

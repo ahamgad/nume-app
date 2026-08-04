@@ -1,9 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 import {
   RootPageHeader,
@@ -11,12 +8,10 @@ import {
   StackPageHeader,
   StackPageTitle,
 } from "@/components/layout/stack-page-chrome";
-import { ScreenBody, ScreenHeader } from "@/components/layout/screen-header";
+import { ScreenBody } from "@/components/layout/screen-header";
 import { MoreMenuRow } from "@/components/patterns";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SettingsRadioList } from "@/components/ui/settings-radio-list";
-import { isDevEnvironment } from "@/dev/is-dev-environment";
 import { requestLocaleRestart } from "@/lib/i18n/locale-restart";
 import type { AppLocale } from "@/lib/fonts";
 import type { ThemePreference } from "@/lib/theme/theme-preference";
@@ -24,40 +19,8 @@ import { useT, useTranslations } from "@/providers/i18n-provider";
 import { useAuth } from "@/providers/auth-provider";
 import { useTheme } from "@/providers/theme-provider";
 
-const CertificatesQaDevPanel = isDevEnvironment
-  ? dynamic(
-      () =>
-        import("@/dev/certificates-qa-dev-panel").then(
-          (module) => module.CertificatesQaDevPanel,
-        ),
-      { ssr: false },
-    )
-  : () => null;
-
 export function MoreScreen() {
   const t = useT();
-  const router = useRouter();
-  const { signOut } = useAuth();
-  const [deleting, setDeleting] = useState(false);
-
-  async function handleLogout() {
-    await signOut();
-    router.replace("/continue");
-    router.refresh();
-  }
-
-  async function handleDeleteTestAccount() {
-    if (deleting) return;
-    setDeleting(true);
-    try {
-      await fetch("/api/qa/delete-test-account", { method: "POST" });
-    } finally {
-      await signOut();
-      router.replace("/continue");
-      router.refresh();
-      setDeleting(false);
-    }
-  }
 
   return (
     <>
@@ -65,49 +28,14 @@ export function MoreScreen() {
       <ScreenBody>
         <RootPageTitle>{t("more.title")}</RootPageTitle>
         <Card className="overflow-hidden shadow-none">
-          <MoreMenuRow
-            title={t("more.profile.title")}
-            description={t("more.profile.description")}
-            onClick={() => router.push("/more/profile")}
-          />
+          <MoreMenuRow title={t("more.profile.title")} />
           <div className="mx-4 border-b border-border" />
-          <MoreMenuRow
-            title={t("more.appearance.title")}
-            description={t("more.appearance.description")}
-            onClick={() => router.push("/more/appearance")}
-          />
+          <MoreMenuRow title={t("more.settings.title")} />
           <div className="mx-4 border-b border-border" />
-          <MoreMenuRow
-            title={t("more.language.title")}
-            description={t("more.language.description")}
-            onClick={() => router.push("/more/language")}
-          />
+          <MoreMenuRow title={t("more.about.title")} />
           <div className="mx-4 border-b border-border" />
-          <MoreMenuRow
-            title={t("more.about.title")}
-            onClick={() => router.push("/more/about")}
-          />
+          <MoreMenuRow title={t("more.feedback.title")} />
         </Card>
-
-        <Button
-          variant="outline"
-          className="mt-6 h-11 w-full"
-          onClick={handleLogout}
-        >
-          {t("more.logout")}
-        </Button>
-
-        {/* Temporary QA tool — remove before production release. */}
-        <Button
-          variant="outline"
-          className="mt-3 h-11 w-full text-destructive hover:text-destructive"
-          onClick={handleDeleteTestAccount}
-          disabled={deleting}
-        >
-          {t("more.deleteTestAccount")}
-        </Button>
-
-        {isDevEnvironment ? <CertificatesQaDevPanel /> : null}
       </ScreenBody>
     </>
   );

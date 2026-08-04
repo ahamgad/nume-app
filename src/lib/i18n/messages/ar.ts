@@ -940,6 +940,9 @@ export const ar = {
       email: "البريد الإلكتروني",
       stub: "تعديل الملف الشخصي سيتاح في تحديث لاحق.",
     },
+    settings: {
+      title: "الإعدادات",
+    },
     appearance: {
       title: "المظهر",
       description: "السمة وتفضيلات العرض",
@@ -958,10 +961,13 @@ export const ar = {
         "تغيير اللغة يعيد تشغيل التطبيق ويفتح لوحة التحكم باللغة التي اخترتها.",
     },
     about: {
-      title: "عن NUME",
+      title: "حول",
       description:
         "NUME هو نظامك التشغيلي للثروة الشخصية — افهم وأدر ونمِّ حياتك المالية.",
       version: "الإصدار {version}",
+    },
+    feedback: {
+      title: "الملاحظات",
     },
     logout: "تسجيل الخروج",
     deleteTestAccount: "حذف حساب الاختبار",

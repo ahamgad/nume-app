@@ -484,15 +484,20 @@ export function RecordRow({
 interface MoreMenuRowProps {
   title: string;
   description?: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export function MoreMenuRow({ title, description, onClick }: MoreMenuRowProps) {
+  const Comp = onClick ? "button" : "div";
+
   return (
-    <button
-      type="button"
+    <Comp
+      type={onClick ? "button" : undefined}
       onClick={onClick}
-      className="flex min-h-14 w-full items-center justify-between gap-3 px-4 py-3 text-start transition-colors active:bg-muted"
+      className={cn(
+        "flex min-h-14 w-full items-center justify-between gap-3 px-4 py-3 text-start",
+        onClick && "transition-colors active:bg-muted",
+      )}
     >
       <div className="min-w-0">
         <p className="text-[0.9375rem] font-medium">{title}</p>
@@ -503,7 +508,7 @@ export function MoreMenuRow({ title, description, onClick }: MoreMenuRowProps) {
         ) : null}
       </div>
       <ChevronRight className="size-5 shrink-0 text-muted-foreground rtl:rotate-180" />
-    </button>
+    </Comp>
   );
 }
 
