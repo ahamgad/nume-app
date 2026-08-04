@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { IconButton } from "@/components/ui/icon-button";
+import { CARD_SURFACE_BG_CLASS } from "@/lib/layout/card-surface";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -144,11 +145,15 @@ export function ProfilePhotoField({
         {displayUrl ? (
           <IconButton
             type="button"
-            variant="destructive"
+            variant="ghost"
             size="sm"
             disabled={busy}
             aria-label={t("more.profile.photoRemove")}
-            className="absolute bottom-1 end-1 z-10 size-7 shadow-sm"
+            className={cn(
+              "absolute bottom-1 end-1 z-10 size-7 text-destructive shadow-sm",
+              "hover:bg-card hover:text-destructive",
+              CARD_SURFACE_BG_CLASS,
+            )}
             onClick={(event) => {
               event.stopPropagation();
               if (busy) return;

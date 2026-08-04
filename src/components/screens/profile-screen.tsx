@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { todayIsoDate } from "@/lib/format/date";
 import { ACCOUNT_FORM_SECTION_GAP_PX } from "@/lib/layout/account-form-chrome";
+import { ACCOUNT_TYPE_PICKER_CARD_GAP_PX } from "@/lib/layout/account-type-picker-chrome";
 import {
   getProfile,
   removeProfileAvatar,
@@ -172,7 +173,9 @@ export function ProfileScreen() {
           </div>
         ) : (
           <AccountFormEditContent>
-            <AccountFormSections>
+            <AccountFormSections
+              style={{ gap: ACCOUNT_TYPE_PICKER_CARD_GAP_PX }}
+            >
               <AccountFormSection
                 title={t("more.profile.detailsSection")}
                 leading={
@@ -216,7 +219,7 @@ export function ProfileScreen() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="h-11 w-full justify-start gap-2 px-0 text-destructive hover:bg-transparent hover:text-destructive"
+                  className="h-auto min-h-0 w-full justify-start gap-2 px-0 py-0 text-destructive hover:bg-transparent hover:text-destructive"
                   onClick={() => {
                     void handleSignOut();
                   }}

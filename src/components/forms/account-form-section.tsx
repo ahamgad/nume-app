@@ -3,6 +3,7 @@ import { Children, isValidElement, type ReactNode } from "react";
 import {
   ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+  ACCOUNT_FORM_SECTION_GAP_PX,
   ACCOUNT_FORM_SECTION_PADDING_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_CLASS,
   ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
@@ -73,7 +74,15 @@ export function AccountFormSection({
         )}
       >
         {leading ? (
-          <div className="flex justify-center">{leading}</div>
+          <div
+            className="flex justify-center"
+            style={{
+              marginTop: ACCOUNT_FORM_SECTION_GAP_PX,
+              marginBottom: ACCOUNT_FORM_SECTION_GAP_PX,
+            }}
+          >
+            {leading}
+          </div>
         ) : null}
         {title ? (
           <h2

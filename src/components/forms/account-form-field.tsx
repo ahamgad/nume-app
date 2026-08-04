@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 
@@ -43,6 +44,7 @@ export function useAccountFormFieldRequired(fieldKey: string): boolean {
 interface AccountFormSectionsProps {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
   requirements?: AccountFormRequirements;
 }
 
@@ -50,11 +52,15 @@ interface AccountFormSectionsProps {
 export function AccountFormSections({
   children,
   className,
+  style,
   requirements = {},
 }: AccountFormSectionsProps) {
   return (
     <AccountFormRequirementsContext.Provider value={requirements}>
-      <div className={cn(ACCOUNT_FORM_SECTION_STACK_CLASS, className)}>
+      <div
+        className={cn(ACCOUNT_FORM_SECTION_STACK_CLASS, className)}
+        style={style}
+      >
         {children}
       </div>
     </AccountFormRequirementsContext.Provider>
