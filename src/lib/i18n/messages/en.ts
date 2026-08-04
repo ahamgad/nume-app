@@ -948,6 +948,13 @@ export const en = {
       photoUpload: "Upload photo",
       photoChange: "Change photo",
       photoRemove: "Remove photo",
+      photoRemoveConfirm: {
+        title: "Remove profile photo?",
+        description: "This permanently deletes your profile photo",
+        confirm: "Remove photo",
+        removing: "Removing…",
+        cancel: "Cancel",
+      },
       photoInvalidType: "Choose a JPEG, PNG, or WebP image",
       photoTooLarge: "Image must be 5 MB or smaller",
       photoSaveError: "Couldn't save photo",

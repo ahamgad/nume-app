@@ -945,6 +945,13 @@ export const ar = {
       photoUpload: "رفع صورة",
       photoChange: "تغيير الصورة",
       photoRemove: "إزالة الصورة",
+      photoRemoveConfirm: {
+        title: "إزالة الصورة الشخصية؟",
+        description: "سيؤدي هذا إلى حذف صورتك الشخصية نهائيًا",
+        confirm: "إزالة الصورة",
+        removing: "جارٍ الإزالة…",
+        cancel: "إلغاء",
+      },
       photoInvalidType: "اختر صورة بصيغة JPEG أو PNG أو WebP",
       photoTooLarge: "يجب ألا يتجاوز حجم الصورة 5 ميغابايت",
       photoSaveError: "تعذر حفظ الصورة",

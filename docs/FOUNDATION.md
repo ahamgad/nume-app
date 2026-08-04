@@ -684,9 +684,10 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 1. **Description → first section** (create only) — `ACCOUNT_FORM_DESCRIPTION_TO_SECTION_GAP_PX` = 16px via `AccountFormCreateContent`
 2. **Section → section** — `ACCOUNT_FORM_SECTION_GAP_PX` = 24px via `AccountFormSections`
 3. **Card surface** — `CARD_SURFACE_CLASS` + `ACCOUNT_FORM_SECTION_PADDING_CLASS` (`p-4`) on every `AccountFormSection`; nested groups use `CARD_SURFACE_FLAT_CLASS`
-4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium; title lives **inside** the section container (no detached header, no title divider)
+4. **Section title** — `ACCOUNT_FORM_SECTION_TITLE_CLASS` = 18px medium; title lives **inside** the section container (no detached header, no title divider). Optional — omit for titleless action sections (e.g. Sign out)
+4a. **Section leading** — optional `leading` content rendered **above** the title (horizontally centered); not a field row (e.g. Profile avatar)
 5. **Section padding** — `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`
-6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`)
+6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`); same 16px rhythm for leading → title and title/leading → fields
 7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`)
 8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` (title/section padding owns outer edges)
 9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
@@ -701,7 +702,7 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 
 | Component | Role |
 |---|---|
-| `AccountFormSection` | Single card surface — title + fields share 16px padding |
+| `AccountFormSection` | Single card surface — optional leading, optional title + fields share 16px padding |
 | `AccountFormSections` | Stacks sections with 24px gap + requirement context |
 | `AccountFormEditableField` | Row `EditableField` for all account form inputs |
 | `AccountFormGroupError` | In-flow group validation for conditional clusters |

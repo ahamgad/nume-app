@@ -1,9 +1,11 @@
 "use client";
 
-import { Camera } from "lucide-react";
+import { Camera, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
+import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
+import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/utils";
 import { useT } from "@/providers/i18n-provider";
 
@@ -14,23 +16,30 @@ interface ProfilePhotoFieldProps {
   avatarUrl: string | null;
   disabled?: boolean;
   onSave: (file: File) => Promise<void>;
+  onRemove: () => Promise<void>;
 }
 
 export function ProfilePhotoField({
   avatarUrl,
   disabled = false,
   onSave,
+  onRemove,
 }: ProfilePhotoFieldProps) {
   const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [optimisticPreview, setOptimisticPreview] = useState<string | null>(
     null,
   );
+  const [optimisticRemoved, setOptimisticRemoved] = useState(false);
 
-  const displayUrl = optimisticPreview ?? avatarUrl;
-  const busy = disabled || saving;
+  const displayUrl = optimisticRemoved
+    ? null
+    : (optimisticPreview ?? avatarUrl);
+  const busy = disabled || saving || removing;
 
   function openPicker() {
     if (busy) return;
@@ -53,6 +62,7 @@ export function ProfilePhotoField({
     }
 
     const preview = URL.createObjectURL(file);
+    setOptimisticRemoved(false);
     setOptimisticPreview(preview);
     setSaving(true);
     setError(null);
@@ -74,39 +84,81 @@ export function ProfilePhotoField({
     }
   }
 
+  async function handleConfirmRemove() {
+    if (busy) return;
+    setRemoving(true);
+    setError(null);
+    try {
+      await onRemove();
+      setOptimisticRemoved(true);
+      setOptimisticPreview((current) => {
+        if (current) URL.revokeObjectURL(current);
+        return null;
+      });
+      setConfirmOpen(false);
+    } catch {
+      setError(t("more.profile.photoSaveError"));
+      setConfirmOpen(false);
+    } finally {
+      setRemoving(false);
+    }
+  }
+
   return (
     <div className="flex flex-col items-center gap-2">
-      <button
-        type="button"
-        disabled={busy}
-        onClick={openPicker}
-        aria-label={
-          avatarUrl
-            ? t("more.profile.photoChange")
-            : t("more.profile.photoUpload")
-        }
-        className={cn(
-          "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground transition-opacity",
-          busy && "pointer-events-none opacity-60",
-        )}
+      <div
+        className="relative shrink-0"
         style={{
           width: PROFILE_PHOTO_SIZE_PX,
           height: PROFILE_PHOTO_SIZE_PX,
         }}
       >
+        <button
+          type="button"
+          disabled={busy}
+          onClick={openPicker}
+          aria-label={
+            displayUrl
+              ? t("more.profile.photoChange")
+              : t("more.profile.photoUpload")
+          }
+          className={cn(
+            "absolute inset-0 inline-flex items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground transition-opacity",
+            busy && "pointer-events-none opacity-60",
+          )}
+        >
+          {displayUrl ? (
+            <Image
+              key={displayUrl}
+              src={displayUrl}
+              alt=""
+              fill
+              unoptimized
+              className="object-cover"
+            />
+          ) : (
+            <Camera className="size-10" aria-hidden />
+          )}
+        </button>
+
         {displayUrl ? (
-          <Image
-            key={displayUrl}
-            src={displayUrl}
-            alt=""
-            fill
-            unoptimized
-            className="object-cover"
-          />
-        ) : (
-          <Camera className="size-10" aria-hidden />
-        )}
-      </button>
+          <IconButton
+            type="button"
+            variant="destructive"
+            size="sm"
+            disabled={busy}
+            aria-label={t("more.profile.photoRemove")}
+            className="absolute bottom-1 end-1 z-10 size-7 shadow-sm"
+            onClick={(event) => {
+              event.stopPropagation();
+              if (busy) return;
+              setConfirmOpen(true);
+            }}
+          >
+            <Trash2 className="size-3.5" aria-hidden />
+          </IconButton>
+        ) : null}
+      </div>
 
       {error ? (
         <p className="text-center text-sm text-destructive" role="alert">
@@ -122,6 +174,24 @@ export function ProfilePhotoField({
         onChange={(event) => {
           void handleFileChange(event.target.files);
           event.target.value = "";
+        }}
+      />
+
+      <ConfirmBottomSheet
+        open={confirmOpen}
+        titleId="profile-photo-remove-title"
+        icon="delete"
+        title={t("more.profile.photoRemoveConfirm.title")}
+        description={t("more.profile.photoRemoveConfirm.description")}
+        confirmLabel={t("more.profile.photoRemoveConfirm.confirm")}
+        confirmLoadingLabel={t("more.profile.photoRemoveConfirm.removing")}
+        cancelLabel={t("more.profile.photoRemoveConfirm.cancel")}
+        confirmDisabled={removing}
+        onConfirm={() => {
+          void handleConfirmRemove();
+        }}
+        onCancel={() => {
+          if (!removing) setConfirmOpen(false);
         }}
       />
     </div>

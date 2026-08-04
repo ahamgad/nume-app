@@ -6,10 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
 import { GenderPicker } from "@/components/profile/gender-picker";
-import {
-  ProfilePhotoField,
-  PROFILE_PHOTO_SIZE_PX,
-} from "@/components/profile/profile-photo-field";
+import { ProfilePhotoField } from "@/components/profile/profile-photo-field";
 import {
   AccountFormDateField,
   AccountFormEditableField,
@@ -25,6 +22,7 @@ import { todayIsoDate } from "@/lib/format/date";
 import { ACCOUNT_FORM_SECTION_GAP_PX } from "@/lib/layout/account-form-chrome";
 import {
   getProfile,
+  removeProfileAvatar,
   updateProfile,
   uploadProfileAvatar,
 } from "@/lib/profile/service";
@@ -66,7 +64,10 @@ export function ProfileScreen() {
   const persist = useCallback(
     async (
       task: () => Promise<Profile>,
-      successKey: "more.profile.saveSuccess" | "more.profile.photoSaveSuccess",
+      successKey:
+        | "more.profile.saveSuccess"
+        | "more.profile.photoSaveSuccess"
+        | "more.profile.photoRemoveSuccess",
     ) => {
       if (!userId) return;
       try {
@@ -117,6 +118,14 @@ export function ProfileScreen() {
     );
   }
 
+  async function handlePhotoRemove() {
+    if (!userId || !profile) return;
+    await persist(
+      () => removeProfileAvatar(supabase, userId, profile.avatarPath),
+      "more.profile.photoRemoveSuccess",
+    );
+  }
+
   async function handleSignOut() {
     if (signingOut) return;
     setSigningOut(true);
@@ -141,17 +150,11 @@ export function ProfileScreen() {
 
         {loading ? (
           <div
-            className="flex flex-col items-center"
+            className="flex flex-col"
             style={{ gap: ACCOUNT_FORM_SECTION_GAP_PX }}
           >
-            <Skeleton
-              className="rounded-full"
-              style={{
-                width: PROFILE_PHOTO_SIZE_PX,
-                height: PROFILE_PHOTO_SIZE_PX,
-              }}
-            />
-            <Skeleton className="h-40 w-full rounded-2xl" />
+            <Skeleton className="h-56 w-full rounded-2xl" />
+            <Skeleton className="h-14 w-full rounded-2xl" />
           </div>
         ) : loadError || !profile ? (
           <div className="space-y-4">
@@ -169,60 +172,61 @@ export function ProfileScreen() {
           </div>
         ) : (
           <AccountFormEditContent>
-            <div
-              className="flex flex-col"
-              style={{ gap: ACCOUNT_FORM_SECTION_GAP_PX }}
-            >
-              <ProfilePhotoField
-                avatarUrl={profile.avatarUrl}
-                onSave={handlePhotoSave}
-              />
-
-              <AccountFormSections>
-                <AccountFormSection title={t("more.profile.detailsSection")}>
-                  <AccountFormEditableField
-                    id="fullName"
-                    label={t("more.profile.name")}
-                    value={profile.fullName ?? ""}
-                    placeholder={t("more.profile.namePlaceholder")}
-                    mode="text"
-                    onSave={(value) => {
-                      void handleNameSave(value);
-                    }}
+            <AccountFormSections>
+              <AccountFormSection
+                title={t("more.profile.detailsSection")}
+                leading={
+                  <ProfilePhotoField
+                    avatarUrl={profile.avatarUrl}
+                    onSave={handlePhotoSave}
+                    onRemove={handlePhotoRemove}
                   />
-                  <AccountFormDateField
-                    id="birthdate"
-                    label={t("more.profile.birthdate")}
-                    value={profile.birthdate ?? ""}
-                    placeholder={t("more.profile.birthdatePlaceholder")}
-                    locale={locale}
-                    maxDate={todayIsoDate()}
-                    onChange={(value) => {
-                      void handleBirthdateSave(value);
-                    }}
-                  />
-                  <GenderPicker
-                    id="gender"
-                    label={t("more.profile.gender")}
-                    value={profile.gender}
-                    onSave={handleGenderSave}
-                  />
-                </AccountFormSection>
-              </AccountFormSections>
-
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-11 w-full justify-start gap-2 px-0 text-destructive hover:bg-transparent hover:text-destructive"
-                onClick={() => {
-                  void handleSignOut();
-                }}
-                disabled={signingOut}
+                }
               >
-                <LogOut className="size-5" aria-hidden />
-                {signingOut ? t("more.profile.signingOut") : t("more.logout")}
-              </Button>
-            </div>
+                <AccountFormEditableField
+                  id="fullName"
+                  label={t("more.profile.name")}
+                  value={profile.fullName ?? ""}
+                  placeholder={t("more.profile.namePlaceholder")}
+                  mode="text"
+                  onSave={(value) => {
+                    void handleNameSave(value);
+                  }}
+                />
+                <AccountFormDateField
+                  id="birthdate"
+                  label={t("more.profile.birthdate")}
+                  value={profile.birthdate ?? ""}
+                  placeholder={t("more.profile.birthdatePlaceholder")}
+                  locale={locale}
+                  maxDate={todayIsoDate()}
+                  onChange={(value) => {
+                    void handleBirthdateSave(value);
+                  }}
+                />
+                <GenderPicker
+                  id="gender"
+                  label={t("more.profile.gender")}
+                  value={profile.gender}
+                  onSave={handleGenderSave}
+                />
+              </AccountFormSection>
+
+              <AccountFormSection>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-11 w-full justify-start gap-2 px-0 text-destructive hover:bg-transparent hover:text-destructive"
+                  onClick={() => {
+                    void handleSignOut();
+                  }}
+                  disabled={signingOut}
+                >
+                  <LogOut className="size-5" aria-hidden />
+                  {signingOut ? t("more.profile.signingOut") : t("more.logout")}
+                </Button>
+              </AccountFormSection>
+            </AccountFormSections>
           </AccountFormEditContent>
         )}
       </ScreenBody>

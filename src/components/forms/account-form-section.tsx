@@ -38,7 +38,13 @@ export function AccountFormField({ children, className }: AccountFormFieldProps)
 }
 
 interface AccountFormSectionProps {
-  title: string;
+  /** Optional — omit for titleless action sections (e.g. Sign out). */
+  title?: string;
+  /**
+   * Optional content above the section title (e.g. centered profile avatar).
+   * Not wrapped as a field row.
+   */
+  leading?: ReactNode;
   children: ReactNode;
   className?: string;
 }
@@ -50,6 +56,7 @@ interface AccountFormSectionProps {
  */
 export function AccountFormSection({
   title,
+  leading,
   children,
   className,
 }: AccountFormSectionProps) {
@@ -65,17 +72,35 @@ export function AccountFormSection({
           className,
         )}
       >
-        <h2 className={ACCOUNT_FORM_SECTION_TITLE_CLASS}>{title}</h2>
-        <div
-          className={cn(
-            ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS,
-            ACCOUNT_FORM_SECTION_FIELDS_CLASS,
-          )}
-        >
-          {fields.map((field, index) => (
-            <AccountFormField key={field.key ?? index}>{field}</AccountFormField>
-          ))}
-        </div>
+        {leading ? (
+          <div className="flex justify-center">{leading}</div>
+        ) : null}
+        {title ? (
+          <h2
+            className={cn(
+              ACCOUNT_FORM_SECTION_TITLE_CLASS,
+              leading ? ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS : undefined,
+            )}
+          >
+            {title}
+          </h2>
+        ) : null}
+        {fields.length > 0 ? (
+          <div
+            className={cn(
+              title || leading
+                ? ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS
+                : undefined,
+              ACCOUNT_FORM_SECTION_FIELDS_CLASS,
+            )}
+          >
+            {fields.map((field, index) => (
+              <AccountFormField key={field.key ?? index}>
+                {field}
+              </AccountFormField>
+            ))}
+          </div>
+        ) : null}
       </section>
     </SurfaceStateProvider>
   );
