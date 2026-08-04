@@ -1,6 +1,7 @@
 import { Children, isValidElement, type ReactNode } from "react";
 
 import {
+  ACCOUNT_FORM_ACTION_CONTENT_OPTICAL_OFFSET_CLASS,
   ACCOUNT_FORM_FIELD_ROW_CLASS,
   ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS,
   ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS,
@@ -117,7 +118,13 @@ export function AccountFormSection({
           >
             {fields.map((field, index) => (
               <div key={field.key ?? index} className={fieldRowClass}>
-                {field}
+                {isActionSection ? (
+                  <div className={ACCOUNT_FORM_ACTION_CONTENT_OPTICAL_OFFSET_CLASS}>
+                    {field}
+                  </div>
+                ) : (
+                  field
+                )}
               </div>
             ))}
           </div>

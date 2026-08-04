@@ -2,7 +2,7 @@
 
 import { Camera, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useId, useState } from "react";
 
 import { ConfirmBottomSheet } from "@/components/ui/confirm-bottom-sheet";
 import { IconButton } from "@/components/ui/icon-button";
@@ -27,7 +27,7 @@ export function ProfilePhotoField({
   onRemove,
 }: ProfilePhotoFieldProps) {
   const t = useT();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -41,12 +41,9 @@ export function ProfilePhotoField({
     ? null
     : (optimisticPreview ?? avatarUrl);
   const busy = disabled || saving || removing;
-
-  function openPicker() {
-    if (busy) return;
-    setError(null);
-    inputRef.current?.click();
-  }
+  const pickerLabel = displayUrl
+    ? t("more.profile.photoChange")
+    : t("more.profile.photoUpload");
 
   async function handleFileChange(fileList: FileList | null) {
     const file = fileList?.[0];
@@ -114,35 +111,51 @@ export function ProfilePhotoField({
           height: PROFILE_PHOTO_SIZE_PX,
         }}
       >
-        <button
-          type="button"
-          disabled={busy}
-          onClick={openPicker}
-          aria-label={
-            displayUrl
-              ? t("more.profile.photoChange")
-              : t("more.profile.photoUpload")
-          }
+        <label
+          htmlFor={busy ? undefined : inputId}
+          aria-label={pickerLabel}
           className={cn(
-            "absolute inset-0 inline-flex items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground transition-opacity",
-            "[&_img]:pointer-events-none [&_svg]:pointer-events-none",
-            busy && "pointer-events-none opacity-60",
+            "absolute inset-0 overflow-hidden rounded-full bg-muted text-muted-foreground transition-opacity",
+            busy ? "pointer-events-none opacity-60" : "cursor-pointer",
           )}
         >
-          {displayUrl ? (
-            <Image
-              key={displayUrl}
-              src={displayUrl}
-              alt=""
-              fill
-              unoptimized
-              draggable={false}
-              className="pointer-events-none object-cover"
-            />
-          ) : (
-            <Camera className="pointer-events-none size-10" aria-hidden />
-          )}
-        </button>
+          {/* Decorative layer — never owns the gesture. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 inline-flex items-center justify-center [&_img]:pointer-events-none [&_svg]:pointer-events-none"
+          >
+            {displayUrl ? (
+              <Image
+                key={displayUrl}
+                src={displayUrl}
+                alt=""
+                fill
+                unoptimized
+                draggable={false}
+                className="pointer-events-none object-cover"
+              />
+            ) : (
+              <Camera className="pointer-events-none size-10" aria-hidden />
+            )}
+          </span>
+
+          {/*
+            Native label/input association: input covers the circle so the
+            gesture targets the file control directly (reliable on iOS PWA).
+          */}
+          <input
+            id={inputId}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            disabled={busy}
+            aria-label={pickerLabel}
+            className="absolute inset-0 z-[1] h-full w-full cursor-pointer opacity-0"
+            onChange={(event) => {
+              void handleFileChange(event.target.files);
+              event.target.value = "";
+            }}
+          />
+        </label>
 
         {displayUrl ? (
           <IconButton
@@ -157,6 +170,7 @@ export function ProfilePhotoField({
               CARD_SURFACE_BG_CLASS,
             )}
             onClick={(event) => {
+              event.preventDefault();
               event.stopPropagation();
               if (busy) return;
               setConfirmOpen(true);
@@ -172,17 +186,6 @@ export function ProfilePhotoField({
           {error}
         </p>
       ) : null}
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="sr-only"
-        onChange={(event) => {
-          void handleFileChange(event.target.files);
-          event.target.value = "";
-        }}
-      />
 
       <ConfirmBottomSheet
         open={confirmOpen}

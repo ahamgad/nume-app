@@ -49,6 +49,13 @@ export const ACCOUNT_FORM_FIELD_ROW_CLASS =
  */
 export const ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS = "py-4";
 
+/**
+ * Optical vertical nudge for titleless action row content.
+ * Compensates typographic/icon ink sitting high in the line box without changing
+ * padding tokens ({@link ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS}).
+ */
+export const ACCOUNT_FORM_ACTION_CONTENT_OPTICAL_OFFSET_CLASS = "translate-y-0.5";
+
 export const ACCOUNT_FORM_DISABLED_CLASS =
   "pointer-events-none opacity-60";
 

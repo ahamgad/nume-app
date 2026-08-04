@@ -40,6 +40,9 @@ describe("account forms foundation", () => {
     );
     expect(sectionSource).toContain("ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS");
     expect(sectionSource).toContain("ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS");
+    expect(sectionSource).toContain(
+      "ACCOUNT_FORM_ACTION_CONTENT_OPTICAL_OFFSET_CLASS",
+    );
   });
 
   it("uses account form field wrappers in form modules", () => {

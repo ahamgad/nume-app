@@ -689,7 +689,7 @@ Location: `components/forms/account-form-section.tsx`, `components/forms/account
 5. **Section padding** — titled/leading: `ACCOUNT_FORM_SECTION_PADDING_PX` = 16px on all sides via `ACCOUNT_FORM_SECTION_PADDING_CLASS`. Titleless action: horizontal only via `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS`
 6. **Title → first field** — `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_GAP_PX` = 16px via `ACCOUNT_FORM_SECTION_TITLE_TO_FIELDS_CLASS` (`mt-4`); same 16px rhythm for leading → title and title/leading → fields
 7. **Field → divider** — `ACCOUNT_FORM_FIELD_DIVIDER_GAP_PX` = 16px via `ACCOUNT_FORM_FIELD_ROW_CLASS` (`py-4`); titled/leading sections flush first/last edges with `first:pt-0 last:pb-0`
-7a. **Titleless action sections** — `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS` (`px-4`) + `ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS` (`py-4` both sides). Vertical rhythm is owned by the field row so section and row padding do not stack
+7a. **Titleless action sections** — `ACCOUNT_FORM_SECTION_ACTION_PADDING_CLASS` (`px-4`) + `ACCOUNT_FORM_FIELD_ROW_STANDALONE_CLASS` (`py-4` both sides). Vertical rhythm is owned by the field row so section and row padding do not stack. Action row content also applies `ACCOUNT_FORM_ACTION_CONTENT_OPTICAL_OFFSET_CLASS` (`translate-y-0.5`) for optical centering without changing padding tokens
 8. **Divider → field** — same 16px row padding; first row `pt-0`, last row `pb-0` when a title/leading owns the outer rhythm (title/section padding owns outer edges)
 9. **Shared section component** — `AccountFormSection` + `AccountFormField`; screens compose only
 10. **Account form field wrappers** — `AccountFormEditableField`, `AccountFormInstitutionPicker`, etc. in `account-form-field.tsx`
